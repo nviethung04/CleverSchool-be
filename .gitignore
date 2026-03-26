@@ -1,0 +1,12 @@
+.env
+myapp
+public
+power_point/*
+!power_point/test/
+!power_point/lesson-sample
+scorm/*
+scorm-packages/*
+logs
+.DS_Store
+power_point
+node_modules
