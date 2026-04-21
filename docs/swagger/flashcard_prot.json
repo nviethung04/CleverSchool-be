@@ -1,0 +1,977 @@
+{
+    "VocabularyDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Vocabulary ID"
+            },
+            "word": {
+                "type": "string",
+                "description": "The vocabulary word",
+                "example": "hello"
+            },
+            "phonetic": {
+                "type": "string",
+                "description": "Phonetic transcription",
+                "example": "/həˈloʊ/"
+            },
+            "translation": {
+                "type": "string",
+                "description": "Translation in native language",
+                "example": "xin chào"
+            },
+            "definition": {
+                "type": "string",
+                "description": "Definition of the word",
+                "example": "A greeting used when meeting someone"
+            },
+            "part_of_speech": {
+                "type": "string",
+                "description": "Part of speech",
+                "enum": [
+                    "noun",
+                    "verb",
+                    "adjective",
+                    "adverb",
+                    "pronoun",
+                    "preposition",
+                    "conjunction",
+                    "interjection"
+                ],
+                "example": "interjection"
+            },
+            "level": {
+                "type": "string",
+                "enum": [
+                    "beginner",
+                    "intermediate",
+                    "advanced"
+                ],
+                "description": "Difficulty level",
+                "example": "beginner"
+            },
+            "tags": {
+                "type": "string",
+                "description": "Comma-separated tags",
+                "example": "greeting,basic,daily"
+            },
+            "difficulty": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "Difficulty rating (1-5)",
+                "example": 2
+            },
+            "frequency": {
+                "type": "integer",
+                "description": "Usage frequency",
+                "example": 100
+            },
+            "word_audio": {
+                "$ref": "#/components/schemas/MediaDTO"
+            },
+            "image": {
+                "$ref": "#/components/schemas/MediaDTO"
+            },
+            "example_audio": {
+                "$ref": "#/components/schemas/MediaDTO"
+            },
+            "example_sentence": {
+                "type": "string",
+                "description": "Example sentence",
+                "example": "Hello, how are you today?"
+            },
+            "example_translation": {
+                "type": "string",
+                "description": "Translation of example sentence",
+                "example": "Xin chào, hôm nay bạn khỏe không?"
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time"
+            },
+            "updated_at": {
+                "type": "string",
+                "format": "date-time"
+            }
+        },
+        "required": [
+            "id",
+            "word",
+            "translation"
+        ]
+    },
+    "MediaDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "file_name": {
+                "type": "string",
+                "example": "hello.mp3"
+            },
+            "file_path": {
+                "type": "string",
+                "example": "/audio/vocabulary/"
+            },
+            "full_path": {
+                "type": "string",
+                "example": "/audio/vocabulary/hello.mp3"
+            },
+            "file_type": {
+                "type": "string",
+                "example": "audio/mpeg"
+            },
+            "file_size": {
+                "type": "integer",
+                "format": "int64",
+                "example": 524288
+            },
+            "url": {
+                "type": "string",
+                "example": "https://cdn.example.com/audio/vocabulary/hello.mp3"
+            }
+        }
+    },
+    "StudentVocabularyProgressDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "student_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "vocabulary_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "new",
+                    "learning",
+                    "known",
+                    "mastered"
+                ],
+                "description": "Learning status",
+                "example": "learning"
+            },
+            "is_known": {
+                "type": "boolean",
+                "description": "Student marked as known",
+                "example": false
+            },
+            "study_count": {
+                "type": "integer",
+                "description": "Number of study sessions",
+                "example": 5
+            },
+            "correct_count": {
+                "type": "integer",
+                "description": "Number of correct attempts",
+                "example": 3
+            },
+            "last_studied_at": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "mastered_at": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "pronunciation_score": {
+                "type": "number",
+                "format": "float",
+                "minimum": 0,
+                "maximum": 100,
+                "nullable": true,
+                "example": 85.5
+            },
+            "best_pronunciation_score": {
+                "type": "number",
+                "format": "float",
+                "minimum": 0,
+                "maximum": 100,
+                "nullable": true,
+                "example": 92.3
+            },
+            "pronunciation_attempts": {
+                "type": "integer",
+                "description": "Number of pronunciation attempts",
+                "example": 8
+            },
+            "vocabulary": {
+                "$ref": "#/components/schemas/VocabularyDTO"
+            }
+        }
+    },
+    "LessonVocabularyDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "vocabulary_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "sort_order": {
+                "type": "integer",
+                "description": "Order in lesson",
+                "example": 1
+            },
+            "is_required": {
+                "type": "boolean",
+                "description": "Required to complete lesson",
+                "example": true
+            },
+            "vocabulary": {
+                "$ref": "#/components/schemas/VocabularyDTO"
+            },
+            "progress": {
+                "$ref": "#/components/schemas/StudentVocabularyProgressDTO"
+            }
+        }
+    },
+    "FlashcardLessonDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "title": {
+                "type": "string",
+                "example": "Greetings and Introductions"
+            },
+            "description": {
+                "type": "string",
+                "example": "Learn basic greeting vocabulary"
+            },
+            "total_vocabularies": {
+                "type": "integer",
+                "description": "Total vocabulary count",
+                "example": 20
+            },
+            "new_vocabularies": {
+                "type": "integer",
+                "description": "New vocabulary count",
+                "example": 5
+            },
+            "learning_vocabularies": {
+                "type": "integer",
+                "description": "Learning vocabulary count",
+                "example": 8
+            },
+            "known_vocabularies": {
+                "type": "integer",
+                "description": "Known vocabulary count",
+                "example": 4
+            },
+            "mastered_vocabularies": {
+                "type": "integer",
+                "description": "Mastered vocabulary count",
+                "example": 3
+            },
+            "last_session_at": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "total_sessions": {
+                "type": "integer",
+                "description": "Total study sessions",
+                "example": 12
+            },
+            "vocabularies": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/LessonVocabularyDTO"
+                }
+            }
+        }
+    },
+    "FlashcardSessionDTO": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "student_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "total_cards": {
+                "type": "integer",
+                "description": "Total cards in session",
+                "example": 20
+            },
+            "completed_cards": {
+                "type": "integer",
+                "description": "Completed cards count",
+                "example": 15
+            },
+            "known_cards": {
+                "type": "integer",
+                "description": "Cards marked as known",
+                "example": 8
+            },
+            "study_duration": {
+                "type": "integer",
+                "description": "Study duration in seconds",
+                "example": 1200
+            },
+            "session_score": {
+                "type": "number",
+                "format": "float",
+                "description": "Overall session score",
+                "example": 87.5
+            },
+            "started_at": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "completed_at": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time"
+            },
+            "progress_percentage": {
+                "type": "number",
+                "format": "float",
+                "description": "Progress percentage (0-100)",
+                "example": 75.0
+            }
+        }
+    },
+    "FlashcardStatsDTO": {
+        "type": "object",
+        "properties": {
+            "student_id": {
+                "type": "integer",
+                "format": "int64"
+            },
+            "total_vocabularies": {
+                "type": "integer",
+                "example": 150
+            },
+            "new_vocabularies": {
+                "type": "integer",
+                "example": 20
+            },
+            "learning_vocabularies": {
+                "type": "integer",
+                "example": 45
+            },
+            "known_vocabularies": {
+                "type": "integer",
+                "example": 60
+            },
+            "mastered_vocabularies": {
+                "type": "integer",
+                "example": 25
+            },
+            "total_sessions": {
+                "type": "integer",
+                "example": 48
+            },
+            "total_study_time": {
+                "type": "integer",
+                "description": "Total study time in seconds",
+                "example": 28800
+            },
+            "average_score": {
+                "type": "number",
+                "format": "float",
+                "example": 84.2
+            },
+            "best_score": {
+                "type": "number",
+                "format": "float",
+                "example": 96.5
+            },
+            "studied_today": {
+                "type": "integer",
+                "example": 5
+            },
+            "studied_this_week": {
+                "type": "integer",
+                "example": 25
+            },
+            "last_study_date": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+            },
+            "current_streak": {
+                "type": "integer",
+                "description": "Consecutive study days",
+                "example": 7
+            },
+            "longest_streak": {
+                "type": "integer",
+                "description": "Longest consecutive study days",
+                "example": 14
+            },
+            "average_pronunciation_score": {
+                "type": "number",
+                "format": "float",
+                "example": 78.9
+            },
+            "best_pronunciation_score": {
+                "type": "number",
+                "format": "float",
+                "example": 95.2
+            }
+        }
+    },
+    "CreateVocabularyRequest": {
+        "type": "object",
+        "properties": {
+            "word": {
+                "type": "string",
+                "description": "The vocabulary word",
+                "example": "hello"
+            },
+            "phonetic": {
+                "type": "string",
+                "description": "Phonetic transcription",
+                "example": "/həˈloʊ/"
+            },
+            "translation": {
+                "type": "string",
+                "description": "Translation in native language",
+                "example": "xin chào"
+            },
+            "definition": {
+                "type": "string",
+                "description": "Definition of the word"
+            },
+            "part_of_speech": {
+                "type": "string",
+                "enum": [
+                    "noun",
+                    "verb",
+                    "adjective",
+                    "adverb",
+                    "pronoun",
+                    "preposition",
+                    "conjunction",
+                    "interjection"
+                ]
+            },
+            "level": {
+                "type": "string",
+                "enum": [
+                    "beginner",
+                    "intermediate",
+                    "advanced"
+                ],
+                "default": "beginner"
+            },
+            "tags": {
+                "type": "string",
+                "description": "Comma-separated tags"
+            },
+            "difficulty": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "default": 1
+            },
+            "frequency": {
+                "type": "integer",
+                "default": 0
+            },
+            "word_audio_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true,
+                "description": "ID of word pronunciation audio file"
+            },
+            "image_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true,
+                "description": "ID of illustration image"
+            },
+            "example_audio_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true,
+                "description": "ID of example sentence audio file"
+            },
+            "example_sentence": {
+                "type": "string",
+                "description": "Example sentence using the word"
+            },
+            "example_translation": {
+                "type": "string",
+                "description": "Translation of example sentence"
+            }
+        },
+        "required": [
+            "word",
+            "translation"
+        ]
+    },
+    "UpdateVocabularyRequest": {
+        "type": "object",
+        "properties": {
+            "word": {
+                "type": "string",
+                "nullable": true
+            },
+            "phonetic": {
+                "type": "string",
+                "nullable": true
+            },
+            "translation": {
+                "type": "string",
+                "nullable": true
+            },
+            "definition": {
+                "type": "string",
+                "nullable": true
+            },
+            "part_of_speech": {
+                "type": "string",
+                "enum": [
+                    "noun",
+                    "verb",
+                    "adjective",
+                    "adverb",
+                    "pronoun",
+                    "preposition",
+                    "conjunction",
+                    "interjection"
+                ],
+                "nullable": true
+            },
+            "level": {
+                "type": "string",
+                "enum": [
+                    "beginner",
+                    "intermediate",
+                    "advanced"
+                ],
+                "nullable": true
+            },
+            "tags": {
+                "type": "string",
+                "nullable": true
+            },
+            "difficulty": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "nullable": true
+            },
+            "frequency": {
+                "type": "integer",
+                "nullable": true
+            },
+            "word_audio_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true
+            },
+            "image_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true
+            },
+            "example_audio_id": {
+                "type": "integer",
+                "format": "int64",
+                "nullable": true
+            },
+            "example_sentence": {
+                "type": "string",
+                "nullable": true
+            },
+            "example_translation": {
+                "type": "string",
+                "nullable": true
+            }
+        }
+    },
+    "AddVocabularyToLessonRequest": {
+        "type": "object",
+        "properties": {
+            "vocabulary_ids": {
+                "type": "array",
+                "items": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "description": "Array of vocabulary IDs to add"
+            },
+            "sort_order": {
+                "type": "integer",
+                "description": "Starting sort order",
+                "default": 0
+            },
+            "is_required": {
+                "type": "boolean",
+                "description": "Whether vocabularies are required",
+                "default": true
+            }
+        },
+        "required": [
+            "vocabulary_ids"
+        ]
+    },
+    "StartFlashcardSessionRequest": {
+        "type": "object",
+        "properties": {
+            "lesson_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Lesson ID to study"
+            }
+        },
+        "required": [
+            "lesson_id"
+        ]
+    },
+    "CompleteFlashcardSessionRequest": {
+        "type": "object",
+        "properties": {
+            "study_duration": {
+                "type": "integer",
+                "description": "Study duration in seconds",
+                "example": 1200
+            },
+            "session_score": {
+                "type": "number",
+                "format": "float",
+                "description": "Overall session score",
+                "example": 87.5
+            }
+        }
+    },
+    "RecordFlashcardActivityRequest": {
+        "type": "object",
+        "properties": {
+            "activity_type": {
+                "type": "string",
+                "enum": [
+                    "view",
+                    "flip",
+                    "mark_known",
+                    "mark_unknown",
+                    "pronunciation"
+                ],
+                "description": "Type of activity performed"
+            },
+            "response": {
+                "type": "string",
+                "description": "Activity response",
+                "example": "known"
+            },
+            "response_time": {
+                "type": "integer",
+                "description": "Response time in milliseconds",
+                "example": 2500
+            },
+            "pronunciation_score": {
+                "type": "number",
+                "format": "float",
+                "minimum": 0,
+                "maximum": 100,
+                "nullable": true,
+                "description": "Pronunciation score if applicable"
+            }
+        },
+        "required": [
+            "activity_type"
+        ]
+    },
+    "UpdateVocabularyProgressRequest": {
+        "type": "object",
+        "properties": {
+            "is_known": {
+                "type": "boolean",
+                "description": "Student knows this vocabulary"
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "new",
+                    "learning",
+                    "known",
+                    "mastered"
+                ],
+                "description": "Learning status"
+            }
+        },
+        "required": [
+            "is_known",
+            "status"
+        ]
+    },
+    "PronunciationAssessmentRequest": {
+        "type": "object",
+        "properties": {
+            "vocabulary_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Vocabulary ID"
+            },
+            "audio_data": {
+                "type": "string",
+                "description": "Base64 encoded audio data"
+            },
+            "word_type": {
+                "type": "string",
+                "enum": [
+                    "word",
+                    "sentence"
+                ],
+                "description": "Type of pronunciation (word or sentence)",
+                "default": "word"
+            }
+        },
+        "required": [
+            "vocabulary_id",
+            "audio_data"
+        ]
+    },
+    "VocabularyResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Vocabulary retrieved successfully"
+            },
+            "data": {
+                "$ref": "#/components/schemas/VocabularyDTO"
+            }
+        }
+    },
+    "VocabularyListResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Vocabularies retrieved successfully"
+            },
+            "data": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/VocabularyDTO"
+                }
+            },
+            "pagination": {
+                "$ref": "#/components/schemas/PaginationMeta"
+            }
+        }
+    },
+    "FlashcardLessonResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Lesson flashcards retrieved successfully"
+            },
+            "data": {
+                "$ref": "#/components/schemas/FlashcardLessonDTO"
+            }
+        }
+    },
+    "FlashcardSessionResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Session started successfully"
+            },
+            "data": {
+                "$ref": "#/components/schemas/FlashcardSessionDTO"
+            }
+        }
+    },
+    "StudentVocabularyProgressResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Progress updated successfully"
+            },
+            "data": {
+                "$ref": "#/components/schemas/StudentVocabularyProgressDTO"
+            }
+        }
+    },
+    "FlashcardStatsResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Statistics retrieved successfully"
+            },
+            "data": {
+                "$ref": "#/components/schemas/FlashcardStatsDTO"
+            }
+        }
+    },
+    "PronunciationAssessmentResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Pronunciation assessed successfully"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "vocabulary_id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "score": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Pronunciation score (0-100)",
+                        "example": 87.5
+                    },
+                    "feedback": {
+                        "type": "string",
+                        "description": "Pronunciation feedback",
+                        "example": "Good pronunciation! Try to emphasize the 'o' sound more."
+                    },
+                    "accuracy": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Pronunciation accuracy percentage",
+                        "example": 92.3
+                    },
+                    "mistakes": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "phoneme": {
+                                    "type": "string",
+                                    "example": "oʊ"
+                                },
+                                "expected": {
+                                    "type": "string",
+                                    "example": "/oʊ/"
+                                },
+                                "actual": {
+                                    "type": "string",
+                                    "example": "/ɔː/"
+                                },
+                                "confidence": {
+                                    "type": "number",
+                                    "format": "float",
+                                    "example": 0.75
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "PaginationMeta": {
+        "type": "object",
+        "properties": {
+            "current_page": {
+                "type": "integer",
+                "example": 1
+            },
+            "per_page": {
+                "type": "integer",
+                "example": 20
+            },
+            "total": {
+                "type": "integer",
+                "example": 150
+            },
+            "total_pages": {
+                "type": "integer",
+                "example": 8
+            },
+            "has_next": {
+                "type": "boolean",
+                "example": true
+            },
+            "has_prev": {
+                "type": "boolean",
+                "example": false
+            }
+        }
+    },
+    "SuccessResponse": {
+        "type": "object",
+        "properties": {
+            "success": {
+                "type": "boolean",
+                "example": true
+            },
+            "message": {
+                "type": "string",
+                "example": "Operation completed successfully"
+            }
+        }
+    }
+}

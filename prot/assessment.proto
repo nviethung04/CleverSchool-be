@@ -1,0 +1,317 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "study_report.proto";
+
+// ===== Assessment Messages =====
+message Assessment {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  int64 program_id = 5;
+  int64 created_at = 6;
+  int64 created_by = 7;
+  int64 updated_at = 8;
+  int64 updated_by = 9;
+  // các field meta
+  repeated AssessmentFileInfo file_infos = 10;
+  repeated string files = 11;
+  int64 study_report_criteria_id = 12;
+  int64 subject_id = 13;
+  int64 assessment_criteria_group_id = 14;
+  string assessment_criteria_group_name = 15;
+  string study_report_criteria_name = 16;
+  string subject_name = 17;
+  // Các trường từ assessment_ref_lessons (khi có course_id)
+  int64 lesson_id = 19;
+  string lesson_title = 20;
+  bool is_assigned = 21; // true nếu assigned_at IS NOT NULL
+  bool has_file = 22; // true nếu có file
+  // criteria để cuối cùng
+  repeated AssessmentCriterion criteria = 18;
+  repeated int64 publish_course_ids = 23;
+}
+
+message AssessmentRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  int64 program_id = 5;
+  repeated AssessmentFileInfo file_infos = 6;
+  int64 assessment_criteria_group_id = 7;
+  repeated int64 assessment_criteria_ids = 8;
+  int64 study_report_criteria_id = 9;
+  int64 subject_id = 10;
+  bool has_file = 11; // true nếu có file
+  // Nếu truyền vào khi create: tạo assessment mới bằng cách copy từ assessment này (các trường khác không cần truyền)
+  int64 copy_from_assessment_id = 12;
+}
+
+message AssessmentListResponse {
+  repeated Assessment assessments = 1;
+  int64 total = 2;
+}
+
+// ===== Assessment Students by Course =====
+message AssessmentStudentItem {
+  int64 student_id = 1;
+  string student_name = 2;
+  Assessment assessment = 3;
+  float total_score = 4; // Tổng điểm (chỉ có khi get_score=true)
+  repeated string files = 5; // Danh sách URL bài làm (chỉ có khi get_score=true)
+  bool is_scored = 6; // true nếu đã có điểm trong assessment_scores, false nếu chưa
+  repeated AssessmentFileInfo file_infos = 7; // Thông tin file gốc từ DB
+  StudyReportCriteria study_report_criteria = 8; // Tiêu chí study report (chỉ có khi get_study_report_criteria=true)
+  string general_comment = 9; // Nhận xét chung từ bảng study_reports
+}
+
+message AssessmentCourseInfo {
+  string name = 1;
+  string object_title = 2;
+  string teacher_names = 3; // Danh sách tên giáo viên phân cách bởi dấu phẩy
+}
+
+message AssessmentStudentListResponse {
+  repeated AssessmentStudentItem students = 1;
+  int64 total = 2;
+  AssessmentCourseInfo course_info = 3;
+}
+
+// ===== Assessment Report (Dashboard) =====
+// Dùng cho API /api/dashboard/assessment/report
+message AssessmentReportInfo {
+  string school_name = 1;
+  string class_name  = 2;
+  string program_name = 3;
+  string school_logo = 4; // URL logo của trường (từ schools.logo_info)
+  string vn_teacher = 5;  // Tên các giáo viên tiếng Việt (type_teacher = 1), phân cách bởi dấu phẩy
+  string fr_teacher = 6;  // Tên các giáo viên tiếng Pháp (type_teacher = 2), phân cách bởi dấu phẩy
+}
+
+// Thống kê số lượng học sinh theo mức điểm trong báo cáo
+message AssessmentReportStatistic {
+  int64 unscored          = 1; // Chưa được chấm xong
+  int64 from_0_to_50      = 2; // Tổng điểm < 50
+  int64 from_50_to_70     = 3; // 50 <= tổng điểm < 70
+  int64 from_70_to_80     = 4; // 70 <= tổng điểm < 80
+  int64 from_80_to_100    = 5; // Tổng điểm >= 80
+}
+
+message AssessmentReportResponse {
+  AssessmentReportInfo info = 1;
+  repeated AssessmentStudentItem students = 2;
+  int64 total = 3;
+  AssessmentReportStatistic statistic = 4;
+}
+
+// ===== Dashboard Student Assessments =====
+message DashboardStudentAssessmentItem {
+  Assessment assessment = 1;
+  bool is_scored = 2; // true nếu đã có điểm trong assessment_scores, false nếu chưa
+  float total_score = 3; // Tổng điểm (chỉ có khi đã chấm)
+  repeated string files = 4; // Danh sách URL bài làm (chỉ có khi đã chấm)
+}
+
+message DashboardStudentAssessmentListResponse {
+  repeated DashboardStudentAssessmentItem assessments = 1;
+  int64 total = 2;
+}
+
+// ===== Assessment Criterion Messages =====
+message AssessmentCriterion {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  bool has_subcriteria = 5;
+  float max_score = 6;
+  int64 created_at = 7;
+  int64 created_by = 8;
+  int64 updated_at = 9;
+  int64 updated_by = 10;
+  repeated AssessmentCriterionSubItem subcriteria = 11;
+  float score = 12; // Điểm của học sinh (chỉ có khi get_score=true)
+}
+
+message AssessmentCriterionSubItem {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  float max_score = 4;
+  float score = 5; // Điểm của học sinh (chỉ có khi get_score=true)
+}
+
+message AssessmentCriterionRequest {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  bool has_subcriteria = 5;
+  float max_score = 6;
+}
+
+message AssessmentCriterionListResponse {
+  repeated AssessmentCriterion criteria = 1;
+  int64 total = 2;
+}
+
+message AssessmentCriteriaGroup {
+  int64 id = 1;
+  string name = 2;
+  int64 subject_id = 3;
+  int64 created_at = 4;
+  int64 created_by = 5;
+  int64 updated_at = 6;
+  int64 updated_by = 7;
+  bool has_file = 9; // true nếu có file
+  repeated AssessmentCriterion criteria = 8;
+}
+
+message AssessmentCriteriaGroupRequest {
+  int64 id = 1;
+  string name = 2;
+  int64 subject_id = 3;
+  repeated int64 criteria_ids = 4;
+  bool has_file = 5; // true nếu có file
+  // Khi create: tạo bản ghi mới bằng cách copy từ group có ID này (các trường khác không cần truyền)
+  int64 copy_from_assessment_criteria_group_id = 6;
+}
+
+message AssessmentCriteriaGroupListResponse {
+  repeated AssessmentCriteriaGroup groups = 1;
+  int64 total = 2;
+}
+
+// ===== Assessment Subcriterion Messages =====
+message AssessmentSubcriterion {
+  int64 id = 1;
+  int64 criterion_id = 2;
+  string name = 3;
+  string description = 4;
+  float max_score = 5;
+  int64 created_at = 6;
+  int64 created_by = 7;
+  int64 updated_at = 8;
+  int64 updated_by = 9;
+}
+
+message AssessmentSubcriterionRequest {
+  int64 id = 1;
+  int64 criterion_id = 2;
+  string name = 3;
+  string description = 4;
+  float max_score = 5;
+}
+
+message AssessmentSubcriterionListResponse {
+  repeated AssessmentSubcriterion subcriteria = 1;
+  int64 total = 2;
+}
+
+// ===== Input Messages for Bulk Creation =====
+message AssessmentSubcriterionInput {
+  int64 id = 1;  // 0 = create new, > 0 = update existing
+  string name = 2;
+  string description = 3;
+  float max_score = 4;
+}
+
+message AssessmentCriterionInput {
+  int64 id = 1;  // 0 = create new, > 0 = update existing
+  string name = 2;
+  string description = 3;
+  float max_score = 4;
+  repeated AssessmentSubcriterionInput subcriteria = 5;
+}
+
+message AssessmentSubcriterionItem {
+  string name = 1;
+  string description = 2;
+  float max_score = 3;
+}
+
+message AssessmentCriterionItem {
+  string name = 1;
+  string description = 2;
+  bool has_subcriteria = 3;
+  float max_score = 4;
+  repeated AssessmentSubcriterionItem subcriteria = 5;
+}
+
+// ===== Request Messages =====
+message CreateAssessmentWithCriteriaRequest {
+  AssessmentRequest assessment = 1;
+  int64 lesson_id = 2;
+  int64 course_id = 3;
+  repeated AssessmentCriterionInput criteria = 4;
+}
+
+message CreateAssessmentCriteriaRequest {
+  int64 subject_id = 1;
+  int64 assessment_id = 2; // optional
+  repeated AssessmentCriterionItem criteria = 3;
+}
+
+message CreateAssessmentCriteriaGroupWithCriteriaRequest {
+  AssessmentCriteriaGroupRequest group = 1;
+  repeated AssessmentCriterionInput criteria = 2;
+}
+
+message AssessmentFileInfo {
+  int64 id = 1;
+  string disk = 2;
+  string path = 3;
+  string url = 4;
+}
+
+// ===== Assessment Score Messages =====
+message AssessmentScoreSubcriterionInput {
+  int64 subcriteria_id = 1;
+  float score = 2;
+}
+
+message AssessmentScoreCriterionInput {
+  int64 criteria_id = 1;
+  float score = 2;
+  repeated AssessmentScoreSubcriterionInput subcriteria = 3;
+}
+
+message AssessmentScoreStudentInput {
+  int64 user_id = 1;
+  repeated AssessmentScoreCriterionInput criteria = 2;
+  repeated AssessmentFileInfo file_infos = 3;
+}
+
+message SaveAssessmentScoreBulkRequest {
+  int64 assessment_id = 1;
+  int64 lesson_id = 2;
+  int64 course_id = 3;
+  repeated AssessmentScoreStudentInput students = 4;
+}
+
+message GetPublishAssessmentResponse {
+  int64 course_id = 1;
+  int64 assessment_id = 2;
+  bool publish = 3;
+}
+
+message UpdatePublishAssessmentRequest {
+  int64 assessment_id = 1;
+  int64 course_id = 2;
+  repeated int64 publish_course_ids = 3;
+  bool publish = 4;
+}
+
+message UpdatePublishAssessmentResponse {
+  int64 assessment_id = 1;
+  int64 course_id = 2;
+  repeated int64 publish_course_ids = 3;
+  bool publish = 4;
+}
+
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative assessment.proto

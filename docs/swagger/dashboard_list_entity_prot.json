@@ -1,0 +1,155 @@
+{
+  "DashboardCourseListItem": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học"
+      },
+      "name": {
+        "type": "string",
+        "description": "Tên khóa học"
+      },
+      "object_title": {
+        "type": "string",
+        "description": "Tiêu đề hiển thị"
+      },
+      "parent_course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học cha (0 nếu là cấp cao nhất)"
+      }
+    }
+  },
+  "DashboardCourseListResponseSchema": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "integer",
+        "example": 200
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/DashboardCourseListItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số khóa học phù hợp"
+          }
+        }
+      },
+      "message": {
+        "type": "string",
+        "example": "success"
+      }
+    }
+  },
+  "DashboardClassListItem": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID lớp học"
+      },
+      "class_name": {
+        "type": "string",
+        "description": "Tên lớp học"
+      },
+      "class_main_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID class_main"
+      },
+      "class_main_name": {
+        "type": "string",
+        "description": "Tên class_main"
+      }
+    }
+  },
+  "DashboardClassListResponseSchema": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "integer",
+        "example": 200
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/DashboardClassListItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số lớp học phù hợp"
+          }
+        }
+      },
+      "message": {
+        "type": "string",
+        "example": "success"
+      }
+    }
+  },
+  "DashboardClassMainListItem": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID class_main"
+      },
+      "name": {
+        "type": "string",
+        "description": "Tên class_main"
+      },
+      "school_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID trường học"
+      }
+    }
+  },
+  "DashboardClassMainListResponseSchema": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "integer",
+        "example": 200
+      },
+      "data": {
+        "type": "object",
+        "properties": {
+          "class_mains": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/DashboardClassMainListItem"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Tổng số class_main phù hợp"
+          }
+        }
+      },
+      "message": {
+        "type": "string",
+        "example": "success"
+      }
+    }
+  }
+}
+

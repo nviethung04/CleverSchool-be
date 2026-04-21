@@ -1,0 +1,122 @@
+{
+  "prot.Subject": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "faculty_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "vtg_info": {
+        "$ref": "#/definitions/prot.SubjectVTGInfo"
+      },
+      "training_levels": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.TrainingLevel"
+        }
+      }
+    }
+  },
+  "prot.SubjectVTGInfo": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "enrollment": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "avatar": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.SubjectRequest": {
+    "type": "object",
+    "properties": {
+      "faculty_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "vtg_info": {
+        "$ref": "#/definitions/prot.SubjectVTGInfo"
+      },
+      "training_levels": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.TrainingLevel"
+        }
+      }
+    }
+  },
+  "prot.SubjectListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "subjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Subject"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

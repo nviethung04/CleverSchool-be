@@ -1,0 +1,305 @@
+{
+    "/api/manage/roles": {
+        "get": {
+            "description": "API để lấy danh sách vai trò",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Roles"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách  vai trò",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.RoleListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để  vai trò mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Roles"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo vai trò",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin vai trò",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.RoleRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo vai trò thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Role"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/roles/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết vai trò",
+            "description": "API để lấy thông tin chi tiết của một vai trò theo ID",
+            "tags": [
+                "Roles"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của vai trò"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Role"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết vai trò",
+            "description": "API để cập nhật thông tin chi tiết của một vai trò theo ID",
+            "tags": [
+                "Roles"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của vai trò"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin vai trò",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.Role"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Role"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa vai trò",
+            "description": "API để xóa một vai trò theo ID",
+            "tags": [
+                "Roles"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của vai trò"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa vai trò thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/roles/{id}/permissions": {
+        "get": {
+            "summary": "Lấy thông danh sách quyền theo vai trò",
+            "description": "API để lấy thông tin danh sách quyền theo vai trò theo ID",
+            "tags": [
+                "Roles"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của vai trò"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.RolePermissionResponse"
+                    }
+                }
+            }
+        }
+    }
+}

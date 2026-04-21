@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample PowerPoint Presentation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .slide {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide p {
+            font-size: 1.5em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .slide ul {
+            text-align: left;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        .slide li {
+            margin-bottom: 10px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-number" id="slideNumber">Slide 1 of 3</div>
+
+    <div class="slide" id="slide1">
+        <h1>Welcome to Our Presentation</h1>
+        <p>This is a sample PowerPoint presentation created with HTML, CSS, and JavaScript.</p>
+        <ul>
+            <li>Interactive navigation</li>
+            <li>Beautiful animations</li>
+            <li>Responsive design</li>
+            <li>Modern UI/UX</li>
+        </ul>
+    </div>
+
+    <div class="slide" id="slide2" style="display: none;">
+        <h1>Key Features</h1>
+        <p>Our presentation system offers:</p>
+        <ul>
+            <li>✨ Smooth transitions between slides</li>
+            <li>🎨 Customizable themes and styles</li>
+            <li>📱 Mobile-friendly responsive design</li>
+            <li>⚡ Fast loading and performance</li>
+            <li>🔧 Easy to maintain and update</li>
+        </ul>
+    </div>
+
+    <div class="slide" id="slide3" style="display: none;">
+        <h1>Thank You!</h1>
+        <p>Thank you for viewing our presentation.</p>
+        <p>This demonstrates how PowerPoint content can be displayed in a web application.</p>
+        <ul>
+            <li>Ready for production use</li>
+            <li>Easy to integrate</li>
+            <li>Cross-platform compatible</li>
+        </ul>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 3;
+
+        function showSlide(slideNumber) {
+            // Hide all slides
+            for (let i = 1; i <= totalSlides; i++) {
+                document.getElementById(`slide${i}`).style.display = 'none';
+            }
+
+            // Show current slide
+            document.getElementById(`slide${slideNumber}`).style.display = 'block';
+
+            // Update slide number
+            document.getElementById('slideNumber').textContent = `Slide ${slideNumber} of ${totalSlides}`;
+
+            // Add fade-in animation
+            const currentSlideElement = document.getElementById(`slide${slideNumber}`);
+            currentSlideElement.style.opacity = '0';
+            currentSlideElement.style.transform = 'translateY(20px)';
+            currentSlideElement.style.transition = 'all 0.5s ease';
+
+            setTimeout(() => {
+                currentSlideElement.style.opacity = '1';
+                currentSlideElement.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+
+        // Initialize first slide
+        showSlide(1);
+        </script>
+</body>
+</html>

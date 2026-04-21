@@ -1,0 +1,379 @@
+{
+    "/api/register": {
+        "post": {
+            "description": "API để đăng ký tài khoản",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "summary": "Đăng ký tài khoản",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.RegisterRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "Message": "success",
+                    "schema": {
+                        "$ref": "#/definitions/prot.User"
+                    }
+                }
+            }
+        }
+    },
+    "/api/login": {
+        "post": {
+            "description": "API để đăng nhập",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "summary": "Đăng nhập",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "credentials",
+                    "description": "Thông tin đăng nhập (username và password)",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "username": {
+                                "type": "string",
+                                "description": "Tên đăng nhập"
+                            },
+                            "password": {
+                                "type": "string",
+                                "description": "Mật khẩu"
+                            }
+                        },
+                        "required": [
+                            "username",
+                            "password"
+                        ]
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "Message": "success",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserLoginResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/accept-roles/{id}": {
+        "put": {
+            "description": "API để chọn vai trò",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Chọn vai trò",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của vai trò"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "Message": "success",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserLoginResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/logout": {
+        "post": {
+            "description": "API để đăng xuất",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "token_id",
+                    "description": "Đăng xuất theo token id",
+                    "required": false
+                }
+            ],
+            "summary": "Đăng xuất",
+            "responses": {
+                "200": {
+                    "Message": "success",
+                    "Data": null
+                }
+            }
+        }
+    },
+    "/api/logout-all": {
+        "post": {
+            "description": "API để đăng xuất",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "summary": "Đăng xuất tất cả các phiên đăng nhập",
+            "responses": {
+                "200": {
+                    "Message": "success",
+                    "Data": null
+                }
+            }
+        }
+    },
+    "/api/sessions": {
+        "get": {
+            "description": "API để lấy danh sách các phiên đăng nhập",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Auth"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "summary": "Lấy danh sách các phiên đăng nhập",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.SessionListResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/change-password": {
+        "put": {
+            "summary": "Cập nhật mật khẩu tài khoản",
+            "description": "API để cập nhật mật khẩu của một tài khoản",
+            "tags": [
+                "Auth"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ChangePassword"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ChangePassword"
+                    }
+                }
+            }
+        }
+    },
+    "/api/forgot-password": {
+        "post": {
+            "summary": "Quên mật khẩu",
+            "description": "API để lấy token lúc quên mật khẩu",
+            "tags": [
+                "Auth"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ForgotPasswordRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ForgotPasswordResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/reset-password": {
+        "post": {
+            "summary": "Reset mật khẩu",
+            "description": "API cập nhật mật khẩu theo token",
+            "tags": [
+                "Auth"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ResetPasswordRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ResetPasswordResponse"
+                    }
+                }
+            }
+        }
+    }
+}

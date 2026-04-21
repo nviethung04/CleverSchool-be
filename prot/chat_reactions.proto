@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package prot;
+option go_package = "be-lms/prot";
+
+// Chat Message Reaction Messages
+message ChatMessageReactionRequest {
+  string emoji = 1;
+}
+
+message ReactionSummary {
+  string emoji = 1;
+  int64 count = 2;
+  repeated string users = 3;
+  map<string, int32> user_counts = 4;
+}
+
+message ChatMessageReactionResponse {
+  bool success = 1;
+  repeated ReactionSummary reactions = 2;
+  string message = 3;
+}
+
+message AddReactionRequest {
+  uint64 course_id = 1;
+  uint64 message_id = 2;
+  string emoji = 3;
+}
+
+message RemoveReactionRequest {
+  uint64 course_id = 1;
+  uint64 message_id = 2;
+  string emoji = 3;
+}
+
+message GetReactionsRequest {
+  uint64 course_id = 1;
+  uint64 message_id = 2;
+}

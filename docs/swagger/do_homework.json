@@ -1,0 +1,214 @@
+{
+  "/api/study/save-score/submit-homework": {
+    "post": {
+      "summary": "Submit homework",
+      "description": "API để trigger tính điểm homework",
+      "tags": ["Do Homework"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trå lời",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SubmitHomeworkRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.SubmitHomeworkResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/study/save-score/skip-question": {
+    "post": {
+      "summary": "Skip homework",
+      "description": "API để skip câu homework",
+      "tags": ["Do Homework"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "",
+          "description": "",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 3,
+              "question_id": 1371
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/check-submit-homework": {
+    "get": {
+      "summary": "Check submit homework (skipped questions)",
+      "description": "Trả về số lượng và danh sách id các câu bị skip. Phân biệt câu skip chưa làm lại và đã làm lại",
+      "tags": ["Do Homework"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "homework_id",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "lesson_id",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 123,
+              "user_id": 456,
+              "skipped_count": 2,
+              "skipped_question_ids": [1111, 2222],
+              "not_completed_count": 3,
+              "skipped_but_redone_count": 1,
+              "skipped_but_redone_question_ids": [3333]
+            }
+          }
+        },
+        "500": {
+          "description": "Internal Server Error",
+          "schema": {
+            "type": "object",
+            "example": {
+              "code": 500,
+              "message": "Bạn chưa nhấn \"Check\" để kiểm tra câu trả lờ",
+              "error": "System error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/study/homework-comment": {
+    "post": {
+      "summary": "Post comment homework",
+      "description": "API để nhận xét homework",
+      "tags": ["Do Homework"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "",
+          "description": "",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 123,
+              "student_id": 456,
+              "content": "Nhận xét ..."
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "api/study/save-score/teacher-evaluate": {
+    "post": {
+      "summary": "Teacher evaluate",
+      "description": "Teacher evaluate",
+      "tags": ["Do Homework"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "",
+          "description": "",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "object_id": 123,
+              "object_type": "homework",
+              "user_id": 456,
+              "rate": "pass"
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  }
+}

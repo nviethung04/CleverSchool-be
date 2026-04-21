@@ -1,0 +1,267 @@
+kind: pipeline
+type: docker
+name: build-and-deploy-develop
+
+trigger:
+  branch:
+    - develop
+  event:
+    - push
+
+steps:
+  # Step 1: Restore cache
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    settings:
+      restore: true
+      mount:
+        - /go/pkg/mod
+        - /root/.cache/buf
+    volumes:
+      - name: cache
+        path: /cache
+
+  # Step 2: Build Go application
+  - name: build
+    image: golang:1.24-alpine
+    commands:
+      - go env GOPATH
+      - apk add --no-cache git curl
+      - curl -sSL "https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64" -o /usr/local/bin/buf
+      - chmod +x /usr/local/bin/buf
+      - go mod download
+      - buf generate
+      - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o myapp .
+      - cp myapp /app/myapp
+      - ls -la /app/
+    environment:
+      GOMAXPROCS: 4
+    volumes:
+      - name: app-build
+        path: /app
+      - name: cache
+        path: /cache
+    depends_on:
+      - restore-cache
+
+  # Step 3: Rebuild cache
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    settings:
+      rebuild: true
+      mount:
+        - /go/pkg/mod
+        - /root/.cache/buf
+    volumes:
+      - name: cache
+        path: /cache
+    depends_on:
+      - build
+
+  # Step 4: Stop current application
+  - name: stop-app
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli docker-cli-compose
+      - cd /home/vps_010/apps/be-lms-enspire
+      - docker compose stop app-develop || echo "App not running or already stopped"
+      - docker compose rm -f app-develop || echo "App container already removed"
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: deploy-path
+        path: /home/vps_010/apps/be-lms-enspire
+    depends_on:
+      - rebuild-cache
+    when:
+      branch:
+        - develop
+
+  # Step 5: Copy binary and restart application
+  - name: deploy
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli docker-cli-compose
+      - echo "📦 Copying new binary to deployment directory..."
+      - cp /app/myapp /home/vps_010/apps/be-lms-enspire/develop/myapp
+      - chmod +x /home/vps_010/apps/be-lms-enspire/develop/myapp
+      - echo "▶️ Starting application with Docker Compose..."
+      - cd /home/vps_010/apps/be-lms-enspire
+      - docker compose up -d app-develop
+    volumes:
+      - name: app-build
+        path: /app
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: deploy-path
+        path: /home/vps_010/apps/be-lms-enspire
+    depends_on:
+      - stop-app
+    when:
+      branch:
+        - develop
+      event:
+        - push
+
+  # Step 6: Cleanup old images
+  - name: cleanup
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli
+      - echo "🧹 Cleaning up old Docker images..."
+      - docker image prune -f || echo "No images to cleanup"
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+    depends_on:
+      - deploy
+    when:
+      status:
+        - success
+
+volumes:
+  - name: app-build
+    host:
+      path: /tmp/app-build
+  - name: cache
+    host:
+      path: /tmp/cache
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+  - name: deploy-path
+    host:
+      path: /home/vps_010/apps/be-lms-enspire
+
+---
+kind: pipeline
+type: docker
+name: build-and-deploy-staging
+
+trigger:
+  branch:
+    - staging
+  event:
+    - push
+
+steps:
+  # Step 1: Restore cache
+  - name: restore-cache
+    image: drillster/drone-volume-cache
+    settings:
+      restore: true
+      mount:
+        - /go/pkg/mod
+        - /root/.cache/buf
+    volumes:
+      - name: cache-staging
+        path: /cache
+
+  # Step 2: Build Go application
+  - name: build
+    image: golang:1.24-alpine
+    commands:
+      - apk add --no-cache git curl
+      - curl -sSL "https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64" -o /usr/local/bin/buf
+      - chmod +x /usr/local/bin/buf
+      - go mod download
+      - buf generate
+      - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o myapp .
+      - cp myapp /app/myapp
+      - ls -la /app/
+    volumes:
+      - name: app-build-staging
+        path: /app
+      - name: cache-staging
+        path: /cache
+    depends_on:
+      - restore-cache
+
+  # Step 3: Rebuild cache
+  - name: rebuild-cache
+    image: drillster/drone-volume-cache
+    settings:
+      rebuild: true
+      mount:
+        - /go/pkg/mod
+        - /root/.cache/buf
+    volumes:
+      - name: cache-staging
+        path: /cache
+    depends_on:
+      - build
+
+  # Step 4: Stop current application
+  - name: stop-app
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli docker-cli-compose
+      - cd /home/vps_010/apps/be-lms-enspire
+      - docker compose stop app-staging || echo "App not running or already stopped"
+      - docker compose rm -f app-staging || echo "App container already removed"
+    volumes:
+      - name: docker-sock-staging
+        path: /var/run/docker.sock
+      - name: deploy-path-staging
+        path: /home/vps_010/apps/be-lms-enspire
+    depends_on:
+      - rebuild-cache
+    when:
+      branch:
+        - staging
+
+  # Step 5: Copy binary and restart application
+  - name: deploy
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli docker-cli-compose
+      - echo "📦 Copying new binary to staging deployment directory..."
+      - cp /app/myapp /home/vps_010/apps/be-lms-enspire/staging/myapp
+      - chmod +x /home/vps_010/apps/be-lms-enspire/staging/myapp
+      - echo "▶️ Starting staging application with Docker Compose..."
+      - cd /home/vps_010/apps/be-lms-enspire
+      - docker compose up -d app-staging
+    volumes:
+      - name: app-build-staging
+        path: /app
+      - name: docker-sock-staging
+        path: /var/run/docker.sock
+      - name: deploy-path-staging
+        path: /home/vps_010/apps/be-lms-enspire
+    depends_on:
+      - stop-app
+    when:
+      branch:
+        - staging
+      event:
+        - push
+
+  # Step 6: Cleanup old images
+  - name: cleanup
+    image: alpine:latest
+    commands:
+      - apk add --no-cache docker-cli
+      - echo "🧹 Cleaning up old Docker images..."
+      - docker image prune -f || echo "No images to cleanup"
+    volumes:
+      - name: docker-sock-staging
+        path: /var/run/docker.sock
+    depends_on:
+      - deploy
+    when:
+      status:
+        - success
+
+volumes:
+  - name: app-build-staging
+    host:
+      path: /tmp/app-build-staging
+  - name: cache-staging
+    host:
+      path: /tmp/cache-staging
+  - name: docker-sock-staging
+    host:
+      path: /var/run/docker.sock
+  - name: deploy-path-staging
+    host:
+      path: /home/vps_010/apps/be-lms-enspire

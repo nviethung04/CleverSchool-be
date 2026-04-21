@@ -1,0 +1,5 @@
+ALTER TABLE exams DROP COLUMN IF EXISTS assigned_at;
+ALTER TABLE exams DROP COLUMN IF EXISTS assigned_by;
+
+ALTER TABLE homeworks DROP COLUMN IF EXISTS assigned_at;
+ALTER TABLE homeworks DROP COLUMN IF EXISTS assigned_by;

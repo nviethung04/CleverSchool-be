@@ -1,0 +1,120 @@
+{
+  "prot.Degree": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "user_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "major": {
+        "type": "string"
+      },
+      "institution": {
+        "type": "string"
+      },
+      "graduation_year": {
+        "type": "integer"
+      },
+      "degree_code": {
+        "type": "string"
+      },
+      "degree_level": {
+        "type": "string"
+      },
+      "received_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "note": {
+        "type": "string"
+      },
+      "file_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.DegreeRequest": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "major": {
+        "type": "string"
+      },
+      "institution": {
+        "type": "string"
+      },
+      "graduation_year": {
+        "type": "integer"
+      },
+      "degree_code": {
+        "type": "string"
+      },
+      "degree_level": {
+        "type": "string"
+      },
+      "received_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "note": {
+        "type": "string"
+      },
+      "file_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.DegreeListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "degrees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Degree"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

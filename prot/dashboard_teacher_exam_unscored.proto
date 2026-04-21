@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Dashboard Teacher Exam Unscored
+message DashboardTeacherExamUnscored {
+  int64 user_id = 1;
+  int64 exam_id = 2;
+  int64 course_id = 3;
+  int64 lesson_id = 4;
+  string student_name = 5;
+  string course_name = 6;
+  string subject_name = 7;
+  string exam_name = 8;
+  string lesson_title = 9;
+  int64 submitted_at = 10;
+  int64 deadline = 11;
+  bool submit_on_time = 12;
+  double ratio = 13;
+  int32 total_questions = 14;
+  int32 unscored_questions = 15;
+}
+
+message DashboardTeacherExamUnscoredListRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  map<string, string> sort = 3;
+  int64 start_date = 4;
+  int64 end_date = 5;
+  int64 course_id = 6;
+  int64 exam_id = 7;
+}
+
+message DashboardTeacherExamUnscoredListResponse {
+  repeated DashboardTeacherExamUnscored exams = 1;
+  int64 total = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_teacher_exam_unscored.proto 

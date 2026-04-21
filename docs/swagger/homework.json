@@ -1,0 +1,447 @@
+{
+  "/api/manage/homeworks": {
+    "get": {
+      "summary": "Danh sách homework",
+      "description": "API để lấy danh sách homework",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "lesson_id",
+          "description": "Lọc theo ID bài học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "is_assigned",
+          "description": "Lọc theo trạng thái giao bài",
+          "required": false,
+          "type": "boolean"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.HomeworkListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo homework",
+      "description": "API để tạo homework mới",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "homework",
+          "description": "Thông tin homework",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.HomeworkRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Homework"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/homeworks/{id}": {
+    "get": {
+      "summary": "Chi tiết homework",
+      "description": "API để lấy chi tiết homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "by_program",
+          "description": "Chỉ lấy homework theo chương trình",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "program_id",
+          "description": "Lấy theo id chương trình",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Homework"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật homework",
+      "description": "API để cập nhật homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        },
+        {
+          "in": "body",
+          "name": "homework",
+          "description": "Thông tin homework",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.HomeworkRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Homework"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa homework",
+      "description": "API để xóa homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/homeworks/{id}/cloned": {
+    "post": {
+      "summary": "Clone homework",
+      "description": "API để lấy clone homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        },
+        {
+          "in": "body",
+          "name": "homework",
+          "description": "Dữ liệu clone",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "name": "Final Homework - Mathematics",
+              "lesson_id": 101,
+              "description": "This is the final homework covering all topics in the course."
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Homework"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/homeworks/{id}/assigned": {
+    "post": {
+      "summary": "Assigned homework",
+      "description": "API để lấy assigned homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        },
+        {
+          "in": "body",
+          "name": "homework",
+          "description": "Dữ liệu assigned",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "is_assigned": true,
+              "lesson_id": 101,
+              "course_id": 101
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/homeworks/{id}/assigned-lessons": {
+    "get": {
+      "summary": "Bài học theo homework",
+      "description": "API để lấy bài học theo homework theo ID",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của homework"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssignedLessons"
+          }
+        }
+      }
+    }
+  }
+  ,
+  "/api/manage/homeworks/students-doing": {
+    "get": {
+      "summary": "Danh sách học sinh đang làm homework",
+      "description": "Trả về danh sách học sinh đang thực hiện homework cụ thể, kèm thông tin cơ bản và thời điểm hoạt động gần nhất",
+      "tags": [
+        "Homeworks"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang (mặc định 1)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng mỗi trang (mặc định 20)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm theo tên hoặc username học sinh",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "homework_id",
+          "description": "ID homework bắt buộc",
+          "required": true,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.HomeworkStudentsDoingResponse"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,571 @@
+{
+    "/api/manage/contests": {
+        "get": {
+            "summary": "Danh sách cuộc thi",
+            "description": "API để lấy danh sách cuộc thi",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Số trang",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "Số lượng item per page",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Trạng thái cuộc thi",
+                    "required": false,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Tạo cuộc thi mới",
+            "description": "API để tạo cuộc thi mới",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "contest",
+                    "description": "Thông tin cuộc thi",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "201": {
+                    "description": "Created",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/contests/{id}": {
+        "get": {
+            "summary": "Lấy thông tin cuộc thi",
+            "description": "API để lấy thông tin cuộc thi theo ID",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật cuộc thi",
+            "description": "API để cập nhật thông tin cuộc thi",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                },
+                {
+                    "in": "body",
+                    "name": "contest",
+                    "description": "Thông tin cuộc thi cập nhật",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa cuộc thi",
+            "description": "API để xóa cuộc thi",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/contests/{id}/restore": {
+        "put": {
+            "summary": "Khôi phục cuộc thi",
+            "description": "API để khôi phục cuộc thi đã xóa",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/contests/user": {
+        "get": {
+            "summary": "Lấy cuộc thi của user",
+            "description": "API để lấy danh sách cuộc thi của user đang đăng nhập",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Số trang",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "Số lượng item per page",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Trạng thái cuộc thi",
+                    "required": false,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/contests/{id}/rounds": {
+        "get": {
+            "summary": "Lấy vòng thi của cuộc thi",
+            "description": "API để lấy danh sách vòng thi của cuộc thi",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/contests/{id}/with-rounds": {
+        "get": {
+            "summary": "Lấy cuộc thi với vòng thi",
+            "description": "API để lấy thông tin cuộc thi kèm danh sách vòng thi",
+            "tags": [
+                "Contests"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID cuộc thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "404": {
+                    "description": "Not Found",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,94 @@
+{
+    "prot.DashboardContestRankingResponse": {
+        "type": "object",
+        "properties": {
+            "students": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/prot.DashboardContestRanking"
+                },
+                "description": "Danh sách học sinh trong bảng xếp hạng"
+            },
+            "total": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số học sinh",
+                "example": 150
+            },
+            "score_chart": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/prot.ContestScoreDistribution"
+                },
+                "description": "Biểu đồ phân bố điểm"
+            },
+            "current_ranking": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Thứ hạng hiện tại của học sinh đang đăng nhập (chỉ hiển thị khi user là học sinh)",
+                "example": 15
+            }
+        }
+    },
+    "prot.DashboardContestRanking": {
+        "type": "object",
+        "properties": {
+            "student_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ID của học sinh",
+                "example": 12345
+            },
+            "student_name": {
+                "type": "string",
+                "description": "Tên học sinh",
+                "example": "Nguyễn Văn A"
+            },
+            "average_ratio": {
+                "type": "number",
+                "format": "double",
+                "description": "Tỷ lệ điểm trung bình (0.0 - 1.0)",
+                "example": 0.85
+            },
+            "average_score": {
+                "type": "number",
+                "format": "double",
+                "description": "Điểm trung bình",
+                "example": 8.5
+            },
+            "average_time": {
+                "type": "number",
+                "format": "double",
+                "description": "Thời gian làm bài trung bình (giây)",
+                "example": 1800
+            },
+            "avatar": {
+                "type": "string",
+                "description": "URL ảnh đại diện của học sinh",
+                "example": "/uploads/avatars/student_123.jpg"
+            },
+            "number_rounds": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số vòng thi đã hoàn thành",
+                "example": 5
+            }
+        }
+    },
+    "prot.ContestScoreDistribution": {
+        "type": "object",
+        "properties": {
+            "score_range": {
+                "type": "string",
+                "description": "Khoảng điểm (VD: 0-2, 2-4, 4-6, 6-8, 8-10)",
+                "example": "8-10"
+            },
+            "student_count": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số lượng học sinh trong khoảng điểm này",
+                "example": 25
+            }
+        }
+    }
+}

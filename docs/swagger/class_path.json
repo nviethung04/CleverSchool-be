@@ -1,0 +1,582 @@
+{
+    "/api/manage/classes": {
+        "get": {
+            "description": "API để lấy danh sách lớp học",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Classes"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái lớp học (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lấy theo ID trường",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "faculty_id",
+                    "description": "Lấy theo ID khoa",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách lớp học",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ClassListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo lớp học mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Classes"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo lớp học",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "class",
+                    "description": "Thông tin lớp học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ClassRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo lớp học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Class"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/classes/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết lớp học",
+            "description": "API để lấy thông tin chi tiết của một lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Class"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết lớp học",
+            "description": "API để cập nhật thông tin chi tiết của một lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                },
+                {
+                    "in": "body",
+                    "name": "class",
+                    "description": "Thông tin lớp học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.Class"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Class"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa lớp học",
+            "description": "API để xóa một lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa lớp học thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/classes/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục lớp học",
+            "description": "API để khôi phục lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Class"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/classes/{id}/users": {
+        "get": {
+            "summary": "Lấy danh sách user trong lớp học",
+            "description": "API lấy danh sách user trong lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                },
+                {
+                    "in": "query",
+                    "name": "role_id",
+                    "description": "Lấy theo role",
+                    "required": false
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserClassList"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Lưu danh sách user trong lớp học",
+            "description": "API lưu danh sách user trong lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                },
+                {
+                    "in": "body",
+                    "name": "users",
+                    "description": "Danh sách user",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserClassListRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserClassList"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Thêm danh sách user trong lớp học",
+            "description": "API thêm danh sách user trong lớp học theo ID",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của lớp học"
+                },
+                {
+                    "in": "body",
+                    "name": "users",
+                    "description": "Danh sách user",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserClassListRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserClassList"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/classes/export": {
+        "get": {
+            "summary": "Export thông tin lớp học",
+            "description": "API để export thông tin lớp học",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lấy theo ID trường",
+                    "required": false
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/classes_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/classes/import": {
+        "post": {
+            "summary": "Import thông tin lớp học",
+            "description": "API để import thông tin lớp học",
+            "tags": [
+                "Classes"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

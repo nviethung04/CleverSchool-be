@@ -1,0 +1,2 @@
+ALTER TABLE homework_users ADD COLUMN IF NOT EXISTS exp NUMERIC(10,2);
+

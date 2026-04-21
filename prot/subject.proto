@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "faculty.proto";
+import "training_level.proto";
+
+message Subject {
+  int64 id = 1;
+  int64 faculty_id = 2;
+  string name = 3;
+  string description = 4;
+  bool status = 5;
+  SubjectVTGInfo vtg_info = 6;
+  Faculty faculty = 7;
+  repeated TrainingLevel training_levels = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message SubjectVTGInfo {
+  string code = 1;
+  string level = 2;
+  string enrollment = 3;
+  string time = 4;
+  string avatar = 5;
+}
+
+
+message GetSubjectRequest {
+  int64 id = 1;
+}
+
+message SubjectResponse {
+  Subject subject = 1;
+  string message = 2;
+}
+
+message ListSubjectsRequest {}
+
+message SubjectRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool status = 4;
+  SubjectVTGInfo vtg_info = 5;
+  int64 faculty_id = 6;
+  repeated TrainingLevel training_levels = 7;
+}
+
+message SubjectIDRequest {
+  int64 id = 1;
+}
+
+message SubjectsResponse {
+  repeated Subject subjects = 1;
+  uint64 total_count = 2;
+}

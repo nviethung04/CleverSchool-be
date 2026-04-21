@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message Skill {
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+  string description = 5;
+  string image_url = 6;
+  bool status = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message GetSkillRequest {
+  int64 id = 1;
+}
+
+message SkillResponse {
+  Skill skill = 1;
+  string message = 2;
+}
+
+message ListSkillsRequest {}
+
+message SkillRequest {
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+  string description = 5;
+  string image_url = 6;
+  bool status = 7;
+}
+
+message SkillIDRequest {
+  int64 id = 1;
+}
+
+message SkillsResponse {
+  repeated Skill skills = 1;
+  uint64 total_count = 2;
+}

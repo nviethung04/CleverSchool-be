@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "course.proto";
+import "subject.proto";
+import "chapter.proto";
+
+message Program {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  string image = 5;
+  bool status = 6;
+  string target = 7;
+  Subject subject = 8;
+  repeated Course courses = 9;
+  repeated Chapter chapters = 10;
+  int32 duration = 11;
+  int32 current_students = 12;
+  string type = 13;
+  string created_at = 14;
+  string updated_at = 15;
+  ProgramVTGInfo vtg_info = 16;
+  repeated Subject subjects = 17;
+  string book_url = 18;
+}
+
+message ProgramVTGInfo {
+  string code = 1;
+  string management_code = 2;
+  int32 number_of_credits = 3;
+  string time = 4;
+  string theoretical_time = 5;
+  string discussion_time = 6;
+  string practice_time = 7;
+  string test_time = 8;
+  string study_module = 9;
+  int32 number_of_frequent = 10;
+  int32 number_of_evaluate = 11;
+}
+
+message ProgramRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool status = 4;
+  int64 subject_id = 5;
+  string target = 6;
+  string image = 7;
+  int32 duration = 8;
+  string type = 9;
+  ProgramVTGInfo vtg_info = 10;
+  repeated Subject subjects = 11;
+  string book_url = 12;
+}
+
+message ProgramsResponse {
+  repeated Program programs = 1;
+  uint64 total_count = 2;
+}
+
+message ReSyncProgram {
+  int64 course_id = 1;
+  repeated int64 course_ids = 2;
+}
+
+message ChapterSort {
+  int64 id = 1;
+}
+
+message ProgramChapterSort {
+  repeated ChapterSort chapters = 1;
+}

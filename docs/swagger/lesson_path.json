@@ -1,0 +1,890 @@
+{
+    "/api/manage/lessons": {
+        "get": {
+            "description": "API để lấy danh sách bài học",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Lessons"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy theo id khóa học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "chapter_id",
+                    "description": "Lấy theo id chương học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "program_id",
+                    "description": "Lấy theo id chương trình",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái bài học (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách bài học",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo bài học mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Lessons"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo bài học",
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "lesson",
+                    "description": "Thông tin bài học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo bài học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonDetail"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết bài học",
+            "description": "API để lấy thông tin chi tiết của một bài học theo ID",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy theo id khóa học",
+                    "required": false
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonDetail"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết bài học",
+            "description": "API để cập nhật thông tin chi tiết của một bài học theo ID",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy theo id khóa học",
+                    "required": false
+                },
+                {
+                    "in": "body",
+                    "name": "lesson",
+                    "description": "Thông tin bài học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonDetail"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa bài học",
+            "description": "API để xóa một bài học theo ID",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa bài học thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục bài học",
+            "description": "API để khôi phục bài học theo ID",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Lesson"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/{id}/completion": {
+        "put": {
+            "summary": "Cập nhật trạng thái bài học",
+            "description": "API để cập nhật trạng thái bài học",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "description": "Trạng thái hoàn thành bài học",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "is_complete": {
+                                "type": "boolean",
+                                "example": true
+                            }
+                        },
+                        "required": [
+                            "is_complete"
+                        ]
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonCompletion"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/{id}/studying": {
+        "put": {
+            "summary": "Cập nhật trạng thái bài học",
+            "description": "API để cập nhật trạng thái bài học",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": true,
+                    "description": "Trạng thái hoàn thành bài học",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "is_studying": {
+                                "type": "boolean",
+                                "example": true
+                            }
+                        },
+                        "required": [
+                            "is_studying"
+                        ]
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonStudying"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/schedules": {
+        "get": {
+            "description": "API để lấy lịch học theo tuần",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Lessons"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Lấy học theo tuần",
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy lịch học theo id khóa học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "week_id",
+                    "description": "Lấy lịch học theo id tuần",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "semester_id",
+                    "description": "Lấy lịch học theo id kỳ học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "date",
+                    "description": "Lấy lịch học theo thời gian",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "week_by_course",
+                    "description": "Lấy lịch học tuần của khóa học (phải có course_id khóa học)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "by_user",
+                    "description": "Lấy lịch học theo tài khoản",
+                    "required": false
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Lấy lịch học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonSchedulesByWeekList"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để thêm lịch học theo tuần",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Lessons"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Thêm lịch học theo tuần",
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "data",
+                    "description": "Thông tin lịch học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonSchedulesByWeekListRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo bài học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonSchedulesByWeekList"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/lesson-plans/{lesson_id}/{course_id}": {
+        "get": {
+            "summary": "Lấy danh sách bài giảng",
+            "description": "API để lấy danh sách bài giảng",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlanByCourse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Cập nhật bài giảng",
+            "description": "API để cập nhật bài giảng",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Thông tin bài giảng",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlanByCourse"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlanByCourse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/exams/{lesson_id}/{course_id}": {
+        "get": {
+            "summary": "Lấy danh sách bài kiểm tra",
+            "description": "API để lấy danh sách bài kiểm tra",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExamByCourse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Cập nhật bài kiểm tra",
+            "description": "API để cập nhật bài kiểm tra",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Thông tin bài kiểm tra",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExamByCourse"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExamByCourse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/homeworks/{lesson_id}/{course_id}": {
+        "get": {
+            "summary": "Lấy danh sách bài tập về nhà",
+            "description": "API để lấy danh sách bài tập về nhà",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.HomeworkByCourse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Cập nhật bài tập về nhà",
+            "description": "API để cập nhật bài tập về nhà",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Thông tin bài tập về nhà",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.HomeworkByCourse"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.HomeworkByCourse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lessons/exercises/{lesson_id}/{course_id}": {
+        "get": {
+            "summary": "Lấy danh sách bài tập",
+            "description": "API để lấy danh sách bài tập",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExerciseByCourse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Cập nhật bài tập",
+            "description": "API để cập nhật bài tập",
+            "tags": [
+                "Lessons"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "name": "lesson_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của bài học"
+                },
+                {
+                    "name": "course_id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Thông tin bài tập",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExerciseByCourse"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ExerciseByCourse"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,794 @@
+{
+    "/api/manage/courses": {
+        "get": {
+            "description": "API để lấy danh sách khóa học",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Courses"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái khóa học (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lấy theo ID trường (0, 1, 2,..)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "by_user",
+                    "description": "Lấy theo tài khoản hiện tại",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "parent_id",
+                    "description": "Lấy theo id khóa gốc",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách khóa học",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo khóa học mới. Có thể copy lịch học từ course khác bằng cách truyền target_course_id > 0",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Courses"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo khóa học",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin khóa học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo khóa học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseDetail"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết khóa học",
+            "description": "API để lấy thông tin chi tiết của một khóa học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseDetail"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết khóa học",
+            "description": "API để cập nhật thông tin chi tiết của một khóa học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin khóa học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.CourseDetail"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa khóa học",
+            "description": "API để xóa một khóa học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa khóa học thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục khoá học",
+            "description": "API để khôi phục khoá học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khoá học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Course"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/users": {
+        "get": {
+            "summary": "Lấy danh sách user trong khoá học",
+            "description": "API lấy danh sách user trong khoá học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khoá học"
+                },
+                {
+                    "in": "query",
+                    "name": "role_id",
+                    "description": "Lấy theo role",
+                    "required": false
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserCourseList"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Lưu danh sách user trong khoá học",
+            "description": "API lưu danh sách user trong khoá học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khoá học"
+                },
+                {
+                    "in": "body",
+                    "name": "users",
+                    "description": "Danh sách user",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserCourseListRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserCourseList"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Thêm danh sách user trong khoá học",
+            "description": "API thêm danh sách user trong khoá học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khoá học"
+                },
+                {
+                    "in": "body",
+                    "name": "users",
+                    "description": "Danh sách user",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserCourseListRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserCourseList"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/score": {
+        "get": {
+            "summary": "Lấy danh sách bài kiểm tra",
+            "description": "API lấy danh sách bài kiểm tra của học sinh trong khóa học",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khoá học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ScoreByCourse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/export": {
+        "get": {
+            "summary": "Export thông tin khóa học",
+            "description": "API để export thông tin khóa học",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "program_id",
+                    "description": "Lấy theo ID chương trình",
+                    "required": false
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/courses_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/import": {
+        "post": {
+            "summary": "Import thông tin khóa học",
+            "description": "API để import thông tin khóa học",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/export-users": {
+        "get": {
+            "summary": "Export danh sách user trong khoá học",
+            "description": "API để export danh sách user trong khoá học theo ID",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/course_1_users_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Lỗi request",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 400
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "messages.id_invalid"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/import-users": {
+        "post": {
+            "summary": "Import danh sách user vào khoá học",
+            "description": "API để import danh sách user vào khoá học theo ID. Nếu user chưa có ID hoặc không tìm thấy, sẽ tạo mới user. Nếu học sinh cũ trong khóa không có trong file import thì sẽ xóa khỏi khóa.",
+            "tags": [
+                "Courses"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "consumes": [
+                "multipart/form-data"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khóa học"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import (sheet 'Users' với các cột: ID, Identifier, Username, Code, Name, Email, Phone, Role ID, Password, Avatar, Status, Class IDs, Class Names)",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Lỗi request",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 400
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "file is required"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

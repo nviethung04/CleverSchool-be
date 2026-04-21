@@ -1,0 +1,566 @@
+{
+  "prot.DashboardAdminReponse": {
+    "type": "object",
+    "properties": {
+      "user_overview": {
+        "$ref": "#/definitions/prot.UserOverview"
+      },
+      "course_overview": {
+        "$ref": "#/definitions/prot.CourseOverview"
+      },
+      "overview_learning": {
+        "$ref": "#/definitions/prot.OverviewLearning"
+      },
+      "score_distribution_overview": {
+        "$ref": "#/definitions/prot.ScoreDistributionOverview"
+      },
+      "system_usage_overview": {
+        "$ref": "#/definitions/prot.SystemUsageOverview"
+      },
+      "teacher_performance_overview": {
+        "$ref": "#/definitions/prot.TeacherPerformanceOverview"
+      },
+      "question_bank_overview": {
+        "$ref": "#/definitions/prot.QuestionBankOverview"
+      },
+      "risk_and_warning": {
+        "$ref": "#/definitions/prot.RiskAndWarning"
+      }
+    }
+  },
+  "prot.UserOverview": {
+    "type": "object",
+    "properties": {
+      "user": {
+        "$ref": "#/definitions/prot.DashboardAdminItem"
+      },
+      "student": {
+        "$ref": "#/definitions/prot.DashboardAdminItem"
+      },
+      "teacher": {
+        "$ref": "#/definitions/prot.DashboardAdminItem"
+      },
+      "activity": {
+        "$ref": "#/definitions/prot.DashboardAdminItem"
+      }
+    }
+  },
+  "prot.DashboardAdminItem": {
+    "type": "object",
+    "properties": {
+      "total": {
+        "type": "integer"
+      },
+      "total_number": {
+        "type": "integer"
+      },
+      "change_value": {
+        "type": "number",
+        "format": "float"
+      },
+      "title": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.CourseOverview": {
+    "type": "object",
+    "properties": {
+      "overviews": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.CourseOverviewItem"
+        }
+      },
+      "rates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.CourseOverviewRate"
+        }
+      }
+    }
+  },
+  "prot.CourseOverviewItem": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "count": {
+        "type": "integer"
+      }
+    }
+  },
+  "prot.CourseOverviewRate": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "total": {
+        "type": "integer"
+      },
+      "complete_total": {
+        "type": "integer"
+      },
+      "percent": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.OverviewLearning": {
+    "type": "object",
+    "properties": {
+      "avg_scores_by_week": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LearningScoreWeek"
+        }
+      },
+      "gems_by_week": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.GemsByWeek"
+        }
+      },
+      "top_highest": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.StudentScore"
+        }
+      },
+      "top_lowest": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.StudentScore"
+        }
+      },
+      "total_gem": {
+        "type": "integer"
+      }
+    }
+  },
+  "prot.LearningScoreWeek": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "week_label": {
+        "type": "string"
+      },
+      "avg_score": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.GemsByWeek": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "week_label": {
+        "type": "string"
+      },
+      "gem_count": {
+        "type": "integer"
+      }
+    }
+  },
+  "prot.StudentScore": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "exam_id": {
+        "type": "integer"
+      },
+      "exam_user_id": {
+        "type": "integer"
+      },
+      "student_name": {
+        "type": "string"
+      },
+      "score": {
+        "type": "number",
+        "format": "float"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "class_name": {
+        "type": "string"
+      },
+      "school_name": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ScoreDistributionOverview": {
+    "type": "object",
+    "properties": {
+      "distributions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ScoreDistributionItem"
+        }
+      }
+    }
+  },
+  "prot.ScoreDistributionItem": {
+    "type": "object",
+    "properties": {
+      "grade": {
+        "type": "string"
+      },
+      "scores": {
+        "type": "array"
+      },
+      "counts": {
+        "type": "array"
+      }
+    }
+  },
+  "prot.SystemUsageOverview": {
+    "type": "object",
+    "properties": {
+      "weekly_usage": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.WeeklyUsage"
+        }
+      },
+      "device_usages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DeviceUsage"
+        }
+      }
+    }
+  },
+  "prot.WeeklyUsage": {
+    "type": "object",
+    "properties": {
+      "week_label": {
+        "type": "string"
+      },
+      "average_duration": {
+        "type": "string"
+      },
+      "average_duration_minute": {
+        "type": "integer"
+      }
+    }
+  },
+  "prot.DeviceUsage": {
+    "type": "object",
+    "properties": {
+      "device_name": {
+        "type": "string"
+      },
+      "user_count": {
+        "type": "integer"
+      },
+      "percentage": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.TeacherPerformanceOverview": {
+    "type": "object",
+    "properties": {
+      "grading_summary": {
+        "$ref": "#/definitions/prot.GradingSummary"
+      },
+      "weekly_marking_rates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.WeeklyMarkingRate"
+        }
+      }
+    }
+  },
+  "prot.GradingSummary": {
+    "type": "object",
+    "properties": {
+      "total_submissions": {
+        "type": "integer"
+      },
+      "graded_submissions": {
+        "type": "integer"
+      },
+      "ungraded_submissions": {
+        "type": "integer"
+      },
+      "ungraded_percent": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.WeeklyMarkingRate": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "week_label": {
+        "type": "string"
+      },
+      "marking_percent": {
+        "type": "number",
+        "format": "float"
+      },
+      "assigned_count": {
+        "type": "integer"
+      },
+      "marked_count": {
+        "type": "integer"
+      },
+      "ungraded_submission_exams": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.UngradedSubmissionExam"
+        }
+      }
+    }
+  },
+  "prot.UngradedSubmissionExam": {
+    "type": "object",
+    "properties": {
+      "teacher_id": {
+        "type": "integer"
+      },
+      "exam_id": {
+        "type": "integer"
+      },
+      "student_id": {
+        "type": "integer"
+      },
+      "teacher_name": {
+        "type": "string"
+      },
+      "student_name": {
+        "type": "string"
+      },
+      "exam_name": {
+        "type": "string"
+      },
+      "question_ids": {
+        "type": "array"
+      },
+      "question_count": {
+        "type": "integer"
+      },
+      "submitted_at": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.QuestionBankOverview": {
+    "type": "object",
+    "properties": {
+      "attributes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.QuestionAttributeItem"
+        }
+      },
+      "media_usage": {
+        "$ref": "#/definitions/prot.MediaUsage"
+      },
+      "types": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.QuestionTypeItem"
+        }
+      }
+    }
+  },
+  "prot.QuestionTypeItem": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "total": {
+        "type": "integer"
+      },
+      "percent": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.QuestionAttributeItem": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "media_usage": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.QuestionDistributionItem"
+        }
+      }
+    }
+  },
+  "prot.QuestionDistributionItem": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "count": {
+        "type": "string"
+      },
+      "percent": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.MediaUsage": {
+    "type": "object",
+    "properties": {
+      "total_questions": {
+        "type": "integer"
+      },
+      "with_audio": {
+        "type": "integer"
+      },
+      "with_image": {
+        "type": "integer"
+      },
+      "audio_percent": {
+        "type": "number",
+        "format": "float"
+      },
+      "image_percent": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.RiskAndWarning": {
+    "type": "object",
+    "properties": {
+      "inactive_students": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.InactiveStudent"
+        }
+      },
+      "declining_students": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DecliningStudent"
+        }
+      },
+      "slow_grading_teachers": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.SlowGradingTeacher"
+        }
+      }
+    }
+  },
+  "prot.InactiveStudent": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "class_name": {
+        "type": "string"
+      },
+      "last_login": {
+        "type": "string"
+      },
+      "absent_days": {
+        "type": "integer"
+      },
+      "avatar": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.DecliningStudent": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "class_name": {
+        "type": "string"
+      },
+      "scores": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ScoreItem"
+        }
+      },
+      "avatar": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ScoreItem": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "score": {
+        "type": "number",
+        "format": "float"
+      }
+    }
+  },
+  "prot.SlowGradingTeacher": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "name": {
+        "type": "string"
+      },
+      "graded": {
+        "type": "integer"
+      },
+      "submitted": {
+        "type": "integer"
+      },
+      "avg_wait_hours": {
+        "type": "number",
+        "format": "float"
+      },
+      "percent": {
+        "type": "number",
+        "format": "float"
+      },
+      "avatar": {
+        "type": "string"
+      }
+    }
+  }
+}

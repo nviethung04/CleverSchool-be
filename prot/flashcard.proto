@@ -1,0 +1,140 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Media thông tin file
+message MediaFlashcard {
+  int64 id = 1;
+  string url = 2;
+  string type = 3;
+}
+
+// Từ vựng
+message Vocabulary {
+  int64 id = 1;
+  string word = 2;
+  string phonetic = 3;
+  string translation = 4;
+  string definition = 5;
+  string part_of_speech = 6;
+  string level = 7;
+  string tags = 8;
+  int32 difficulty = 9;
+  int32 frequency = 10;
+
+  MediaFlashcard word_audio = 11;
+  MediaFlashcard image = 12;
+  MediaFlashcard example_audio = 13;
+
+  string example_sentence = 14;
+  string example_translation = 15;
+
+  string created_at = 16;
+  string updated_at = 17;
+}
+
+// Tiến trình học từ vựng của học sinh
+message StudentVocabularyProgress {
+  int64 id = 1;
+  int64 student_id = 2;
+  int64 vocabulary_id = 3;
+  int64 lesson_id = 4;
+
+  string status = 5;
+  bool is_known = 6;
+  int32 study_count = 7;
+  int32 correct_count = 8;
+  string last_studied_at = 9;
+  string mastered_at = 10;
+
+  double pronunciation_score = 11;
+  double best_pronunciation_score = 12;
+  int32 pronunciation_attempts = 13;
+
+  Vocabulary vocabulary = 14;
+}
+
+// Flashcard session
+message FlashcardSession {
+  int64 id = 1;
+  int64 student_id = 2;
+  int64 lesson_id = 3;
+  int32 total_cards = 4;
+  int32 completed_cards = 5;
+  int32 known_cards = 6;
+  int32 study_duration = 7;
+  double session_score = 8;
+  string started_at = 9;
+  string completed_at = 10;
+  string created_at = 11;
+  double progress_percentage = 12;
+}
+
+// Flashcard activity
+message FlashcardActivity {
+  int64 id = 1;
+  int64 session_id = 2;
+  int64 vocabulary_id = 3;
+  string activity_type = 4;
+  string response = 5;
+  int32 response_time = 6;
+  double pronunciation_score = 7;
+  string created_at = 8;
+}
+
+// Từ vựng trong bài học
+message LessonVocabulary {
+  int64 id = 1;
+  int64 lesson_id = 2;
+  int64 vocabulary_id = 3;
+  int32 sort_order = 4;
+  bool is_required = 5;
+
+  Vocabulary vocabulary = 6;
+  StudentVocabularyProgress progress = 7;
+}
+
+// Bài học flashcard
+message FlashcardLesson {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+
+  int32 total_vocabularies = 4;
+  int32 new_vocabularies = 5;
+  int32 learning_vocabularies = 6;
+  int32 known_vocabularies = 7;
+  int32 mastered_vocabularies = 8;
+
+  string last_session_at = 9;
+  int32 total_sessions = 10;
+
+  repeated LessonVocabulary vocabularies = 11;
+}
+
+// Thống kê flashcard cho học sinh
+message FlashcardStats {
+  int64 student_id = 1;
+
+  int32 total_vocabularies = 2;
+  int32 new_vocabularies = 3;
+  int32 learning_vocabularies = 4;
+  int32 known_vocabularies = 5;
+  int32 mastered_vocabularies = 6;
+
+  int32 total_sessions = 7;
+  int32 total_study_time = 8;
+  double average_score = 9;
+  double best_score = 10;
+
+  int32 studied_today = 11;
+  int32 studied_this_week = 12;
+  string last_study_date = 13;
+  int32 current_streak = 14;
+  int32 longest_streak = 15;
+
+  double average_pronunciation_score = 16;
+  double best_pronunciation_score = 17;
+}

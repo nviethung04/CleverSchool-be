@@ -1,0 +1,2 @@
+ALTER TABLE degrees
+ADD COLUMN IF NOT EXISTS file_url TEXT;

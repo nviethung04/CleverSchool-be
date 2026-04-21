@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCORM Content Viewer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .scorm-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .scorm-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .scorm-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .scorm-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .scorm-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .scorm-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .scorm-btn.danger {
+            background-color: #e74c3c;
+        }
+        
+        .scorm-btn.danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .scorm-content {
+            flex: 1;
+            background-color: white;
+            border: none;
+            width: 100%;
+        }
+        
+        .scorm-status {
+            background-color: #ecf0f1;
+            padding: 10px 20px;
+            border-top: 1px solid #bdc3c7;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        .scorm-debug {
+            background-color: #34495e;
+            color: #ecf0f1;
+            padding: 10px 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .scorm-debug.show {
+            display: block;
+        }
+        
+        .debug-toggle {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .debug-toggle:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 18px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            background-color: #e74c3c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="scorm-container">
+        <div class="scorm-header">
+            <div class="scorm-title">
+                <span id="course-title">SCORM Content</span>
+            </div>
+            <div class="scorm-controls">
+                <button class="scorm-btn" onclick="toggleDebug()">
+                    <span id="debug-text">Show Debug</span>
+                </button>
+                <button class="scorm-btn" onclick="commitData()">Commit</button>
+                <button class="scorm-btn danger" onclick="terminateSession()">Finish</button>
+            </div>
+        </div>
+        
+        <iframe id="scorm-frame" class="scorm-content" 
+                src="about:blank"
+                allowfullscreen>
+        </iframe>
+        
+        <div class="scorm-status">
+            <div>Status: <span id="status-text">Loading...</span></div>
+            <div>Score: <span id="score-text">--</span></div>
+            <div>Time: <span id="time-text">00:00:00</span></div>
+        </div>
+        
+        <div id="scorm-debug" class="scorm-debug">
+            <div style="margin-bottom: 10px;">
+                <strong>SCORM Debug Information</strong>
+                <button class="debug-toggle" onclick="clearDebug()">Clear</button>
+            </div>
+            <div id="debug-content"></div>
+        </div>
+    </div>
+
+    <!-- SCORM Runtime -->
+    <script src="/static/scorm/scorm-runtime.js"></script>
+    
+    <script>
+        // SCORM Wrapper Configuration
+        var SCORM_WRAPPER = {
+            version: '1.2', // Default version
+            attemptId: null,
+            courseId: null,
+            userId: null,
+            api: null,
+            debug: false,
+            status: 'not attempted',
+            score: 0,
+            startTime: null,
+            timer: null
+        };
+
+        // Initialize SCORM Wrapper
+        function initSCORMWrapper(config) {
+            SCORM_WRAPPER.version = config.version || '1.2';
+            SCORM_WRAPPER.attemptId = config.attemptId;
+            SCORM_WRAPPER.courseId = config.courseId;
+            SCORM_WRAPPER.userId = config.userId;
+            
+            // Create SCORM API
+            SCORM_WRAPPER.api = createSCORMAPI(SCORM_WRAPPER.version);
+            
+            // Set attempt ID if provided
+            if (SCORM_WRAPPER.attemptId) {
+                SCORM_WRAPPER.api.LMSInitialize(SCORM_WRAPPER.attemptId);
+            } else {
+                SCORM_WRAPPER.api.LMSInitialize();
+            }
+            
+            // Start timer
+            startTimer();
+            
+            // Load content
+            loadSCORMContent(config.contentUrl);
+            
+            logDebug('SCORM Wrapper initialized', {
+                version: SCORM_WRAPPER.version,
+                attemptId: SCORM_WRAPPER.attemptId,
+                courseId: SCORM_WRAPPER.courseId,
+                userId: SCORM_WRAPPER.userId
+            });
+        }
+
+        // Load SCORM content
+        function loadSCORMContent(contentUrl) {
+            if (!contentUrl) {
+                showError('No content URL provided');
+                return;
+            }
+            
+            const frame = document.getElementById('scorm-frame');
+            frame.src = contentUrl;
+            
+            frame.onload = function() {
+                logDebug('SCORM content loaded', { url: contentUrl });
+                updateStatus('Content loaded');
+            };
+            
+            frame.onerror = function() {
+                showError('Failed to load SCORM content');
+            };
+        }
+
+        // Start timer
+        function startTimer() {
+            SCORM_WRAPPER.startTime = new Date();
+            SCORM_WRAPPER.timer = setInterval(updateTimer, 1000);
+        }
+
+        // Update timer display
+        function updateTimer() {
+            if (!SCORM_WRAPPER.startTime) return;
+            
+            const now = new Date();
+            const diff = now - SCORM_WRAPPER.startTime;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('time-text').textContent = timeStr;
+        }
+
+        // Update status display
+        function updateStatus(status) {
+            SCORM_WRAPPER.status = status;
+            document.getElementById('status-text').textContent = status;
+            logDebug('Status updated', { status: status });
+        }
+
+        // Update score display
+        function updateScore(score) {
+            SCORM_WRAPPER.score = score;
+            document.getElementById('score-text').textContent = score;
+            logDebug('Score updated', { score: score });
+        }
+
+        // Commit data to server
+        function commitData() {
+            if (SCORM_WRAPPER.api) {
+                const result = SCORM_WRAPPER.api.LMSCommit("");
+                logDebug('Data committed', { result: result });
+                updateStatus('Data committed');
+            }
+        }
+
+        // Terminate session
+        function terminateSession() {
+            if (SCORM_WRAPPER.api) {
+                const result = SCORM_WRAPPER.api.LMSTerminate("");
+                logDebug('Session terminated', { result: result });
+                updateStatus('Session terminated');
+                
+                // Stop timer
+                if (SCORM_WRAPPER.timer) {
+                    clearInterval(SCORM_WRAPPER.timer);
+                }
+                
+                // Close window or redirect
+                setTimeout(() => {
+                    window.close();
+                }, 1000);
+            }
+        }
+
+        // Toggle debug panel
+        function toggleDebug() {
+            const debugPanel = document.getElementById('scorm-debug');
+            const debugText = document.getElementById('debug-text');
+            
+            if (debugPanel.classList.contains('show')) {
+                debugPanel.classList.remove('show');
+                debugText.textContent = 'Show Debug';
+                SCORM_WRAPPER.debug = false;
+            } else {
+                debugPanel.classList.add('show');
+                debugText.textContent = 'Hide Debug';
+                SCORM_WRAPPER.debug = true;
+            }
+        }
+
+        // Clear debug content
+        function clearDebug() {
+            document.getElementById('debug-content').innerHTML = '';
+        }
+
+        // Log debug information
+        function logDebug(message, data) {
+            if (!SCORM_WRAPPER.debug) return;
+            
+            const debugContent = document.getElementById('debug-content');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            
+            if (data) {
+                logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}: <pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } else {
+                logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            }
+            
+            debugContent.appendChild(logEntry);
+            debugContent.scrollTop = debugContent.scrollHeight;
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            
+            const container = document.querySelector('.scorm-container');
+            container.appendChild(errorDiv);
+            
+            logDebug('Error occurred', { message: message });
+        }
+
+        // Handle window beforeunload
+        window.addEventListener('beforeunload', function(e) {
+            if (SCORM_WRAPPER.api && SCORM_WRAPPER.api.LMSTerminate) {
+                SCORM_WRAPPER.api.LMSTerminate("");
+            }
+        });
+
+        // Example usage - you can call this with your configuration
+        function loadCourse(config) {
+            try {
+                initSCORMWrapper(config);
+            } catch (error) {
+                showError('Failed to initialize SCORM: ' + error.message);
+                logDebug('Initialization error', { error: error.message });
+            }
+        }
+
+        // Auto-initialize if configuration is provided via URL parameters
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const config = {
+                version: urlParams.get('version') || '1.2',
+                attemptId: urlParams.get('attemptId'),
+                courseId: urlParams.get('courseId'),
+                userId: urlParams.get('userId'),
+                contentUrl: urlParams.get('contentUrl')
+            };
+            
+            if (config.contentUrl) {
+                loadCourse(config);
+            } else {
+                // Show example configuration
+                logDebug('No configuration provided. Example usage:', {
+                    url: window.location.href + '?version=1.2&attemptId=123&courseId=456&userId=789&contentUrl=/scorm/course/index.html'
+                });
+            }
+        });
+
+        // Expose functions globally for external use
+        window.SCORM_WRAPPER = SCORM_WRAPPER;
+        window.loadCourse = loadCourse;
+        window.commitData = commitData;
+        window.terminateSession = terminateSession;
+    </script>
+</body>
+</html>

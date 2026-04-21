@@ -1,0 +1,627 @@
+{
+    "/api/study/contest-score/multiple-choice": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi trắc nghiệm",
+            "description": "API để lưu điểm câu hỏi trắc nghiệm trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi trắc nghiệm",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/fill-in-blank": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi điền từ",
+            "description": "API để lưu điểm câu hỏi điền từ trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi điền từ",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/ordering-and-dragdrop": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi sắp xếp",
+            "description": "API để lưu điểm câu hỏi sắp xếp trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi sắp xếp",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/matching": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi ghép cặp",
+            "description": "API để lưu điểm câu hỏi ghép cặp trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi ghép cặp",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/labeling": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi gắn nhãn",
+            "description": "API để lưu điểm câu hỏi gắn nhãn trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi gắn nhãn",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/category": {
+        "post": {
+            "summary": "Lưu điểm câu hỏi phân loại",
+            "description": "API để lưu điểm câu hỏi phân loại trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm câu hỏi phân loại",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/manual-scoring": {
+        "post": {
+            "summary": "Lưu điểm chấm thủ công",
+            "description": "API để lưu điểm chấm thủ công trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "score_data",
+                    "description": "Dữ liệu điểm chấm thủ công",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/submit-contest-round": {
+        "post": {
+            "summary": "Nộp bài vòng thi",
+            "description": "API để nộp bài vòng thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "submit_data",
+                    "description": "Dữ liệu nộp bài vòng thi",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/skip-question": {
+        "post": {
+            "summary": "Bỏ qua câu hỏi",
+            "description": "API để bỏ qua câu hỏi trong cuộc thi",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "skip_data",
+                    "description": "Dữ liệu bỏ qua câu hỏi",
+                    "required": true,
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-score/check-submit-contest-round": {
+        "get": {
+            "summary": "Kiểm tra nộp bài vòng thi",
+            "description": "API để kiểm tra xem có thể nộp bài vòng thi không",
+            "tags": [
+                "Contest Scoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "contest_round_id",
+                    "description": "ID vòng thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "OK",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}

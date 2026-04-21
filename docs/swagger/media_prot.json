@@ -1,0 +1,115 @@
+{
+  "prot.File": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "example": 1
+      },
+      "file_name": {
+        "type": "string",
+        "example": "16.BTH_3T_apple.png"
+      },
+      "url": {
+        "type": "string",
+        "example": "http://10.10.2.198:8080/public/videos/1746758323-16.BTH_3T_apple.png"
+      },
+      "path": {
+        "type": "string",
+        "example": "/public/videos/1746758323-16.BTH_3T_apple.png"
+      },
+      "file_size": {
+        "type": "string",
+        "example": "71.78 KB"
+      },
+      "file_extension": {
+        "type": "string",
+        "example": ".png"
+      },
+      "file_mime_type": {
+        "type": "string",
+        "example": "image/png"
+      },
+      "disk_name": {
+        "type": "string",
+        "example": "public"
+      },
+      "type": {
+        "type": "string",
+        "example": "image/png"
+      }
+    }
+  },
+  "prot.ChildrenMedia": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "example": 1
+      },
+      "parent_id": {
+        "type": "integer",
+        "example": 1
+      },
+      "path": {
+        "type": "string",
+        "example": "Images"
+      },
+      "full_path": {
+        "type": "string",
+        "example": "Images"
+      },
+      "disk_name": {
+        "type": "string",
+        "example": "public"
+      },
+      "children": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ChildrenMedia"
+        }
+      }
+    }
+  },
+  "prot.Media": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "example": 1
+      },
+      "parent_id": {
+        "type": "integer",
+        "example": 0
+      },
+      "path": {
+        "type": "string",
+        "example": "Images"
+      },
+      "disk_name": {
+        "type": "string",
+        "example": "public"
+      },
+      "children": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ChildrenMedia"
+        }
+      }
+    }
+  },
+  "prot.FileReponse": {
+    "type": "object",
+    "properties": {
+      "fies": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.File"
+        }
+      },
+      "total_count": {
+        "type": "integer"
+      }
+    }
+  }
+}

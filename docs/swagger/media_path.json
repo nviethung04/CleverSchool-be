@@ -1,0 +1,253 @@
+{
+  "/api/upload-file": {
+    "post": {
+      "summary": "Tải tệp lên",
+      "description": "API để tải tệp lên hệ thống",
+      "tags": [
+        "Medias"
+      ],
+      "consumes": [
+        "multipart/form-data"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "formData",
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "Tệp cần tải lên"
+        },
+        {
+          "in": "formData",
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Tên thư mục"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.File"
+          }
+        }
+      }
+    }
+  },
+  "/api/medias/folders": {
+    "get": {
+      "summary": "Lấy danh sách thư mục",
+      "description": "API để lấy dang sách thư mục",
+      "tags": [
+        "Medias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "folder_id",
+          "type": "integer",
+          "description": "Id thư mục"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Media"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo thư mục",
+      "description": "API để tạo thư mục",
+      "tags": [
+        "Medias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "formData",
+          "name": "parent_id",
+          "type": "integer",
+          "required": true,
+          "description": "Thư mục cha"
+        },
+        {
+          "in": "formData",
+          "name": "file_path",
+          "type": "strig",
+          "required": true,
+          "description": "Tên thư mục"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    }
+  },
+  "/api/medias/files/{folder_id}": {
+    "get": {
+      "summary": "Lấy danh sách files trong thư mục",
+      "description": "API để lấy dang sách files trong thư mục",
+      "tags": [
+        "Medias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "folder_id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID thư mục"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Lấy theo page",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng items trên trang",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Từ khóa tìm kiếm",
+          "required": false
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.FileReponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/medias/files/{file_id}": {
+    "delete": {
+      "summary": "Xóa file",
+      "description": "API để xóa file theo id",
+      "tags": [
+        "Medias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "file_id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID file"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    }
+  },
+  "/api/medias/folders/{folder_id}": {
+    "delete": {
+      "summary": "Xóa folder",
+      "description": "API để xóa folders theo id",
+      "tags": [
+        "Medias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "folders_id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID folders"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    }
+  }
+}

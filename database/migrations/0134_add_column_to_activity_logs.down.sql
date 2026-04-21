@@ -1,0 +1,3 @@
+ALTER TABLE activity_logs
+DROP COLUMN IF EXISTS session_id,
+DROP COLUMN IF EXISTS agent;

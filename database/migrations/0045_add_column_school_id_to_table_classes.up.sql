@@ -1,0 +1,2 @@
+ALTER TABLE classes
+ADD COLUMN "school_id" BIGINT DEFAULT NULL;

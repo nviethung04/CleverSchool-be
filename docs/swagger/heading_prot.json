@@ -1,0 +1,88 @@
+{
+  "prot.Heading": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "chapter_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonInfo"
+        }
+      },
+      "time": {
+        "type": "integer"
+      },
+      "sort_position": {
+        "type": "integer"
+      },
+      "target": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.HeadingRequest": {
+    "type": "object",
+    "properties": {
+      "chapter_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "target": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.HeadingListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "headings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Heading"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

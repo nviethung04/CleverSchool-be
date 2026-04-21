@@ -1,0 +1,90 @@
+{
+  "prot.Topic": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "parent_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "description": {
+        "type": "string"
+      },
+      "image_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.TopicRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "parent_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "description": {
+        "type": "string"
+      },
+      "image_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.TopicListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "topics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Topic"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

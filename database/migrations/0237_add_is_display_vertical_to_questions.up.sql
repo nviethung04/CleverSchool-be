@@ -1,0 +1,1 @@
+ALTER TABLE questions ADD COLUMN IF NOT EXISTS is_display_vertical BOOLEAN DEFAULT FALSE;

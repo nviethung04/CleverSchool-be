@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Dashboard School List
+message DashboardSchoolList {
+  int64 id = 1;
+  string school_name = 2;
+  string school_short_name = 3;
+  string ward_name = 4;
+  string province_name = 5;
+}
+
+message DashboardSchoolListResponse {
+  repeated DashboardSchoolList schools = 1;
+  int64 total = 2;
+}
+
+// Dashboard Course List
+message DashboardCourseList {
+  int64 id = 1;
+  string name = 2;
+  string object_title = 3;
+  int64 parent_course_id = 4;
+  int64 program_id = 5;
+  string program_name = 6;
+}
+
+message DashboardCourseListResponse {
+  repeated DashboardCourseList courses = 1;
+  int64 total = 2;
+}
+
+// Dashboard Teacher List
+message DashboardTeacherList {
+  int64 id = 1;
+  string name = 2;
+}
+
+message DashboardTeacherListResponse {
+  repeated DashboardTeacherList teachers = 1;
+  int64 total = 2;
+}
+
+// Dashboard Subject List
+message DashboardSubjectList {
+  int64 id = 1;
+  string name = 2;
+}
+
+message DashboardSubjectListResponse {
+  repeated DashboardSubjectList subjects = 1;
+  int64 total = 2;
+}
+
+// Dashboard Exam List
+message DashboardExamList {
+  int64 id = 1;
+  string name = 2;
+  int64 course_id = 3;
+  int64 subject_id = 4;
+}
+
+message DashboardExamListResponse {
+  repeated DashboardExamList exams = 1;
+  int64 total = 2;
+}
+
+// Dashboard Homework List
+message DashboardHomeworkList {
+  int64 id = 1;
+  string name = 2;
+  int64 course_id = 3;
+  int64 subject_id = 4;
+  string course_name = 5;
+  string subject_name = 6;
+  int64 lesson_id = 7;
+  string lesson_title = 8;
+  int64 assigned_at = 9;
+}
+
+message DashboardHomeworkListResponse {
+  repeated DashboardHomeworkList homeworks = 1;
+  int64 total = 2;
+}
+
+// Dashboard Lesson List
+message DashboardLessonList {
+  int64 id = 1;
+  string title = 2;
+  int64 chapter_id = 3;
+  string chapter_name = 4;
+  int64 course_id = 5;
+  string course_name = 6;
+}
+
+message DashboardLessonListResponse {
+  repeated DashboardLessonList lessons = 1;
+  int64 total = 2;
+}
+
+// Dashboard Chapter List
+message DashboardChapterList {
+  int64 id = 1;
+  string title = 2;
+  int64 course_id = 3;
+  string course_name = 4;
+}
+
+message DashboardChapterListResponse {
+  repeated DashboardChapterList chapters = 1;
+  int64 total = 2;
+}
+
+// Dashboard Class List
+message DashboardClassList {
+  int64 id = 1;
+  string class_name = 2;
+  int64 class_main_id = 3;
+  string class_main_name = 4;
+}
+
+message DashboardClassListResponse {
+  repeated DashboardClassList classes = 1;
+  int64 total = 2;
+}
+
+// Dashboard Class Main List
+message DashboardClassMainList {
+  int64 id = 1;
+  string name = 2;
+  int64 school_id = 3;
+}
+
+message DashboardClassMainListResponse {
+  repeated DashboardClassMainList class_mains = 1;
+  int64 total = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_list_entity.proto 

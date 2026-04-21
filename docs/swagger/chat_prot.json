@@ -1,0 +1,887 @@
+{
+    "ChatMessage": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "description": "ID của tin nhắn",
+                "example": 123
+            },
+            "content": {
+                "type": "string",
+                "description": "Nội dung tin nhắn",
+                "example": "Hello everyone!"
+            },
+            "user_id": {
+                "type": "integer",
+                "description": "ID của người gửi",
+                "example": 485
+            },
+            "user_name": {
+                "type": "string",
+                "description": "Tên người gửi",
+                "example": "John Doe"
+            },
+            "course_id": {
+                "type": "integer",
+                "description": "ID của course",
+                "example": 102
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian tạo",
+                "example": "2025-09-11T16:50:00Z"
+            },
+            "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian cập nhật",
+                "example": "2025-09-11T16:50:00Z"
+            },
+            "is_pinned": {
+                "type": "boolean",
+                "description": "Tin nhắn có được pin không",
+                "example": false
+            },
+            "replies_count": {
+                "type": "integer",
+                "description": "Số lượng replies",
+                "example": 3
+            },
+            "medias": {
+                "type": "array",
+                "description": "Danh sách media attachments",
+                "items": {
+                    "$ref": "#/definitions/ChatMedia"
+                }
+            },
+            "reactions": {
+                "type": "array",
+                "description": "Danh sách reactions",
+                "items": {
+                    "$ref": "#/definitions/ChatReaction"
+                }
+            }
+        },
+        "required": [
+            "id",
+            "content",
+            "user_id",
+            "user_name",
+            "course_id",
+            "created_at"
+        ]
+    },
+    "ChatReply": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "description": "ID của reply",
+                "example": 456
+            },
+            "content": {
+                "type": "string",
+                "description": "Nội dung reply",
+                "example": "Thanks for sharing!"
+            },
+            "user_id": {
+                "type": "integer",
+                "description": "ID của người reply",
+                "example": 487
+            },
+            "user_name": {
+                "type": "string",
+                "description": "Tên người reply",
+                "example": "Jane Smith"
+            },
+            "parent_message_id": {
+                "type": "integer",
+                "description": "ID của tin nhắn cha",
+                "example": 123
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian tạo",
+                "example": "2025-09-11T16:55:00Z"
+            },
+            "medias": {
+                "type": "array",
+                "description": "Danh sách media attachments",
+                "items": {
+                    "$ref": "#/definitions/ChatMedia"
+                }
+            }
+        },
+        "required": [
+            "id",
+            "content",
+            "user_id",
+            "user_name",
+            "parent_message_id",
+            "created_at"
+        ]
+    },
+    "ChatMedia": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "description": "ID của media",
+                "example": 789
+            },
+            "name": {
+                "type": "string",
+                "description": "Tên file",
+                "example": "image.jpg"
+            },
+            "type": {
+                "type": "string",
+                "description": "MIME type",
+                "example": "image/jpeg"
+            },
+            "size": {
+                "type": "integer",
+                "description": "Kích thước file (bytes)",
+                "example": 1024000
+            },
+            "url": {
+                "type": "string",
+                "description": "URL để truy cập file",
+                "example": "https://domain.com/uploads/image.jpg"
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian upload",
+                "example": "2025-09-11T16:50:00Z"
+            }
+        },
+        "required": [
+            "id",
+            "name",
+            "type",
+            "size",
+            "url",
+            "created_at"
+        ]
+    },
+    "ChatReaction": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "description": "ID của reaction",
+                "example": 101
+            },
+            "emoji": {
+                "type": "string",
+                "description": "Emoji reaction",
+                "example": "👍"
+            },
+            "user_id": {
+                "type": "integer",
+                "description": "ID của người react",
+                "example": 485
+            },
+            "user_name": {
+                "type": "string",
+                "description": "Tên người react",
+                "example": "John Doe"
+            },
+            "message_id": {
+                "type": "integer",
+                "description": "ID của tin nhắn",
+                "example": 123
+            },
+            "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian react",
+                "example": "2025-09-11T16:52:00Z"
+            }
+        },
+        "required": [
+            "id",
+            "emoji",
+            "user_id",
+            "user_name",
+            "message_id",
+            "created_at"
+        ]
+    },
+    "SendChatMessageRequest": {
+        "type": "object",
+        "properties": {
+            "content": {
+                "type": "string",
+                "description": "Nội dung tin nhắn",
+                "example": "Hello everyone!",
+                "minLength": 1,
+                "maxLength": 10000
+            },
+            "course_id": {
+                "type": "integer",
+                "description": "ID của course",
+                "example": 102
+            },
+            "media_ids": {
+                "type": "array",
+                "description": "Danh sách ID của media đã upload",
+                "items": {
+                    "type": "integer"
+                },
+                "example": [
+                    789,
+                    790
+                ]
+            }
+        },
+        "required": [
+            "content",
+            "course_id"
+        ]
+    },
+    "SendChatReplyRequest": {
+        "type": "object",
+        "properties": {
+            "content": {
+                "type": "string",
+                "description": "Nội dung reply",
+                "example": "Thanks for sharing!",
+                "minLength": 1,
+                "maxLength": 10000
+            },
+            "parent_message_id": {
+                "type": "integer",
+                "description": "ID của tin nhắn cha",
+                "example": 123
+            },
+            "course_id": {
+                "type": "integer",
+                "description": "ID của course",
+                "example": 102
+            },
+            "media_ids": {
+                "type": "array",
+                "description": "Danh sách ID của media đã upload",
+                "items": {
+                    "type": "integer"
+                },
+                "example": [
+                    791
+                ]
+            }
+        },
+        "required": [
+            "content",
+            "parent_message_id",
+            "course_id"
+        ]
+    },
+    "AddReactionRequest": {
+        "type": "object",
+        "properties": {
+            "emoji": {
+                "type": "string",
+                "description": "Emoji để react",
+                "example": "👍",
+                "pattern": "^[\\p{Emoji}]$"
+            }
+        },
+        "required": [
+            "emoji"
+        ]
+    },
+    "RemoveReactionRequest": {
+        "type": "object",
+        "properties": {
+            "emoji": {
+                "type": "string",
+                "description": "Emoji để xóa reaction",
+                "example": "👍",
+                "pattern": "^[\\p{Emoji}]$"
+            }
+        },
+        "required": [
+            "emoji"
+        ]
+    },
+    "ChatMessagesResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "array",
+                "description": "Danh sách tin nhắn",
+                "items": {
+                    "$ref": "#/definitions/ChatMessage"
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ChatMessageResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "$ref": "#/definitions/ChatMessage"
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ChatReplyResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "$ref": "#/definitions/ChatReply"
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ChatActionResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Action completed successfully"
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "UploadFilesResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "array",
+                "description": "Danh sách media đã upload",
+                "items": {
+                    "$ref": "#/definitions/ChatMedia"
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "PinnedMessagesResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "pinned_messages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ChatMessage"
+                        }
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 5
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "MessageCountResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "total_messages": {
+                        "type": "integer",
+                        "example": 1523
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "RecentMessagesResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "recent_messages": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ChatMessage"
+                        }
+                    },
+                    "count": {
+                        "type": "integer",
+                        "example": 10
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "MessageWithRepliesResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "$ref": "#/definitions/ChatMessage"
+                    },
+                    "replies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ChatReply"
+                        }
+                    },
+                    "replies_count": {
+                        "type": "integer",
+                        "example": 3
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ReactionResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "reaction": {
+                        "$ref": "#/definitions/ChatReaction"
+                    },
+                    "reaction_count": {
+                        "type": "integer",
+                        "description": "Tổng số reaction của emoji này",
+                        "example": 5
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "MessageReactionsResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "reactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/ChatReaction"
+                        }
+                    },
+                    "reaction_summary": {
+                        "type": "object",
+                        "description": "Tóm tắt reactions theo emoji",
+                        "example": {
+                            "👍": 5,
+                            "❤️": 3,
+                            "😂": 2
+                        }
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ActiveChannelsResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "channels": {
+                        "type": "array",
+                        "description": "Danh sách active Redis channels",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "chat:course:102",
+                            "chat:course:103",
+                            "chat:user:485"
+                        ]
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "ChannelStatsResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "channels": {
+                        "type": "array",
+                        "description": "Danh sách channels",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "chat:course:102",
+                            "chat:course:103"
+                        ]
+                    },
+                    "subscriber_counts": {
+                        "type": "object",
+                        "description": "Số lượng subscribers cho mỗi channel",
+                        "example": {
+                            "chat:course:102": 15,
+                            "chat:course:103": 8
+                        }
+                    },
+                    "total_channels": {
+                        "type": "integer",
+                        "description": "Tổng số channels active",
+                        "example": 2
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    },
+    "SSEEventData": {
+        "type": "object",
+        "description": "Cấu trúc dữ liệu SSE event",
+        "properties": {
+            "type": {
+                "type": "string",
+                "description": "Loại event",
+                "enum": [
+                    "connected",
+                    "message",
+                    "reply",
+                    "reaction",
+                    "pin",
+                    "delete",
+                    "heartbeat"
+                ],
+                "example": "message"
+            },
+            "message_id": {
+                "type": "integer",
+                "description": "ID của message (nếu có)",
+                "example": 123
+            },
+            "user_id": {
+                "type": "integer",
+                "description": "ID của user (nếu có)",
+                "example": 485
+            },
+            "course_id": {
+                "type": "integer",
+                "description": "ID của course (nếu có)",
+                "example": 102
+            },
+            "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Thời gian event",
+                "example": "2025-09-11T16:50:00Z"
+            },
+            "data": {
+                "type": "object",
+                "description": "Dữ liệu cụ thể của event",
+                "properties": {
+                    "message": {
+                        "$ref": "#/definitions/ChatMessage"
+                    },
+                    "reply": {
+                        "$ref": "#/definitions/ChatReply"
+                    },
+                    "reaction": {
+                        "$ref": "#/definitions/ChatReaction"
+                    },
+                    "is_pinned": {
+                        "type": "boolean"
+                    },
+                    "action": {
+                        "type": "string"
+                    },
+                    "emoji": {
+                        "type": "string"
+                    },
+                    "reaction_count": {
+                        "type": "integer"
+                    },
+                    "user_name": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "parent_message_id": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "required": [
+            "type",
+            "timestamp"
+        ]
+    },
+    "ErrorResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 400
+            },
+            "message": {
+                "type": "string",
+                "example": "Bad Request"
+            },
+            "data": {
+                "type": "object",
+                "nullable": true
+            },
+            "error": {
+                "type": "string",
+                "description": "Chi tiết lỗi",
+                "example": "Invalid course ID"
+            }
+        }
+    },
+    "RecentSender": {
+        "type": "object",
+        "description": "Thông tin người gửi tin nhắn gần đây kèm tin nhắn cuối cùng",
+        "properties": {
+            "sender": {
+                "$ref": "#/definitions/ChatUserResponse",
+                "description": "Thông tin người gửi"
+            },
+            "last_message": {
+                "$ref": "#/definitions/ChatMessage",
+                "description": "Tin nhắn cuối cùng từ người gửi này"
+            }
+        },
+        "required": [
+            "sender",
+            "last_message"
+        ]
+    },
+    "ChatUserResponse": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer",
+                "description": "ID của user",
+                "example": 485
+            },
+            "username": {
+                "type": "string",
+                "description": "Username",
+                "example": "john_doe"
+            },
+            "full_name": {
+                "type": "string",
+                "description": "Tên đầy đủ",
+                "example": "John Doe"
+            },
+            "avatar": {
+                "type": "string",
+                "description": "URL avatar",
+                "example": "https://domain.com/uploads/avatar.jpg"
+            }
+        },
+        "required": [
+            "id",
+            "username",
+            "full_name"
+        ]
+    },
+    "RecentSendersResponse": {
+        "type": "object",
+        "properties": {
+            "code": {
+                "type": "integer",
+                "example": 200
+            },
+            "message": {
+                "type": "string",
+                "example": "success"
+            },
+            "data": {
+                "type": "object",
+                "properties": {
+                    "senders": {
+                        "type": "array",
+                        "description": "Danh sách người gửi tin nhắn gần đây",
+                        "items": {
+                            "$ref": "#/definitions/RecentSender"
+                        }
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "Số lượng người gửi",
+                        "example": 5
+                    }
+                }
+            },
+            "error": {
+                "type": "string",
+                "example": ""
+            }
+        }
+    }
+}

@@ -1,0 +1,293 @@
+{
+  "/api/manage/holidays": {
+    "get": {
+      "description": "API để lấy danh sách ngày nghỉ",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Holidays"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "semester_id",
+          "description": "Lọc theo ngày nghỉ",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Lọc theo trạng thái (1, 0)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false
+        }
+      ],
+      "summary": "Danh sách ngày nghỉ",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.HolidayListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo ngày nghỉ mới",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Holidays"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo ngày nghỉ",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "holiday",
+          "description": "Thông tin ngày nghỉ",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.HolidayRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo ngày nghỉ thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Holiday"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/holidays/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết ngày nghỉ",
+      "description": "API để lấy thông tin chi tiết của một ngày nghỉ theo ID",
+      "tags": [
+        "Holidays"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của ngày nghỉ"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Holiday"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin ngày nghỉ",
+      "description": "API để cập nhật một ngày nghỉ theo ID",
+      "tags": [
+        "Holidays"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID ngày nghỉ"
+        },
+        {
+          "in": "body",
+          "name": "holiday",
+          "description": "Thông tin ngày nghỉ cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.HolidayRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Holiday"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá ngày nghỉ",
+      "description": "API để xoá một ngày nghỉ theo ID",
+      "tags": [
+        "Holidays"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỹ năng"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/holidays/{id}/restore": {
+    "patch": {
+      "summary": "Khôi phục ngày nghỉ",
+      "description": "API để khôi phục ngày nghỉ đã xoá",
+      "tags": [
+        "Holidays"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID ngày nghỉ"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Khôi phục thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Holiday"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,299 @@
+{
+  "/api/manage/semesters": {
+    "get": {
+      "description": "API để lấy danh sách kỳ học",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Semesters"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "by_user",
+          "description": "Lọc theo user",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "is_current",
+          "description": "Lọc theo thời gian hiện tại",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Lọc theo trạng thái (1, 0)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false
+        }
+      ],
+      "summary": "Danh sách kỳ học",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.SemesterListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo kỳ học mới",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Semesters"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo kỳ học",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "semester",
+          "description": "Thông tin kỳ học",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SemesterRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo kỳ học thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Semester"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/semesters/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết kỳ học",
+      "description": "API để lấy thông tin chi tiết của một kỳ học theo ID",
+      "tags": [
+        "Semesters"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của kỳ học"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Semester"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin kỳ học",
+      "description": "API để cập nhật một kỳ học theo ID",
+      "tags": [
+        "Semesters"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỳ học"
+        },
+        {
+          "in": "body",
+          "name": "semester",
+          "description": "Thông tin kỳ học cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SemesterRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Semester"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá kỳ học",
+      "description": "API để xoá một kỳ học theo ID",
+      "tags": [
+        "Semesters"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỹ năng"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/semesters/{id}/restore": {
+    "patch": {
+      "summary": "Khôi phục kỳ học",
+      "description": "API để khôi phục kỳ học đã xoá",
+      "tags": [
+        "Semesters"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỳ học"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Khôi phục thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Semester"
+          }
+        }
+      }
+    }
+  }
+}

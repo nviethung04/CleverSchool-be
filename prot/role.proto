@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package models;
+
+option go_package = "be-lms/prot";
+
+message PermissionGroup {
+  string name = 1;
+  int32 sort_position = 2;
+  map<string, bool> actions = 3;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
+  string created_at = 3;
+  string updated_at = 4;
+  bool status = 5;
+  string default_page_view = 6;
+  int64 default_page_id = 7;
+}
+
+message RoleList {
+  repeated Role roles = 1;
+}
+
+message RoleResponse {
+  Role role = 1;
+  string message = 2;
+}
+
+message RolesResponse {
+  repeated Role roles = 1;
+  uint64 total_count = 2;
+}
+
+message PermissionGroupEntry {
+    string key = 1;
+    PermissionGroup value = 2;
+}
+
+message PermissionGroups {
+    repeated PermissionGroupEntry permissions = 1;
+}
+
+message RolePermission {
+  Role role = 1;
+  map<string, PermissionGroup> permissions = 2;
+}
+
+message RoleAction {
+  string key = 1;
+  string name = 2;
+}
+
+message PermissionGroupAction {
+  string key = 1;
+  string name = 2;
+  int32 sort_position = 3;
+  repeated RoleAction actions = 4;
+}
+
+message RolePermissionsList {
+  repeated RolePermission role_permissions = 1;
+  repeated PermissionGroupAction permissions = 2;
+}
+
+message RoleActionDisplay {
+  string key = 1;
+  string name = 2;
+  bool is_display = 3;
+}
+
+message PermissionGroupDisplay {
+  string key = 1;
+  string name = 2;
+  int32 sort_position = 3;
+  repeated RoleActionDisplay actions = 4;
+}
+
+message RolePermissionsDisplayList {
+  repeated PermissionGroupDisplay permissions = 1;
+}

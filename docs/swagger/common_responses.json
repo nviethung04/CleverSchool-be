@@ -1,0 +1,86 @@
+{
+    "BadRequest": {
+        "description": "Bad Request - Invalid request parameters",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "success": {
+                            "type": "boolean",
+                            "example": false
+                        },
+                        "message": {
+                            "type": "string",
+                            "example": "Invalid request parameters"
+                        },
+                        "error": {
+                            "type": "string",
+                            "example": "Validation failed"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Unauthorized": {
+        "description": "Unauthorized - Authentication required",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "success": {
+                            "type": "boolean",
+                            "example": false
+                        },
+                        "message": {
+                            "type": "string",
+                            "example": "Authentication required"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "NotFound": {
+        "description": "Not Found - Resource not found",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "success": {
+                            "type": "boolean",
+                            "example": false
+                        },
+                        "message": {
+                            "type": "string",
+                            "example": "Resource not found"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "InternalServerError": {
+        "description": "Internal Server Error - Something went wrong",
+        "content": {
+            "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "success": {
+                            "type": "boolean",
+                            "example": false
+                        },
+                        "message": {
+                            "type": "string",
+                            "example": "Internal server error"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

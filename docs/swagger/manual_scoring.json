@@ -1,0 +1,94 @@
+{
+  "/api/study/save-answer/manual-scoring": {
+    "post": {
+      "summary": "Save manual scoring answer",
+      "description": "API để lưu câu trả lời cần chấm điểm thủ công",
+      "tags": [
+        "ManualScoring"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời cần chấm thủ công",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 192,
+              "lesson_id": 25,
+              "answer": "Đây là câu trả lời của học sinh",
+              "file_url": "https://example.com/file.pdf"
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/manual-scoring": {
+    "post": {
+      "summary": "Save manual scoring result",
+      "description": "API để lưu kết quả chấm điểm thủ công",
+      "tags": [
+        "ManualScoring"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "scoring",
+          "description": "Thông tin kết quả chấm điểm",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "user_id": 123,
+              "lesson_id": 25,
+              "score_list": {
+                "192": 8.5,
+                "193": 9.0
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  }
+}

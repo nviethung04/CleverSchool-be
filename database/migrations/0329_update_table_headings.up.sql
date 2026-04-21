@@ -1,0 +1,3 @@
+ALTER TABLE headings
+  ADD COLUMN target VARCHAR(255);
+  

@@ -1,0 +1,104 @@
+{
+    "/api/manage/weeks": {
+        "get": {
+            "description": "API để lấy danh sách tuần",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Weeks"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lọc theo khóa",
+                    "required": false
+                },
+                {
+                    "in": "semester_id",
+                    "name": "per_page",
+                    "description": "Lọc theo kỳ",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Trang hiện tại",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng mỗi trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách tuần",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.WeekListResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/weeks/by-date": {
+        "get": {
+            "description": "API để lấy danh sách tuần",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Weeks"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "date",
+                    "description": "Tìm theo ngày",
+                    "required": false
+                }
+            ],
+            "summary": "Tuần",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Week"
+                    }
+                }
+            }
+        }
+    }
+}

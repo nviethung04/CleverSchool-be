@@ -1,0 +1,493 @@
+{
+  "/api/dashboard/teacher/homework-unscored": {
+    "get": {
+      "description": "API để lấy danh sách homework chưa được chấm điểm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng per page",
+          "required": false,
+          "type": "integer",
+          "default": 10
+        },
+        {
+          "in": "query",
+          "name": "sort",
+          "description": "Sắp xếp theo field và order (VD: created_at:desc)",
+          "required": false,
+          "type": "object"
+        },
+        {
+          "in": "query",
+          "name": "start_date",
+          "description": "Ngày bắt đầu (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "end_date",
+          "description": "Ngày kết thúc (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo ID khóa học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "homework_id",
+          "description": "Lọc theo ID bài tập",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Lấy danh sách homework chưa chấm điểm",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.DashboardTeacherHomeworkUnscoredListResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/dashboard/teacher/homework-scored": {
+    "get": {
+      "description": "API để lấy danh sách homework đã được chấm điểm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng per page",
+          "required": false,
+          "type": "integer",
+          "default": 10
+        },
+        {
+          "in": "query",
+          "name": "sort",
+          "description": "Sắp xếp theo field và order (VD: created_at:desc)",
+          "required": false,
+          "type": "object"
+        },
+        {
+          "in": "query",
+          "name": "start_date",
+          "description": "Ngày bắt đầu (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "end_date",
+          "description": "Ngày kết thúc (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo ID khóa học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "homework_id",
+          "description": "Lọc theo ID bài tập",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Lấy danh sách homework đã chấm điểm",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.DashboardTeacherHomeworkScoredListResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/dashboard/teacher/homework-overview": {
+    "get": {
+      "description": "API để lấy số lượng homework đã nộp, đã chấm, chưa chấm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "summary": "Lấy số lượng homework đã nộp, đã chấm, chưa chấm",
+      "responses": {
+      }
+    }
+  },
+  "/api/dashboard/teacher/exam-unscored": {
+    "get": {
+      "description": "API để lấy danh sách exam chưa được chấm điểm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng per page",
+          "required": false,
+          "type": "integer",
+          "default": 10
+        },
+        {
+          "in": "query",
+          "name": "sort",
+          "description": "Sắp xếp theo field và order (VD: created_at:desc)",
+          "required": false,
+          "type": "object"
+        },
+        {
+          "in": "query",
+          "name": "start_date",
+          "description": "Ngày bắt đầu (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "end_date",
+          "description": "Ngày kết thúc (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo ID khóa học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "exam_id",
+          "description": "Lọc theo ID bài thi",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Lấy danh sách exam chưa chấm điểm",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.DashboardTeacherExamUnscoredListResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/dashboard/teacher/exam-scored": {
+    "get": {
+      "description": "API để lấy danh sách exam đã được chấm điểm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng per page",
+          "required": false,
+          "type": "integer",
+          "default": 10
+        },
+        {
+          "in": "query",
+          "name": "sort",
+          "description": "Sắp xếp theo field và order (VD: created_at:desc)",
+          "required": false,
+          "type": "object"
+        },
+        {
+          "in": "query",
+          "name": "start_date",
+          "description": "Ngày bắt đầu (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "end_date",
+          "description": "Ngày kết thúc (timestamp)",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo ID khóa học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "exam_id",
+          "description": "Lọc theo ID bài thi",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Lấy danh sách exam đã chấm điểm",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.DashboardTeacherExamScoredListResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/dashboard/teacher/exam-overview": {
+    "get": {
+      "description": "API để lấy số lượng exam đã nộp, đã chấm, chưa chấm",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "summary": "Lấy số lượng exam đã nộp, đã chấm, chưa chấm",
+      "responses": {
+      }
+    }
+  },
+  "/api/dashboard/assessment/report": {
+    "get": {
+      "description": "API để lấy báo cáo chấm điểm tiêu chí theo lớp (theo assessment)",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard Teacher"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "class_id",
+          "description": "ID lớp học",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "assessment_id",
+          "description": "ID bài đánh giá (assessment)",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "student_id",
+          "description": "Lọc theo 1 học sinh (tùy chọn)",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "get_score",
+          "description": "Nếu true, trả thêm điểm và chi tiết điểm theo tiêu chí",
+          "required": false,
+          "type": "boolean"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer",
+          "default": 1
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng per page (0 = không giới hạn)",
+          "required": false,
+          "type": "integer",
+          "default": 0
+        }
+      ],
+      "summary": "Báo cáo chấm điểm tiêu chí theo lớp",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentReportResponse"
+          }
+        }
+      }
+    }
+  }
+}

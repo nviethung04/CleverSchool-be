@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson: Introduction to Web Development</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .presentation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .slide h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .slide p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            font-size: 1.1em;
+            line-height: 1.8;
+            margin-left: 20px;
+        }
+
+        .slide li {
+            margin-bottom: 8px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .content-text {
+            padding: 20px;
+        }
+
+        .content-visual {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .emoji-large {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .slide {
+                padding: 20px;
+            }
+
+            .slide h1 {
+                font-size: 2em;
+            }
+
+            .navigation {
+                bottom: 20px;
+            }
+
+            .slide-counter {
+                top: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">Slide 1 of 5</div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Introduction -->
+        <div class="slide active" id="slide1">
+            <h1>🌐 Introduction to Web Development</h1>
+            <div class="content-grid">
+                <div class="content-text">
+                    <h2>Welcome to the Course!</h2>
+                    <p>In this lesson, we'll explore the fundamentals of web development and learn how to create modern, responsive websites.</p>
+                    <ul>
+                        <li>Understanding the web ecosystem</li>
+                        <li>HTML, CSS, and JavaScript basics</li>
+                        <li>Responsive design principles</li>
+                        <li>Modern development tools</li>
+                    </ul>
+                </div>
+                <div class="content-visual">
+                    <div class="emoji-large">🚀</div>
+                    <p>Ready to start your web development journey?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: HTML Basics -->
+        <div class="slide" id="slide2">
+            <h1>📝 HTML Fundamentals</h1>
+            <div class="content-grid">
+                <div class="content-text">
+                    <h2>What is HTML?</h2>
+                    <p>HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of web content.</p>
+                    <h3>Key Concepts:</h3>
+                    <ul>
+                        <li><span class="highlight">Elements</span> - Building blocks of HTML</li>
+                        <li><span class="highlight">Tags</span> - Define elements</li>
+                        <li><span class="highlight">Attributes</span> - Provide additional information</li>
+                        <li><span class="highlight">Semantic HTML</span> - Meaningful structure</li>
+                    </ul>
+                </div>
+                <div class="content-visual">
+                    <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello World!&lt;/h1&gt;
+    &lt;p&gt;Welcome to web development.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: CSS Styling -->
+        <div class="slide" id="slide3">
+            <h1>🎨 CSS Styling</h1>
+            <div class="content-grid">
+                <div class="content-text">
+                    <h2>Cascading Style Sheets</h2>
+                    <p>CSS is used to style and layout web pages. It controls the visual presentation of HTML elements.</p>
+                    <h3>CSS Features:</h3>
+                    <ul>
+                        <li><span class="highlight">Selectors</span> - Target specific elements</li>
+                        <li><span class="highlight">Properties</span> - Define styles</li>
+                        <li><span class="highlight">Flexbox & Grid</span> - Modern layouts</li>
+                        <li><span class="highlight">Responsive Design</span> - Mobile-friendly</li>
+                    </ul>
+                </div>
+                <div class="content-visual">
+                    <div class="code-block">
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: #667eea;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: JavaScript -->
+        <div class="slide" id="slide4">
+            <h1>⚡ JavaScript Programming</h1>
+            <div class="content-grid">
+                <div class="content-text">
+                    <h2>Adding Interactivity</h2>
+                    <p>JavaScript is a programming language that enables interactive web pages and dynamic content.</p>
+                    <h3>JavaScript Capabilities:</h3>
+                    <ul>
+                        <li><span class="highlight">DOM Manipulation</span> - Change page content</li>
+                        <li><span class="highlight">Event Handling</span> - Respond to user actions</li>
+                        <li><span class="highlight">AJAX</span> - Load data dynamically</li>
+                        <li><span class="highlight">Frameworks</span> - React, Vue, Angular</li>
+                    </ul>
+                </div>
+                <div class="content-visual">
+                    <div class="code-block">
+// Simple JavaScript example
+document.addEventListener('DOMContentLoaded', function() {
+    const button = document.querySelector('.btn');
+    const counter = document.querySelector('.counter');
+    let count = 0;
+
+    button.addEventListener('click', function() {
+        count++;
+        counter.textContent = count;
+    });
+});
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Conclusion -->
+        <div class="slide" id="slide5">
+            <h1>🎯 What's Next?</h1>
+            <div class="content-grid">
+                <div class="content-text">
+                    <h2>Your Learning Path</h2>
+                    <p>Congratulations! You've completed the introduction to web development. Here's what you can do next:</p>
+                    <ul>
+                        <li>Practice with hands-on projects</li>
+                        <li>Learn a JavaScript framework</li>
+                        <li>Explore backend development</li>
+                        <li>Build a portfolio website</li>
+                        <li>Join developer communities</li>
+                    </ul>
+                    <h3>Remember:</h3>
+                    <p><span class="highlight">Practice makes perfect!</span> Keep coding, keep learning, and never stop exploring new technologies.</p>
+                </div>
+                <div class="content-visual">
+                    <div class="emoji-large">🎉</div>
+                    <p>You're ready to build amazing websites!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function showSlide(slideNumber) {
+            // Hide all slides
+            for (let i = 1; i <= totalSlides; i++) {
+                document.getElementById(`slide${i}`).classList.remove('active');
+            }
+
+            // Show current slide
+            document.getElementById(`slide${slideNumber}`).classList.add('active');
+
+            // Update slide counter
+            document.getElementById('slideCounter').textContent = `Slide ${slideNumber} of ${totalSlides}`;
+
+            // Update progress bar
+            const progress = ((slideNumber - 1) / (totalSlides - 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = slideNumber === 1;
+            document.getElementById('nextBtn').disabled = slideNumber === totalSlides;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                event.preventDefault();
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                previousSlide();
+            } else if (event.key === 'Home') {
+                event.preventDefault();
+                currentSlide = 1;
+                showSlide(currentSlide);
+            } else if (event.key === 'End') {
+                event.preventDefault();
+                currentSlide = totalSlides;
+                showSlide(currentSlide);
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(event) {
+            touchStartX = event.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            touchEndX = event.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next slide
+                    nextSlide();
+                } else {
+                    // Swipe right - previous slide
+                    previousSlide();
+                }
+            }
+        }
+
+        // Initialize first slide
+        showSlide(1);
+    </script>
+</body>
+</html>

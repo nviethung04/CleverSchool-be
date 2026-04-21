@@ -1,0 +1,747 @@
+{
+  "prot.SourceQuestion": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "skill": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "content": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "medias": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.SourceQuestionRequest": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "skill": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "content": {
+        "type": "string"
+      },
+      "medias": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.QuestionSubjectInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.Question": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "kind": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "instructions": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "time": {
+            "type": "integer"
+          },
+          "display": {
+            "type": "string"
+          }
+        }
+      },
+      "content": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "media": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "blanks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "coordinates": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "integer"
+                    },
+                    "y": {
+                      "type": "integer"
+                    },
+                    "w": {
+                      "type": "integer"
+                    },
+                    "h": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "correct_answers": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "attributes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.QuestionAttributeInfo"
+        }
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "subject": {
+        "$ref": "#/definitions/prot.QuestionSubjectInfo"
+      },
+      "sort_position": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "image_width": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "image_height": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "source_question_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "source": {
+        "$ref": "#/definitions/prot.SourceQuestion"
+      }
+    }
+  },
+  "prot.QuestionRequest": {
+    "type": "object",
+    "properties": {
+      "kind": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "metadata": {
+        "type": "object",
+        "properties": {
+          "instructions": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "time": {
+            "type": "integer"
+          },
+          "display": {
+            "type": "string"
+          }
+        }
+      },
+      "content": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "media": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
+          },
+          "medias": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "options": {
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "media": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "blanks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer"
+                },
+                "coordinates": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "integer"
+                    },
+                    "y": {
+                      "type": "integer"
+                    },
+                    "w": {
+                      "type": "integer"
+                    },
+                    "h": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "correct_answers": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "attributes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.QuestionAttributeInfo"
+        }
+      },
+      "sort_position": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "image_width": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "image_height": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "source_question_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "source": {
+        "$ref": "#/definitions/prot.SourceQuestion"
+      }
+    }
+  },
+  "prot.QuestionListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Question"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.ListQuestionAttribute": {
+    "type": "array",
+    "items": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "parent_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "subject_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "integer"
+        },
+        "level": {
+          "type": "integer"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "parent_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "subject_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "integer"
+              },
+              "level": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.QuestionAttributeInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "prot.RelationRequest": {
+    "type": "object",
+    "properties": {
+      "exam_id": {
+        "type": "integer",
+        "description": "ID của bài thi"
+      },
+      "homework_id": {
+        "type": "integer",
+        "description": "ID của bài tập về nhà"
+      },
+      "level_test_id": {
+        "type": "integer",
+        "description": "ID của bài test"
+      },
+      "lesson_plan_part_id": {
+        "type": "integer",
+        "description": "ID của bài học"
+      },
+      "question_scores": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "description": "Danh sách điểm câu hỏi"
+      },
+      "source_question_scores": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "description": "Danh sách điểm nguồn câu hỏi"
+      },
+      "is_reset": {
+        "type": "boolean",
+        "description": "Có reset hay không"
+      },
+      "reset_all": {
+        "type": "boolean",
+        "description": "Reset toàn bộ hay không"
+      },
+      "sort_question_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        },
+        "description": "Danh sách ID câu hỏi để sắp xếp"
+      }
+    }
+  }
+}

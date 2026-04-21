@@ -1,0 +1,271 @@
+{
+  "/api/manage/study-report-criterias": {
+    "get": {
+      "description": "API để lấy danh sách tiêu chí báo cáo học tập",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "StudyReportCriterias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "subject_id",
+          "description": "Lọc theo môn học",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Danh sách tiêu chí báo cáo học tập",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteriasResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo tiêu chí báo cáo học tập mới. Có hai cách: (1) Truyền copy_from_study_report_criteria_id: tạo bản ghi mới bằng cách copy từ tiêu chí có ID đó (các trường khác không bắt buộc). (2) Truyền subject_id, name, star_skills, check_skills,... để tạo tiêu chí mới thủ công.",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "StudyReportCriterias"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo tiêu chí báo cáo học tập",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "study_report_criteria",
+          "description": "Thông tin tiêu chí báo cáo học tập. Nếu truyền copy_from_study_report_criteria_id thì chỉ cần field đó.",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteriaRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo tiêu chí báo cáo học tập thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteria"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/study-report-criterias/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết tiêu chí báo cáo học tập",
+      "description": "API để lấy thông tin chi tiết của một tiêu chí báo cáo học tập theo ID",
+      "tags": [
+        "StudyReportCriterias"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của tiêu chí báo cáo học tập"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteria"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin tiêu chí báo cáo học tập",
+      "description": "API để cập nhật một tiêu chí báo cáo học tập theo ID",
+      "tags": [
+        "StudyReportCriterias"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID tiêu chí báo cáo học tập"
+        },
+        {
+          "in": "body",
+          "name": "study_report_criteria",
+          "description": "Thông tin tiêu chí báo cáo học tập cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteriaRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportCriteria"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá tiêu chí báo cáo học tập",
+      "description": "API để xoá một tiêu chí báo cáo học tập theo ID",
+      "tags": [
+        "StudyReportCriterias"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID tiêu chí báo cáo học tập"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

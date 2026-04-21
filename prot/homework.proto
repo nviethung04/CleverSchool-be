@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message HomeworkFile {
+  string type = 1;
+  string url = 2;
+}
+
+message Homework {
+  int64 id = 1;
+  int64 lesson_id = 2;
+  string name = 3;
+  int32 status = 4;
+  string description = 5;
+  float max_score = 6;
+  string cover_image = 7;
+  int64 created_at = 8;
+  int64 created_by = 9;
+  int64 updated_at = 10;
+  int64 updated_by = 11;
+  bool is_assigned = 12;
+  int32 total_questions = 13;
+  int32 question_completed = 14;
+  int64 last_question_id_completed = 15;
+  string object_title = 16;
+  bool is_random_question = 17;
+  string question_form = 18;
+  repeated HomeworkFile question_files = 19;
+}
+
+message HomeworkRequest {
+  int64 id = 1;
+  int64 lesson_id = 2;
+  string name = 3;
+  int32 status = 4;
+  string description = 5;
+  float max_score = 6;
+  string cover_image = 7;
+  int64 created_at = 8;
+  int64 created_by = 9;
+  int64 updated_at = 10;
+  int64 updated_by = 11;
+  bool is_assigned = 12;
+  int32 total_questions = 13;
+  int32 question_completed = 14;
+  int64 last_question_id_completed = 15;
+  string object_title = 16;
+  bool is_random_question = 17;
+  string question_form = 18;
+  repeated HomeworkFile question_files = 19;
+}
+
+message HomeworkListResponse {
+  repeated Homework homeworks = 1;
+  int64 total = 2;
+}
+
+message HomeworkStudentsRequest {
+  int64 homework_id = 1;
+}
+
+message HomeworkStudentInfo {
+  int64 user_id = 1;
+  string name = 2;
+  string username = 3;
+  string avatar = 4;
+  int64 questions_completed = 5;
+  int64 last_question_id_completed = 6;
+  int64 updated_at = 7; // timestamp
+  int32 manual_questions_count = 8; // số câu hỏi manual scoring đã làm
+  string object_title = 9;
+  int64 course_id = 10; // course mà học sinh thuộc về
+  bool is_submitted = 11;
+}
+
+message HomeworkStudentsResponse {
+  message HomeworkInfo {
+    string name = 1;
+    string description = 2;
+    int32 status = 3;
+    string cover_image = 4;
+    bool is_assigned = 5;
+    int32 total_questions = 6;
+    int64 created_at = 7; // timestamp
+    string object_title = 8;
+    string question_form = 9;
+    repeated HomeworkFile question_files = 10;
+  }
+  HomeworkInfo homework_info = 1;
+  repeated HomeworkStudentInfo students = 2;
+}
+
+message ClonedHomeworkRequest {
+  int64 lesson_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message AssignedHomework {
+  int64 lesson_id = 1;
+  int64 course_id = 2;
+  bool is_assigned = 3;
+}
+
+message HomeworkByCourse {
+  repeated Homework homeworks = 1;
+  repeated Homework homework_by_programs = 2;
+}
+
+message HomeworkStudentsDoingItem {
+  int64 user_id = 1;
+  string username = 2;
+  string name = 3;
+  string school_name = 4;
+  int64 homework_id = 5;
+  int64 submitted_at = 6;
+}
+
+message HomeworkStudentsDoingResponse {
+  repeated HomeworkStudentsDoingItem students = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message TeacherEvaluateRequest {
+  int64 user_id = 1;
+  int64 object_id = 2;
+  string object_type = 3;
+  string rate = 4;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/homework.proto

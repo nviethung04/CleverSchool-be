@@ -1,0 +1,141 @@
+{
+  "prot.School": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "short_name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "ward_code": {
+        "type": "string"
+      },
+      "ward_name": {
+        "type": "string"
+      },
+      "province_code": {
+        "type": "string"
+      },
+      "province_name": {
+        "type": "string"
+      },
+      "address_vn": {
+        "type": "string"
+      },
+      "address_en": {
+        "type": "string"
+      },
+      "parent_school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "contact_name": {
+        "type": "string"
+      },
+      "contact_phone": {
+        "type": "string"
+      },
+      "contact_mail": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "logo": {
+        "type": "string"
+      },
+      "class_count": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "student_count": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.SchoolRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "short_name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "ward_code": {
+        "type": "string"
+      },
+      "address_vn": {
+        "type": "string"
+      },
+      "address_en": {
+        "type": "string"
+      },
+      "parent_school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "contact_name": {
+        "type": "string"
+      },
+      "contact_phone": {
+        "type": "string"
+      },
+      "contact_mail": {
+        "type": "string"
+      },
+      "logo": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.SchoolListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "schools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.School"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

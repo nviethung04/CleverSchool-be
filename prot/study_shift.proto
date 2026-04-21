@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message StudyShift {
+  int64 id = 1;
+  string name = 2;
+  string start_time = 3;
+  string end_time = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message StudyShiftRequest {
+  int64 id = 1;
+  string name = 2;
+  string start_time = 3;
+  string end_time = 4;
+}
+
+message StudyShiftInfo {
+  int64 id = 1;
+  string name = 2;
+  string start_time = 3;
+  string end_time = 4;
+  int32 day_of_week = 5;
+}
+
+message StudyShiftsResponse {
+  repeated StudyShift study_shifts = 1;
+  uint64 total_count = 2;
+}

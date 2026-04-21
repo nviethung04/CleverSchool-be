@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message ExamCourseRequest {
+  int64 course_id = 1;
+  bool is_assigned = 2;
+}
+
+message ExamCourseInfo {
+  string name = 1;
+  string description = 2;
+  bool status = 3;
+}
+
+message ExamCourseChapterInfo {
+  string title = 1;
+  string description = 2;
+  bool status = 3;
+}
+
+message ExamCourseExamInfo {
+  int64 id = 1;
+  string name = 2;
+  string lesson_title = 3;
+  string description = 4;
+  string cover_image = 5;
+  int64 deadline = 6;
+  int32 status = 7;
+  bool is_assigned = 8;
+  int32 students_done = 9;
+  int32 students_not_scored = 10;
+}
+
+message ExamCourseChapter {
+  ExamCourseChapterInfo chapter_info = 1;
+  repeated ExamCourseExamInfo exams = 2;
+}
+
+message ExamCourseResponse {
+  ExamCourseInfo course_info = 1;
+  repeated ExamCourseChapter chapters = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/exam_course.proto

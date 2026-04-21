@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message TeachingPlanLessonInfo {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message TeachingPlanApproved {
+  int64 approved_by = 1;
+  string approved_at = 2;
+  string approved_note = 3;
+  bool status = 4;
+}
+
+message TeachingPlan {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string file_url = 4;
+  string file_type = 5;
+  TeachingPlanApproved approved = 6;
+  TeachingPlanLessonInfo lesson = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message TeachingPlanRequest {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string file_url = 4;
+  string file_type = 5;
+  TeachingPlanLessonInfo lesson = 6;
+}
+
+message TeachingPlanApproveRequest {
+  int64 id = 1;
+  string approved_note = 2;
+  bool status = 3;
+}
+
+message TeachingPlansResponse {
+  repeated TeachingPlan teaching_plans = 1;
+  uint64 total_count = 2;
+}

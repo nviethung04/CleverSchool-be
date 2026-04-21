@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message Week {
+  int64 id = 1;
+  int32 year = 2;
+  int32 week_number = 3;
+  string start_date = 4;
+  string end_date = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  int32 number = 8;
+}
+
+message WeekInfo {
+  int64 id = 1;
+  int32 year = 2;
+  int32 week_number = 3;
+  string start_date = 4;
+  string end_date = 5;
+}
+
+message WeeksResponse {
+  repeated Week weeks = 1;
+  uint64 total_count = 2;
+}

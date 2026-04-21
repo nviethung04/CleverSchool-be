@@ -1,0 +1,262 @@
+{
+  "/api/dashboard": {
+    "get": {
+      "description": "API để lấy dashboard",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "tab",
+          "description": "Lọc tab (overview, quality, behavior, grading, question, warning)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "program_id",
+          "description": "Lọc theo id chương trình",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo id Khóa học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "school_id",
+          "description": "Lọc theo id Trường học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "class_id",
+          "description": "Lọc theo id Lớp học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "teacher_id",
+          "description": "Lọc theo id Giáo viên",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "role_id",
+          "description": "Lọc hành vi theo role id (2, 3)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "object_type",
+          "description": "Lọc loại bài (exam, homework, exercise)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "province_code",
+          "description": "Lọc theo code Tỉnh/Thành phố",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "ward_code",
+          "description": "Lọc theo code Phường/Xã",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "year",
+          "description": "Lọc theo năm",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "quarter",
+          "description": "Lọc theo quý",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "month",
+          "description": "Lọc theo tháng",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "time_type",
+          "description": "Lọc tổng số người dùng theo thời gian (month, week, day)",
+          "required": false
+        }
+      ],
+      "summary": "Dashboard",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/prot.DashboardAdminReponse"
+              },
+              {
+                "$ref": "#/definitions/prot.DashboardTeacherItem"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "/api/dashboard/export": {
+    "get": {
+      "description": "API để export dashboard",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Dashboard"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "program_id",
+          "description": "Lọc theo id chương trình",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo id Khóa học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "school_id",
+          "description": "Lọc theo id Trường học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "class_id",
+          "description": "Lọc theo id Lớp học",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "teacher_id",
+          "description": "Lọc theo id Giáo viên",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "role_id",
+          "description": "Lọc hành vi theo role id (2, 3)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "object_type",
+          "description": "Lọc loại bài (exam, homework, exercise)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "province_code",
+          "description": "Lọc theo code Tỉnh/Thành phố",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "ward_code",
+          "description": "Lọc theo code Phường/Xã",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "year",
+          "description": "Lọc theo năm",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "quarter",
+          "description": "Lọc theo quý",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "month",
+          "description": "Lọc theo tháng",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "time_type",
+          "description": "Lọc theo thời gian (month, week, day)",
+          "required": false
+        }
+      ],
+      "summary": "Dashboard",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "http://localhost:8080/public/exports/dashboard_1748944491.xlsx"
+                  }
+                }
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

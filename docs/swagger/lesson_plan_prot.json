@@ -1,0 +1,266 @@
+{
+  "prot.LessonPlan": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "views": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "sort_position": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "total_time": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "created_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "updated_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "is_complete": {
+        "type": "boolean"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "complete_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "author_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonPlanLessonInfo"
+        }
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "prot.LessonPlanRequest": {
+    "type": "object",
+    "properties": {
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "views": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "sort_position": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "total_time": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "is_complete": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "updated_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "author_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          }
+        }
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonPlanLessonInfo"
+        }
+      }
+    }
+  },
+  "prot.LessonPlanListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "lesson_plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.LessonPlan"
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.LessonPlanLessonInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "chapter": {
+        "$ref": "#/definitions/prot.LessonPlanChapterInfo"
+      }
+    }
+  },
+  "prot.LessonPlanChapterInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "program": {
+        "$ref": "#/definitions/prot.LessonPlanProgramInfo"
+      }
+    }
+  },
+  "prot.LessonPlanProgramInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "subjects": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonPlanSubjectInfo"
+        }
+      }
+    }
+  },
+  "prot.LessonPlanSubjectInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "faculty": {
+        "$ref": "#/definitions/prot.LessonPlanFacultyInfo"
+      }
+    }
+  },
+  "prot.LessonPlanFacultyInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+    }
+  }
+}

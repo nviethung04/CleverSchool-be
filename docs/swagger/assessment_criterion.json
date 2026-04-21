@@ -1,0 +1,356 @@
+{
+  "/api/manage/assessment-criteria": {
+    "get": {
+      "summary": "Danh sách tiêu chí đánh giá",
+      "description": "API để lấy danh sách assessment criteria",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Từ khóa theo tên/mô tả",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "subject_id",
+          "description": "Lọc theo môn học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "has_subcriteria",
+          "description": "Lọc theo trạng thái có tiêu chí con",
+          "required": false,
+          "type": "boolean"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterionListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo tiêu chí đánh giá",
+      "description": "API để tạo assessment criterion",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "assessment_criterion",
+          "description": "Thông tin tiêu chí đánh giá",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterionRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterion"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/assessment-criteria/bulk": {
+    "post": {
+      "summary": "Tạo nhiều tiêu chí đánh giá",
+      "description": "API để tạo nhiều assessment criteria cùng lúc với cấu trúc phân cấp (criteria và subcriteria). Nếu có assessment_id, các criteria sẽ được gán vào assessment.",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "description": "Dữ liệu criteria phân cấp",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": [
+              "subject_id",
+              "criteria"
+            ],
+            "properties": {
+              "subject_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ID môn học (bắt buộc)"
+              },
+              "assessment_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ID assessment (tùy chọn, nếu có sẽ gán criteria vào assessment)"
+              },
+              "criteria": {
+                "type": "array",
+                "description": "Danh sách criteria",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "name",
+                    "has_subcriteria",
+                    "max_score"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "has_subcriteria": {
+                      "type": "boolean"
+                    },
+                    "max_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "subcriteria": {
+                      "type": "array",
+                      "description": "Danh sách subcriteria (nếu có)",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "max_score"
+                        ],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "max_score": {
+                            "type": "number",
+                            "format": "float"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Tạo criteria thành công"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Lỗi validation hoặc xử lý"
+        }
+      }
+    }
+  },
+  "/api/manage/assessment-criteria/{id}": {
+    "get": {
+      "summary": "Chi tiết tiêu chí đánh giá",
+      "description": "API để lấy thông tin theo ID",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của tiêu chí"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterion"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật tiêu chí đánh giá",
+      "description": "API để cập nhật tiêu chí theo ID",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của tiêu chí"
+        },
+        {
+          "in": "body",
+          "name": "assessment_criterion",
+          "description": "Thông tin tiêu chí",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterionRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentCriterion"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa tiêu chí đánh giá",
+      "description": "API để xóa tiêu chí",
+      "tags": [
+        "Assessment Criteria"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của tiêu chí"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa thành công"
+        }
+      }
+    }
+  }
+}
+

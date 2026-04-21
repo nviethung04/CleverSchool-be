@@ -1,0 +1,124 @@
+{
+    "/api/manage/provinces": {
+        "get": {
+            "description": "API để lấy danh sách tỉnh",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Regions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "summary": "Danh sách tỉnh",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ProvincesResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/provinces/{code}": {
+        "get": {
+            "description": "API để lấy chi tiết tỉnh",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Regions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "code",
+                    "required": true,
+                    "type": "integer",
+                    "description": "Code của tỉnh"
+                }
+            ],
+            "summary": "Tỉnh",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ProvinceResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/provinces/{code}/wards": {
+        "get": {
+            "description": "API để lấy danh sách xã trong tỉnh",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Regions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "code",
+                    "required": true,
+                    "type": "integer",
+                    "description": "Code của tỉnh"
+                }
+            ],
+            "summary": "Xã",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.WardsResponse"
+                    }
+                }
+            }
+        }
+    }
+}

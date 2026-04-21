@@ -1,0 +1,524 @@
+{
+  "prot.DashboardTeacherHomeworkUnscored": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của học sinh"
+      },
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài tập"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của khóa học"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài học"
+      },
+      "student_name": {
+        "type": "string",
+        "description": "Tên học sinh"
+      },
+      "course_name": {
+        "type": "string",
+        "description": "Tên khóa học"
+      },
+      "subject_name": {
+        "type": "string",
+        "description": "Tên môn học"
+      },
+      "homework_name": {
+        "type": "string",
+        "description": "Tên bài tập"
+      },
+      "lesson_title": {
+        "type": "string",
+        "description": "Tiêu đề bài học"
+      },
+      "submitted_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian nộp bài (timestamp)"
+      },
+      "ratio": {
+        "type": "number",
+        "format": "double",
+        "description": "Tỷ lệ điểm số"
+      },
+      "total_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Tổng số câu hỏi"
+      },
+      "unscored_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số câu hỏi chưa được chấm điểm"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkUnscoredListRequest": {
+    "type": "object",
+    "properties": {
+      "page": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số trang",
+        "default": 1
+      },
+      "limit": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số lượng per page",
+        "default": 10
+      },
+      "sort": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Sắp xếp theo field và order"
+      },
+      "start_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày bắt đầu (timestamp)"
+      },
+      "end_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày kết thúc (timestamp)"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học"
+      },
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID bài tập"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkUnscoredListResponse": {
+    "type": "object",
+    "properties": {
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DashboardTeacherHomeworkUnscored"
+        },
+        "description": "Danh sách homework chưa chấm điểm"
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số bản ghi"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkScored": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của học sinh"
+      },
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài tập"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của khóa học"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài học"
+      },
+      "student_name": {
+        "type": "string",
+        "description": "Tên học sinh"
+      },
+      "course_name": {
+        "type": "string",
+        "description": "Tên khóa học"
+      },
+      "subject_name": {
+        "type": "string",
+        "description": "Tên môn học"
+      },
+      "homework_name": {
+        "type": "string",
+        "description": "Tên bài tập"
+      },
+      "lesson_title": {
+        "type": "string",
+        "description": "Tiêu đề bài học"
+      },
+      "submitted_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian nộp bài (timestamp)"
+      },
+      "ratio": {
+        "type": "number",
+        "format": "double",
+        "description": "Tỷ lệ điểm số"
+      },
+      "total_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Tổng số câu hỏi"
+      },
+      "unscored_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số câu hỏi chưa được chấm điểm (luôn = 0 cho homework đã chấm)"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkScoredListRequest": {
+    "type": "object",
+    "properties": {
+      "page": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số trang",
+        "default": 1
+      },
+      "limit": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số lượng per page",
+        "default": 10
+      },
+      "sort": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Sắp xếp theo field và order"
+      },
+      "start_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày bắt đầu (timestamp)"
+      },
+      "end_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày kết thúc (timestamp)"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học"
+      },
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID bài tập"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkScoredListResponse": {
+    "type": "object",
+    "properties": {
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DashboardTeacherHomeworkScored"
+        },
+        "description": "Danh sách homework đã chấm điểm"
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số bản ghi"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamUnscored": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của học sinh"
+      },
+      "exam_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài thi"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của khóa học"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài học"
+      },
+      "student_name": {
+        "type": "string",
+        "description": "Tên học sinh"
+      },
+      "course_name": {
+        "type": "string",
+        "description": "Tên khóa học"
+      },
+      "subject_name": {
+        "type": "string",
+        "description": "Tên môn học"
+      },
+      "exam_name": {
+        "type": "string",
+        "description": "Tên bài thi"
+      },
+      "lesson_title": {
+        "type": "string",
+        "description": "Tiêu đề bài học"
+      },
+      "submitted_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian nộp bài (timestamp)"
+      },
+      "deadline": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Hạn nộp bài (timestamp)"
+      },
+      "submit_on_time": {
+        "type": "boolean",
+        "description": "Có nộp đúng hạn không"
+      },
+      "ratio": {
+        "type": "number",
+        "format": "double",
+        "description": "Tỷ lệ điểm số"
+      },
+      "total_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Tổng số câu hỏi"
+      },
+      "unscored_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số câu hỏi chưa được chấm điểm"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamUnscoredListRequest": {
+    "type": "object",
+    "properties": {
+      "page": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số trang",
+        "default": 1
+      },
+      "limit": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số lượng per page",
+        "default": 10
+      },
+      "sort": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Sắp xếp theo field và order"
+      },
+      "start_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày bắt đầu (timestamp)"
+      },
+      "end_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày kết thúc (timestamp)"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học"
+      },
+      "exam_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID bài thi"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamUnscoredListResponse": {
+    "type": "object",
+    "properties": {
+      "exams": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DashboardTeacherExamUnscored"
+        },
+        "description": "Danh sách exam chưa chấm điểm"
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số bản ghi"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamScored": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của học sinh"
+      },
+      "exam_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài thi"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của khóa học"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài học"
+      },
+      "student_name": {
+        "type": "string",
+        "description": "Tên học sinh"
+      },
+      "course_name": {
+        "type": "string",
+        "description": "Tên khóa học"
+      },
+      "subject_name": {
+        "type": "string",
+        "description": "Tên môn học"
+      },
+      "exam_name": {
+        "type": "string",
+        "description": "Tên bài thi"
+      },
+      "lesson_title": {
+        "type": "string",
+        "description": "Tiêu đề bài học"
+      },
+      "submitted_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian nộp bài (timestamp)"
+      },
+      "deadline": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Hạn nộp bài (timestamp)"
+      },
+      "submit_on_time": {
+        "type": "boolean",
+        "description": "Có nộp đúng hạn không"
+      },
+      "ratio": {
+        "type": "number",
+        "format": "double",
+        "description": "Tỷ lệ điểm số"
+      },
+      "total_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Tổng số câu hỏi"
+      },
+      "unscored_questions": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số câu hỏi chưa được chấm điểm (luôn = 0 cho exam đã chấm)"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamScoredListRequest": {
+    "type": "object",
+    "properties": {
+      "page": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số trang",
+        "default": 1
+      },
+      "limit": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số lượng per page",
+        "default": 10
+      },
+      "sort": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Sắp xếp theo field và order"
+      },
+      "start_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày bắt đầu (timestamp)"
+      },
+      "end_date": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Ngày kết thúc (timestamp)"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa học"
+      },
+      "exam_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID bài thi"
+      }
+    }
+  },
+  "prot.DashboardTeacherExamScoredListResponse": {
+    "type": "object",
+    "properties": {
+      "exams": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DashboardTeacherExamScored"
+        },
+        "description": "Danh sách exam đã chấm điểm"
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số bản ghi"
+      }
+    }
+  }
+}

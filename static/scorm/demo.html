@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCORM Runtime Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .demo-section h3 {
+            color: #34495e;
+            margin-top: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button.danger {
+            background-color: #e74c3c;
+        }
+        
+        button.danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .scorm-viewer {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        
+        .api-test {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .api-panel {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        
+        .api-panel h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .log {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 SCORM Runtime Demo</h1>
+        
+        <div class="demo-section">
+            <h3>📚 SCORM Content Launcher</h3>
+            <p>Test launching SCORM content with different configurations:</p>
+            
+            <div class="form-group">
+                <label for="scormVersion">SCORM Version:</label>
+                <select id="scormVersion">
+                    <option value="1.2">SCORM 1.2</option>
+                    <option value="2004">SCORM 2004</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="attemptId">Attempt ID:</label>
+                <input type="text" id="attemptId" value="demo_attempt_001" placeholder="Enter attempt ID">
+            </div>
+            
+            <div class="form-group">
+                <label for="courseId">Course ID:</label>
+                <input type="text" id="courseId" value="demo_course_001" placeholder="Enter course ID">
+            </div>
+            
+            <div class="form-group">
+                <label for="userId">User ID:</label>
+                <input type="text" id="userId" value="demo_user_001" placeholder="Enter user ID">
+            </div>
+            
+            <div class="form-group">
+                <label for="contentUrl">Content URL:</label>
+                <input type="text" id="contentUrl" value="/scorm/demo/index.html" placeholder="Enter content URL">
+            </div>
+            
+            <button onclick="launchScorm()">🚀 Launch SCORM</button>
+            <button onclick="openInNewWindow()">🔄 Open in New Window</button>
+            <button onclick="clearResults()" class="danger">🗑️ Clear</button>
+        </div>
+        
+        <div class="demo-section">
+            <h3>🔧 SCORM API Testing</h3>
+            <p>Test SCORM API functions directly:</p>
+            
+            <div class="api-test">
+                <div class="api-panel">
+                    <h4>SCORM 1.2 API</h4>
+                    <div class="form-group">
+                        <label for="element12">Element:</label>
+                        <input type="text" id="element12" value="cmi.core.lesson_status" placeholder="e.g., cmi.core.lesson_status">
+                    </div>
+                    <div class="form-group">
+                        <label for="value12">Value:</label>
+                        <input type="text" id="value12" value="completed" placeholder="e.g., completed">
+                    </div>
+                    <button onclick="testScorm12()">Test SCORM 1.2</button>
+                </div>
+                
+                <div class="api-panel">
+                    <h4>SCORM 2004 API</h4>
+                    <div class="form-group">
+                        <label for="element2004">Element:</label>
+                        <input type="text" id="element2004" value="cmi.completion_status" placeholder="e.g., cmi.completion_status">
+                    </div>
+                    <div class="form-group">
+                        <label for="value2004">Value:</label>
+                        <input type="text" id="value2004" value="completed" placeholder="e.g., completed">
+                    </div>
+                    <button onclick="testScorm2004()">Test SCORM 2004</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3>📊 SCORM Viewer</h3>
+            <p>Embedded SCORM content viewer:</p>
+            <iframe id="scormFrame" class="scorm-viewer" src="about:blank"></iframe>
+        </div>
+        
+        <div class="demo-section">
+            <h3>📝 Results & Logs</h3>
+            <div id="results"></div>
+            <div class="log" id="log"></div>
+        </div>
+    </div>
+
+    <!-- SCORM Runtime -->
+    <script src="/static/scorm/scorm-runtime.js"></script>
+    
+    <script>
+        // Demo configuration
+        let currentConfig = {
+            version: '1.2',
+            attemptId: 'demo_attempt_001',
+            courseId: 'demo_course_001',
+            userId: 'demo_user_001',
+            contentUrl: '/scorm/demo/index.html'
+        };
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConfigFromInputs();
+            log('Demo initialized successfully');
+            log('SCORM Runtime loaded: ' + (typeof createSCORMAPI !== 'undefined' ? 'Yes' : 'No'));
+        });
+
+        // Update configuration from input fields
+        function updateConfigFromInputs() {
+            currentConfig.version = document.getElementById('scormVersion').value;
+            currentConfig.attemptId = document.getElementById('attemptId').value;
+            currentConfig.courseId = document.getElementById('courseId').value;
+            currentConfig.userId = document.getElementById('userId').value;
+            currentConfig.contentUrl = document.getElementById('contentUrl').value;
+        }
+
+        // Launch SCORM content
+        function launchScorm() {
+            updateConfigFromInputs();
+            
+            try {
+                // Create SCORM API
+                const api = createSCORMAPI(currentConfig.version);
+                
+                // Initialize
+                const initResult = api.LMSInitialize ? 
+                    api.LMSInitialize(currentConfig.attemptId) : 
+                    api.Initialize(currentConfig.attemptId);
+                
+                log(`SCORM ${currentConfig.version} initialized: ${initResult}`);
+                
+                // Update iframe
+                const viewerUrl = `/scorm-viewer?` + 
+                    `version=${currentConfig.version}` +
+                    `&attemptId=${currentConfig.attemptId}` +
+                    `&courseId=${currentConfig.courseId}` +
+                    `&userId=${currentConfig.userId}` +
+                    `&contentUrl=${currentConfig.contentUrl}`;
+                
+                document.getElementById('scormFrame').src = viewerUrl;
+                
+                showResult('success', `SCORM ${currentConfig.version} launched successfully!\nAttempt ID: ${currentConfig.attemptId}\nViewer URL: ${viewerUrl}`);
+                
+            } catch (error) {
+                showResult('error', `Failed to launch SCORM: ${error.message}`);
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        // Open SCORM in new window
+        function openInNewWindow() {
+            updateConfigFromInputs();
+            
+            const viewerUrl = `/scorm-viewer?` + 
+                `version=${currentConfig.version}` +
+                `&attemptId=${currentConfig.attemptId}` +
+                `&courseId=${currentConfig.courseId}` +
+                `&userId=${currentConfig.userId}` +
+                `&contentUrl=${currentConfig.contentUrl}`;
+            
+            window.open(viewerUrl, 'scorm_viewer', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+            
+            showResult('info', `Opened SCORM viewer in new window:\n${viewerUrl}`);
+        }
+
+        // Test SCORM 1.2 API
+        function testScorm12() {
+            try {
+                const api = createSCORMAPI('1.2');
+                const element = document.getElementById('element12').value;
+                const value = document.getElementById('value12').value;
+                
+                // Initialize if not already
+                if (!window.SCORM_RUNTIME || !window.SCORM_RUNTIME.initialized) {
+                    api.LMSInitialize('demo_attempt_001');
+                }
+                
+                // Set value
+                const setResult = api.LMSSetValue(element, value);
+                log(`SCORM 1.2 SetValue(${element}, ${value}): ${setResult}`);
+                
+                // Get value
+                const getResult = api.LMSGetValue(element);
+                log(`SCORM 1.2 GetValue(${element}): ${getResult}`);
+                
+                // Commit
+                const commitResult = api.LMSCommit('');
+                log(`SCORM 1.2 Commit: ${commitResult}`);
+                
+                showResult('success', `SCORM 1.2 API test completed successfully!\nElement: ${element}\nValue: ${value}\nSet Result: ${setResult}\nGet Result: ${getResult}\nCommit Result: ${commitResult}`);
+                
+            } catch (error) {
+                showResult('error', `SCORM 1.2 API test failed: ${error.message}`);
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        // Test SCORM 2004 API
+        function testScorm2004() {
+            try {
+                const api = createSCORMAPI('2004');
+                const element = document.getElementById('element2004').value;
+                const value = document.getElementById('value2004').value;
+                
+                // Initialize if not already
+                if (!window.SCORM_RUNTIME || !window.SCORM_RUNTIME.initialized) {
+                    api.Initialize('demo_attempt_001');
+                }
+                
+                // Set value
+                const setResult = api.SetValue(element, value);
+                log(`SCORM 2004 SetValue(${element}, ${value}): ${setResult}`);
+                
+                // Get value
+                const getResult = api.GetValue(element);
+                log(`SCORM 2004 GetValue(${element}): ${getResult}`);
+                
+                // Commit
+                const commitResult = api.Commit('');
+                log(`SCORM 2004 Commit: ${commitResult}`);
+                
+                showResult('success', `SCORM 2004 API test completed successfully!\nElement: ${element}\nValue: ${value}\nSet Result: ${setResult}\nGet Result: ${getResult}\nCommit Result: ${commitResult}`);
+                
+            } catch (error) {
+                showResult('error', `SCORM 2004 API test failed: ${error.message}`);
+                log(`Error: ${error.message}`);
+            }
+        }
+
+        // Clear results
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('scormFrame').src = 'about:blank';
+            log('Results and logs cleared');
+        }
+
+        // Show result message
+        function showResult(type, message) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (resultDiv.parentNode) {
+                    resultDiv.parentNode.removeChild(resultDiv);
+                }
+            }, 10000);
+        }
+
+        // Log message
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            // Keep only last 50 entries
+            while (logDiv.children.length > 50) {
+                logDiv.removeChild(logDiv.firstChild);
+            }
+        }
+
+        // Input change handlers
+        document.getElementById('scormVersion').addEventListener('change', updateConfigFromInputs);
+        document.getElementById('attemptId').addEventListener('input', updateConfigFromInputs);
+        document.getElementById('courseId').addEventListener('input', updateConfigFromInputs);
+        document.getElementById('userId').addEventListener('input', updateConfigFromInputs);
+        document.getElementById('contentUrl').addEventListener('input', updateConfigFromInputs);
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "user.proto";
+
+message Teacher {
+  uint64 id = 1;
+  string code = 2;
+  string school = 3;
+  string position = 4;
+  uint64 user_id = 5;
+  prot.User user = 6;
+}

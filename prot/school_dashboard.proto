@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package prot;
+option go_package = "be-lms/be-lms/prot;prot";
+
+
+
+message SchoolSummary {
+  int64 id = 1;
+  string name = 2;
+  int64 student_count = 3;
+  int64 teacher_count = 4;
+  int64 classroom_count = 5;
+  int64 course_count = 6;
+}
+
+message SchoolSummaryList {
+  repeated SchoolSummary items = 1;
+}
+

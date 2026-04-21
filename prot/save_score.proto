@@ -1,0 +1,321 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message SaveScoreResponse {
+  int64 id = 1;
+  int64 question_id = 2;
+  repeated int64 answer_ids = 3;
+  repeated int64 true_answer_ids = 4;
+  repeated string answers = 5;
+  repeated string true_answers = 6;
+  bool is_correct = 7;
+  double score = 8;
+  int32 star = 9;
+  double ratio_score = 10;
+  double weight = 11;
+  int32 number_time_sent = 12;
+}
+
+message AnswerResultFillInBlank {
+  int32 sort_position = 1;
+  string answer = 2;
+  string true_answer = 3;
+  bool is_correct = 4;
+  double score = 5;
+}
+
+message SaveScoreResponseFillInBlank {
+  int64 question_id = 1;
+  double total_score = 2;
+  repeated AnswerResultFillInBlank answers = 3;
+  bool is_all_correct = 4;
+  int32 star = 5;
+  double ratio_score = 6;
+  double weight = 7;
+  int32 number_time_sent = 8;
+}
+
+message AnswerResultPosition {
+  int32 sort_position = 1;
+  int64 answer_group_position = 2;
+  int64 true_answer_group_position = 3;
+  string true_answer_content = 4;
+  bool is_correct = 5;
+  double score = 6;
+}
+
+message SaveScoreResponsePosition {
+  int64 question_id = 1;
+  double total_score = 2;
+  repeated AnswerResultPosition answers = 3;
+  bool is_all_correct = 4;
+  int32 star = 5;
+  double ratio_score = 6;
+  double weight = 7;
+  int32 number_time_sent = 8;
+}
+
+message MatchingPair {
+  int64 first_item_id = 1;
+  int64 second_item_id = 2;
+  string first_item_content = 3;
+  string second_item_content = 4;
+  bool is_correct = 5;
+  double score = 6;
+}
+
+message SaveScoreResponseMatching {
+  int64 question_id = 1;
+  double total_score = 2;
+  repeated MatchingPair matches = 3;
+  bool is_all_correct = 4;
+  int32 star = 5;
+  double ratio_score = 6;
+  double weight = 7;
+  int32 number_time_sent = 8;
+}
+
+message LabelingPair {
+  int64 blank_id = 1;
+  int64 answer_id = 2;
+  string blank_content = 3;
+  string answer_content = 4;
+  bool is_correct = 5;
+  double score = 6;
+}
+
+message SaveScoreResponseLabeling {
+  int64 question_id = 1;
+  double total_score = 2;
+  repeated LabelingPair labels = 3;
+  bool is_all_correct = 4;
+  int32 star = 5;
+  double ratio_score = 6;
+  double weight = 7;
+  int32 number_time_sent = 8;
+}
+
+message GroupPair {
+  int64 answer_id = 1;
+  int64 group_id = 2;
+  string answer_content = 3;
+  string group_content = 4;
+  bool is_correct = 5;
+  double score = 6;
+}
+
+message SaveScoreResponseGroup {
+  int64 question_id = 1;
+  double total_score = 2;
+  repeated GroupPair groups = 3;
+  bool is_all_correct = 4;
+  int32 star = 5;
+  double ratio_score = 6;
+  double weight = 7;
+  int32 number_time_sent = 8;
+}
+
+message SaveScoreResponseManual {
+  int64 question_id = 1;
+  string answer = 2;
+  string file_url = 3;
+  bool is_saved = 4;
+}
+
+message BulkFile {
+  string type = 1;
+  string url = 2;
+}
+
+message SaveScoreBulkResponse {
+  string exam_name = 1;
+  double total_score = 2;
+  double ratio = 3;
+  int64 time = 4;
+  repeated SaveScoreResponse multiple_choice = 5;
+  repeated SaveScoreResponseFillInBlank fill_in_blank = 6;
+  repeated SaveScoreResponsePosition ordering = 7;
+  repeated SaveScoreResponsePosition dragdrop = 8;
+  repeated SaveScoreResponseMatching matching = 9;
+  repeated SaveScoreResponseLabeling labeling = 10;
+  repeated SaveScoreResponseGroup category = 11;
+  repeated SaveScoreResponseManual manual = 12;
+  string exercise_name = 13;
+  string contest_round_name = 14;
+  int64 contest_round_id = 15;
+  repeated BulkFile files = 16;
+}
+
+// ===================== REQUESTS =====================
+
+// Multiple choice
+message SaveScoreMultipleChoiceRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  repeated int64 answer_ids = 6;
+  int64 lesson_id = 7;
+}
+
+// Fill in blank
+message SaveScoreFillInBlankRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  map<string, string> answers = 6;
+  int64 lesson_id = 7;
+}
+
+// Position
+message SaveScorePositionRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  map<string, int32> answers = 6;
+  int64 lesson_id = 7;
+}
+
+// Matching
+message SaveScoreMatchingRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  map<string, int64> answers = 6; // first_item_id -> second_item_id
+  int64 lesson_id = 7;
+}
+
+// Labeling
+message SaveScoreLabelingRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  map<string, int64> answers = 6; // blank_id -> answer_id
+  int64 lesson_id = 7;
+}
+
+// Group
+message SaveScoreGroupRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  int64 question_id = 5;
+  map<string, int64> answers = 6; // answer_id -> group_id
+  int64 lesson_id = 7;
+}
+
+message FileInfo {
+  int64 id = 1;
+  string path = 2;
+  string disk = 3;
+}
+
+// Answer manual (người dùng nhập hoặc upload file)
+message SaveAnswerManualRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 homework_id = 3;
+  int64 question_id = 4;
+  string answer = 5;
+  string file_url = 6;
+  FileInfo file_info = 7;
+  int64 lesson_id = 8;
+}
+
+// Manual scoring (giáo viên chấm tay)
+message SaveScoreManualRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 homework_id = 3;
+  int64 user_id = 4;
+  map<string, double> score_list = 5;
+}
+
+// Bulk submit nhiều câu hỏi cùng lúc
+message SaveScoreBulkRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 level_test_id = 3;
+  int64 homework_id = 4;
+  repeated AnswerRequest list_answers = 5;
+  int64 time = 6; // time in seconds
+  int64 lesson_id = 7;
+  int64 contest_round_id = 8;
+  int64 user_id = 9;
+  repeated BulkFile files = 10;
+}
+
+message AnswerRequest {
+  string type_question = 1;
+  oneof request {
+    SaveAnswerManualRequest manual_request = 2;
+    SaveScoreGroupRequest group_request = 3;
+    SaveScoreLabelingRequest labeling_request = 4;
+    SaveScoreMatchingRequest matching_request = 5;
+    SaveScorePositionRequest position_request = 6;
+    SaveScoreFillInBlankRequest fill_in_blank_request = 7;
+    SaveScoreMultipleChoiceRequest multiple_choice_request = 8;
+  }
+}
+message SubmitHomeworkFile {
+  string type = 1;
+  string url = 2;
+}
+
+message SubmitHomeworkRequest {
+  int64 homework_id = 1;
+  int64 lesson_id = 2;
+  int64 user_id = 3;
+  repeated SubmitHomeworkFile files = 4;
+}
+
+message SubmitHomeworkResponse {
+  int64 homework_id = 1;
+  int64 user_id = 2;
+  double score = 3;
+  double ratio = 4;
+  bool has_manual_scoring = 5;
+  bool has_questions_need_manual_grading = 6;
+  repeated SubmitHomeworkFile files = 7;
+  double star = 8;
+  bool is_completed = 9;
+  double exp = 10;
+  double total_exp = 11;
+  int64 total_star = 12;
+  double change_exp = 13;
+  int64 change_star = 14;
+  double completion_rate = 15;
+}
+
+message EvaluateRequest {
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 homework_id = 3;
+  int64 contest_round_id = 4;
+  int64 user_id = 5;
+  double score = 6;
+}
+
+message EvaluateResponse{
+  int64 exam_id = 1;
+  int64 exercise_id = 2;
+  int64 homework_id = 3;
+  int64 contest_round_id = 4;
+  int64 user_id = 5;
+  double score = 6;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/save_score.proto

@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message Topic {
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+  string description = 5;
+  string image_url = 6;
+  bool status = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message GetTopicRequest {
+  int64 id = 1;
+}
+
+message TopicResponse {
+  Topic topic = 1;
+  string message = 2;
+}
+
+message ListTopicsRequest {}
+
+message TopicRequest {
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+  int64 parent_id = 4;
+  string description = 5;
+  string image_url = 6;
+  bool status = 7;
+}
+
+message TopicIDRequest {
+  int64 id = 1;
+}
+
+message TopicsResponse {
+  repeated Topic topics = 1;
+  uint64 total_count = 2;
+}

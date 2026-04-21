@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message CheckSubmitHomeworkResponse {
+  int64 homework_id = 1;
+  int64 user_id = 2;
+  int64 skipped_count = 3;
+  repeated int64 skipped_question_ids = 4;
+  int64 not_completed_count = 5;
+  int64 skipped_but_redone_count = 6;
+  repeated int64 skipped_but_redone_question_ids = 7;
+}
+
+message SkipQuestionRequest {
+  int64 homework_id = 1;
+  int64 question_id = 2;
+}
+
+message SkipQuestionResponse {
+  bool success = 1;
+  string message = 2;
+  int64 homework_id = 3;
+  int64 question_id = 4;
+  int64 user_id = 5;
+}
+//protoc --go_out=. --go_opt=paths=source_relative prot/skip_question.proto

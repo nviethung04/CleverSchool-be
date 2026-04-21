@@ -1,0 +1,2 @@
+ALTER TABLE microsoft_meetings
+DROP COLUMN IF EXISTS recording_share_url;

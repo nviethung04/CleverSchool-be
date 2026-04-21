@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message Holiday {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string start_date = 4;
+  string end_date = 5;
+  string type = 6;
+  int64 week_id = 7;
+  bool status = 8;
+  int32 sort_order = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message GetHolidayRequest {
+  int64 id = 1;
+}
+
+message HolidayResponse {
+  Holiday holiday_week = 1;
+  string message = 2;
+}
+
+message ListHolidaysRequest {
+  int64 semester_id = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  string search = 4;
+  string sort_by = 5;
+  string sort_order = 6;
+}
+
+message HolidayRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string start_date = 4;
+  string end_date = 5;
+  string type = 6;
+  bool status = 7;
+  int32 sort_order = 8;
+  int64 week_id = 9;
+}
+
+message HolidayIDRequest {
+  int64 id = 1;
+}
+
+message HolidaysResponse {
+  repeated Holiday holidays = 1;
+  int64 total_count = 2;
+}
+
+message GetHolidaysBySemesterRequest {
+  int64 semester_id = 1;
+}
+
+message Holidays {
+  repeated Holiday holidays = 1;
+}

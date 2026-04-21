@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Dashboard Contest Ranking
+message DashboardContestRanking {
+  int64 student_id = 1;
+  string student_name = 2;
+  double average_ratio = 3;
+  double average_score = 4;
+  double average_time = 5;       // Thời gian trung bình (giây)
+  string avatar = 6;             // URL ảnh đại diện
+  int64 number_rounds = 7;       // Số vòng thi đã làm
+}
+
+message ContestScoreDistribution {
+  string score_range = 1;
+  int64 student_count = 2;
+}
+
+// Dashboard Contest Ranking Response
+message DashboardContestRankingResponse {
+  repeated DashboardContestRanking students = 1;
+  int64 total = 2;
+  repeated ContestScoreDistribution score_chart = 3;
+  int64 current_ranking = 4;  // Thứ tự xếp hạng hiện tại của học sinh (chỉ trả về khi là học sinh)
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_contest_ranking.proto
+
+

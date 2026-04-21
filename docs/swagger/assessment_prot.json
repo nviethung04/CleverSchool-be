@@ -1,0 +1,426 @@
+{
+  "prot.Assessment": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "created_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "created_by": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "updated_at": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "updated_by": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "file_infos": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentFileInfo"
+        }
+      },
+      "files": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "study_report_criteria_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "assessment_criteria_group_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "assessment_criteria_group_name": {
+        "type": "string"
+      },
+      "study_report_criteria_name": {
+        "type": "string"
+      },
+      "subject_name": {
+        "type": "string"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID bài học (từ assessment_ref_lessons khi có course_id)"
+      },
+      "lesson_title": {
+        "type": "string",
+        "description": "Tiêu đề bài học (từ assessment_ref_lessons khi có course_id)"
+      },
+      "is_assigned": {
+        "type": "boolean",
+        "description": "true nếu assigned_at IS NOT NULL"
+      },
+      "has_file": {
+        "type": "boolean",
+        "description": "true nếu có file"
+      }
+    }
+  },
+  "prot.AssessmentRequest": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "file_infos": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentFileInfo"
+        }
+      },
+      "assessment_criteria_group_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của nhóm tiêu chí đánh giá. Nếu có (> 0), tất cả criteria của group sẽ được gán vào assessment. Nếu không có hoặc = 0, sẽ dùng assessment_criteria_ids"
+      },
+      "assessment_criteria_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "description": "Danh sách ID các tiêu chí đánh giá. Chỉ được sử dụng khi assessment_criteria_group_id không có hoặc = 0"
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "study_report_criteria_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "has_file": {
+        "type": "boolean",
+        "description": "true nếu có file"
+      },
+      "copy_from_assessment_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Khi tạo mới: truyền ID assessment nguồn để tạo bản ghi mới bằng cách copy (name, description, type, program_id, subject_id, study_report_criteria_id, file_infos, has_file + assessment_ref_criteria). Các trường khác không cần truyền."
+      }
+    }
+  },
+  "prot.AssessmentListResponse": {
+    "type": "object",
+    "properties": {
+      "assessments": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Assessment"
+        }
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  },
+  "prot.AssessmentStudentItem": {
+    "type": "object",
+    "properties": {
+      "student_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "student_name": {
+        "type": "string"
+      },
+      "assessment": {
+        "$ref": "#/definitions/prot.Assessment"
+      }
+    }
+  },
+  "prot.AssessmentStudentListResponse": {
+    "type": "object",
+    "properties": {
+      "students": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentStudentItem"
+        }
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  },
+  "prot.AssessmentFileInfo": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "integer", "format": "int64" },
+      "disk": { "type": "string" },
+      "path": { "type": "string" },
+      "url": { "type": "string" }
+    }
+  },
+  "prot.AssessmentReportInfo": {
+    "type": "object",
+    "properties": {
+      "school_name": {
+        "type": "string",
+        "description": "Tên trường"
+      },
+      "class_name": {
+        "type": "string",
+        "description": "Tên lớp"
+      }
+    }
+  },
+  "prot.AssessmentReportStatistic": {
+    "type": "object",
+    "properties": {
+      "unscored": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số học sinh chưa được chấm xong"
+      },
+      "from_0_to_50": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số học sinh có tổng điểm < 50"
+      },
+      "from_50_to_70": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số học sinh có tổng điểm từ 50 đến < 70"
+      },
+      "from_70_to_80": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số học sinh có tổng điểm từ 70 đến < 80"
+      },
+      "from_80_to_100": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số học sinh có tổng điểm từ 80 đến 100"
+      }
+    }
+  },
+  "prot.AssessmentReportResponse": {
+    "type": "object",
+    "properties": {
+      "info": {
+        "$ref": "#/definitions/prot.AssessmentReportInfo"
+      },
+      "students": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentStudentItem"
+        }
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "statistic": {
+        "$ref": "#/definitions/prot.AssessmentReportStatistic"
+      }
+    }
+  },
+  "prot.AssessmentCriteriaGroup": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "integer", "format": "int64" },
+      "name": { "type": "string" },
+      "subject_id": { "type": "integer", "format": "int64" },
+      "created_at": { "type": "integer", "format": "int64" },
+      "created_by": { "type": "integer", "format": "int64" },
+      "updated_at": { "type": "integer", "format": "int64" },
+      "has_file": {
+        "type": "boolean",
+        "description": "true nếu có file"
+      },
+      "updated_by": { "type": "integer", "format": "int64" },
+      "criteria": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentCriterion"
+        }
+      }
+    }
+  },
+  "prot.AssessmentCriteriaGroupRequest": {
+    "type": "object",
+    "properties": {
+      "id": { "type": "integer", "format": "int64" },
+      "name": { "type": "string" },
+      "subject_id": { "type": "integer", "format": "int64" },
+      "criteria_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "has_file": {
+        "type": "boolean",
+        "description": "true nếu có file"
+      },
+      "copy_from_assessment_criteria_group_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Khi copy: chỉ cần truyền body {\"copy_from_assessment_criteria_group_id\": <id>}; các trường khác không cần. Tạo bản ghi mới copy từ nhóm có ID này (name, subject_id, has_file và assessment_criteria_group_ref_criteria)."
+      }
+    }
+  },
+  "prot.AssessmentCriteriaGroupListResponse": {
+    "type": "object",
+    "properties": {
+      "groups": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/prot.AssessmentCriteriaGroup" }
+      },
+      "total": { "type": "integer", "format": "int64" }
+    }
+  },
+  "prot.CreateAssessmentCriteriaGroupWithCriteriaRequest": {
+    "type": "object",
+    "description": "Khi copy: chỉ cần truyền copy_from_assessment_criteria_group_id (ví dụ: {\"copy_from_assessment_criteria_group_id\": 8}). Khi tạo mới: truyền group và criteria.",
+    "properties": {
+      "copy_from_assessment_criteria_group_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Nếu truyền: tạo nhóm mới bằng cách copy từ nhóm có ID này; không cần group hay criteria."
+      },
+      "group": {
+        "$ref": "#/definitions/prot.AssessmentCriteriaGroupRequest"
+      },
+      "criteria": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentCriterionInput"
+        }
+      }
+    }
+  },
+  "prot.AssessmentCriterionInput": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "description": { "type": "string" },
+      "max_score": { "type": "number", "format": "float" },
+      "subcriteria": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssessmentSubcriterionInput"
+        }
+      }
+    },
+    "required": ["name"]
+  },
+  "prot.AssessmentSubcriterionInput": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "description": { "type": "string" },
+      "max_score": { "type": "number", "format": "float" }
+    },
+    "required": ["name", "max_score"]
+  },
+  "prot.GetPublishAssessmentResponse": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "assessment_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "publish": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.UpdatePublishAssessmentRequest": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "assessment_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "publish_course_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "publish": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.UpdatePublishAssessmentResponse": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "assessment_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "publish_course_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "publish": {
+        "type": "boolean"
+      }
+    }
+  }
+}

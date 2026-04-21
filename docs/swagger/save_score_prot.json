@@ -1,0 +1,418 @@
+{
+  "definitions": {
+    "prot.SaveScoreMultipleChoiceRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answer_ids": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Danh sách ID các câu trả lời được chọn"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreFillInBlankRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Map các câu trả lời điền vào chỗ trống"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScorePositionRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "description": "Map các câu trả lời sắp xếp thứ tự"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreMatchingRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Map các câu trả lời ghép cặp"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreLabelingRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Map các câu trả lời gắn nhãn"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreGroupRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": "Map các câu trả lời phân nhóm"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreBulkRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "level_test_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài kiểm tra trình độ"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "list_answers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/prot.AnswerRequest"
+          },
+          "description": "Danh sách các câu trả lời"
+        },
+        "time": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Thời gian làm bài (giây)"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveAnswerManualRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "answer": {
+          "type": "string",
+          "description": "Nội dung câu trả lời"
+        },
+        "file_url": {
+          "type": "string",
+          "description": "URL file đính kèm"
+        },
+        "file_info": {
+          "$ref": "#/definitions/prot.FileInfo"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.SaveScoreManualRequest": {
+      "type": "object",
+      "properties": {
+        "exam_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài thi"
+        },
+        "exercise_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập"
+        },
+        "homework_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài tập về nhà"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của người dùng"
+        },
+        "score_list": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": "Map điểm số cho từng câu hỏi"
+        },
+        "lesson_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của bài học"
+        }
+      }
+    },
+    "prot.AnswerRequest": {
+      "type": "object",
+      "properties": {
+        "type_question": {
+          "type": "string",
+          "description": "Loại câu hỏi"
+        },
+        "question_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của câu hỏi"
+        },
+        "data": {
+          "type": "object",
+          "description": "Dữ liệu câu trả lời"
+        }
+      }
+    },
+    "prot.FileInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID của file"
+        },
+        "path": {
+          "type": "string",
+          "description": "Đường dẫn file"
+        },
+        "disk": {
+          "type": "string",
+          "description": "Disk lưu trữ"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "/api/manage/study-reports": {
+    "get": {
+      "description": "API để lấy danh sách báo cáo học tập",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "StudyReports"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "subject_id",
+          "description": "Lọc theo môn học",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "course_id",
+          "description": "Lọc theo khóa học",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "student_id",
+          "description": "Lọc theo học sinh",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "teacher_id",
+          "description": "Lọc theo giáo viên",
+          "required": false,
+          "type": "integer",
+          "format": "int64"
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "description": "Lọc theo loại báo cáo",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Danh sách báo cáo học tập",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportsResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo báo cáo học tập mới",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "StudyReports"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo báo cáo học tập",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "study_report",
+          "description": "Thông tin báo cáo học tập",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo báo cáo học tập thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReport"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/study-reports/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết báo cáo học tập",
+      "description": "API để lấy thông tin chi tiết của một báo cáo học tập theo ID",
+      "tags": [
+        "StudyReports"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của báo cáo học tập"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReport"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin báo cáo học tập",
+      "description": "API để cập nhật một báo cáo học tập theo ID",
+      "tags": [
+        "StudyReports"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID báo cáo học tập"
+        },
+        {
+          "in": "body",
+          "name": "study_report",
+          "description": "Thông tin báo cáo học tập cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReport"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá báo cáo học tập",
+      "description": "API để xoá một báo cáo học tập theo ID",
+      "tags": [
+        "StudyReports"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID báo cáo học tập"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/study-reports/evaluates/{course_id}": {
+    "get": {
+      "summary": "Lấy danh sách báo cáo chưa đánh giá",
+      "description": "API trả về danh sách học sinh trong khoá học cùng tiến độ nhận xét theo loại báo cáo",
+      "tags": [
+        "StudyReports"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "course_id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "int64",
+          "description": "ID khoá học"
+        },
+        {
+          "name": "assessment_id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "int64",
+          "description": "ID assessment"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.StudyReportEvaluateResponse"
+          }
+        }
+      },
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ]
+    }
+  },
+  "/api/manage/publish-study-report": {
+    "get": {
+      "summary": "Lấy thông tin publish của báo cáo học tập",
+      "description": "API để lấy thông tin publish của báo cáo học tập",
+      "tags": [
+        "StudyReports"
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.GetPublishStudyReportResponse"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật trạng thái publish của báo cáo học tập",
+      "description": "API để cập nhật trạng thái publish của báo cáo học tập",
+      "tags": [
+        "StudyReports"
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "publish_request",
+          "description": "Thông tin publish báo cáo học tập",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.UpdatePublishStudyReportRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.UpdatePublishStudyReportResponse"
+          }
+        }
+      }
+    }
+  }
+}
+

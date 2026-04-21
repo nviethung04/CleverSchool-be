@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "week.proto";
+import "study_shift.proto";
+import "lesson_plan.proto";
+
+message LessonSchedule {
+  int64 id = 1;
+  int64 course_id = 2;
+  int64 lesson_id = 3;
+  int64 shift_id = 4;
+  string scheduled_date = 5;
+  int64 week_id = 6;
+
+  string created_at = 7;
+  string updated_at = 8;
+
+  Week week = 9;
+  StudyShift shift = 10;
+}
+
+message LessonPlanBySchedule {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_active = 4;
+  LessonPlanAuthor author = 5;
+}
+
+message LessonBySchedule {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  repeated LessonPlanBySchedule lesson_plans = 4;
+}
+
+message CourseBySchedule {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string object_title = 4;
+}
+
+message ChapterBySchedule {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message LessonScheduleDetail {
+  int64 id = 1;
+  string scheduled_date = 2;
+  int32 week_number = 3;
+  LessonBySchedule lesson = 4;
+  CourseBySchedule course = 5;
+  ChapterBySchedule chapter = 6;
+  int32 sort_position = 7;
+}
+
+message LessonScheduleList {
+  string date = 1;
+  repeated LessonScheduleDetail schedules = 2;
+}
+
+message LessonScheduleGroup {
+  int32 week_id = 1;
+  int32 week_number = 2;
+  int32 year = 3;
+  string start_date = 4;
+  string end_date = 5;
+  map<string, LessonScheduleList> days = 6;
+}
+
+message LessonSchedulesResponse {
+  repeated LessonScheduleGroup groups = 1;
+}
+
+message LessonScheduleByWeek {
+  int64 lesson_id = 1;
+  int32 week_id = 2;
+}
+
+message ListLessonScheduleByWeek {
+  int64 course_id = 1;
+  repeated LessonScheduleByWeek schedules = 2;
+}
+
+message ScheduleByWeek {
+  int32 week_id = 1;
+  int32 week_number_in_year = 2;
+  int32 week_number = 3;
+  string start_date = 4;
+  string end_date = 5;
+  repeated LessonScheduleDetail schedules = 6;
+}
+
+message ScheduleBySemester {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string start_date = 4;
+  string end_date = 5;
+  repeated ScheduleByWeek weeks = 6;
+}
+
+message LessonSchedulesInfoResponse {
+  repeated ScheduleByWeek weeks = 1;
+  repeated ScheduleBySemester semesters = 2;
+}
+
+message LessonSchedulesInfoRequest {
+  int64 course_id = 1;
+  repeated ScheduleByWeek weeks = 2;
+  repeated ScheduleBySemester semesters = 3;
+}
+
+message LessonScheduleSyncRequest {
+  int64 course_id = 1;
+}
+
+message LessonScheduleSyncResponse {
+  bool success = 1;
+  string message = 2;
+  int64 source_course_id = 3;
+  repeated int64 synced_course_ids = 4;
+  repeated int64 failed_course_ids = 5;
+  int32 synced_count = 6;
+  int32 failed_count = 7;
+}

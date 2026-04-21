@@ -1,0 +1,60 @@
+{
+    "DashboardReportDTO": {
+        "type": "object",
+        "properties": {
+            "total_schools": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số trường học trong hệ thống"
+            },
+            "total_classes": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số lớp học trong hệ thống"
+            },
+            "total_users": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số người dùng trong hệ thống"
+            },
+            "student_active": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số học sinh hoạt động (role_id = 3) từ activity_logs"
+            },
+            "teacher_active": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số giáo viên hoạt động (role_id = 2) từ activity_logs"
+            },
+            "student_active_weekly": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số học sinh hoạt động trong 7 ngày gần nhất (role_id = 3) từ activity_logs"
+            },
+            "teacher_active_weekly": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số giáo viên hoạt động trong 7 ngày gần nhất (role_id = 2) từ activity_logs"
+            },
+            "frequent_login_students": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số học sinh login thường xuyên (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần, created_at > active_student_time) từ activity_logs"
+            },
+            "frequent_login_students_weekly": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Số học sinh login thường xuyên trong 7 ngày gần nhất (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần) từ activity_logs"
+            }
+        }
+    },
+    "DashboardReportResponseDTO": {
+        "type": "object",
+        "properties": {
+            "data": {
+                "$ref": "#/definitions/DashboardReportDTO"
+            }
+        }
+    }
+}

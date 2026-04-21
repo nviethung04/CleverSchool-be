@@ -1,0 +1,154 @@
+{
+    "/api/manage/warnings/active-users-count": {
+        "get": {
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "description": "Đếm số lượng users hoạt động trong khoảng thời gian nhất định. Có thể sử dụng minutes hoặc khoảng thời gian cụ thể với Unix timestamp.",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Warning Management"
+            ],
+            "summary": "Đếm số lượng users hoạt động",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "type": "integer",
+                    "description": "Số phút tính từ hiện tại (nếu = 0 thì phải có start_time và end_time)",
+                    "name": "minutes",
+                    "in": "query",
+                    "default": 15
+                },
+                {
+                    "type": "integer",
+                    "description": "Unix timestamp thời gian bắt đầu (bắt buộc khi minutes=0)",
+                    "name": "start_time",
+                    "in": "query"
+                },
+                {
+                    "type": "integer",
+                    "description": "Unix timestamp thời gian kết thúc (bắt buộc khi minutes=0)",
+                    "name": "end_time",
+                    "in": "query"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/ActiveUsersCountResponse"
+                    }
+                },
+                "400": {
+                    "description": "Tham số không hợp lệ",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Không có quyền truy cập",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/warnings/failed-logins-count": {
+        "get": {
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "description": "Đếm số lượng IP có failed login attempts trong khoảng thời gian nhất định. Có thể sử dụng minutes hoặc khoảng thời gian cụ thể với Unix timestamp.",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Warning Management"
+            ],
+            "summary": "Đếm số lượng IP có failed login attempts",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "type": "integer",
+                    "description": "Số phút tính từ hiện tại (nếu = 0 thì phải có start_time và end_time)",
+                    "name": "minutes",
+                    "in": "query",
+                    "default": 60
+                },
+                {
+                    "type": "integer",
+                    "description": "Unix timestamp thời gian bắt đầu (bắt buộc khi minutes=0)",
+                    "name": "start_time",
+                    "in": "query"
+                },
+                {
+                    "type": "integer",
+                    "description": "Unix timestamp thời gian kết thúc (bắt buộc khi minutes=0)",
+                    "name": "end_time",
+                    "in": "query"
+                },
+                {
+                    "type": "integer",
+                    "description": "ID của user cần filter (optional)",
+                    "name": "user_id",
+                    "in": "query"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/FailedLoginsCountResponse"
+                    }
+                },
+                "400": {
+                    "description": "Tham số không hợp lệ",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Không có quyền truy cập",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    }
+}

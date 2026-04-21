@@ -1,0 +1,563 @@
+{
+  "/api/manage/assessments": {
+    "get": {
+      "summary": "Danh sách assessment",
+      "description": "API để lấy danh sách assessment",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Từ khóa tìm kiếm theo tên/mô tả",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "description": "Loại assessment",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "program_id",
+          "description": "Lọc theo chương trình",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo assessment",
+      "description": "API để tạo assessment mới. Có hai cách: (1) Truyền copy_from_assessment_id: tạo bản ghi mới bằng cách copy từ assessment có ID đó (các trường khác không bắt buộc). (2) Truyền name, description, type, program_id, assessment_criteria_group_id,... để tạo assessment mới thủ công.",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "assessment",
+          "description": "Thông tin assessment. Nếu truyền copy_from_assessment_id thì chỉ cần field đó.",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Assessment"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/assessments/with-criteria": {
+    "post": {
+      "summary": "Tạo assessment kèm tiêu chí",
+      "description": "Tạo mới assessment, đồng thời tạo danh sách criteria/subcriteria và tự động gán vào lesson/course tương ứng.",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": ["assessment", "lesson_id", "criteria"],
+            "properties": {
+              "assessment": {
+                "$ref": "#/definitions/prot.AssessmentRequest"
+              },
+              "lesson_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Lesson ID bắt buộc để xác định subject và gán assessment"
+              },
+              "course_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Course ID (tuỳ chọn). Nếu không truyền sẽ lưu course_id = 0 trong bảng ref"
+              },
+              "criteria": {
+                "type": "array",
+                "description": "Danh sách tiêu chí đánh giá",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "max_score"],
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "max_score": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "subcriteria": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["name", "max_score"],
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "max_score": {
+                            "type": "number",
+                            "format": "float"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Assessment"
+          }
+        },
+        "400": {
+          "description": "Lỗi dữ liệu đầu vào"
+        }
+      }
+    }
+  },
+  "/api/assessments/save-score/bulk": {
+    "post": {
+      "summary": "Lưu điểm assessment hàng loạt",
+      "description": "API chấm điểm nhiều học sinh cho một assessment. Yêu cầu đã đăng nhập và có quyền assessments.store.",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": ["assessment_id", "lesson_id", "course_id", "students"],
+            "properties": {
+              "assessment_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "course_id": {
+                "type": "integer",
+                "format": "int64",
+                "description": "ID khóa học (bắt buộc)"
+              },
+              "students": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["user_id", "criteria"],
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "file_infos": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/prot.AssessmentFileInfo"
+                      },
+                      "description": "Danh sách file đính kèm (tuỳ chọn)"
+                    },
+                    "criteria": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": ["criteria_id"],
+                        "properties": {
+                          "criteria_id": {
+                            "type": "integer",
+                            "format": "int64"
+                          },
+                          "score": {
+                            "type": "number",
+                            "format": "float",
+                            "description": "Điểm criteria (nếu không có subcriteria)"
+                          },
+                          "subcriteria": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": ["subcriteria_id", "score"],
+                              "properties": {
+                                "subcriteria_id": {
+                                  "type": "integer",
+                                  "format": "int64"
+                                },
+                                "score": {
+                                  "type": "number",
+                                  "format": "float"
+                                }
+                              }
+                            },
+                            "description": "Nếu có subcriteria, điểm của criteria sẽ là tổng subcriteria"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lưu điểm thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Lưu điểm thành công"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Lỗi dữ liệu đầu vào hoặc xử lý"
+        }
+      }
+    }
+  },
+  "/api/manage/assessments/{id}": {
+    "get": {
+      "summary": "Chi tiết assessment",
+      "description": "API để lấy thông tin assessment theo ID",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của assessment"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Assessment"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật assessment",
+      "description": "API để cập nhật assessment theo ID",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của assessment"
+        },
+        {
+          "in": "body",
+          "name": "assessment",
+          "description": "Thông tin assessment",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.AssessmentRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Assessment"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa assessment",
+      "description": "API để xóa assessment theo ID",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của assessment"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/assessments/ref-lesson": {
+    "post": {
+      "summary": "Gán assessment vào bài học",
+      "description": "Tạo hoặc cập nhật liên kết assessment với lesson/course",
+      "tags": ["Assessments"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "payload",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "required": ["assessment_id", "lesson_id", "course_id"],
+            "properties": {
+              "assessment_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "course_id": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Gán thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "assessment_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "lesson_id": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "course_id": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/publish-assessments": {
+    "get": {
+      "summary": "Lấy thông tin publish của bài đánh giá",
+      "description": "API để lấy thông tin publish của bài đánh giá",
+      "tags": ["StudyReports"],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.GetPublishAssessmantResponse"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật trạng thái publish của bài đánh giá",
+      "description": "API để cập nhật trạng thái publish của bài đánh giá",
+      "tags": ["StudyReports"],
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "publish_request",
+          "description": "Thông tin publish bài đánh giá",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.UpdatePublishAssessmentRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.UpdatePublishAssessmentResponse"
+          }
+        }
+      }
+    }
+  }
+}

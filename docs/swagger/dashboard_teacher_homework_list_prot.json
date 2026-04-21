@@ -1,0 +1,71 @@
+{
+  "prot.DashboardTeacherHomeworkListResponse": {
+    "type": "object",
+    "properties": {
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.DashboardTeacherHomeworkListItem"
+        }
+      },
+      "total": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số homework"
+      }
+    }
+  },
+  "prot.DashboardTeacherHomeworkListItem": {
+    "type": "object",
+    "properties": {
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của homework"
+      },
+      "homework_name": {
+        "type": "string",
+        "description": "Tên homework"
+      },
+      "total_questions": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Tổng số câu hỏi"
+      },
+      "questions_completed": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Số câu đã hoàn thành"
+      },
+      "status": {
+        "type": "string",
+        "enum": ["not_started", "in_progress", "completed"],
+        "description": "Trạng thái: not_started (chưa làm), in_progress (đang làm), completed (đã hoàn thành)"
+      },
+      "submitted_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian submit (Unix timestamp từ homework_users.updated_at)"
+      },
+      "assigned_at": {
+        "type": "integer",
+        "format": "int64",
+        "description": "Thời gian giao bài (Unix timestamp từ homework_ref_lessons.assigned_at, giữ nguyên như trong DB)"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của bài học"
+      },
+      "lesson_name": {
+        "type": "string",
+        "description": "Tên bài học"
+      },
+      "assign_late": {
+        "type": "boolean",
+        "description": "true nếu homework được giao (assigned_at) sau end_date filter"
+      }
+    }
+  }
+}
+

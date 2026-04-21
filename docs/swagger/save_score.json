@@ -1,0 +1,484 @@
+{
+  "/api/study/save-score/multiple-choice": {
+    "post": {
+      "summary": "Multiple choice",
+      "description": "API để lưu điểm với loại câu hỏi multiple choice",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "exam_id": 30,
+              "homework_id": 15,
+              "question_id": 189,
+              "lesson_id": 25,
+              "answer_ids": [
+                263,
+                264
+              ]
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/fill-in-blank": {
+    "post": {
+      "summary": "Fill in blank",
+      "description": "API để lưu điểm với loại câu hỏi fill in blank",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 167,
+              "lesson_id": 25,
+              "answers": {
+                "1": "Indonesia",
+                "2": "Jakarta1"
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/ordering-and-dragdrop": {
+    "post": {
+      "summary": "Ordering and Drag & Drop",
+      "description": "API để lưu điểm với 2 loại câu hỏi Ordering và Drag & Drop",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 211,
+              "lesson_id": 25,
+              "answers": {
+                "293": 294,
+                "294": 293,
+                "295": 295,
+                "296": 295
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/matching": {
+    "post": {
+      "summary": "Matching",
+      "description": "API để lưu điểm với loại câu hỏi matching",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 191,
+              "lesson_id": 25,
+              "answers": {
+                "10": 11,
+                "11": 10,
+                "12": 12,
+                "13": 13
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/labeling": {
+    "post": {
+      "summary": "Labeling",
+      "description": "API để lưu điểm với loại câu hỏi labeling",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 192,
+              "lesson_id": 25,
+              "answers": {
+                "55": 56,
+                "56": 55,
+                "57": 57,
+                "58": 58,
+                "59": 59
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/category": {
+    "post": {
+      "summary": "Group",
+      "description": "API để lưu điểm với loại câu hỏi category",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "homework_id": 8,
+              "question_id": 192,
+              "lesson_id": 25,
+              "answers": {
+                "55": 56,
+                "56": 55,
+                "57": 57,
+                "58": 58,
+                "59": 59
+              }
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/bulk": {
+    "post": {
+      "summary": "Bulk Save Score",
+      "description": "bulk API để lưu điểm với nhiều câu hỏi",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin danh sách câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "exam_id": 30,
+              "lesson_id": 25,
+              "list_answers": [
+                {
+                  "type_question": "multiple_choice",
+                  "question_id": 189,
+                  "data": {
+                    "answer_ids": [
+                      262
+                    ]
+                  }
+                },
+                {
+                  "type_question": "fill_in_blank",
+                  "question_id": 228,
+                  "data": {
+                    "answers": {
+                      "Indonesia": 1,
+                      "Jakarta1": 2
+                    }
+                  }
+                },
+                {
+                  "type_question": "ordering",
+                  "question_id": 190,
+                  "data": {
+                    "answers": {
+                      "323": 1,
+                      "324": 2,
+                      "326": 3,
+                      "325": 4
+                    }
+                  }
+                },
+                {
+                  "type_question": "dragdrop",
+                  "question_id": 229,
+                  "data": {
+                    "answers": {
+                      "312": 1,
+                      "313": 2,
+                      "314": 3,
+                      "315": 4
+                    }
+                  }
+                },
+                {
+                  "type_question": "matching",
+                  "question_id": 191,
+                  "data": {
+                    "answers": {
+                      "18": 18,
+                      "19": 19,
+                      "21": 20,
+                      "20": 21
+                    }
+                  }
+                },
+                {
+                  "type_question": "labeling",
+                  "question_id": 174,
+                  "data": {
+                    "answers": {
+                      "44": 44,
+                      "45": 45,
+                      "46": 46
+                    }
+                  }
+                },
+                {
+                  "type_question": "category",
+                  "question_id": 174,
+                  "data": {
+                    "answers": {
+                      "61": 49,
+                      "62": 49,
+                      "63": 51,
+                      "64": 50,
+                      "65": 51
+                    }
+                  }
+                },
+                {
+                  "type_question": "category",
+                  "question_id": 185,
+                  "data": {
+                    "answers": {
+                      "81": 61,
+                      "82": 61,
+                      "83": 62,
+                      "84": 62,
+                      "85": 62
+                    }
+                  }
+                }
+              ],
+              "user_id": 25,
+              "files": [
+                {
+                  "type": "image",
+                  "url": "abcd.png"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  },
+  "/api/study/save-score/evaluate": {
+    "post": {
+      "summary": "Chấm điểm bài tập",
+      "description": "API để lưu điểm bài tập",
+      "tags": [
+        "SaveScore"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "answer",
+          "description": "Thông tin danh sách câu trả lời",
+          "required": false,
+          "schema": {
+            "type": "object",
+            "example": {
+              "exam_id": 30,
+              "homework_id": 30,
+              "exercise_id": 30,
+              "contest_round_id": 30,
+              "user_id": 25,
+              "score": 75.5
+            }
+          }
+        }
+      ],
+      "responses": {}
+    }
+  }
+}

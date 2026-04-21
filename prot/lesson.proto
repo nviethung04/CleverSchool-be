@@ -1,0 +1,244 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "week.proto";
+import "user.proto";
+import "flashcard.proto";
+import "lesson_plan.proto";
+import "teaching_plan.proto";
+
+message ChapterInfo {
+  int64 id = 1;
+  string title = 2;
+  string object_title = 3;
+}
+
+message TagInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message TopicInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message SkillInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message HeadingInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message LessonInfo {
+  int64 id = 1;
+  string title = 2;
+  int32 sort_position = 3;
+  bool is_complete = 4;
+  bool is_studying = 5;
+  string object_title = 6;
+}
+
+message ExamInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_completed = 4; // trạng thái đã làm hay chưa
+  int32 total_questions = 5; // tổng số câu hỏi
+  string created_at = 6;
+  bool is_assigned = 7;
+  int32 time_limit = 8;
+  string deadline = 9;
+  string object_title = 10;
+  bool is_program = 11;
+  string question_form = 12;
+}
+
+message HomeworkInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 questions_completed = 4; // số câu đã làm
+  int32 total_questions = 5; // tổng số câu hỏi
+  string created_at = 6;
+  bool is_assigned = 7;
+  string object_title = 11;
+  bool is_program = 12;
+  string question_form = 13;
+  bool is_submitted = 14;
+}
+
+message ExerciseInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_completed = 4; // trạng thái đã làm hay chưa
+  int32 total_questions = 5; // tổng số câu hỏi
+  string created_at = 6;
+  bool is_assigned = 7;
+  int32 time_limit = 8;
+  string deadline = 9;
+  string object_title = 10;
+  bool is_program = 11;
+  string question_form = 12;
+}
+
+message AssessmentInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  bool is_assigned = 5;
+  string object_title = 6;
+  bool is_program = 7;
+  bool publish = 8;
+}
+
+message AuthorInfo {
+  int64 id = 1;
+  string name = 2;
+  string username = 3;
+  string phone_number = 4;
+  string email = 5;
+}
+
+message LessonPlanInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string cover_image = 4;
+  int32 status = 5;
+  int32 sort_position = 6;
+  int64 total_time = 7;
+  bool is_complete = 8;
+  string object_title = 9;
+  bool is_active = 10;
+  LessonPlanAuthor author = 11;
+}
+
+message LessonScheduleInfo {
+  int64 id = 1;
+  int64 course_id = 2;
+  string scheduled_date = 3;
+  int64 week_id = 4;
+  int32 week_number = 5;
+  WeekInfo week = 6;
+}
+
+message LessonProgramInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message Lesson {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string sort_position = 4;
+  bool status = 5;
+  ChapterInfo chapter = 6;
+  repeated LessonInfo dependencies = 7;
+  repeated TagInfo tags = 8;
+  repeated TopicInfo topics = 9;
+  repeated SkillInfo skills = 10;
+  AuthorInfo author = 11;
+  repeated ExamInfo exams = 12;
+  repeated HomeworkInfo homeworks = 13;
+  repeated ExerciseInfo exercises = 14;
+  repeated LessonPlanInfo lesson_plans = 15;
+  repeated LessonScheduleInfo schedules = 16;
+  repeated AssessmentInfo assessment = 17;
+  LessonProgramInfo program = 18;
+  int32 views = 19;
+  bool is_complete = 20;
+  string object_title = 21;
+  repeated Vocabulary vocabularies = 22;
+  int32 vocabulary_count = 23;
+  string created_at = 24;
+  string updated_at = 25;
+  CourseInfo course = 26;
+  HeadingInfo heading = 27;
+  TeachingPlan teaching_plan = 28;
+  bool is_studying = 29;
+}
+
+message GetLessonRequest {
+  int64 id = 1;
+}
+
+message LessonResponse {
+  Lesson lesson = 1;
+  string message = 2;
+}
+
+message ListLessonsRequest {}
+
+message LessonRequest {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string sort_position = 4;
+  bool status = 5;
+  ChapterInfo chapter = 6;
+  repeated LessonInfo dependencies = 7;
+  repeated TagInfo tags = 8;
+  repeated TopicInfo topics = 9;
+  repeated SkillInfo skills = 10;
+  repeated ExamInfo exams = 11;
+  repeated HomeworkInfo homeworks = 12;
+  repeated ExerciseInfo exercises = 13;
+  repeated LessonPlanInfo lesson_plans = 14;
+  repeated LessonScheduleInfo schedules = 15;
+  repeated AssessmentInfo assessment = 16;
+  int32 views = 17;
+  string object_title = 18;
+  int64 program_id = 19;
+  HeadingInfo heading = 20;
+  TeachingPlan teaching_plan = 21;
+}
+
+message LessonIDRequest {
+  int64 id = 1;
+}
+
+message LessonsResponse {
+  repeated Lesson lessons = 1;
+  uint64 total_count = 2;
+}
+
+message Lessons {
+  repeated Lesson lessons = 1;
+}
+
+message LessonCompletion {
+  int64 id = 1;
+  int64 student_id = 2;
+  bool is_complete = 3;
+  string completion_at = 4;
+}
+
+message LessonStudying {
+  int64 id = 1;
+  int64 student_id = 2;
+  bool is_studying = 3;
+  string studying_at = 4;
+}
+
+message AssignedLesson {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  string object_title = 4;
+  bool is_assigned = 5;
+}
+
+message AssignedLessons {
+  repeated AssignedLesson lessons = 1;
+}

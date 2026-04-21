@@ -1,0 +1,268 @@
+{
+  "/api/manage/teaching-plans": {
+    "get": {
+      "description": "API để lấy danh sách giáo án giáo viên",
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "tags": ["TeachingPlans"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Lấy theo page",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng items trên trang",
+          "required": false
+        }
+      ],
+      "summary": "Danh sách giáo án giáo viên",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlanListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo giáo án giáo viên mới",
+      "consumes": ["application/json"],
+      "produces": ["application/json"],
+      "tags": ["TeachingPlans"],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo giáo án giáo viên",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "tag",
+          "description": "Thông tin giáo án giáo viên",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlanRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo giáo án giáo viên thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlan"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/teaching-plans/{id}": {
+    "get": {
+      "summary": "Lấy thông tin chi tiết giáo án giáo viên",
+      "description": "API để lấy thông tin chi tiết của một giáo án giáo viên theo ID",
+      "tags": ["TeachingPlans"],
+      "produces": ["application/json", "application/x-protobuf"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của giáo án giáo viên"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlan"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin chi tiết giáo án giáo viên",
+      "description": "API để cập nhật thông tin chi tiết của một giáo án giáo viên theo ID",
+      "tags": ["TeachingPlans"],
+      "produces": ["application/json", "application/x-protobuf"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của giáo án giáo viên"
+        },
+        {
+          "in": "body",
+          "name": "tag",
+          "description": "Thông tin giáo án giáo viên",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlan"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlan"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa giáo án giáo viên",
+      "description": "API để xóa một giáo án giáo viên theo ID",
+      "tags": ["TeachingPlans"],
+      "produces": ["application/json", "application/x-protobuf"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của giáo án giáo viên"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa giáo án giáo viên thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/teaching-plan-approve": {
+    "patch": {
+      "summary": "Khôi phục giáo án giáo viên",
+      "description": "API để duyệt giáo án giáo viên",
+      "tags": ["TeachingPlans"],
+      "produces": ["application/json", "application/x-protobuf"],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "tag",
+          "description": "Thông tin giáo án giáo viên",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlanApproveRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.TeachingPlan"
+          }
+        }
+      }
+    }
+  }
+}

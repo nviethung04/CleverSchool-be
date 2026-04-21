@@ -1,0 +1,50 @@
+# Git files
+.git
+.gitignore
+
+# Documentation files that are not needed in the container
+README*.md
+# Note: docs/ directory is needed for go:embed in docs/init-json.go
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Test files
+*_test.go
+**/*_test.go
+
+# Node.js files (if any)
+node_modules
+package*.json
+
+# Build artifacts
+myapp
+*.exe
+
+# Docker files
+dockerfile
+docker-compose*.yml
+Dockerfile*
+
+# Deployment scripts
+deploy*.sh
+deploy*.bat
+
+# Environment files (should be mounted or passed as env vars)
+.env
+.env.* 

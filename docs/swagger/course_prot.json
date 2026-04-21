@@ -1,0 +1,527 @@
+{
+  "prot.SchoolInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ProgramInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "book_url": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.CourseTeacherInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.SemesterInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.Course": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "duration": {
+        "type": "integer"
+      },
+      "image": {
+        "type": "string"
+      },
+      "progress": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "current_students": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "target": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "subject": {
+        "$ref": "#/definitions/prot.Subject"
+      },
+      "program": {
+        "$ref": "#/definitions/prot.ProgramInfo"
+      },
+      "chaptes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Chapter"
+        }
+      },
+      "school": {
+        "$ref": "#/definitions/prot.SchoolInfo"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "copy_schedule_success": {
+        "type": "boolean",
+        "description": "Kết quả copy lịch học"
+      },
+      "copy_schedule_message": {
+        "type": "string",
+        "description": "Thông báo kết quả copy lịch học"
+      },
+      "eligible_for_final_exam": {
+        "type": "boolean",
+        "description": "Có được thi cuối kỳ không"
+      }
+    }
+  },
+  "prot.CourseDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "duration": {
+        "type": "integer"
+      },
+      "image": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "progress": {
+        "type": "string"
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "current_students": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "target": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "program": {
+        "$ref": "#/definitions/prot.ProgramInfo"
+      },
+      "teacher": {
+        "$ref": "#/definitions/prot.CourseTeacherInfo"
+      },
+      "subject": {
+        "$ref": "#/definitions/prot.Subject"
+      },
+      "chaptes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ChapterDetail"
+        }
+      },
+      "school": {
+        "$ref": "#/definitions/prot.SchoolInfo"
+      },
+      "study_shifts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.StudyShiftInfo"
+        }
+      },
+      "semesters": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.SemesterInfo"
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "copy_schedule_success": {
+        "type": "boolean",
+        "description": "Kết quả copy lịch học"
+      },
+      "copy_schedule_message": {
+        "type": "string",
+        "description": "Thông báo kết quả copy lịch học"
+      },
+      "eligible_for_final_exam": {
+        "type": "boolean",
+        "description": "Có được thi cuối kỳ không"
+      }
+    }
+  },
+  "prot.CourseRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "level": {
+        "type": "string"
+      },
+      "duration": {
+        "type": "integer"
+      },
+      "image": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "subject_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "target": {
+        "type": "string"
+      },
+      "time": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "subject": {
+        "$ref": "#/definitions/prot.Subject"
+      },
+      "school": {
+        "$ref": "#/definitions/prot.SchoolInfo"
+      },
+      "study_shifts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.StudyShiftInfo"
+        }
+      },
+      "semesters": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.SemesterInfo"
+        }
+      },
+      "target_course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của course nguồn để copy lịch học (nếu > 0 thì sẽ copy lịch học)"
+      }
+    }
+  },
+  "prot.CourseListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Course"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.UserCourse": {
+    "type": "object",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "main_teacher": {
+              "type": "boolean"
+            },
+            "is_failed": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "total_count": {
+        "type": "integer"
+      }
+    }
+  },
+  "prot.UserCourseListRequest": {
+    "type": "object",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "is_failed": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "role_id": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  },
+  "prot.UserCourseList": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.UserCourse"
+        }
+      }
+    }
+  },
+  "prot.ExamRessult": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "lesson": {
+        "type": "string"
+      },
+      "exam": {
+        "type": "string"
+      },
+      "date": {
+        "type": "string"
+      },
+      "score": {
+        "type": "integer",
+        "format": "float"
+      },
+      "max_score": {
+        "type": "integer",
+        "format": "float"
+      },
+      "time": {
+        "type": "string"
+      },
+      "exam_time": {
+        "type": "string"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ScoreByCourse": {
+    "type": "object",
+    "properties": {
+      "exam_count": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "average_score": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "finish_exam": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "max_score": {
+        "type": "integer",
+        "format": "float"
+      },
+      "exam_ressults": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ExamRessult"
+        }
+      }
+    }
+  }
+}

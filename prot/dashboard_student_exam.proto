@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message DashboardStudentExamRequest {
+    int64 course_id = 1;
+    int64 start_date = 2;
+    int64 end_date = 3;
+}
+
+message DashboardStudentExamWeek {
+    int32 week_number = 1;
+    int32 year = 2;
+    int32 exam_submitted = 3;
+    double avg_score = 4;
+    int64 start_date = 5;
+    int64 end_date = 6;
+    double avg_ratio = 7;
+    int32 exam_assigned = 8;
+}
+
+message DashboardStudentExamOverview {
+    int32 total_exam_assigned = 1;
+    int32 total_exam_submitted = 2;
+    double avg_ratio = 3;
+}
+
+message DashboardStudentExamResponse {
+    DashboardStudentExamOverview overview = 1;
+    repeated DashboardStudentExamWeek chart = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_student_exam.proto

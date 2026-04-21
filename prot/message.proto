@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message DeleteResponse {
+  int64 id = 1;
+  string message = 2;
+}
+
+message CompleteResponse {
+  int64 id = 1;
+  string message = 2;
+}
+
+message QuestionRelationResponse {
+  string message = 1;
+}
+
+message Export {
+  string url = 1;
+}
+
+message Import {
+  string message = 1;
+}
+
+message SaveMessage {
+  bool success = 1;
+  string message = 2;
+}

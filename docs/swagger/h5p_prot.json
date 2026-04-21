@@ -1,0 +1,80 @@
+{
+  "prot.H5P": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "content_id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "library": {
+        "type": "string"
+      },
+      "parameters": {
+        "type": "object"
+      },
+      "metadata": {
+        "type": "object"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.H5PListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "contents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.H5P"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.H5PContentScoreRequest": {
+    "type": "object",
+    "properties": {
+      "contentId": {
+        "type": "string"
+      },
+      "score": {
+        "type": "string"
+      },
+      "maxScore": {
+        "type": "string"
+      },
+      "opened": {
+        "type": "string"
+      },
+      "finished": {
+        "type": "string"
+      }
+    }
+  }
+}

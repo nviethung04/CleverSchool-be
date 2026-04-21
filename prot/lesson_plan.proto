@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message LessonPlanFacultyInfo {
+  int64 id = 1;
+  string name = 2;
+  string code = 3;
+  string description = 4;
+}
+
+message LessonPlanSubjectInfo {
+  int64 id = 1;
+  string name = 2;
+  string description= 3;
+  LessonPlanFacultyInfo faculty = 4;
+}
+
+message LessonPlanProgramInfo {
+  int64 id = 1;
+  string name = 2;
+  string description= 3;
+  repeated LessonPlanSubjectInfo subjects = 4;
+}
+
+message LessonPlanChapterInfo {
+  int64 id = 1;
+  string title = 2;
+  string description= 3;
+  LessonPlanProgramInfo program = 4;
+}
+
+message LessonPlanLessonInfo {
+  int64 id = 1;
+  string title = 2;
+  string description= 3;
+  LessonPlanChapterInfo chapter = 4;
+}
+
+message LessonPlanAuthor {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+}
+
+message LessonPlan {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string cover_image = 4;
+  int32 status = 5;
+  int32 sort_position = 6;
+  int64 total_time = 7;
+  int32 views = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+  bool is_complete = 11;
+  int64 complete_at = 12;
+  string object_title = 13;
+  int64 author_id = 14;
+  LessonPlanAuthor author = 15;
+  repeated LessonPlanLessonInfo lessons = 16;
+}
+
+message LessonPlanListResponse {
+  repeated LessonPlan lessonPlans = 1;
+  int64 total = 2;
+}
+
+message LessonPlanRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string cover_image = 4;
+  int32 status = 5;
+  int32 sort_position = 6;
+  int64 total_time = 7;
+  int32 views = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
+  bool is_complete = 11;
+  int64 complete_at = 12;
+  int64 lesson_id = 13;
+  string object_title = 14;
+  int64 author_id = 15;
+  LessonPlanAuthor author = 16;
+  repeated LessonPlanLessonInfo lessons = 17;
+}
+
+message LessonPlanCompleteRequest {
+  bool is_complete = 1;
+}
+
+message LessonPlanByCourse {
+  repeated LessonPlan lesson_plans = 1;
+  repeated LessonPlan lesson_plan_by_programs = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/lesson_plan.proto

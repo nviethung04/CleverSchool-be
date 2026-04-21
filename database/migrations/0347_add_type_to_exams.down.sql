@@ -1,0 +1,2 @@
+ALTER TABLE exams
+    DROP COLUMN IF EXISTS type;

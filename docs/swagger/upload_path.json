@@ -1,0 +1,378 @@
+{
+    "/api/upload/presign": {
+        "post": {
+            "description": "API trả thông tin presigned URL để upload file lên S3",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Upload"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "description": "Thông tin file cần upload",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "filename": {
+                                "type": "string",
+                                "example": "test_ext"
+                            },
+                            "content_type": {
+                                "type": "string",
+                                "example": "image/png"
+                            },
+                            "folder": {
+                                "type": "string",
+                                "example": "test_extract"
+                            },
+                            "expires_second": {
+                                "type": "integer",
+                                "example": 900,
+                                "description": "Thời gian hết hạn presigned URL, tính theo giây (mặc định 900s)"
+                            }
+                        },
+                        "required": [
+                            "filename"
+                        ]
+                    }
+                }
+            ],
+            "summary": "Tạo presigned URL để upload file",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "upload_url": {
+                                        "type": "string",
+                                        "example": "https://bucket.s3.amazonaws.com/public/test_extract/test_ext"
+                                    },
+                                    "object_url": {
+                                        "type": "string",
+                                        "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                                    },
+                                    "key": {
+                                        "type": "string",
+                                        "example": "public/test_extract/test_ext"
+                                    },
+                                    "expires_in": {
+                                        "type": "integer",
+                                        "example": 900
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server"
+                }
+            }
+        }
+    },
+    "/api/upload/complete": {
+        "post": {
+            "description": "API ghi nhận thông tin file đã upload lên S3",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Upload"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "description": "Thông tin file đã upload",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "filename": {
+                                "type": "string",
+                                "example": "test_ext",
+                                "description": "Tên file"
+                            },
+                            "key": {
+                                "type": "string",
+                                "example": "public/test_extract/test_ext",
+                                "description": "Key của file trên S3"
+                            },
+                            "url": {
+                                "type": "string",
+                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext",
+                                "description": "URL truy cập file"
+                            },
+                            "size": {
+                                "type": "integer",
+                                "example": 102400,
+                                "description": "Kích thước file (bytes)"
+                            },
+                            "content_type": {
+                                "type": "string",
+                                "example": "image/png",
+                                "description": "Loại MIME của file"
+                            },
+                            "user_id": {
+                                "type": "integer",
+                                "example": 932,
+                                "description": "ID người upload (nếu có)"
+                            }
+                        },
+                        "required": [
+                            "filename",
+                            "key",
+                            "url"
+                        ]
+                    }
+                }
+            ],
+            "summary": "Ghi nhận file đã upload",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "final_url": {
+                                "type": "string",
+                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                            },
+                            "job_id": {
+                                "type": "string",
+                                "example": "1234567890"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Upload recorded"
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server"
+                }
+            }
+        }
+    },
+    "/api/upload/extract": {
+        "post": {
+            "description": "API extract file (ví dụ unzip, giải nén nội dung PowerPoint/ZIP)",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Upload"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "description": "Thông tin file cần extract",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "filename": {
+                                "type": "string",
+                                "example": "test_ext.zip",
+                                "description": "Tên file"
+                            },
+                            "key": {
+                                "type": "string",
+                                "example": "public/test_extract/test_ext.zip",
+                                "description": "Key của file trên S3"
+                            },
+                            "url": {
+                                "type": "string",
+                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext.zip",
+                                "description": "URL truy cập file"
+                            },
+                            "size": {
+                                "type": "integer",
+                                "example": 102400,
+                                "description": "Kích thước file (bytes)"
+                            },
+                            "content_type": {
+                                "type": "string",
+                                "example": "application/zip",
+                                "description": "Loại MIME của file"
+                            },
+                            "user_id": {
+                                "type": "integer",
+                                "example": 932,
+                                "description": "ID người upload (nếu có)"
+                            }
+                        },
+                        "required": [
+                            "filename",
+                            "key",
+                            "url"
+                        ]
+                    }
+                }
+            ],
+            "summary": "Extract file đã upload",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Extract completed"
+                                    },
+                                    "folder": {
+                                        "type": "string",
+                                        "example": "test_extract/test_ext"
+                                    },
+                                    "files": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "base_key": {
+                                        "type": "string",
+                                        "example": "public/test_extract/test_ext"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server"
+                }
+            }
+        }
+    },
+    "/api/upload/progress": {
+        "get": {
+            "description": "API lấy progress của extraction job",
+            "tags": [
+                "Upload"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "query",
+                    "name": "job_id",
+                    "description": "ID của job",
+                    "required": true,
+                    "type": "string",
+                    "example": "1234567890"
+                }
+            ],
+            "summary": "Lấy progress của extraction job",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "job_id": {
+                                        "type": "string",
+                                        "example": "1234567890"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "completed"
+                                    },
+                                    "progress": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Extraction completed"
+                                    },
+                                    "error": {
+                                        "type": "string",
+                                        "example": "Extraction failed"
+                                    },
+                                    "final_url": {
+                                        "type": "string",
+                                        "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                                    },
+                                    "started_at": {
+                                        "type": "string",
+                                        "example": "2021-01-01T00:00:00Z"
+                                    },
+                                    "updated_at": {
+                                        "type": "string",
+                                        "example": "2021-01-01T00:00:00Z"
+                                    },
+                                    "completed_at": {
+                                        "type": "string",
+                                        "example": "2021-01-01T00:00:00Z"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server"
+                }
+            }
+        }
+    }
+}

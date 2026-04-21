@@ -1,0 +1,154 @@
+{
+    "/api/dashboard/contest/ranking": {
+        "get": {
+            "description": "API để lấy bảng xếp hạng học sinh trong các cuộc thi (Contest Ranking)",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Dashboard Contest"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lọc theo ID khóa học",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "contest_id",
+                    "description": "Lọc theo ID cuộc thi",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "contest_round_id",
+                    "description": "Lọc theo ID vòng thi",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "class_id",
+                    "description": "Lọc theo ID lớp học",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lọc theo ID trường học",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "province_code",
+                    "description": "Lọc theo mã tỉnh/thành phố",
+                    "required": false,
+                    "type": "string"
+                },
+                {
+                    "in": "query",
+                    "name": "start_date",
+                    "description": "Ngày bắt đầu (timestamp Unix)",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "end_date",
+                    "description": "Ngày kết thúc (timestamp Unix)",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Số trang",
+                    "required": false,
+                    "type": "integer",
+                    "default": 1
+                },
+                {
+                    "in": "query",
+                    "name": "limit",
+                    "description": "Số lượng per page",
+                    "required": false,
+                    "type": "integer",
+                    "default": 10
+                },
+                {
+                    "in": "query",
+                    "name": "order_by",
+                    "description": "Sắp xếp theo điểm (asc = tăng dần, desc = giảm dần)",
+                    "required": false,
+                    "type": "string",
+                    "enum": [
+                        "asc",
+                        "desc"
+                    ],
+                    "default": "desc"
+                }
+            ],
+            "summary": "Lấy bảng xếp hạng cuộc thi",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.DashboardContestRankingResponse"
+                    }
+                },
+                "400": {
+                    "description": "Yêu cầu không hợp lệ",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 400
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "messages.invalid_request"
+                            },
+                            "error": {
+                                "type": "string",
+                                "example": "Invalid request parameters"
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Chưa xác thực",
+                    "schema": {
+                        "$ref": "#/definitions/common.UnauthorizedResponse"
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server",
+                    "schema": {
+                        "$ref": "#/definitions/common.InternalServerErrorResponse"
+                    }
+                }
+            }
+        }
+    }
+}

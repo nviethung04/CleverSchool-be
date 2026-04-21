@@ -1,0 +1,6 @@
+-- +migrate Up
+
+ALTER TABLE chapters
+ADD COLUMN "time" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "target" TEXT NOT NULL DEFAULT '';
+

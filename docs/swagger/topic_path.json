@@ -1,0 +1,305 @@
+{
+    "/api/manage/topics": {
+        "get": {
+            "description": "API để lấy danh sách chủ đề",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Topics"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lọc theo trạng thái (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Trang hiện tại",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng mỗi trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách chủ đề",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.TopicListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo chủ đề mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Topics"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo chủ đề",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "topic",
+                    "description": "Thông tin chủ đề",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.TopicRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo chủ đề thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Topic"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/topics/{id}": {
+        "get": {
+            "summary": "Lấy chi tiết chủ đề",
+            "description": "API để lấy thông tin chi tiết của một chủ đề theo ID",
+            "tags": [
+                "Topics"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của chủ đề"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Topic"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chủ đề",
+            "description": "API để cập nhật một chủ đề theo ID",
+            "tags": [
+                "Topics"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID chủ đề"
+                },
+                {
+                    "in": "body",
+                    "name": "topic",
+                    "description": "Thông tin chủ đề cập nhật",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.TopicRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Cập nhật thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Topic"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xoá chủ đề",
+            "description": "API để xoá một chủ đề theo ID",
+            "tags": [
+                "Topics"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID chủ đề"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xoá thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/topics/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục chủ đề",
+            "description": "API để khôi phục chủ đề đã xoá",
+            "tags": [
+                "Topics"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID chủ đề"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Khôi phục thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Topic"
+                    }
+                }
+            }
+        }
+    }
+}

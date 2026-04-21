@@ -1,0 +1,38 @@
+{
+    "ActiveUsersCountResponse": {
+        "type": "object",
+        "properties": {
+            "total_active_users": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số lượng users hoạt động"
+            },
+            "time_range": {
+                "type": "string",
+                "description": "Mô tả khoảng thời gian (currently_online, last_hour, today, recent_days hoặc from-to)"
+            },
+            "timestamp": {
+                "type": "string",
+                "description": "Thời gian tạo response (YYYY-MM-DD HH:MM:SS)"
+            }
+        }
+    },
+    "FailedLoginsCountResponse": {
+        "type": "object",
+        "properties": {
+            "total_failed_logins": {
+                "type": "integer",
+                "format": "int64",
+                "description": "Tổng số lượng IP có failed login attempts"
+            },
+            "time_range": {
+                "type": "string",
+                "description": "Mô tả khoảng thời gian (currently_online, last_hour, today, recent_days hoặc from-to)"
+            },
+            "timestamp": {
+                "type": "string",
+                "description": "Thời gian tạo response (YYYY-MM-DD HH:MM:SS)"
+            }
+        }
+    }
+}

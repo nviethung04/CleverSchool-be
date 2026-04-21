@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message DashboardStudentHomeworkRequest {
+    int64 course_id = 1;
+    int64 start_date = 2;
+    int64 end_date = 3;
+}
+
+message DashboardStudentHomeworkWeek {
+    int32 week_number = 1;
+    int32 year = 2;
+    int32 course_week = 3;
+    int32 homework_submitted = 4;
+    int64 start_date = 5;
+    int64 end_date = 6;
+    int32 homework_assigned = 7;
+    int32 questions_completed = 8;
+    int32 total_questions = 9;
+    double percent_completed = 10;
+    double average_ratio = 11;
+}
+
+message DashboardStudentHomeworkOverview {
+    int32 total_homework_assigned = 1;
+    int32 total_homework_submitted = 2;
+    int32 total_questions_completed = 3;
+    int32 total_questions = 4;
+    double percent_completed = 5;
+    double average_ratio = 6;
+}
+
+message DashboardStudentHomeworkResponse {
+    DashboardStudentHomeworkOverview overview = 1;
+    repeated DashboardStudentHomeworkWeek chart = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_student_homework.proto

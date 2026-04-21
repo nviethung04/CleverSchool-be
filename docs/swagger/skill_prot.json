@@ -1,0 +1,90 @@
+{
+  "prot.Skill": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "parent_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "description": {
+        "type": "string"
+      },
+      "image_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.SkillRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "parent_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "description": {
+        "type": "string"
+      },
+      "image_url": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.SkillListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Skill"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

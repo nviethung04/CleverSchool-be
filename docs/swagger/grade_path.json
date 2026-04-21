@@ -1,0 +1,281 @@
+{
+    "/api/manage/grades": {
+        "get": {
+            "description": "API để lấy danh sách khối lớp",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Grades"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Trang hiện tại",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng mỗi trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách khối lớp",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.GradeListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo khối lớp mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Grades"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo khối lớp",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "grade",
+                    "description": "Thông tin khối lớp",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.GradeRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo khối lớp thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Grade"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/grades/{id}": {
+        "get": {
+            "summary": "Lấy chi tiết khối lớp",
+            "description": "API để lấy thông tin chi tiết của một khối lớp theo ID",
+            "tags": [
+                "Grades"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của khối lớp"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Grade"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin khối lớp",
+            "description": "API để cập nhật một khối lớp theo ID",
+            "tags": [
+                "Grades"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID khối lớp"
+                },
+                {
+                    "in": "body",
+                    "name": "grade",
+                    "description": "Thông tin khối lớp cập nhật",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.GradeRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Cập nhật thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Grade"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xoá khối lớp",
+            "description": "API để xoá một khối lớp theo ID",
+            "tags": [
+                "Grades"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID khối lớp"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xoá thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/grades/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục khối lớp",
+            "description": "API để khôi phục khối lớp đã xoá",
+            "tags": [
+                "Grades"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID khối lớp"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Khôi phục thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Grade"
+                    }
+                }
+            }
+        }
+    }
+}

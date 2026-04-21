@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message Degree {
+  int64 id = 1;
+  int64 user_id = 2;
+  string name = 3;
+  string major = 4;
+  string institution = 5;
+  int32 graduation_year = 6;
+  string degree_code = 7;
+  string degree_level = 8;
+  string received_date = 9;
+  string note = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  string file_url = 13;
+  bool status = 14;
+}
+
+message DegreelListResponse {
+  repeated Degree degrees = 1;
+  int64 total_count = 2;
+}
+//protoc --go_out=. --go_opt=paths=source_relative prot/degree.proto

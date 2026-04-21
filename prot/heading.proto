@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "lesson.proto";
+
+message Heading {
+  int64 id = 1;
+  int64 chapter_id = 2;
+  string name = 3;
+  string description = 4;
+  repeated prot.LessonInfo lessons = 5;
+  int32 time = 6;
+  int32 sort_position = 7;
+  string target = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message HeadingRequest {
+  int64 id = 1;
+  int64 chapter_id = 2;
+  string name = 3;
+  string description = 4;
+  repeated prot.LessonInfo lessons = 6;
+  int32 time = 7;
+  int32 sort_position = 8;
+  string target = 9;
+}
+
+message HeadingsResponse {
+  repeated Heading headings = 1;
+  uint64 total_count = 2;
+}

@@ -1,0 +1,391 @@
+{
+  "/api/manage/schools": {
+    "get": {
+      "summary": "Danh sách school",
+      "description": "API để lấy danh sách school",
+      "tags": [
+        "Schools"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "province_code",
+          "description": "Lọc theo mã tỉnh/thành phố",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "ward_code",
+          "description": "Lọc theo mã phường/xã",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "name",
+          "description": "Lọc theo tên trường",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "type",
+          "description": "Lọc theo loại trường",
+          "required": false,
+          "type": "string"
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Lấy theo trạng thái (1, 0)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.SchoolListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo school",
+      "description": "API để tạo school mới",
+      "tags": [
+        "Schools"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "school",
+          "description": "Thông tin trường học",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SchoolRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo trường học thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.School"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/schools/{id}": {
+    "get": {
+      "summary": "Chi tiết school",
+      "description": "API để lấy chi tiết school theo ID",
+      "tags": [
+        "Schools"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của school"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Lấy thông tin trường học thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.School"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật school",
+      "description": "API để cập nhật school theo ID",
+      "tags": [
+        "Schools"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của school"
+        },
+        {
+          "in": "body",
+          "name": "school",
+          "description": "Thông tin trường học",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SchoolRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật trường học thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.School"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa school",
+      "description": "API để xóa school theo ID",
+      "tags": [
+        "Schools"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của school"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa trường học thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/schools/export": {
+    "get": {
+      "summary": "Export thông tin trường học",
+      "description": "API để export thông tin trường học",
+      "tags": [
+        "Schools"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "example": "http://localhost:8080/public/exports/schools_1748944491.xlsx"
+                  }
+                }
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/schools/import": {
+    "post": {
+      "summary": "Import thông tin trường học",
+      "description": "API để import thông tin trường học",
+      "tags": [
+        "Schools"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "formData",
+          "name": "file",
+          "type": "file",
+          "description": "File Excel để import",
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Import successful"
+                  }
+                }
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

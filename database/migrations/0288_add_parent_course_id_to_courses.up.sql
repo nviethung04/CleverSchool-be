@@ -1,0 +1,3 @@
+ALTER TABLE courses
+ADD COLUMN IF NOT EXISTS parent_course_id BIGINT DEFAULT 0;
+

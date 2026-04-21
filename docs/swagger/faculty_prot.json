@@ -1,0 +1,94 @@
+{
+  "prot.Faculty": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "name_head": {
+        "type": "string"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.FacultyRequest": {
+    "type": "object",
+    "properties": {
+      "school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "name_head": {
+        "type": "string"
+      },
+      "avatar": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.FacultyListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "faculties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Faculty"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

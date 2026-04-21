@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "google/protobuf/timestamp.proto";
+import "certificate.proto";
+import "degree.proto";
+import "department.proto";
+import "employee_position.proto";
+
+message UsernameExits {
+  string username = 1;
+  bool exits = 2;
+}
+
+message SessionInfo {
+  string id = 1;
+  string token = 2;
+  string ip = 3;
+  string user_agent = 4;
+  google.protobuf.Timestamp expires = 5;
+  google.protobuf.Timestamp login_at = 6;
+  bool is_current = 7;
+}
+
+message ListSession {
+  repeated SessionInfo sessions = 1;
+}
+
+message UserRole {
+  int64 id = 1;
+  string name = 2;
+}
+
+message User {
+  int64 id = 1;
+  UserInfo user_info = 2;
+  string identifier = 3;
+  string username = 4;
+  string name = 5;
+  string address = 6;
+  string email = 7;
+  string phone_number = 8;
+  bool status = 9;
+  int64 parent_id = 10;
+  string role_name = 11;
+  string password = 12;
+  int64 role_id = 13;
+  string avatar = 14;
+  string date_of_birth = 15;
+  string description = 16;
+  bool main_teacher = 17;
+  int32 type_teacher = 18;
+  string code = 19;
+  string created_at = 20;
+  string updated_at = 21;
+  string member_type = 22;
+  bool is_independent_student = 23;
+  bool is_failed_subject = 24;
+  int64 total_star = 25;
+  double total_exp = 26;
+  bool is_failed = 27;
+}
+
+message ClassInfo {
+  int64 id = 1;
+  string name = 2;
+  SchoolInfo school = 3;
+}
+
+message SchoolInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message UserProgramInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message CourseInfo {
+  int64 id = 1;
+  string name = 2;
+  string object_title = 3;
+  UserProgramInfo program = 4;
+}
+
+message SubjectInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message FacultyInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message AddressInfo {
+  int64 id = 1;
+  string province_code = 2;
+  string ward_code = 3;
+  string province_name = 4;
+  string ward_name = 5;
+  string address = 6;
+}
+
+message UserInfo {
+  SchoolInfo school = 1;
+  ClassInfo class = 2;
+  repeated CourseInfo courses = 3;
+  AddressInfo address = 4;
+  UserRole role = 5;
+  repeated prot.Certificate certificates = 6;
+  repeated prot.Degree degrees = 7;
+  repeated prot.Department departments = 8;
+  repeated prot.EmployeePosition positions = 9;
+  repeated SubjectInfo subjects = 10;
+  repeated UserRole roles = 11;
+  FacultyInfo faculty = 12;
+  repeated SchoolInfo schools = 13;
+  repeated ClassInfo classes = 14;
+}
+
+message ListUser {
+  repeated User users = 1;
+}
+
+message UserIDRequest {
+  int64 id = 1;
+}
+
+message UserResponse {
+  User user = 1;
+  string message = 2;
+}
+
+message UsersResponse {
+  repeated User users = 1;
+  int64 total_count = 2;
+}
+
+message UserLoginResponse {
+  string token = 1;
+  int32 role_id = 2;
+  string role_name = 3;
+  string type = 4;
+  repeated int32 role_ids = 5;
+  repeated string role_names = 6;
+}
+
+message EmptyResponse {}
+
+message ChangePasswordRequest {
+  string old_password = 1;
+  string new_password = 2;
+  string confirm_password = 3;
+}
+
+message UserRequest  {
+  int64 id = 1;
+  string username = 2;
+  string name = 3;
+  bool main_teacher = 4;
+  int32 type_teacher = 5;
+  bool is_failed = 6;
+}
+
+message UserCourseRequest {
+  repeated UserRequest users = 1;
+  int32 role_id = 2;
+}
+
+message UserClassRequest {
+  repeated UserRequest users = 1;
+  int32 role_id = 2;
+}
+
+// Forgot Password Messages
+message ForgotPasswordRequest {
+  string username = 1;
+}
+
+message ForgotPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+  string confirm_password = 3;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message RegisterRequest {
+  string full_name = 1;
+  string email = 2;
+  string phone_number = 3;
+  int32 role_id = 4;
+  string member_type = 5;
+  string password = 6;
+  string username = 7;
+}
+
+message LogoutResponse {
+  bool success = 1;
+  string message = 2;
+}

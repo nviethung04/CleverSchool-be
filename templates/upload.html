@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File - LMS Enspire</title>
+    <link rel="stylesheet" href="/assets/upload.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="upload-card">
+            <div class="upload-header">
+                <h1><i class="fas fa-cloud-upload-alt"></i> Upload File</h1>
+                <p>Kéo thả file vào đây hoặc click để chọn file</p>
+                <!-- <div class="upload-info-params" id="uploadInfoParams" style="margin-top: 15px; padding: 10px; background: #f0f4ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <div style="font-size: 0.9rem; color: #666;">
+                        <span id="paramInfo">Đang tải thông tin...</span>
+                    </div>
+                </div> -->
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="upload-text">
+                    <p>Kéo thả file vào đây</p>
+                    <p>hoặc</p>
+                    <button class="select-btn" id="selectBtn">Chọn File</button>
+                </div>
+                <input type="file" id="fileInput" multiple style="display: none;">
+            </div>
+
+            <div class="file-list" id="fileList" style="display: none;">
+                <h3>Danh sách file đã chọn:</h3>
+                <div class="files" id="files"></div>
+            </div>
+
+            <div class="upload-progress" id="uploadProgress" style="display: none;">
+                <h3>Tiến trình upload:</h3>
+                <div class="progress-container" id="progressContainer"></div>
+            </div>
+
+
+
+            <div class="upload-actions">
+                <button class="upload-btn" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i> Bắt đầu Upload
+                </button>
+                <button class="clear-btn" id="clearBtn" disabled>
+                    <i class="fas fa-trash"></i> Xóa tất cả
+                </button>
+            </div>
+
+            <div class="upload-info">
+                <div class="info-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Hỗ trợ resume upload khi bị gián đoạn</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>File được mã hóa và bảo mật</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Upload không giới hạn thời gian</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pass API domain from Go template to JavaScript
+        window.API_DOMAIN = "{{ .apiDomain }}";
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tus-js-client@3.1.2/dist/tus.min.js"></script>
+    <script src="/assets/upload.js"></script>
+</body>
+</html>

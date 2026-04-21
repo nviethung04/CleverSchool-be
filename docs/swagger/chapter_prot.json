@@ -1,0 +1,223 @@
+{
+  "prot.Chapter": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "time": {
+        "type": "integer"
+      },
+      "target": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.ChapterDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonInfo"
+        }
+      },
+      "headings": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.HeadingInfo"
+        }
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "time": {
+        "type": "integer"
+      },
+      "target": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.ChapterRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonInfo"
+        }
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "time": {
+        "type": "integer"
+      },
+      "target": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.ChapterListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "chapters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Chapter"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.LessonInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "is_complete": {
+        "type": "boolean"
+      },
+      "object_title": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.HeadingInfo": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonInfo"
+        }
+      }
+    }
+  },
+  "prot.ChapterLessonSort": {
+    "type": "object",
+    "properties": {
+      "lessons": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

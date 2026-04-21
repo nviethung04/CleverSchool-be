@@ -1,0 +1,316 @@
+{
+    "/api/manage/lesson-plans": {
+        "get": {
+            "summary": "Danh sách lesson plan",
+            "description": "API để lấy danh sách lesson plan",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "lesson_id",
+                    "description": "Lọc theo ID bài học",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Số trang",
+                    "required": false,
+                    "type": "integer"
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng mỗi trang",
+                    "required": false,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlanListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "summary": "Tạo lesson plan",
+            "description": "API để tạo lesson plan mới",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Thông tin lesson plan",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "example": {
+                            "title": "Introduction to Go",
+                            "name": "Lesson plan 1",
+                            "description": "Learn the basics of Go programming language including syntax, packages, and error handling.",
+                            "status": 1,
+                            "lesson_id": 1
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlan"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/lesson-plans/{id}": {
+        "get": {
+            "summary": "Chi tiết lesson plan",
+            "description": "API để lấy chi tiết lesson plan theo ID",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "by_program",
+                    "description": "Chỉ lấy lesson plan theo chương trình",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "program_id",
+                    "description": "Lấy theo id chương trình",
+                    "required": false
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "ID của lesson plan"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlan"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật lesson plan",
+            "description": "API để cập nhật lesson plan theo ID",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "ID của lesson plan"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Dữ liệu cập nhật",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "example": {
+                            "title": "Introduction to Go",
+                            "name": "Lesson plan 1",
+                            "description": "lesson plan description",
+                            "status": 1,
+                            "lesson_id": 1,
+                            "views": 1,
+                            "is_complete": true
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.LessonPlan"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa lesson plan",
+            "description": "API để xóa lesson plan theo ID",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "ID của lesson plan"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa thành công"
+                }
+            }
+        }
+    },
+    "/api/manage/lesson-plans/{id}/complete": {
+        "put": {
+            "summary": "Cập nhật lesson plan",
+            "description": "API để cập nhật lesson plan theo ID",
+            "tags": [
+                "LessonPlans"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "ID của lesson plan"
+                },
+                {
+                    "in": "body",
+                    "name": "lesson_plan",
+                    "description": "Dữ liệu cập nhật",
+                    "required": true,
+                    "schema": {
+                        "type": "object",
+                        "example": {
+                            "is_complete": true
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công"
+                }
+            }
+        }
+    }
+}

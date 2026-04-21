@@ -1,0 +1,444 @@
+{
+    "/api/manage/subjects": {
+        "get": {
+            "description": "API để lấy danh sách môn học",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Subjects"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái môn học (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "faculty_id",
+                    "description": "Lọc theo id khoa",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách môn học",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.SubjectListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo môn học mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Subjects"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo môn học",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "subject",
+                    "description": "Thông tin môn học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.SubjectRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo môn học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Subject"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/subjects/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết môn học",
+            "description": "API để lấy thông tin chi tiết của một môn học theo ID",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của môn học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Subject"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết môn học",
+            "description": "API để cập nhật thông tin chi tiết của một môn học theo ID",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của môn học"
+                },
+                {
+                    "in": "body",
+                    "name": "subject",
+                    "description": "Thông tin môn học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.Subject"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Subject"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa môn học",
+            "description": "API để xóa một môn học theo ID",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của môn học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa môn học thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/subjects/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục môn học",
+            "description": "API để khôi phục môn học theo ID",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của môn học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Subject"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/subjects/export": {
+        "get": {
+            "summary": "Export thông tin môn học",
+            "description": "API để export thông tin môn học",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "begin_at",
+                    "description": "Tạo tài khoản từ ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                },
+                {
+                    "in": "query",
+                    "name": "end_at",
+                    "description": "Tạo tài khoản đến ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/subjects_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/subjects/import": {
+        "post": {
+            "summary": "Import thông tin môn học",
+            "description": "API để import thông tin môn học",
+            "tags": [
+                "Subjects"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

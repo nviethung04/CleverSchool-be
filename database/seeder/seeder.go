@@ -1,0 +1,496 @@
+package main
+
+import (
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/models"
+	"flag"
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type Seeder struct{}
+
+func main() {
+	// Load env
+	_ = godotenv.Load()
+
+	// Load config
+	cfg := config.LoadConfig()
+
+	// Connect Database
+	if err := db.ConnectPostgres(cfg); err != nil {
+		log.Fatal("❌ Database connection failed:", err)
+	}
+
+	fmt.Println("🎉 Create fake data")
+
+	seed := &Seeder{}
+
+	fmt.Println("🎉 Fake data has been saved to the database.!")
+
+	model := flag.String("model", "", "Task to run (e.g., role, user)")
+	// count := flag.Int("count", 10, "Number of records to seed")
+	flag.Parse()
+
+	switch *model {
+	case "Question":
+		seed.SeedQuestions()
+	case "QuestionAttribute":
+		seed.SeedQuestionAttributes()
+	case "Role":
+		seed.SeedRoles()
+	case "UserClassAndCourse":
+		seed.UserClassAndCourse()
+	case "Week":
+		currentYear := time.Now().Year()
+		seed.SeedWeeksForYear(currentYear)
+	case "Flashcard":
+		seed.SeedFlashcards()
+	case "Lesson4Flashcard":
+		SeedLesson4Flashcards()
+	default:
+		seed.SeedQuestions()
+		seed.SeedRoles()
+		return
+	}
+}
+func (s *Seeder) SeedWeeksForYear(year int) {
+	var count int64
+	if err := db.MasterDB.Model(&models.Week{}).
+		Where("year = ?", year).
+		Count(&count).Error; err != nil {
+		log.Printf("Error checking existing weeks for year %d: %v", year, err)
+		return
+	}
+
+	if count > 0 {
+		log.Printf("Weeks for year %d already exist. Skipping seeding.", year)
+		return
+	}
+
+	// Bắt đầu từ Thứ Hai của tuần chứa ngày 4/1 (ISO week 1)
+	jan4 := time.Date(year, 1, 4, 0, 0, 0, 0, time.UTC)
+	start := jan4
+	for start.Weekday() != time.Monday {
+		start = start.AddDate(0, 0, -1)
+	}
+
+	// Lặp tạo tuần đến khi ISO year > năm cần seed
+	for {
+		isoYear, isoWeek := start.ISOWeek()
+		if isoYear > year {
+			break
+		}
+
+		if isoYear == year {
+			end := start.AddDate(0, 0, 6)
+
+			weekData := models.Week{
+				Year:       year,
+				WeekNumber: isoWeek,
+				StartDate:  start,
+				EndDate:    end,
+			}
+
+			if err := db.MasterDB.Create(&weekData).Error; err != nil {
+				log.Printf("Error seeding week %d/%d: %v", isoWeek, year, err)
+			}
+		}
+
+		// Chuyển sang tuần tiếp theo
+		start = start.AddDate(0, 0, 7)
+	}
+}
+
+func (s *Seeder) SeedQuestionAttributes() {
+	subjectId := int64(1)
+	attributes := []models.QuestionAttribute{
+		{
+			ParentID:  nil,
+			SubjectId: &subjectId,
+			Name:      "Kỹ năng",
+			Level:     1,
+			Weight:    1,
+			Nodes: []models.QuestionAttribute{
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Nghe",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Nói",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Đọc",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Viết",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Từ vựng",
+					Level:     2,
+					Weight:    1,
+				},
+			},
+		},
+		{
+			ParentID:  nil,
+			SubjectId: &subjectId,
+			Name:      "Mức độ",
+			Level:     1,
+			Weight:    1,
+			Nodes: []models.QuestionAttribute{
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Beginner",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Elementary",
+					Level:     2,
+					Weight:    2,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Pre-Intermediate",
+					Level:     2,
+					Weight:    3,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Intermediate",
+					Level:     2,
+					Weight:    4,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Upper-Intermediat",
+					Level:     2,
+					Weight:    5,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Advanced",
+					Level:     2,
+					Weight:    2,
+				},
+			},
+		},
+		{
+			ParentID:  nil,
+			SubjectId: &subjectId,
+			Name:      "Mức độ nhận thức",
+			Level:     1,
+			Weight:    1,
+			Nodes: []models.QuestionAttribute{
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Nhận diện",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Ghi nhớ",
+					Level:     2,
+					Weight:    1,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Vận dụng",
+					Level:     2,
+					Weight:    2,
+				},
+				{
+					ParentID:  nil,
+					SubjectId: &subjectId,
+					Name:      "Vận dụng nâng cao/sáng tạo",
+					Level:     2,
+					Weight:    1,
+				},
+			},
+		},
+	}
+
+	for _, a := range attributes {
+		if err := db.MasterDB.Create(&a).Error; err != nil {
+			log.Printf("Error seeding attributes: %v", err)
+		}
+	}
+}
+
+func (s *Seeder) SeedQuestions() {
+	questions := []models.Question{
+		{
+			Kind:             "image",
+			QuestionType:     "multiple_choice",
+			Title:            "Chọn đáp án đúng.",
+			Content:          "Thủ đô của Việt Nam là gì?",
+			Point:            10,
+			TimeLimitSeconds: 60,
+			Answers: []models.Answer{
+				{Content: "Hà Nội", IsCorrect: true, Kind: "image"},
+				{Content: "TP. Hồ Chí Minh", IsCorrect: false, Kind: "image"},
+				{Content: "Đà Nẵng", IsCorrect: false, Kind: "image"},
+				{Content: "Huế", IsCorrect: false, Kind: "image"},
+			},
+		},
+		{
+			Kind:             "audio",
+			QuestionType:     "fill_in_blanks",
+			Title:            "Điền từ đúng vào chỗ trống.",
+			Content:          "[blank1] là quốc gia lớn nhất Đông Nam Á về diện tích. Thủ đô của nó là [blank2].",
+			Point:            10,
+			TimeLimitSeconds: 30,
+			AnswerPositions: []models.AnswerPosition{
+				{Content: "Một quốc gia Đông Nam Á", IsCorrect: true, Kind: "text", Point: 5, CorrectPosition: 1},
+				{Content: "Thủ đô của quốc gia đó", IsCorrect: true, Kind: "text", Point: 5, CorrectPosition: 2},
+			},
+		},
+		{
+			Kind:             "video",
+			QuestionType:     "ordering",
+			Title:            "Kéo các hành tinh vào đúng thứ tự.",
+			Content:          "Sắp xếp các hành tinh theo thứ tự từ gần Mặt Trời nhất.",
+			Point:            40,
+			TimeLimitSeconds: 30,
+			AnswerPositions: []models.AnswerPosition{
+				{Content: "Sao Thủy", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 1},
+				{Content: "Sao Kim", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 2},
+				{Content: "Trái Đất", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 3},
+				{Content: "Sao Hỏa", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 4},
+			},
+		},
+		{
+			Kind:             "image",
+			QuestionType:     "matching",
+			Title:            "Kéo mỗi quốc gia đến lá cờ tương ứng",
+			Content:          "Ghép quốc gia với lá cờ tương ứng.",
+			Point:            10,
+			TimeLimitSeconds: 30,
+			AnswerPositions: []models.AnswerPosition{
+				{Content: "Việt Nam", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 1},
+				{Content: "Nhật Bản", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 1},
+				{Content: "Hàn Quốc", IsCorrect: true, Kind: "image", Point: 10, CorrectPosition: 1},
+				{Content: "Việt Nam", IsCorrect: false, Kind: "image", Point: 10, CorrectPosition: 1},
+			},
+		},
+		{
+			Kind:             "image",
+			QuestionType:     "drag_drop",
+			Title:            "Kéo các từ đúng vào chỗ trống. Lưu ý: Có một số đáp án không sử dụng.",
+			Content:          "[blank1] là hành tinh lớn nhất. [blank2] là hành tinh gần Mặt Trời nhất. [blank3] có vành đai nổi bật.",
+			Point:            8,
+			TimeLimitSeconds: 30,
+			AnswerPositions: []models.AnswerPosition{
+				{Content: "Sao Mộc", IsCorrect: true, Kind: "text", Point: 1, CorrectPosition: 1},
+				{Content: "Sao Thủy", IsCorrect: true, Kind: "text", Point: 1, CorrectPosition: 2},
+				{Content: "Sao Thổ", IsCorrect: true, Kind: "text", Point: 1, CorrectPosition: 3},
+				{Content: "Sao Kim", IsCorrect: false, Kind: "text", Point: 1, CorrectPosition: 0},
+				{Content: "Sao Hỏa", IsCorrect: false, Kind: "text", Point: 1, CorrectPosition: 0},
+			},
+		},
+		{
+			Kind:             "image",
+			QuestionType:     "labeling",
+			Title:            "Kéo nhãn đến đúng vị trí trên bông hoa. Lưu ý: Có một số nhãn không sử dụng.",
+			Content:          "Gắn nhãn các phần của bông hoa.",
+			Point:            10,
+			TimeLimitSeconds: 30,
+			ImageWidth:       500,
+			ImageHeight:      250,
+			AnswerCoordinates: []models.AnswerCoordinates{
+				{Content: "Cánh hoa", Kind: "text", Point: 5, PositionX: 100, PositionY: 200, PositionWidth: 20, PositionHeight: 5},
+				{Content: "Thân", Kind: "text", Point: 5, PositionX: 150, PositionY: 300, PositionWidth: 20, PositionHeight: 5},
+				{Content: "Lá", Kind: "text", Point: 5, PositionX: 120, PositionY: 250, PositionWidth: 20, PositionHeight: 5},
+				{Content: "Rễ", Kind: "text", Point: 5, PositionX: 0, PositionY: 0, PositionWidth: 20, PositionHeight: 5},
+			},
+		},
+		{
+			Kind:             "video",
+			QuestionType:     "category",
+			Title:            "Kéo mỗi động vật vào môi trường sống tương ứng.",
+			Content:          "Phân loại động vật theo môi trường sống.",
+			Point:            10,
+			TimeLimitSeconds: 30,
+			AnswerGroups: []models.AnswerGroup{
+				{Content: "Sư tử", Group: models.GroupAnswer{Content: "Đất liền", Kind: "text"}, Kind: "image", Point: 2},
+				{Content: "Cá heo", Group: models.GroupAnswer{Content: "Biển", Kind: "text"}, Kind: "image", Point: 2},
+				{Content: "Chim đại bàng", Group: models.GroupAnswer{Content: "Bầu trời", Kind: "text"}, Kind: "image", Point: 2},
+				{Content: "Cá mập", Group: models.GroupAnswer{Content: "Biển", Kind: "text"}, Kind: "image", Point: 2},
+				{Content: "Hươu", Group: models.GroupAnswer{Content: "Đất liền", Kind: "text"}, Kind: "image", Point: 2},
+				{Content: "Chim cánh cụt", Group: models.GroupAnswer{Content: "Biển", Kind: "text"}, Kind: "image", Point: 2},
+			},
+		},
+		{
+			Kind:             "text",
+			QuestionType:     "speaking",
+			Title:            "Đọc và trả lời câu hỏi.",
+			Content:          "Bạn tên gì?",
+			Point:            10,
+			TimeLimitSeconds: 30,
+		},
+		{
+			Kind:             "text",
+			QuestionType:     "writing",
+			Title:            "Đọc và trả lời câu hỏi.",
+			Content:          "Quả gì mà lăn lốc lốc?",
+			Point:            10,
+			TimeLimitSeconds: 30,
+		},
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM answers").Error; err != nil {
+		log.Fatalf("Error deleting old answers: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM answer_groups").Error; err != nil {
+		log.Fatalf("Error deleting old answer_groups: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM group_answers").Error; err != nil {
+		log.Fatalf("Error deleting old group_answers: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM answer_positions").Error; err != nil {
+		log.Fatalf("Error deleting old answer_positions: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM answer_coordinates").Error; err != nil {
+		log.Fatalf("Error deleting old answer_coordinates: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM answer_matchings").Error; err != nil {
+		log.Fatalf("Error deleting old answer_matchings: %v", err)
+	}
+
+	if err := db.MasterDB.Exec("DELETE FROM questions").Error; err != nil {
+		log.Fatalf("Error deleting old questions: %v", err)
+	}
+
+	for _, q := range questions {
+		if err := db.MasterDB.Create(&q).Error; err != nil {
+			log.Printf("Error seeding question: %v", err)
+		}
+	}
+}
+func (s *Seeder) SeedRoles() {
+	if err := db.MasterDB.Exec("DELETE FROM role_permissions").Error; err != nil {
+		fmt.Println("Lỗi khi xóa bảng role_permissions:", err)
+		return
+	}
+	if err := db.MasterDB.Exec("DELETE FROM permissions").Error; err != nil {
+		fmt.Println("Lỗi khi xóa bảng permissions:", err)
+		return
+	}
+
+	roles := map[string]*models.Role{
+		"admin":   {},
+		"teacher": {},
+		"student": {},
+	}
+	for name := range roles {
+		var role models.Role
+		if err := db.MasterDB.Where("name = ?", name).First(&role).Error; err != nil {
+			role = models.Role{Name: name}
+			db.MasterDB.Create(&role)
+		}
+		roles[name] = &role
+	}
+
+	var adminUser models.User
+	if err := db.MasterDB.Where("username = ?", "admin").First(&adminUser).Error; err != nil {
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+		adminUser = models.User{
+			Username: "admin",
+			// RoleID:   int(roles["admin"].ID),
+			Password: string(hashedPassword),
+			Status:   true,
+		}
+		db.MasterDB.Create(&adminUser)
+	}
+	// else if adminUser.RoleID != int(roles["admin"].ID) {
+	// 	adminUser.RoleID = int(roles["admin"].ID)
+	// 	db.MasterDB.Save(&adminUser)
+	// }
+
+	s.seedPermissions(config.GetPermissions(), roles["admin"])
+	s.seedPermissions(config.GetTeacherPermissions(), roles["teacher"])
+	s.seedPermissions(config.GetStudentPermissions(), roles["student"])
+}
+
+func (s *Seeder) seedPermissions(perms map[string]config.PermissionGroup, role *models.Role) {
+	for key, val := range perms {
+		for idx, action := range val.Actions {
+			permissionStr := fmt.Sprintf("%s.%s", key, action)
+
+			name := ""
+			if idx < len(val.Names) {
+				name = val.Names[idx]
+			}
+
+			var perm models.Permission
+			db.MasterDB.Where(models.Permission{Permission: permissionStr}).
+				Assign(models.Permission{
+					Group:        val.Group,
+					Name:         name,
+					SortPosition: val.SortPosition,
+				}).
+				FirstOrCreate(&perm)
+
+			var rolePerm models.RolePermission
+			if err := db.MasterDB.Where("role_id = ? AND permission_id = ?", role.ID, perm.ID).First(&rolePerm).Error; err != nil {
+				db.MasterDB.Create(&models.RolePermission{
+					RoleID:       role.ID,
+					PermissionID: int64(perm.ID),
+				})
+			}
+		}
+	}
+}
+
+func (s *Seeder) UserClassAndCourse() {
+	if err := db.MasterDB.Exec("INSERT INTO user_classes (class_id, user_id, is_current) VALUES (1, 1, TRUE)").Error; err != nil {
+		fmt.Println("Lỗi khi thêm dữ liệu vào bảng user_classes:", err)
+		return
+	}
+
+	if err := db.MasterDB.Exec("INSERT INTO user_courses (course_id, user_id, is_current) VALUES (1, 1, TRUE)").Error; err != nil {
+		fmt.Println("Lỗi khi thêm dữ liệu vào bảng user_courses:", err)
+		return
+	}
+}
+
+//go run database/seeder/seeder.go --model=Role

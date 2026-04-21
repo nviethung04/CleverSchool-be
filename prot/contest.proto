@@ -1,0 +1,540 @@
+syntax = "proto3";
+
+package prot;
+option go_package = "be-lms/prot";
+
+// Simple Creator info
+message ContestCreator {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string username = 4;
+}
+
+// Contest image info
+message ContestImageInfo {
+  int64 id = 1;
+  string path = 2;
+  string disk = 3;
+}
+
+// Contest Management
+message Contest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 status = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  ContestImageInfo image_info = 7;
+  int64 created_at = 8;
+  int64 created_by = 9;
+  int64 updated_at = 10;
+  int64 updated_by = 11;
+  int64 deleted_at = 12;
+  int64 deleted_by = 13;
+  repeated ContestRound contest_rounds = 14;
+  ContestCreator creator = 15;
+  int64 total_participants = 16;
+  string image = 17;
+}
+
+message ContestRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int32 status = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  ContestImageInfo image_info = 7;
+  int64 created_at = 8;
+  int64 created_by = 9;
+  int64 updated_at = 10;
+  int64 updated_by = 11;
+  int64 deleted_at = 12;
+  int64 deleted_by = 13;
+}
+
+message ContestResponse {
+  Contest contest = 1;
+  string message = 2;
+}
+
+message ContestListResponse {
+  repeated Contest contests = 1;
+  int64 total_count = 2;
+}
+
+message ContestRoundFile {
+  string type = 1;
+  string url = 2;
+}
+
+message ContestRound {
+  int64 id = 1;
+  int64 contest_id = 2;
+  string name = 3;
+  string description = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  int64 sort_position = 7;
+  string join_level = 8;
+  int64 created_at = 9;
+  int64 created_by = 10;
+  int64 updated_at = 11;
+  int64 updated_by = 12;
+  int64 deleted_at = 13;
+  int64 deleted_by = 14;
+  string question_form = 15;
+  repeated ContestRoundFile question_files = 16;
+}
+
+message ContestRoundRequest {
+  int64 id = 1;
+  int64 contest_id = 2;
+  string name = 3;
+  string description = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  int64 sort_position = 7;
+  string join_level = 8;
+  int64 created_at = 9;
+  int64 created_by = 10;
+  int64 updated_at = 11;
+  int64 updated_by = 12;
+  int64 deleted_at = 13;
+  int64 deleted_by = 14;
+  string question_form = 15;
+  repeated ContestRoundFile question_files = 16;
+}
+
+message ContestRoundResponse {
+  ContestRound contest_round = 1;
+  string message = 2;
+}
+
+message ContestRoundListResponse {
+  repeated ContestRound contest_rounds = 1;
+  int64 total_count = 2;
+}
+
+// Contest Question Management
+message AssignQuestionsToContestRoundRequest {
+  repeated int64 question_ids = 1;
+}
+
+message RemoveQuestionsFromContestRoundRequest {
+  repeated int64 question_ids = 1;
+}
+
+// Contest Scoring
+message SaveContestScoreMultipleChoiceRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  int64 answer_id = 4;
+  int64 true_answer_id = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreFillInBlankRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  string answer = 4;
+  string true_answer = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreOrderingDragdropRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  int64 answer_group_position = 4;
+  int32 sort_position = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreMatchingRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  int64 first_item_id = 4;
+  int64 second_item_id = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreLabelingRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  int64 label_id = 4;
+  int64 blank_id = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreCategoryRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  int64 item_id = 4;
+  int64 category_id = 5;
+  bool is_correct = 6;
+  double score = 7;
+}
+
+message SaveContestScoreManualScoringRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+  double score = 4;
+  string feedback = 5;
+}
+
+message SubmitContestRoundRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  double score = 3;
+  double ratio = 4;
+  int64 time = 5;
+  bool has_manual_scoring = 6;
+}
+
+message SkipContestQuestionRequest {
+  int64 contest_round_id = 1;
+  int64 user_id = 2;
+  int64 question_id = 3;
+}
+
+// Contest Results
+message ContestRoundAnswersResponse {
+  repeated ContestRoundQuestionUserMultipleChoice multiple_choice = 1;
+  repeated ContestRoundQuestionUserFillInBlank fill_in_blank = 2;
+  repeated ContestRoundQuestionUserPosition ordering = 3;
+  repeated ContestRoundQuestionUserMatching matching = 4;
+  repeated ContestRoundQuestionUserLabeling labeling = 5;
+  repeated ContestRoundQuestionUserCategory category = 6;
+  repeated ContestRoundQuestionUserManualScoring manual_scoring = 7;
+}
+
+message ContestRoundResultsResponse {
+  repeated ContestRoundUser results = 1;
+}
+
+message ContestRoundLeaderboardResponse {
+  repeated ContestRoundLeaderboardEntry leaderboard = 1;
+}
+
+message ContestRoundLeaderboardEntry {
+  int64 user_id = 1;
+  string user_name = 2;
+  double score = 3;
+  double ratio = 4;
+  int64 time = 5;
+  int32 rank = 6;
+}
+
+// Contest Round User Models
+message ContestRoundQuestionUserMultipleChoice {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  int64 answer_id = 5;
+  int64 true_answer_id = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserFillInBlank {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  string answer = 5;
+  string true_answer = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserPosition {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  int64 answer_group_position = 5;
+  int32 sort_position = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserMatching {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  int64 first_item_id = 5;
+  int64 second_item_id = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserLabeling {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  int64 label_id = 5;
+  int64 blank_id = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserCategory {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  int64 item_id = 5;
+  int64 category_id = 6;
+  bool is_correct = 7;
+  double score = 8;
+  string created_at = 9;
+}
+
+message ContestRoundQuestionUserManualScoring {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  double score = 5;
+  string feedback = 6;
+  string created_at = 7;
+}
+
+message ContestRoundQuestionUserSkip {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  int64 question_id = 4;
+  string created_at = 5;
+}
+
+message ContestRoundUser {
+  int64 id = 1;
+  int64 contest_round_id = 2;
+  int64 user_id = 3;
+  double score = 4;
+  double ratio = 5;
+  int64 time = 6;
+  bool has_manual_scoring = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+// Contest Student APIs
+message ContestStudent {
+  int64 id = 1;
+  int64 user_id = 2;
+  string user_name = 3;
+  string user_email = 4;
+  double score = 5;
+  double ratio = 6;
+  int64 time = 7;
+  int64 created_at = 8;
+}
+
+message ContestStudentListResponse {
+  repeated ContestStudent students = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message GetContestByStudentContest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 start_time = 4;
+  int64 end_time = 5;
+  int32 status = 6;
+}
+
+message GetContestByStudentResponse {
+  repeated GetContestByStudentContest contests = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message ContestRoundDetailResponse {
+  int64 id = 1;
+  int64 contest_id = 2;
+  string name = 3;
+  string description = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  string join_level = 7;
+  bool is_joined = 8;
+  bool can_join = 9;
+  int32 total_questions = 10;
+}
+
+message ContestRoundJoinResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ContestRoundQuestion {
+  int64 id = 1;
+  string title = 2;
+  string type = 3;
+  string content = 4;
+  double score = 5;
+  int32 position = 6;
+}
+
+message ContestRoundQuestionsResponse {
+  repeated ContestRoundQuestion questions = 1;
+  int64 total = 2;
+}
+
+message ContestRoundStatusResponse {
+  bool is_joined = 1;
+  bool is_completed = 2;
+  double current_score = 3;
+  int64 time_spent = 4;
+  int32 questions_answered = 5;
+  int32 total_questions = 6;
+}
+
+// Contest Course APIs
+message ContestCourseRequest {
+  int64 course_id = 1;
+  bool is_assigned = 2;
+}
+
+message ContestCourseInfo {
+  string name = 1;
+  string description = 2;
+  int32 status = 3;
+}
+
+message ContestCourseContestInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 start_time = 4;
+  int64 end_time = 5;
+  int32 status = 6;
+  bool is_assigned = 7;
+  int32 students_done = 8;
+  int32 students_not_scored = 9;
+}
+
+message ContestCourseChapterInfo {
+  string title = 1;
+  string description = 2;
+  int32 status = 3;
+}
+
+message ContestCourseChapter {
+  ContestCourseChapterInfo chapter_info = 1;
+  repeated ContestCourseContestInfo contests = 2;
+}
+
+message ContestCourseResponse {
+  ContestCourseInfo course_info = 1;
+  repeated ContestCourseChapter chapters = 2;
+}
+
+message ContestCourseDetailData {
+  ContestCourseInfo course_info = 1;
+  repeated ContestCourseChapterData chapters = 2;
+}
+
+message ContestCourseChapterData {
+  ContestCourseChapterInfo chapter_info = 1;
+  repeated ContestCourseContestData contests = 2;
+}
+
+message ContestCourseContestData {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 start_time = 4;
+  int64 end_time = 5;
+  int32 status = 6;
+  bool is_assigned = 7;
+  int32 students_done = 8;
+  int32 students_not_scored = 9;
+}
+
+message ContestCourseAssignmentResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Dashboard Contest APIs
+message DashboardContestStatsResponse {
+  int32 total_contests = 1;
+  int32 completed_contests = 2;
+  double average_score = 3;
+  int64 total_time_spent = 4;
+  double best_score = 5;
+  int32 rank = 6;
+}
+
+message DashboardContestItem {
+  int64 id = 1;
+  string name = 2;
+  int64 start_time = 3;
+  int64 end_time = 4;
+  double score = 5;
+  string status = 6;
+  bool is_completed = 7;
+}
+
+message DashboardContestListResponse {
+  repeated DashboardContestItem contests = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message DashboardContestRoundStatsResponse {
+  int32 total_rounds = 1;
+  int32 completed_rounds = 2;
+  double average_score = 3;
+  int64 total_time_spent = 4;
+  double best_score = 5;
+  int32 rank = 6;
+}
+
+message DashboardContestRoundItem {
+  int64 id = 1;
+  int64 contest_id = 2;
+  string name = 3;
+  int64 start_time = 4;
+  int64 end_time = 5;
+  double score = 6;
+  string status = 7;
+  bool is_completed = 8;
+}
+
+message DashboardContestRoundListResponse {
+  repeated DashboardContestRoundItem rounds = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}

@@ -1,0 +1,452 @@
+package repositories
+
+import (
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
+	"errors"
+	"reflect"
+	"time"
+
+	"gorm.io/gorm"
+)
+
+type QuestionRepository interface {
+	base.BaseRepositoryInterface[models.Question]
+	UpdateOrCreate(question models.Question) (int64, error)
+	UpdateFileInfos(questionId int64, fileInfos models.MediaInfos) error
+	GetQuestionIdsAndScoresByLessonPlanPartId(lessonPlanPartkId int64) ([]QuesstionScore, error)
+	GetQuestionIdsAndScoresByLevelTestId(examId int64) ([]QuesstionScore, error)
+	UpdateOrCreateAttribute(attribute models.QuestionRefAttribute) error
+	DeleteOldAttribute(questionId int64, attributeIds []int64) error
+
+	GetHomeworkIDsByQuestionID(questionId int64) ([]int64, error)
+	GetExamIDsByQuestionID(questionId int64) ([]int64, error)
+	GetLessonPlanPartIDsByQuestionID(questionId int64) ([]int64, error)
+	GetLevelTestIDsByQuestionID(questionId int64) ([]int64, error)
+	GetQuestionIdsByQuestionAttributeIds(questionAttributeIDs []int64) ([]int64, error)
+	// UpdateSortPositionsForSource cập nhật source_question_id và sort_position cho danh sách câu hỏi thuộc một source question
+	UpdateSortPositionsForSource(sourceQuestionID int64, orders []QuestionSortOrder) error
+	// ClearQuestionsFromSource gỡ toàn bộ câu hỏi khỏi source question (set source_question_id = 0, sort_position = 0)
+	ClearQuestionsFromSource(sourceQuestionID int64) error
+	// FindBySourceQuestionID lấy danh sách câu hỏi thuộc source question, sắp xếp theo sort_position (preload đủ để format như detail)
+	FindBySourceQuestionID(sourceQuestionID int64) ([]*models.Question, error)
+}
+
+// QuestionSortOrder dùng khi gán/thay đổi thứ tự câu hỏi thuộc source question
+type QuestionSortOrder struct {
+	ID           int64
+	SortPosition int32
+}
+
+type questionRepository struct {
+	*base.BaseRepository[models.Question]
+}
+
+func NewQuestionRepository() QuestionRepository {
+	return &questionRepository{
+		BaseRepository: base.NewBaseRepository[models.Question](),
+	}
+}
+
+type QuesstionScore struct {
+	QuestionID int64   `gorm:"column:question_id"`
+	Score      float64 `gorm:"column:score"`
+}
+
+func (r *questionRepository) UpdateOrCreate(question models.Question) (int64, error) {
+	if question.ID != 0 {
+		result := db.MasterDB.Model(&models.Question{}).Where("id = ?", question.ID).Updates(question)
+		return question.ID, result.Error
+	} else {
+		result := db.MasterDB.Create(&question)
+		return question.ID, result.Error
+	}
+}
+
+func (r *questionRepository) UpdateFileInfos(questionId int64, fileInfos models.MediaInfos) error {
+	return db.MasterDB.Model(&models.Question{}).
+		Where("id = ?", questionId).
+		Update("file_infos", fileInfos).Error
+}
+
+func (r *questionRepository) GetQuestionIdsAndScoresByLevelTestId(levelTestId int64) ([]QuesstionScore, error) {
+	var records []QuesstionScore
+	err := db.MasterDB.
+		Table("level_test_questions").
+		Select("question_id, score").
+		Where("level_test_id = ?", levelTestId).
+		Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
+}
+
+func (r *questionRepository) GetQuestionIdsAndScoresByLessonPlanPartId(lessonPlanPartkId int64) ([]QuesstionScore, error) {
+	var records []QuesstionScore
+	err := db.MasterDB.
+		Table("lesson_plan_part_questions").
+		Select("question_id, score").
+		Where("lesson_plan_part_id = ?", lessonPlanPartkId).
+		Find(&records).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return records, nil
+}
+
+func (r *questionRepository) UpdateSortPositionsForSource(sourceQuestionID int64, orders []QuestionSortOrder) error {
+	if len(orders) == 0 {
+		return nil
+	}
+	tx := db.MasterDB.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	for _, o := range orders {
+		if o.ID == 0 {
+			continue
+		}
+		if err := tx.Model(&models.Question{}).
+			Where("id = ?", o.ID).
+			Updates(map[string]interface{}{
+				"source_question_id": sourceQuestionID,
+				"sort_position":      o.SortPosition,
+			}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit().Error
+}
+
+func (r *questionRepository) ClearQuestionsFromSource(sourceQuestionID int64) error {
+	if sourceQuestionID == 0 {
+		return nil
+	}
+	return db.MasterDB.Model(&models.Question{}).
+		Where("source_question_id = ?", sourceQuestionID).
+		Updates(map[string]interface{}{
+			"source_question_id": 0,
+			"sort_position":     0,
+		}).Error
+}
+
+var questionDetailPreloads = []string{
+	"Answers",
+	"AnswerPositions",
+	"AnswerGroups",
+	"AnswerGroups.Group",
+	"AnswerCoordinates",
+	"AnswerMatchings",
+	"RefAttributes",
+	"RefAttributes.Attribute",
+	"RefAttributes.ParentAttribute",
+	"Source",
+}
+
+func (r *questionRepository) FindBySourceQuestionID(sourceQuestionID int64) ([]*models.Question, error) {
+	if sourceQuestionID == 0 {
+		return nil, nil
+	}
+	var list []*models.Question
+	query := db.ReplicaDB.Model(&models.Question{}).
+		Where("source_question_id = ?", sourceQuestionID).
+		Order("sort_position ASC, id ASC")
+	for _, preload := range questionDetailPreloads {
+		query = query.Preload(preload)
+	}
+	err := query.Find(&list).Error
+	return list, err
+}
+
+func StoreAnswers[T models.AnswerGroup | models.AnswerCoordinates | models.AnswerPosition | models.Answer | models.AnswerMatching](answers []T) error {
+	if len(answers) > 0 {
+		if err := db.MasterDB.Create(&answers).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func DeleteOldAnswers[T models.AnswerGroup | models.AnswerCoordinates | models.AnswerPosition | models.Answer | models.AnswerMatching](questionId int64, ids []int64) error {
+	var model T
+	if len(ids) > 0 {
+		if err := db.MasterDB.Where("id NOT IN (?) AND question_id = ?", ids, questionId).Delete(&model).Error; err != nil {
+			return err
+		}
+	} else {
+		if err := db.MasterDB.Where("question_id = ?", questionId).Delete(&model).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func UpdateOrCreateAnswers[T any](answers []T) ([]int64, error) {
+	if len(answers) == 0 {
+		return nil, nil
+	}
+
+	var (
+		toCreate []T
+		toUpdate []T
+	)
+
+	for _, a := range answers {
+		v := reflect.ValueOf(a)
+		if v.Kind() == reflect.Ptr {
+			v = v.Elem()
+		}
+		idField := v.FieldByName("ID")
+
+		if idField.IsValid() && idField.Kind() == reflect.Int64 && idField.Int() != 0 {
+			toUpdate = append(toUpdate, a)
+		} else {
+			toCreate = append(toCreate, a)
+		}
+	}
+
+	for i := range toUpdate {
+		if err := db.MasterDB.Save(&toUpdate[i]).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	if len(toCreate) > 0 {
+		ptrToCreate := make([]*T, len(toCreate))
+		for i := range toCreate {
+			ptrToCreate[i] = &toCreate[i]
+		}
+		if err := db.MasterDB.Create(&ptrToCreate).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	var ids []int64
+
+	for _, a := range toUpdate {
+		v := reflect.ValueOf(a)
+		if v.Kind() == reflect.Ptr {
+			v = v.Elem()
+		}
+		idField := v.FieldByName("ID")
+		if idField.IsValid() && idField.Kind() == reflect.Int64 {
+			ids = append(ids, idField.Int())
+		}
+	}
+
+	for _, a := range toCreate {
+		v := reflect.ValueOf(a)
+		if v.Kind() == reflect.Ptr {
+			v = v.Elem()
+		}
+		idField := v.FieldByName("ID")
+		if idField.IsValid() && idField.Kind() == reflect.Int64 {
+			ids = append(ids, idField.Int())
+		}
+	}
+
+	return ids, nil
+}
+
+func UpdateOrCreateGroup(group models.GroupAnswer) (int64, error) {
+	if group.ID != 0 {
+		if err := db.MasterDB.Save(&group).Error; err != nil {
+			return 0, err
+		}
+		return group.ID, nil
+	} else {
+		if err := db.MasterDB.Create(&group).Error; err != nil {
+			return 0, err
+		}
+		return group.ID, nil
+	}
+}
+
+func (r *questionRepository) UpdateOrCreateAttribute(attribute models.QuestionRefAttribute) error {
+	var existing models.QuestionRefAttribute
+
+	err := db.MasterDB.
+		Where("question_id = ? AND question_attribute_id = ?", attribute.QuestionID, attribute.AttributeID).
+		First(&existing).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return db.MasterDB.Create(&attribute).Error
+		}
+		return err
+	}
+
+	existing.ParentAttributeID = attribute.ParentAttributeID
+
+	return db.MasterDB.Save(&existing).Error
+}
+
+func (r *questionRepository) DeleteOldAttribute(questionId int64, attributeIds []int64) error {
+	return db.MasterDB.
+		Where("question_id = ? AND question_attribute_id NOT IN ?", questionId, attributeIds).
+		Delete(&models.QuestionRefAttribute{}).Error
+}
+
+func (r *questionRepository) PermanentlyDeleteOldRecords(before time.Time) error {
+	var model models.Question
+
+	var deletedUserIDs []int64
+
+	if err := db.MasterDB.
+		Model(&models.Question{}).
+		Unscoped().
+		Where("deleted_at IS NOT NULL AND deleted_at <= ?", before).
+		Pluck("id", &deletedUserIDs).Error; err != nil {
+		return err
+	}
+
+	if len(deletedUserIDs) > 0 {
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.AnswerCoordinates{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.AnswerGroup{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.AnswerMatching{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.AnswerPosition{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.Answer{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.AnswerMatching{}).Error; err != nil {
+			return err
+		}
+
+		if err := db.MasterDB.
+			Where("question_id IN (?)", deletedUserIDs).
+			Delete(&models.QuestionRefAttribute{}).Error; err != nil {
+			return err
+		}
+
+		var groupIds []int64
+
+		if err := db.MasterDB.
+			Model(&models.AnswerGroup{}).
+			Pluck("group_id", &groupIds).Error; err != nil {
+			return err
+		}
+
+		if len(groupIds) > 0 {
+			if err := db.MasterDB.
+				Where("id NOT IN ?", groupIds).
+				Delete(&models.GroupAnswer{}).Error; err != nil {
+				return err
+			}
+		}
+	}
+
+	return db.MasterDB.
+		Unscoped().
+		Where("deleted_at IS NOT NULL AND deleted_at <= ?", before).
+		Delete(&model).Error
+}
+
+func (r *questionRepository) GetHomeworkIDsByQuestionID(questionID int64) ([]int64, error) {
+	var homeworkIDs []int64
+
+	err := db.MasterDB.
+		Model(&models.HomeworkQuestion{}).
+		Where("question_id = ?", questionID).
+		Pluck("homework_id", &homeworkIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return homeworkIDs, nil
+}
+
+func (r *questionRepository) GetExamIDsByQuestionID(questionID int64) ([]int64, error) {
+	var examIDs []int64
+
+	err := db.MasterDB.
+		Model(&models.ExamQuestion{}).
+		Where("question_id = ?", questionID).
+		Pluck("exam_id", &examIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return examIDs, nil
+}
+
+func (r *questionRepository) GetLessonPlanPartIDsByQuestionID(questionID int64) ([]int64, error) {
+	var lessonPlanPartIDs []int64
+
+	err := db.MasterDB.
+		Model(&models.LessonPlanPartQuestion{}).
+		Where("question_id = ?", questionID).
+		Pluck("lesson_plan_part_id", &lessonPlanPartIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return lessonPlanPartIDs, nil
+}
+
+func (r *questionRepository) GetLevelTestIDsByQuestionID(questionID int64) ([]int64, error) {
+	var levelTestIDs []int64
+
+	err := db.MasterDB.
+		Model(&models.LevelTestQuestion{}).
+		Where("question_id = ?", questionID).
+		Pluck("level_test_id", &levelTestIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return levelTestIDs, nil
+}
+
+func (r *questionRepository) GetQuestionIdsByQuestionAttributeIds(questionAttributeIDs []int64) ([]int64, error) {
+	var questionIDs []int64
+
+	if len(questionAttributeIDs) == 0 {
+		return questionIDs, nil
+	}
+
+	err := db.MasterDB.
+		Model(&models.QuestionRefAttribute{}).
+		Where("question_attribute_id IN ?", questionAttributeIDs).
+		Pluck("DISTINCT question_id", &questionIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return questionIDs, nil
+}

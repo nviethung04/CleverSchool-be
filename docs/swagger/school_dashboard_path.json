@@ -1,0 +1,28 @@
+{
+  "/api/manage/school-dashboard-starts": {
+    "get": {
+      "summary": "Lấy thống kê tổng quan các trường học",
+      "description": "API trả về danh sách trường học và thống kê số lượng học sinh, giáo viên, lớp học, và khoá học của từng trường.",
+      "tags": [
+        "SchoolDashboard"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "responses": {}
+    }
+  }
+}

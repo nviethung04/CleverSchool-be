@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/admin/prot";
+
+message MediaAnswer {
+  string type = 1;
+  string url = 2;
+  bytes file = 3;
+}
+
+message GroupAnswer {
+  uint64 id = 1;
+  string name = 2;
+  prot.MediaAnswer media = 3;
+}
+
+message AnswerContent {
+  uint64 id = 1;
+  string text = 2;
+  double point = 3;
+  prot.MediaAnswer media = 4;
+  bool is_correct = 5;
+  int32 correct_position = 6;
+  int32 group_position = 7;
+}
+
+message SourceContent {
+  string text = 1;
+  prot.MediaAnswer media = 2;
+}
+
+message AnswerSource {
+  int64 id = 1;
+  prot.SourceContent content = 2;
+  int32 group_position = 3;
+}
+
+message AnswerTarget {
+  int64 id = 1;
+  prot.AnswerContent content = 2;
+}
+
+message AnswerCoordinates {
+  int32 x = 1;
+  int32 y = 2;
+  int32 w = 3;
+  int32 h = 4;
+}
+
+message AnswerBlank {
+  int64 id = 1;
+  prot.AnswerCoordinates coordinates = 2;
+}
+
+message GroupPosition {
+  int32 position = 1;
+  int32 count = 2;
+  string text = 3;
+  prot.MediaAnswer media = 4;
+}
+
+// Message đại diện cho một câu trả lời
+message Answer {
+  int64 id = 1;                      // ID câu trả lời
+  int64 question_id = 2;              // ID câu hỏi (int64 để phù hợp với model Go)
+  string content = 3;                 // Nội dung câu trả lời
+  prot.GroupAnswer group = 4;            // Nhóm câu trả lời (nếu có)
+  string file_url = 5;                // URL của file (nếu có)
+  bool is_correct = 6;                // Trạng thái đúng/sai
+  string kind = 7;                      // Loại câu trả lời (enum)
+  double point = 8;                    // Điểm cho câu trả lời
+  int32 position_x = 9;               // Vị trí X
+  int32 position_y = 10;              // Vị trí Y
+  int32 position_width = 11;          // Chiều rộng
+  int32 position_height = 12;         // Chiều cao
+  int32 sort_position = 13;           // Vị trí sắp xếp
+  int32 correct_position = 14;        // Vị trí chính xác
+  string created_at = 15;             // Thời gian tạo
+  string updated_at = 16;
+}
+
+// Yêu cầu tạo Answer mới
+message CreateAnswerRequest {
+  int64 question_id = 1;             // ID câu hỏi (thay vì int32, dùng int64 cho phù hợp)
+  string kind = 2;                     // Loại câu trả lời
+  string content = 3;                 // Nội dung câu trả lời
+  prot.GroupAnswer group = 4;           // Nhóm câu trả lời
+  string file_url = 5;               // URL của file (nếu có)
+  bool is_correct = 6;               // Trạng thái đúng/sai
+  double point = 7;                   // Điểm cho câu trả lời
+  int32 position_x = 8;              // Vị trí X
+  int32 position_y = 9;              // Vị trí Y
+  int32 position_width = 10;         // Chiều rộng
+  int32 position_height = 11;        // Chiều cao
+  int32 sort_position = 12;          // Vị trí sắp xếp
+  int32 correct_position = 13;       // Vị trí chính xác
+}
+
+// Yêu cầu cập nhật Answer
+message UpdateAnswerRequest {
+  int64 id = 1;                      // ID câu trả lời
+  int64 question_id = 2;              // ID câu hỏi (sử dụng int64)
+  string kind = 3;                      // Loại câu trả lời
+  string content = 4;                  // Nội dung câu trả lời
+  prot.GroupAnswer group = 5;            // Nhóm câu trả lời
+  string file_url = 6;                // URL của file (nếu có)
+  bool is_correct = 7;                // Trạng thái đúng/sai
+  double point = 8;                    // Điểm cho câu trả lời
+  int32 position_x = 9;               // Vị trí X
+  int32 position_y = 10;              // Vị trí Y
+  int32 position_width = 11;          // Chiều rộng
+  int32 position_height = 12;         // Chiều cao
+  int32 sort_position = 13;           // Vị trí sắp xếp
+  int32 correct_position = 14;        // Vị trí chính xác
+}
+
+// Danh sách các Answer
+message AnswerList {
+  repeated Answer contents = 1; // Mảng câu trả lời
+}

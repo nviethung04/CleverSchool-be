@@ -1,0 +1,257 @@
+{
+  "/api/manage/lesson-plan-parts": {
+    "get": {
+      "summary": "Danh sách lesson plan part",
+      "description": "API để lấy danh sách lesson plan part",
+      "tags": [
+        "LessonPlanParts"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "lesson_plan_id",
+          "description": "Lọc theo ID bài giảng",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "limit",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo lesson plan part",
+      "description": "API để tạo lesson plan part mới",
+      "tags": [
+        "LessonPlanParts"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "lesson_plan",
+          "description": "Thông tin lesson plan part",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "lesson_plan_id": 6,
+              "title": "Introduction to Go",
+              "tag": "go,basic,syntax",
+              "cover_image": "https://example.com/images/go_intro.png",
+              "file": "lesson1.pdf",
+              "sort_position": 1,
+              "time": 45,
+              "is_classwork": true,
+              "file_type": "pdf",
+              "link": "https://example.com/resources/go-docs",
+              "link_type": "external",
+              "guide_teacher": "Review syntax and prepare examples before class.",
+              "guide_student": "Read the material and attempt the quiz at the end."
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/lesson-plan-parts/{id}": {
+    "get": {
+      "summary": "Chi tiết lesson plan part",
+      "description": "API để lấy chi tiết lesson plan part theo ID",
+      "tags": [
+        "LessonPlanParts"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "by_program",
+          "description": "Chỉ lấy lesson plan part theo chương trình",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "program_id",
+          "description": "Lấy theo id chương trình",
+          "required": false
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của lesson plan part"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật lesson plan part",
+      "description": "API để cập nhật lesson plan part theo ID",
+      "tags": [
+        "LessonPlanParts"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của lesson plan part"
+        },
+        {
+          "in": "body",
+          "name": "lesson_plan",
+          "description": "Dữ liệu cập nhật",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "lesson_plan_id": 6,
+              "title": "Introduction to Go",
+              "tag": "go,basic,syntax",
+              "cover_image": "https://example.com/images/go_intro.png",
+              "file": "lesson1.pdf123",
+              "sort_position": 1,
+              "time": 45,
+              "is_classwork": true,
+              "file_type": "pdf",
+              "link": "https://example.com/resources/go-docs",
+              "link_type": "external",
+              "guide_teacher": "Review syntax and prepare examples before class.",
+              "guide_student": "Read the material and attempt the quiz at the end."
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công"
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa lesson plan part",
+      "description": "API để xóa lesson plan part theo ID",
+      "tags": [
+        "LessonPlanParts"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của lesson plan part"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa thành công"
+        }
+      }
+    }
+  }
+}

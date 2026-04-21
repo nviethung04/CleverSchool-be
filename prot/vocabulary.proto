@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "google/protobuf/wrappers.proto";
+
+// CreateVocabularyRequest
+message CreateVocabularyRequest {
+  string word = 1;
+  string phonetic = 2;
+  string translation = 3;
+  string definition = 4;
+  string part_of_speech = 5;
+  string level = 6;
+  string tags = 7;
+  int32 difficulty = 8;
+  int32 frequency = 9;
+
+  // Media IDs
+  int64 word_audio_id = 10;    // optional
+  int64 image_id = 11;         // optional
+  int64 example_audio_id = 12; // optional
+
+  // Example
+  string example_sentence = 13;
+  string example_translation = 14;
+}
+
+// UpdateVocabularyRequest
+message UpdateVocabularyRequest {
+  google.protobuf.StringValue word = 1;
+  google.protobuf.StringValue phonetic = 2;
+  google.protobuf.StringValue translation = 3;
+  google.protobuf.StringValue definition = 4;
+  google.protobuf.StringValue part_of_speech = 5;
+  google.protobuf.StringValue level = 6;
+  google.protobuf.StringValue tags = 7;
+  google.protobuf.Int32Value difficulty = 8;
+  google.protobuf.Int32Value frequency = 9;
+
+  // Media IDs
+  google.protobuf.Int64Value word_audio_id = 10;
+  google.protobuf.Int64Value image_id = 11;
+  google.protobuf.Int64Value example_audio_id = 12;
+
+  // Example
+  google.protobuf.StringValue example_sentence = 13;
+  google.protobuf.StringValue example_translation = 14;
+}
+
+// AddVocabularyToLessonRequest
+message AddVocabularyToLessonRequest {
+  repeated int64 vocabulary_ids = 1;
+  int32 sort_order = 2;
+  bool is_required = 3;
+}
+
+// UpdateLessonVocabularyRequest
+message UpdateLessonVocabularyRequest {
+  google.protobuf.Int32Value sort_order = 1;
+  google.protobuf.BoolValue is_required = 2;
+}
+
+// StartFlashcardSessionRequest
+message StartFlashcardSessionRequest {
+  int64 lesson_id = 1;
+}
+
+// UpdateVocabularyProgressRequest
+message UpdateVocabularyProgressRequest {
+  bool is_known = 1;
+  string status = 2; // new, learning, known, mastered
+}
+
+// RecordFlashcardActivityRequest
+message RecordFlashcardActivityRequest {
+  int64 vocabulary_id = 1;
+  string activity_type = 2; // view, flip, mark_known, mark_unknown, pronunciation
+  string response = 3;
+  int32 response_time = 4;
+  google.protobuf.DoubleValue pronunciation_score = 5; // optional
+}
+
+// CompleteFlashcardSessionRequest
+message CompleteFlashcardSessionRequest {
+  int32 total_time_spent = 1;  // seconds
+  int32 words_studied = 2;
+  int32 words_known = 3;
+  int32 words_learning = 4;
+  double completion_rate = 5;  // 0-1
+  double average_score = 6;
+  int32 study_duration = 7;    // backward compatibility
+  double session_score = 8;    // backward compatibility
+}
+
+// BulkUpdateProgressRequest
+message BulkUpdateProgressRequest {
+  repeated VocabularyProgressUpdate updates = 1;
+}
+
+message VocabularyProgressUpdate {
+  int64 vocabulary_id = 1;
+  bool is_known = 2;
+  string status = 3;
+}
+
+// PronunciationAssessmentRequest
+message PronunciationAssessmentRequest {
+  int64 vocabulary_id = 1;
+  string audio_data = 2; // base64 encoded audio
+  string word_type = 3;  // word, sentence
+}

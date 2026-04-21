@@ -1,0 +1,126 @@
+{
+    "/api/dashboard/report": {
+        "get": {
+            "tags": ["Dashboard"],
+            "summary": "Get dashboard report",
+            "description": "Lấy thông tin tổng quan về số trường, số lớp và số người dùng trong hệ thống",
+            "operationId": "getDashboardReport",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "active_student_time",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Unix timestamp để lọc học sinh hoạt động (mặc định: 15/9/2025)"
+                },
+                {
+                    "in": "query",
+                    "name": "active_teacher_time",
+                    "required": false,
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Unix timestamp để lọc giáo viên hoạt động (mặc định: 8/9/2025)"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "total_schools": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Tổng số trường học",
+                                        "example": 150
+                                    },
+                                    "total_classes": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Tổng số lớp học",
+                                        "example": 1200
+                                    },
+                                    "total_users": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Tổng số người dùng",
+                                        "example": 50000
+                                    },
+                                    "student_active": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số học sinh hoạt động (role_id = 3)",
+                                        "example": 25000
+                                    },
+                                    "teacher_active": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số giáo viên hoạt động (role_id = 2)",
+                                        "example": 1500
+                                    },
+                                    "student_active_weekly": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số học sinh hoạt động trong 7 ngày gần nhất (role_id = 3)",
+                                        "example": 12000
+                                    },
+                                    "teacher_active_weekly": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số giáo viên hoạt động trong 7 ngày gần nhất (role_id = 2)",
+                                        "example": 800
+                                    },
+                                    "frequent_login_students": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số học sinh login thường xuyên (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần, created_at > active_student_time)",
+                                        "example": 5000
+                                    },
+                                    "frequent_login_students_weekly": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "Số học sinh login thường xuyên trong 7 ngày gần nhất (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần)",
+                                        "example": 2000
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,352 @@
+{
+  "/api/manage/question-attributes": {
+    "get": {
+      "description": "API để lấy danh sách thuộc tính câu hỏi",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "subject_id",
+          "description": "Lọc theo môn học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Lấy theo trạng thái (1, 0)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false
+        }
+      ],
+      "summary": "Danh sách thuộc tính câu hỏi",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttributeListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo thuộc tính câu hỏi",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo thuộc tính câu hỏi",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "attribute",
+          "description": "Thông tin thuộc tính",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttributeRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttribute"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/question-attributes/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết thuộc tính câu hỏi",
+      "description": "API để lấy thông tin chi tiết của một thuộc tính câu hỏi theo ID",
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID thuộc tính"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttribute"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thuộc tính câu hỏi",
+      "description": "API để cập nhật một thuộc tính câu hỏi theo ID",
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID thuộc tính"
+        },
+        {
+          "in": "body",
+          "name": "attribute",
+          "description": "Thông tin cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttributeRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttribute"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá thuộc tính câu hỏi",
+      "description": "API để xoá thuộc tính theo ID",
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID thuộc tính"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/question-attributes/{id}/restore": {
+    "patch": {
+      "summary": "Khôi phục thuộc tính câu hỏi",
+      "description": "API để khôi phục thuộc tính đã bị xoá",
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID thuộc tính"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Khôi phục thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.QuestionAttribute"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/question-attributes/parent": {
+    "get": {
+      "summary": "Danh sách attributes",
+      "description": "API để lấy danh sách attributes",
+      "tags": [
+        "QuestionAttributes"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "subject_id",
+          "description": "Lấy theo id môn học",
+          "required": false
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.ListQuestionAttribute"
+          }
+        }
+      }
+    }
+  }
+}

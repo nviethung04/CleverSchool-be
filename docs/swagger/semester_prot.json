@@ -1,0 +1,147 @@
+{
+  "prot.Semester": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "start_week_id": {
+        "type": "integer"
+      },
+      "end_week_id": {
+        "type": "integer"
+      },
+      "previous_semester_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "sort_order": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "holidays": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Holiday"
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.SemesterRequest": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "end_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "start_week_id": {
+        "type": "integer"
+      },
+      "end_week_id": {
+        "type": "integer"
+      },
+      "previous_semester_id": {
+        "type": "integer",
+        "format": "int64",
+        "nullable": true
+      },
+      "sort_order": {
+        "type": "integer"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "holidays": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Holiday"
+        }
+      }
+    }
+  },
+  "prot.SemesterListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "semesters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Semester"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.Holidays": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "holidays": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Holidays"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,160 @@
+{
+    "/api/manage/permissions": {
+        "get": {
+            "description": "API để lấy danh sách quyền",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Permissions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "summary": "Danh sách  quyền",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.PermissionListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để cập nhật quyền",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Permissions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Cập nhật quyền",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin quyền",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.PermissionListResponse"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Cập nhật quyền thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.PermissionListResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/permissions/display": {
+        "get": {
+            "description": "API để lấy danh sách hiển thị quyền",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Permissions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "summary": "Danh sách quyền",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.RolePermissionsDisplayList"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để cập nhật hiển thị quyền",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Permissions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Cập nhật hiển thị quyền",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "course",
+                    "description": "Thông tin quyền",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.RolePermissionsDisplayList"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Cập nhật quyền thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.RolePermissionsDisplayList"
+                    }
+                }
+            }
+        }
+    }
+}

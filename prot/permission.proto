@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Định nghĩa cấu trúc Permission
+message Permission {
+  uint64 id = 1;
+  string name = 2;
+  string description = 3; 
+}
+
+// Danh sách các quyền (permissions)
+message PermissionList {
+  repeated Permission permissions = 1;
+}
+
+// Phản hồi thông báo chung
+message PermissionResponse {
+  Permission permission = 1;
+  string message = 2;
+}

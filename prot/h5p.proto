@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+import "google/protobuf/struct.proto";
+
+message H5P {
+  int64 id = 1;
+  string content_id = 2;
+  string title = 3;
+  string library = 4;
+  google.protobuf.Struct parameters = 5;
+  google.protobuf.Struct metadata = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message H5PRequest {
+  int64 id = 1;
+  string content_id = 2;
+  string title = 3;
+  string library = 4;
+  google.protobuf.Struct parameters = 5;
+  google.protobuf.Struct metadata = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message H5PContentScoreRequest {
+  string contentId = 1;
+  string score = 2;
+  string maxScore = 3;
+  string opened = 4;
+  string userId = 5;
+}
+
+message H5PsResponse {
+  repeated H5P contents = 1;
+  uint64 total_count = 2;
+}

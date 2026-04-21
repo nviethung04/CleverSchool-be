@@ -1,0 +1,124 @@
+{
+    "/api/study/contest-rounds/{id}/questions": {
+        "get": {
+            "summary": "Lấy câu hỏi vòng thi (Student)",
+            "description": "API để học sinh lấy danh sách câu hỏi của vòng thi",
+            "tags": [
+                "Contest Student"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID vòng thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ContestRoundQuestionsResponse"
+                    }
+                },
+                "400": {
+                    "description": "Yêu cầu không hợp lệ",
+                    "schema": {
+                        "$ref": "#/definitions/common.BadRequestResponse"
+                    }
+                },
+                "401": {
+                    "description": "Chưa xác thực",
+                    "schema": {
+                        "$ref": "#/definitions/common.UnauthorizedResponse"
+                    }
+                },
+                "404": {
+                    "description": "Không tìm thấy",
+                    "schema": {
+                        "$ref": "#/definitions/common.NotFoundResponse"
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server",
+                    "schema": {
+                        "$ref": "#/definitions/common.InternalServerErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/study/contest-rounds/{id}/status": {
+        "get": {
+            "summary": "Lấy trạng thái vòng thi (Student)",
+            "description": "API để học sinh lấy trạng thái và thông tin làm bài của vòng thi",
+            "tags": [
+                "Contest Student"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "path",
+                    "name": "id",
+                    "description": "ID vòng thi",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object"
+                    }
+                },
+                "401": {
+                    "description": "Chưa xác thực",
+                    "schema": {
+                        "$ref": "#/definitions/common.UnauthorizedResponse"
+                    }
+                },
+                "404": {
+                    "description": "Không tìm thấy",
+                    "schema": {
+                        "$ref": "#/definitions/common.NotFoundResponse"
+                    }
+                },
+                "500": {
+                    "description": "Lỗi server",
+                    "schema": {
+                        "$ref": "#/definitions/common.InternalServerErrorResponse"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,183 @@
+{
+  "prot.TeacherInfo": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "phone": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.Class": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "grade_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "faculty_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "max_students": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "current_students": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "teacher_info": {
+        "$ref": "#/definitions/prot.TeacherInfo"
+      },
+      "school": {
+        "$ref": "#/definitions/prot.School"
+      },
+      "grade": {
+        "$ref": "#/definitions/prot.Grade"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.ClassRequest": {
+    "type": "object",
+    "properties": {
+      "school_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "grade_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "faculty_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "max_students": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "teacher_info": {
+        "$ref": "#/definitions/prot.TeacherInfo"
+      },
+      "school": {
+        "$ref": "#/definitions/prot.School"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.ClassListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Class"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.UserClass": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "name": {
+        "type": "string"
+      },
+      "username": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.UserClassListRequest": {
+    "type": "object",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.UserClass"
+        }
+      },
+      "role_id": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  },
+  "prot.UserClassList": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.UserClass"
+        }
+      }
+    }
+  }
+}

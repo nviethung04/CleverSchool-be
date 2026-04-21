@@ -1,0 +1,261 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message StudyReportStarTypeResult {
+  int64 id = 1;
+  string name_vn = 2;
+  string name_en = 3;
+  int32 star = 4;
+  int64 parent_id = 5;
+  int32 level = 6;
+  float average_star = 7;
+  repeated StudyReportStarTypeResult node_types = 8;
+}
+
+message StudyReportStarSkillResult {
+  int64 id = 1;
+  string name_vn = 2;
+  string name_en = 3;
+  float average_star = 4;
+  repeated StudyReportStarTypeResult types = 5;
+}
+
+message StudyReportCheckTypeResult {
+  int64 id = 1;
+  string name_vn = 2;
+  string name_en = 3;
+  bool is_check = 4;
+  int64 parent_id = 5;
+  int32 level = 6;
+  repeated StudyReportCheckTypeResult node_types = 7;
+}
+
+message StudyReportCheckSkillResult {
+  int64 id = 1;
+  string name_vn = 2;
+  string name_en = 3;
+  repeated StudyReportCheckTypeResult types = 4;
+}
+
+message StudyReportStarTypeInput {
+  int64 id = 1;
+  int32 star = 2;
+  int64 parent_id = 3;
+  int32 level = 4;
+  repeated StudyReportStarTypeInput node_types = 5;
+}
+
+message StudyReportStarSkillInput {
+  int64 id = 1;
+  repeated StudyReportStarTypeInput types = 2;
+}
+
+message StudyReportCheckTypeInput {
+  int64 id = 1;
+  bool is_check = 2;
+  int64 parent_id = 3;
+  int32 level = 4;
+  repeated StudyReportCheckTypeInput node_types = 5;
+}
+
+message StudyReportCheckSkillInput {
+  int64 id = 1;
+  repeated StudyReportCheckTypeInput types = 2;
+}
+
+message StudyReportNote {
+  int32 value = 1;
+  string text = 2;
+  string description = 3;
+}
+
+message StudyReportStudentInfo {
+  int64 id = 1;
+  string name = 2;
+  string class = 3;
+}
+
+message StudyReportTeacherInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message StudyReportCourseInfo {
+  int64 id = 1;
+  string name = 2;
+  string program = 3;
+  int64 id_program = 4;
+}
+
+message StudyReportAssessmentInfo {
+  int64 id = 1;
+  string name = 2;
+  string type = 3;
+}
+
+message StudyReport {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 subject_id = 4;
+  int64 study_report_criteria_id = 5;
+  int64 assessment_score_id = 6;
+  int64 course_id = 7;
+  int64 student_id = 8;
+  int64 teacher_id = 9;
+  string general_comment = 10;
+  int32 total_star = 11;
+  double avg_star = 12;
+  bool is_completed = 13;
+  int32 max_star = 14;
+
+  string created_at = 15;
+  string updated_at = 16;
+
+  repeated StudyReportStarSkillResult star_skills = 17;
+  repeated StudyReportCheckSkillResult check_skills = 18;
+  
+  StudyReportStudentInfo student_info = 29;
+  StudyReportTeacherInfo teacher_info = 20;
+  StudyReportCourseInfo course_info = 21;
+
+  repeated StudyReportNote notes = 22;
+  int64 assessment_id = 23;
+
+  StudyReportAssessmentInfo assessment = 24;
+  bool publish = 25;
+}
+
+message StudyReportRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 subject_id = 4;
+  int64 study_report_criteria_id = 5;
+  int64 course_id = 6;
+  int64 student_id = 7;
+  int64 teacher_id = 8;
+  int64 assessment_score_id = 9;
+  string general_comment = 10;
+  bool is_completed = 11;
+  repeated StudyReportStarSkillInput star_skills = 12;
+  repeated StudyReportCheckSkillInput check_skills = 13;
+  int64 assessment_id = 14;
+}
+
+message StudyReportSkillType {
+  int64 id = 1;
+  int64 skill_id = 2;
+  string name_vn = 3;
+  string name_en = 4;
+  int32 sort_order = 5;
+  int64 parent_id = 6;
+  int32 level = 7;
+  repeated StudyReportSkillType node_types = 8;
+  int32 star = 9;      // giá trị sao (nếu là star skill)
+  bool is_check = 10;  // trạng thái check (nếu là check skill)
+}
+
+message StudyReportSkill {
+  int64 id = 1;
+  int64 criteria_id = 2;
+  string name_vn = 3;
+  string name_en = 4;
+  string description = 5;
+  string type = 6;
+  int32 sort_order = 7;
+
+  repeated StudyReportSkillType types = 8;
+}
+
+message StudyReportCriteria {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  int32 max_star = 5;
+  string created_at = 6;
+  string updated_at = 7;
+  repeated StudyReportNote notes = 8;
+
+  repeated StudyReportSkill star_skills = 9;
+  repeated StudyReportSkill check_skills = 10;
+  StudyReportSubjectInfo subject = 11;
+}
+
+message StudyReportCriteriaRequest {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  int32 max_star = 5;
+  repeated StudyReportNote notes = 6;
+  repeated StudyReportSkill star_skills = 7;
+  repeated StudyReportSkill check_skills = 8;
+  // Khi create: tạo bản ghi mới bằng cách copy từ criteria này (các trường khác không cần truyền)
+  int64 copy_from_study_report_criteria_id = 9;
+}
+
+message StudyReportCriteriasResponse {
+  repeated StudyReportCriteria study_report_criterias = 1;
+  uint64 total_count = 2;
+}
+
+message StudyReportsResponse {
+  repeated StudyReport study_reports = 1;
+  uint64 total_count = 2;
+}
+
+message StudyReportEvaluateItem {
+  int64 student_id = 1;
+  string student_name = 2;
+  int64 course_id = 3;
+  string course_name = 4;
+  int64 report_id = 5;
+  string report_name = 6;
+  bool is_completed = 7;
+  int32 criteria_count = 8;
+  int32 evaluated_criteria = 9;
+  bool has_general_comment = 10;
+  string general_comment = 11;
+  int64 assessment_id = 12;
+  int64 assessment_score_id = 13;
+
+  repeated StudyReportStarSkillResult star_skills = 14;
+  repeated StudyReportCheckSkillResult check_skills = 15;
+
+  int32 total_star = 16;
+  double avg_star = 17;
+}
+
+message StudyReportEvaluateResponse {
+  repeated StudyReportEvaluateItem items = 1;
+  uint64 total_count = 2;
+  bool publish = 3;
+}
+
+message StudyReportSubjectInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message GetPublishStudyReportResponse {
+  int64 course_id = 1;
+  int64 assessment_id = 2;
+  bool publish = 3;
+}
+
+message UpdatePublishStudyReportRequest {
+  int64 course_id = 1;
+  int64 assessment_id = 2;
+  bool publish = 3;
+}
+
+message UpdatePublishStudyReportResponse {
+  int64 course_id = 1;
+  int64 assessment_id = 2;
+  bool publish = 3;
+}

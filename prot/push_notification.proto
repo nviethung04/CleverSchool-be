@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message RegisterDeviceRequest {
+    string device_token = 1;
+}
+
+message RegisterDeviceResponse {
+    string message = 1;
+    string error = 2;
+}
+
+message UnregisterDeviceRequest {
+    string device_token = 1;
+}
+
+message UnregisterDeviceResponse {
+    string message = 1;
+    string error = 2;
+}
+
+message UserDevice {
+  int64 id = 1;
+  int64 user_id = 2;
+  string device_token = 3;
+  string device_type = 4;
+  optional string device_name = 5;
+  optional string platform = 6;
+  optional string app_version = 7;
+  optional string os_version = 8;
+  bool is_active = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  string last_used_at = 12;
+}
+
+message MyDeviceResponse {
+    repeated UserDevice devices = 1;
+    int32 total = 2;
+}
+
+message TestNotificationRequest {
+  string title = 1;
+  string body = 2;
+  map<string, string> data = 3;
+}
+
+message TestNotificationResponse {
+    string message = 1;
+    string error = 2;
+}
+
+message SendNoticePushRequest {
+  string type = 1;
+  int64 value = 2;
+}
+
+message SendNoticePushResponse {
+    string message = 1;
+    string error = 2;
+}
+
+message SendNoticeWithPushResponse {
+    string message = 1;
+    string error = 2;
+    int64 notice_id = 3;
+    string target = 4;
+}

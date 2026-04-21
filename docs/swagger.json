@@ -1,0 +1,407 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/config": {
+            "get": {
+                "description": "Get app configuration based on platform and version from headers",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Config"
+                ],
+                "summary": "Get app configuration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Platform (ios, android, web)",
+                        "name": "platform",
+                        "in": "header"
+                    },
+                    {
+                        "type": "string",
+                        "description": "App version (e.g., 1.0.0)",
+                        "name": "version",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/prot.AppConfigResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/ai-grading/image": {
+            "post": {
+                "description": "Giáo viên gửi ảnh bài làm (viết tay, vẽ, diagram) lên để AI chấm điểm. Hỗ trợ 1 hoặc nhiều ảnh.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Grading"
+                ],
+                "summary": "Grade Image Answer with AI",
+                "parameters": [
+                    {
+                        "description": "Image answer to grade",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.GradeImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/services.ImageGradeResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/ai-grading/speaking": {
+            "post": {
+                "description": "Giáo viên gửi file audio speaking lên để AI chấm điểm",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Grading"
+                ],
+                "summary": "Grade Speaking Audio with AI",
+                "parameters": [
+                    {
+                        "description": "Speaking audio to grade",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.GradeSpeakingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/services.SpeakingGradeResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/ai-grading/writing": {
+            "post": {
+                "description": "Giáo viên gửi bài writing lên để AI chấm điểm và đưa ra feedback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AI Grading"
+                ],
+                "summary": "Grade Writing Essay with AI",
+                "parameters": [
+                    {
+                        "description": "Writing essay to grade",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.GradeWritingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/services.WritingGradeResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.GradeImageRequest": {
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "description": "URL ảnh bài làm (single image - deprecated)",
+                    "type": "string"
+                },
+                "image_urls": {
+                    "description": "Danh sách URL ảnh bài làm (multiple images)",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rubric": {
+                    "description": "Đề bài/tiêu chí chấm",
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.GradeSpeakingRequest": {
+            "type": "object",
+            "required": [
+                "audio_url"
+            ],
+            "properties": {
+                "audio_url": {
+                    "description": "URL file audio mp3",
+                    "type": "string"
+                },
+                "rubric": {
+                    "description": "Đề bài/tiêu chí chấm",
+                    "type": "string"
+                }
+            }
+        },
+        "controllers.GradeWritingRequest": {
+            "type": "object",
+            "required": [
+                "essay_text"
+            ],
+            "properties": {
+                "essay_text": {
+                    "description": "Đoạn văn cần chấm",
+                    "type": "string"
+                },
+                "rubric": {
+                    "description": "Đề bài/tiêu chí chấm",
+                    "type": "string"
+                }
+            }
+        },
+        "prot.AppConfig": {
+            "type": "object",
+            "properties": {
+                "force_update": {
+                    "type": "boolean"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                },
+                "platform": {
+                    "type": "string"
+                },
+                "url_video_tutorial": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "prot.AppConfigResponse": {
+            "type": "object",
+            "properties": {
+                "app_config": {
+                    "$ref": "#/definitions/prot.AppConfig"
+                }
+            }
+        },
+        "services.ImageGradeResult": {
+            "type": "object",
+            "properties": {
+                "accuracy_score": {
+                    "description": "Điểm độ chính xác",
+                    "type": "number"
+                },
+                "content_score": {
+                    "description": "Điểm nội dung",
+                    "type": "number"
+                },
+                "feedback": {
+                    "description": "Nhận xét chi tiết",
+                    "type": "string"
+                },
+                "improvements": {
+                    "description": "Cần cải thiện",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "overall_score": {
+                    "description": "Điểm tổng (0-10)",
+                    "type": "number"
+                },
+                "presentation_score": {
+                    "description": "Điểm trình bày",
+                    "type": "number"
+                },
+                "recognized_text": {
+                    "description": "Text nhận diện được từ ảnh (nếu có)",
+                    "type": "string"
+                },
+                "strengths": {
+                    "description": "Điểm mạnh",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "services.SpeakingGradeResult": {
+            "type": "object",
+            "properties": {
+                "feedback": {
+                    "description": "Nhận xét chi tiết",
+                    "type": "string"
+                },
+                "fluency_score": {
+                    "description": "Điểm độ trưng",
+                    "type": "number"
+                },
+                "grammar_score": {
+                    "description": "Điểm ngữ pháp",
+                    "type": "number"
+                },
+                "improvements": {
+                    "description": "Cần cải thiện",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "overall_score": {
+                    "description": "Điểm tổng (0-10)",
+                    "type": "number"
+                },
+                "pronunciation_score": {
+                    "description": "Điểm phát âm",
+                    "type": "number"
+                },
+                "strengths": {
+                    "description": "Điểm mạnh",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "transcript": {
+                    "description": "Bản transcript",
+                    "type": "string"
+                },
+                "vocabulary_score": {
+                    "description": "Điểm từ vựng",
+                    "type": "number"
+                }
+            }
+        },
+        "services.WritingGradeResult": {
+            "type": "object",
+            "properties": {
+                "content_score": {
+                    "description": "Điểm nội dung",
+                    "type": "number"
+                },
+                "feedback": {
+                    "description": "Nhận xét chi tiết",
+                    "type": "string"
+                },
+                "grammar_score": {
+                    "description": "Điểm ngữ pháp",
+                    "type": "number"
+                },
+                "improvements": {
+                    "description": "Cần cải thiện",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "organization_score": {
+                    "description": "Điểm tổ chức bài",
+                    "type": "number"
+                },
+                "overall_score": {
+                    "description": "Điểm tổng (0-10)",
+                    "type": "number"
+                },
+                "strengths": {
+                    "description": "Điểm mạnh",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "vocabulary_score": {
+                    "description": "Điểm từ vựng",
+                    "type": "number"
+                }
+            }
+        }
+    }
+}

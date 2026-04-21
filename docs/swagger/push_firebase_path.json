@@ -1,0 +1,235 @@
+{
+  "/api/devices/register": {
+    "post": {
+      "summary": "Đăng ký thiết bị nhận thông báo",
+      "description": "API để lưu thông tin thiết bị (device token) nhằm nhận push notification",
+      "tags": [
+        "Devices"
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "device",
+          "required": true,
+          "description": "Thông tin thiết bị",
+          "schema": {
+            "$ref": "#/definitions/prot.DeviceRegisterRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Đăng ký thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Device"
+          }
+        }
+      }
+    }
+  },
+  "/api/devices/unregister": {
+    "post": {
+      "summary": "Hủy đăng ký thiết bị nhận thông báo",
+      "description": "API để xóa thiết bị khỏi hệ thống nhận push notification",
+      "tags": [
+        "Devices"
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "device",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.DeviceUnregisterRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/devices": {
+    "get": {
+      "summary": "Lấy danh sách thiết bị của tôi",
+      "description": "API để lấy tất cả thiết bị đã đăng ký của user hiện tại",
+      "tags": [
+        "Devices"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.MyDevicesResponse"
+          }
+        }
+      }
+    }
+  },
+  "/api/test": {
+    "post": {
+      "summary": "Gửi push notification test",
+      "description": "API để gửi thử thông báo đến tất cả thiết bị của user",
+      "tags": [
+        "Notifications"
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Gửi test thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/notices/{id}/send": {
+    "post": {
+      "summary": "Gửi thông báo",
+      "description": "API gửi push notification cho thông báo theo ID (admin only)",
+      "tags": [
+        "Notifications"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID của thông báo",
+          "type": "integer",
+          "format": "uint64"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Gửi thông báo thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

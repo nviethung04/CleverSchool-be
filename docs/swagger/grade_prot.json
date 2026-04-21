@@ -1,0 +1,68 @@
+{
+  "prot.Grade": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "number": {
+        "type": "integer"
+      },
+      "name_vn": {
+        "type": "string"
+      },
+      "name_en": {
+        "type": "string"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.GradeRequest": {
+    "type": "object",
+    "properties": {
+      "number": {
+        "type": "integer"
+      },
+      "name_vn": {
+        "type": "string"
+      },
+      "name_en": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.GradeListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "grades": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Grade"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

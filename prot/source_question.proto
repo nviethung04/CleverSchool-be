@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/admin/prot";
+
+// Message for the source question in the source_questions table
+message SourceQuestion {
+  int64 id = 1;                        // ID câu hỏi
+  string title = 2;                     // Tiêu đề câu hỏi
+  string skill = 3;                  // Kỹ năng (Listening, Reading, etc.)
+  string content = 4;                   // Nội dung câu hỏi
+  string level = 5;                  // Độ khó (Easy, Medium, Hard)
+
+  string created_at = 6;
+  string updated_at = 7;
+  bool status = 8;
+  repeated MediaSourceQuestion medias = 9;
+}
+
+message MediaSourceQuestion {
+  string type = 1;
+  string url = 2;
+}
+
+message SourceQuestionRequest {
+  int64 id = 1;                        // ID câu hỏi
+  string title = 2;                     // Tiêu đề câu hỏi
+  string skill = 3;                  // Kỹ năng
+  string content = 4;                   // Nội dung câu hỏi
+  string level = 5;                  // Độ khó
+  int64 updated_by = 6;                 // Người cập nhật câu hỏi
+  bool status = 7;
+  repeated MediaSourceQuestion medias = 9;
+  // Optional: link questions to this source question and set sort order (Create).
+  // Optional: update questions sort order for this source question (Update).
+  repeated UpdateSourceQuestionQuestion questions = 10;
+}
+
+// Question id and sort_position when creating/updating a source question
+message UpdateSourceQuestionQuestion {
+  int64 id = 1;
+  int32 sort_position = 2;
+}
+
+// Response for a single source question
+message SourceQuestionResponse {
+  SourceQuestion source_question = 1;   // Câu hỏi nguồn
+  string message = 2;                   // Thông báo
+}
+
+// Response for multiple source questions
+message SourceQuestionsResponse {
+  repeated SourceQuestion source_questions = 1;
+  uint64 total_count = 2;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative source_question.proto

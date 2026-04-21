@@ -1,0 +1,1252 @@
+{
+  "prot.Lesson": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "views": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "is_complete": {
+        "type": "boolean"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "chapter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "heading": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "course": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_title": {
+            "type": "string"
+          }
+        }
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "topics": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "skill": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "exams": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "is_program": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "is_program": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "lesson_plans": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "cover_image": {
+              "type": "string"
+            },
+            "status": {
+              "type": "boolean"
+            },
+            "sort_position": {
+              "type": "integer"
+            },
+            "total_time": {
+              "type": "string"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "is_complete": {
+              "type": "boolean"
+            },
+            "is_active": {
+              "type": "boolean"
+            },
+            "author": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          }
+        }
+      },
+      "teaching_plan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "object",
+            "properties": {
+              "approved_by": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "approved_at": {
+                "type": "string"
+              },
+              "approved_note": {
+                "type": "string"
+              },
+              "status": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.LessonDetail": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "is_complete": {
+        "type": "boolean"
+      },
+      "views": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "chapter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "object_title": {
+            "type": "string"
+          }
+        }
+      },
+      "heading": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "course": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "object_title": {
+            "type": "string"
+          }
+        }
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "topics": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "skill": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "exams": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "questions_completed": {
+              "type": "integer"
+            },
+            "total_questions": {
+              "type": "integer"
+            },
+            "created_at": {
+              "type": "string"
+            },
+            "is_random_question": {
+              "type": "boolean"
+            },
+            "time_limit": {
+              "type": "integer"
+            },
+            "deadline": {
+              "type": "string"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "is_program": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "questions_completed": {
+              "type": "integer"
+            },
+            "total_questions": {
+              "type": "integer"
+            },
+            "created_at": {
+              "type": "string"
+            },
+            "is_random_question": {
+              "type": "boolean"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "is_program": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "lesson_plans": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "cover_image": {
+              "type": "string"
+            },
+            "status": {
+              "type": "boolean"
+            },
+            "sort_position": {
+              "type": "integer"
+            },
+            "total_time": {
+              "type": "string"
+            },
+            "is_complete": {
+              "type": "boolean"
+            },
+            "object_title": {
+              "type": "string"
+            },
+            "author": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "author": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone_number": {
+            "type": "string"
+          }
+        }
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "course_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "week_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "scheduled_date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "week_number": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "week": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "year": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "week_number": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "start_date": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "end_date": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "teaching_plan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "object",
+            "properties": {
+              "approved_by": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "approved_at": {
+                "type": "string"
+              },
+              "approved_note": {
+                "type": "string"
+              },
+              "status": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.LessonRequest": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "views": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "program_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "chapter": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "object_title": {
+            "type": "string"
+          }
+        }
+      },
+      "heading": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "title": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "topics": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "skill": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "exams": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "lesson_plans": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "cover_image": {
+              "type": "string"
+            },
+            "status": {
+              "type": "boolean"
+            },
+            "sort_position": {
+              "type": "integer"
+            },
+            "total_time": {
+              "type": "string"
+            },
+            "author": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "week_id": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      },
+      "teaching_plan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "object",
+            "properties": {
+              "approved_by": {
+                "type": "integer",
+                "format": "int64"
+              },
+              "approved_at": {
+                "type": "string"
+              },
+              "approved_note": {
+                "type": "string"
+              },
+              "status": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.LessonListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "lessons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Lesson"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.ListLessonScheduleByWeek": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "string"
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "lesson_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "week_id": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.Schedule": {
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "scheduled_date": {
+        "type": "string",
+        "format": "date"
+      },
+      "week_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "week_number": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "lesson": {
+        "$ref": "#/definitions/prot.LessonBySchedule"
+      },
+      "course": {
+        "$ref": "#/definitions/prot.CourseBySchedule"
+      }
+    }
+  },
+  "prot.ScheduleRequest": {
+    "properties": {
+      "lesson": {
+        "$ref": "#/definitions/prot.LessonByScheduleRequest"
+      }
+    }
+  },
+  "prot.LessonSchedulesByWeekList": {
+    "type": "object",
+    "properties": {
+      "weeks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonSchedulesByWeek"
+        }
+      }
+    }
+  },
+  "prot.LessonSchedulesByWeekListRequest": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "weeks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonSchedulesByWeekRequest"
+        }
+      }
+    }
+  },
+  "prot.LessonSchedulesByWeek": {
+    "type": "object",
+    "properties": {
+      "week_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "week_number_in_year": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "week_number": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "start_date": {
+        "type": "string"
+      },
+      "end_date": {
+        "type": "string"
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Schedule"
+        }
+      }
+    }
+  },
+  "prot.LessonSchedulesByWeekRequest": {
+    "type": "object",
+    "properties": {
+      "week_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.ScheduleRequest"
+        }
+      }
+    }
+  },
+  "prot.LessonSchedulesInfoResponse": {
+    "type": "object",
+    "properties": {
+      "schedules": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Schedule"
+        }
+      }
+    }
+  },
+  "prot.LessonSchemaRequest": {
+    "type": "object",
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "schedules": {
+        "type": "array",
+        "items": {
+          "properties": {
+            "lesson_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "week_id": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.LessonCompletion": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "example": "76",
+        "description": "ID bản ghi lesson completion"
+      },
+      "student_id": {
+        "type": "string",
+        "example": "246",
+        "description": "ID học sinh"
+      },
+      "is_complete": {
+        "type": "boolean",
+        "example": true,
+        "description": "Trạng thái hoàn thành bài học"
+      },
+      "completion_at": {
+        "type": "string",
+        "format": "date",
+        "example": "2025-07-21",
+        "description": "Ngày hoàn thành"
+      }
+    },
+    "required": [
+      "id",
+      "student_id",
+      "is_complete"
+    ]
+  },
+  "prot.LessonStudying": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "example": "76",
+        "description": "ID bản ghi lesson"
+      },
+      "student_id": {
+        "type": "string",
+        "example": "246",
+        "description": "ID học sinh"
+      },
+      "is_studying": {
+        "type": "boolean",
+        "example": true,
+        "description": "Trạng thái bắt đầu bài học"
+      },
+      "studying_at": {
+        "type": "string",
+        "format": "date",
+        "example": "2025-07-21",
+        "description": "Ngày bắt đầu bài học"
+      }
+    },
+    "required": [
+      "id",
+      "student_id",
+      "is_studying"
+    ]
+  },
+  "prot.AssignedLesson": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "title": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "object_title": {
+        "type": "string"
+      },
+      "is_assigned": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.AssignedLessons": {
+    "type": "object",
+    "properties": {
+      "lessons": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.AssignedLesson"
+        }
+      }
+    }
+  },
+  "prot.LessonPlanByCourse": {
+    "type": "object",
+    "properties": {
+      "lesson_plans": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonPlan"
+        }
+      },
+      "lesson_plan_by_programs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.LessonPlan"
+        }
+      }
+    }
+  },
+  "prot.ExerciseByCourse": {
+    "type": "object",
+    "properties": {
+      "exercises": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Exercise"
+        }
+      },
+      "exercise_by_programs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Exercise"
+        }
+      }
+    }
+  },
+  "prot.HomeworkByCourse": {
+    "type": "object",
+    "properties": {
+      "homeworks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Homework"
+        }
+      },
+      "homework_by_programs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Homework"
+        }
+      }
+    }
+  },
+  "prot.ExamByCourse": {
+    "type": "object",
+    "properties": {
+      "exams": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Exam"
+        }
+      },
+      "exam_by_programs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/prot.Exam"
+        }
+      }
+    }
+  }
+}

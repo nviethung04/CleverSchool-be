@@ -1,0 +1,8 @@
+DROP INDEX IF EXISTS idx_homework_users_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_users_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_positions_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_matchings_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_manual_scoring_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_labelings_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_groups_homework_id;
+DROP INDEX IF EXISTS idx_homework_question_user_fill_in_blanks_homework_id;

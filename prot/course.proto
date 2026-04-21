@@ -1,0 +1,171 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "subject.proto";
+import "chapter.proto";
+import "study_shift.proto";
+import "semester.proto";
+
+message SchooInfo {
+  int64 id = 1;
+  string name = 2;
+}
+
+message CourseTeacherInfo {
+  int64 id = 1;
+  string name = 2;
+  string avatar = 3;
+  string description = 4;
+}
+
+message ProgramInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string book_url = 4;
+}
+
+message Course {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  string sort_position = 5;
+  string type = 6;
+  int32 duration = 7;
+  string image = 8;
+  string level = 9;
+  bool status = 10;
+  int32 current_students = 11;
+  string target = 12;
+  Subject subject = 13;
+  repeated Chapter chapters = 14;
+  SchooInfo school = 15;
+  repeated StudyShiftInfo study_shifts = 16;
+  string start_date = 17;
+  string end_date = 18;
+  string time = 19;
+  CourseTeacherInfo teacher = 20;
+  string progress = 21;
+  repeated SemesterInfo semesters = 22;
+  ProgramInfo program = 23;
+  string object_title = 24;
+  int64 program_id = 25;
+  string state = 26;
+  string created_at = 27;
+  string updated_at = 28;
+  bool copy_schedule_success = 29;
+  string copy_schedule_message = 30;
+  bool eligible_for_final_exam = 31;
+}
+
+message GetCourseRequest {
+  int64 id = 1;
+}
+
+message CourseResponse {
+  Course course = 1;
+  string message = 2;
+}
+
+message ListCoursesRequest {}
+
+message CourseRequest {
+  int64 id = 1;
+  int64 subject_id = 2;
+  string name = 3;
+  string description = 4;
+  string sort_position = 5;
+  string type = 6;
+  int32 duration = 7;
+  string image = 8;
+  string level = 9;
+  bool status = 10;
+  string target = 11;
+  repeated Chapter chapters = 12;
+  SchooInfo school = 13;
+  string start_date = 14;
+  string end_date = 15;
+  string time = 16;
+  repeated StudyShiftInfo study_shifts = 17;
+  repeated SemesterInfo semesters = 18;
+  string object_title = 19;
+  int64 program_id = 20;
+  string state = 21;
+  int64 parent_course_id = 22;
+}
+
+message CourseIDRequest {
+  int64 id = 1;
+}
+
+message CoursesResponse {
+  repeated Course courses = 1;
+  int64 total_count = 2;
+}
+
+message ExamResult {
+  int64 id = 1;
+  string lesson = 2;
+  string exam = 3;
+  string date = 4;
+  float score = 5;
+  float max_score = 6;
+  string time = 7;
+  string exam_time = 8;
+  string status = 9;
+}
+
+message ScoreByCourse {
+  int32 exam_count = 1;
+  float average_score = 2;
+  int32 finish_exam = 3;
+  float max_score = 4;
+  repeated ExamResult exam_results = 5;
+}
+
+message ClonedCourseRequest {
+  string course_name = 1;
+  string object_title = 2;
+  bool skip_clone_chapters = 3;
+  bool skip_clone_lessons = 4;
+  bool skip_clone_homeworks = 5;
+  bool skip_clone_exams = 6;
+  bool skip_clone_lesson_plans = 7;
+  bool skip_clone_lesson_plan_parts = 8;
+  bool skip_clone_lesson_schedules = 9;
+}
+
+message SyncCourses {
+  repeated int32 ids = 1;
+  bool only_course = 2;
+}
+
+message ResyncScheduleRequest {
+  int64 course_id = 1;
+  repeated int64 course_ids = 2;
+}
+
+message ResyncScheduleResponse {
+  string message = 1;
+}
+
+message CourseFamilyItem {
+  int64 id = 1;
+  string name = 2;
+  string object_title = 3;
+}
+
+message CourseFamilyParent {
+  int64 id = 1;
+  string name = 2;
+  string object_title = 3;
+  repeated CourseFamilyItem children_courses = 4;
+}
+
+message ListCoursesFamilyResponse {
+  repeated CourseFamilyParent parent_courses = 1;
+}

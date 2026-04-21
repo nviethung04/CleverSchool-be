@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ .title }}</title>
+
+  <link rel="stylesheet" href="/node_modules/h5p-standalone/dist/styles/h5p.css" />
+</head>
+<body>
+  <div id="h5p-container"></div>
+
+  <script>
+    window.H5PIntegration = {
+      baseUrl: "{{ .base_url }}",
+      url: "{{ .base_url }}",
+      user: {
+        name: "User",
+        mail: "user@example.com"
+      },
+      showStatus: true,
+      saveFreq: false,
+      l10n: {
+        H5P: {
+          submitReport: "Submit Report"
+        }
+      },
+      ajax: {
+        setFinished: "{{ .submit_url }}",
+        contentUserData: "{{ .base_url }}/h5p-user-data/:contentId/:dataType/:subContentId?/:preload?"
+      }
+    };
+  </script>
+
+  <script src="/node_modules/h5p-standalone/dist/main.bundle.js"></script>
+
+  <script>
+    const el = document.getElementById('h5p-container');
+
+    const options = {
+      id: 'exercise-one',
+      h5pJsonPath: '{{.h5pJsonPath}}',
+      frameJs: '/node_modules/h5p-standalone/dist/frame.bundle.js',
+      frameCss: '/node_modules/h5p-standalone/dist/styles/h5p.css',
+      preloadUserData: false,
+      frame: true,
+      copyright: true,
+      export: false,
+      icon: true,
+      embed: true,
+      embedCode: '<iframe width=":w" height=":h" src="{{ .base_url }}/public/h5p/{{ .dir }}" frameborder="0" scrolling="no" style="width:100%"></iframe>',
+    };
+
+    const h5pInstance = new H5PStandalone.H5P(el, options);
+
+    h5pInstance.then(() => {
+      const checkInterval = setInterval(() => {
+        if (window.H5P && H5P.externalDispatcher) {
+          clearInterval(checkInterval);
+
+          H5P.externalDispatcher.on('xAPI', function (event) {
+            const verb = event.getVerb();
+            const statement = event.data.statement;
+            const user = statement.actor?.name || 'Unknown';
+            const object = statement.object?.definition?.name?.['en-US'] || 'Unknown content';
+            const token = "{{.token}}";
+
+            if ((verb === "answered" || verb === "completed") && token != "") {
+              submitData(statement);
+            }
+          });
+        }
+      }, 300);
+    });
+
+    function submitData(statement) {
+      const folder = "{{.dir}}";
+      const url = "{{.submit_url}}";
+      const token = "{{.token}}";
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          statement: statement,
+          folder: folder,
+          token: token
+        }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('✅ Data submitted successfully:', data);
+      })
+      .catch((error) => {
+        console.error('❌ Error submitting data:', error);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+{
+  "paths": {
+    "/api/dashboard/report/schools": {
+      "get": {
+        "tags": ["Dashboard Schools"],
+        "summary": "Get dashboard schools with pagination, search, and date filtering",
+        "description": "Retrieve a list of schools with statistics including total students, teachers, active users, and homework completion data. Supports pagination, search functionality, and date range filtering.",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by school name (case-insensitive)",
+            "required": false,
+            "type": "string",
+            "example": "trường"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (default: 1, or all data if not provided)",
+            "required": false,
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page (default: 10, or all data if not provided)",
+            "required": false,
+            "type": "integer",
+            "minimum": 1,
+            "example": 10
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Selected week start date (Unix timestamp)",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "example": 1736899200
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Selected week end date (Unix timestamp)",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "example": 1737504000
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/DashboardSchoolsResponseSchema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard/report/schools/export": {
+      "get": {
+        "tags": ["Dashboard Schools"],
+        "summary": "Export dashboard schools to Excel with date filtering",
+        "description": "Export all schools data to Excel file (.xlsx) with statistics including total students, teachers, active users, and homework completion data. Supports date range filtering.",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Selected week start date (Unix timestamp)",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "example": 1736899200
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "Selected week end date (Unix timestamp)",
+            "required": false,
+            "type": "integer",
+            "format": "int64",
+            "example": 1737504000
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel file download",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment filename",
+                "schema": {
+                  "type": "string",
+                  "example": "attachment; filename=dashboard_schools.xlsx"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "DashboardReportSchoolSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "School record ID"
+        },
+        "school_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "School ID"
+        },
+        "school_name": {
+          "type": "string",
+          "description": "School name"
+        },
+        "total_students": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of students in the school"
+        },
+        "total_teachers": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Total number of teachers in the school"
+        },
+        "active_teachers_from_sep8": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of active teachers from September 8, 2025"
+        },
+        "active_students_from_sep15": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of active students from September 15, 2025"
+        },
+        "students_completed_homework_from_sep15": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of students who completed homework from September 15, 2025"
+        },
+        "students_completed_homework_last_week": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of students who completed homework in the last week (-1 if no data)"
+        },
+        "active_students_last_week": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of active students in the last week (-1 if no data)"
+        },
+        "active_teachers_last_week": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of active teachers in the last week (-1 if no data)"
+        }
+      }
+    },
+    "DashboardSchoolsResponseSchema": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "description": "Response code"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "schools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DashboardReportSchoolSchema"
+              }
+            },
+            "total": {
+              "type": "integer",
+              "format": "int64",
+              "description": "Total number of schools"
+            },
+            "page": {
+              "type": "integer",
+              "description": "Current page number"
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Items per page"
+            },
+            "total_pages": {
+              "type": "integer",
+              "description": "Total number of pages"
+            }
+          }
+        },
+        "message": {
+          "type": "string",
+          "description": "Response message"
+        }
+      }
+    }
+  }
+}

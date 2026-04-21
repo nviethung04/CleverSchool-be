@@ -1,0 +1,790 @@
+{
+    "/api/manage/users": {
+        "get": {
+            "description": "API để lấy danh sách tài khoản",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Users"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "role_id",
+                    "description": "Lấy theo role ID",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lấy theo ID trường",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy theo ID khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "class_id",
+                    "description": "Lấy theo ID lớp",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lọc theo trạng thái (0, 1)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "faculty_id",
+                    "description": "Lấy theo ID khoa",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "subject_id",
+                    "description": "Lấy theo ID môn học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "program_id",
+                    "description": "Lấy theo ID chương trình học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "not_participated",
+                    "description": "Lọc theo tính chất học sinh chưa tham gia chương trình học (false, true)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "fail_the_subject",
+                    "description": "Lọc theo tính chất học sinh rớt chương trình học (false, true)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "province_code",
+                    "description": "Lọc tỉnh thành",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "ward_code",
+                    "description": "Lọc theo quận xã",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "begin_at",
+                    "description": "Tạo tài khoản từ ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                },
+                {
+                    "in": "query",
+                    "name": "end_at",
+                    "description": "Tạo tài khoản đến ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                },
+                {
+                    "in": "query",
+                    "name": "is_used",
+                    "description": "Đã login vào hệ thống (false, true)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách tài khoản",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo tài khoản mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Users"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo tài khoản",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo tài khoản thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserDetail"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết tài khoản",
+            "description": "API để lấy thông tin chi tiết của một tài khoản theo ID",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của tài khoản"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserDetail"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết tài khoản",
+            "description": "API để cập nhật thông tin chi tiết của một tài khoản theo ID",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của tài khoản"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserDetail"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa tài khoản",
+            "description": "API để xóa một tài khoản theo ID",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của tài khoản"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa tài khoản thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/export": {
+        "get": {
+            "summary": "Export thông tin tài khoản",
+            "description": "API để export thông tin tài khoản",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "role_id",
+                    "description": "Lấy theo role ID",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "school_id",
+                    "description": "Lấy theo ID trường",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "course_id",
+                    "description": "Lấy theo ID khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "class_id",
+                    "description": "Lấy theo ID lớp",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "begin_at",
+                    "description": "Tạo tài khoản từ ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                },
+                {
+                    "in": "query",
+                    "name": "end_at",
+                    "description": "Tạo tài khoản đến ngày",
+                    "required": false,
+                    "example": "2025-06-09"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/users_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/import": {
+        "post": {
+            "summary": "Import thông tin tài khoản",
+            "description": "API để import thông tin tài khoản",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/profile": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết tài khoản đang đăng nhập",
+            "description": "API để lấy thông tin chi tiết profile đang đăng nhập",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserDetail"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết tài khoản",
+            "description": "API để cập nhật thông tin chi tiết của một tài khoản",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "user",
+                    "description": "Thông tin tài khoản",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserDetail"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/permissions": {
+        "get": {
+            "summary": "Lấy thông danh sách quyền theo vai trò",
+            "description": "API để lấy thông tin danh sách quyền theo vai trò",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.RolePermissionResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/username-exists/{username}": {
+        "get": {
+            "summary": "Kiểm tra username",
+            "description": "API để kiểm tra username đã tồn tại",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UsernameExitsResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/class": {
+        "get": {
+            "summary": "Lấy thông tin lớp học hiện tại",
+            "description": "API để lấy thông tin lớp học hiện tại",
+            "tags": [
+                "Users"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.ClassByUserResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/activated": {
+        "get": {
+            "description": "API để lấy danh sách tài khoản hoạt động",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Users"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "role_id",
+                    "description": "Lấy theo role ID",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "month",
+                    "description": "Lấy theo tháng",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "year",
+                    "description": "Lấy theo năm",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách tài khoản",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.UserListResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/users/{id}/reset-password": {
+        "put": {
+            "description": "API để c",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Users"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của tài khoản"
+                }
+            ],
+            "summary": "Reset password",
+            "responses": {
+                "200": {
+                    "description": "Thành công"
+                }
+            }
+        }
+    }
+}

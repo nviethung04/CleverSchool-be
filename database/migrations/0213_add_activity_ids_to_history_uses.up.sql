@@ -1,0 +1,1 @@
+ALTER TABLE history_uses ADD COLUMN activity_ids JSONB NOT NULL DEFAULT '{}'::JSONB;

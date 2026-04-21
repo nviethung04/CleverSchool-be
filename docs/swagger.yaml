@@ -1,0 +1,278 @@
+definitions:
+  controllers.GradeImageRequest:
+    properties:
+      image_url:
+        description: URL ảnh bài làm (single image - deprecated)
+        type: string
+      image_urls:
+        description: Danh sách URL ảnh bài làm (multiple images)
+        items:
+          type: string
+        type: array
+      rubric:
+        description: Đề bài/tiêu chí chấm
+        type: string
+    type: object
+  controllers.GradeSpeakingRequest:
+    properties:
+      audio_url:
+        description: URL file audio mp3
+        type: string
+      rubric:
+        description: Đề bài/tiêu chí chấm
+        type: string
+    required:
+    - audio_url
+    type: object
+  controllers.GradeWritingRequest:
+    properties:
+      essay_text:
+        description: Đoạn văn cần chấm
+        type: string
+      rubric:
+        description: Đề bài/tiêu chí chấm
+        type: string
+    required:
+    - essay_text
+    type: object
+  prot.AppConfig:
+    properties:
+      force_update:
+        type: boolean
+      host:
+        type: string
+      mode:
+        type: string
+      platform:
+        type: string
+      url_video_tutorial:
+        type: string
+      version:
+        type: string
+    type: object
+  prot.AppConfigResponse:
+    properties:
+      app_config:
+        $ref: '#/definitions/prot.AppConfig'
+    type: object
+  services.ImageGradeResult:
+    properties:
+      accuracy_score:
+        description: Điểm độ chính xác
+        type: number
+      content_score:
+        description: Điểm nội dung
+        type: number
+      feedback:
+        description: Nhận xét chi tiết
+        type: string
+      improvements:
+        description: Cần cải thiện
+        items:
+          type: string
+        type: array
+      overall_score:
+        description: Điểm tổng (0-10)
+        type: number
+      presentation_score:
+        description: Điểm trình bày
+        type: number
+      recognized_text:
+        description: Text nhận diện được từ ảnh (nếu có)
+        type: string
+      strengths:
+        description: Điểm mạnh
+        items:
+          type: string
+        type: array
+    type: object
+  services.SpeakingGradeResult:
+    properties:
+      feedback:
+        description: Nhận xét chi tiết
+        type: string
+      fluency_score:
+        description: Điểm độ trưng
+        type: number
+      grammar_score:
+        description: Điểm ngữ pháp
+        type: number
+      improvements:
+        description: Cần cải thiện
+        items:
+          type: string
+        type: array
+      overall_score:
+        description: Điểm tổng (0-10)
+        type: number
+      pronunciation_score:
+        description: Điểm phát âm
+        type: number
+      strengths:
+        description: Điểm mạnh
+        items:
+          type: string
+        type: array
+      transcript:
+        description: Bản transcript
+        type: string
+      vocabulary_score:
+        description: Điểm từ vựng
+        type: number
+    type: object
+  services.WritingGradeResult:
+    properties:
+      content_score:
+        description: Điểm nội dung
+        type: number
+      feedback:
+        description: Nhận xét chi tiết
+        type: string
+      grammar_score:
+        description: Điểm ngữ pháp
+        type: number
+      improvements:
+        description: Cần cải thiện
+        items:
+          type: string
+        type: array
+      organization_score:
+        description: Điểm tổ chức bài
+        type: number
+      overall_score:
+        description: Điểm tổng (0-10)
+        type: number
+      strengths:
+        description: Điểm mạnh
+        items:
+          type: string
+        type: array
+      vocabulary_score:
+        description: Điểm từ vựng
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /api/config:
+    get:
+      consumes:
+      - application/json
+      description: Get app configuration based on platform and version from headers
+      parameters:
+      - description: Platform (ios, android, web)
+        in: header
+        name: platform
+        type: string
+      - description: App version (e.g., 1.0.0)
+        in: header
+        name: version
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/prot.AppConfigResponse'
+      summary: Get app configuration
+      tags:
+      - Config
+  /api/manage/ai-grading/image:
+    post:
+      consumes:
+      - application/json
+      description: Giáo viên gửi ảnh bài làm (viết tay, vẽ, diagram) lên để AI chấm
+        điểm. Hỗ trợ 1 hoặc nhiều ảnh.
+      parameters:
+      - description: Image answer to grade
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.GradeImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.ImageGradeResult'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Grade Image Answer with AI
+      tags:
+      - AI Grading
+  /api/manage/ai-grading/speaking:
+    post:
+      consumes:
+      - application/json
+      description: Giáo viên gửi file audio speaking lên để AI chấm điểm
+      parameters:
+      - description: Speaking audio to grade
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.GradeSpeakingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.SpeakingGradeResult'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Grade Speaking Audio with AI
+      tags:
+      - AI Grading
+  /api/manage/ai-grading/writing:
+    post:
+      consumes:
+      - application/json
+      description: Giáo viên gửi bài writing lên để AI chấm điểm và đưa ra feedback
+      parameters:
+      - description: Writing essay to grade
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.GradeWritingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/services.WritingGradeResult'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Grade Writing Essay with AI
+      tags:
+      - AI Grading
+swagger: "2.0"

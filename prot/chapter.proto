@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "lesson.proto";
+import "heading.proto";
+
+message Chapter {
+  int64 id = 1;
+  int64 course_id = 2;
+  string title = 3;
+  string description = 4;
+  string sort_position = 5;
+  bool status = 6;
+  repeated prot.LessonInfo lessons = 7;
+  string object_title = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  int64 program_id = 11;
+  int32 time = 12;
+  string target = 13;
+  repeated prot.Heading headings = 14;
+}
+
+message GetChapterRequest {
+  int64 id = 1;
+}
+
+message ChapterResponse {
+  Chapter chapter = 1;
+  string message = 2;
+}
+
+message ListChaptersRequest {}
+
+message ChapterRequest {
+  int64 id = 1;
+  int64 course_id = 2;
+  string title = 3;
+  string description = 4;
+  string sort_position = 5;
+  bool status = 6;
+  repeated prot.LessonInfo lessons = 7;
+  string object_title = 8;
+  int64 program_id = 9;
+  int32 time = 10;
+  string target = 11;
+  repeated prot.Heading headings = 13;
+}
+
+message ChapterIDRequest {
+  int64 id = 1;
+}
+
+message ChaptersResponse {
+  repeated Chapter chapters = 1;
+  uint64 total_count = 2;
+}
+
+message LessonSort {
+  int64 id = 1;
+}
+
+message ChapterLessonSort {
+  repeated LessonSort lessons = 1;
+}

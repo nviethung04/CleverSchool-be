@@ -1,0 +1,28 @@
+{
+  "prot.SourceQuestionListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "source_questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.SourceQuestion"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

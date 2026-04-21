@@ -1,0 +1,79 @@
+{
+  "prot.SubmitHomeworkRequest": {
+    "type": "object",
+    "properties": {
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của homework"
+      },
+      "lesson_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của lesson"
+      },
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của lesson"
+      },
+      "files": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "required": [
+      "homework_id",
+      "lesson_id"
+    ]
+  },
+  "prot.SubmitHomeworkResponse": {
+    "type": "object",
+    "properties": {
+      "homework_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của homework"
+      },
+      "user_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID của user"
+      },
+      "score": {
+        "type": "number",
+        "format": "double",
+        "description": "Điểm số của homework"
+      },
+      "ratio": {
+        "type": "number",
+        "format": "double",
+        "description": "Tỷ lệ hoàn thành"
+      },
+      "has_manual_scoring": {
+        "type": "boolean",
+        "description": "Có câu hỏi cần chấm thủ công không"
+      },
+      "has_questions_need_manual_grading": {
+        "type": "boolean",
+        "description": "Có câu hỏi cần chấm thủ công không (alias)"
+      },
+      "files": [
+        {
+          "type": "image",
+          "url": "abcd.png"
+        }
+      ]
+    }
+  }
+}

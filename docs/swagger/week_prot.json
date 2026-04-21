@@ -1,0 +1,65 @@
+{
+  "prot.Week": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "year": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "week_number": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "start_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "name": {
+        "end_date": "string",
+        "format": "date-time"
+      },
+      "number": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "created_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "updated_at": {
+        "type": "string",
+        "format": "date-time"
+      }
+    }
+  },
+  "prot.WeekListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "weeks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Week"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
+}

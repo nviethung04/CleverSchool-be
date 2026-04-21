@@ -1,0 +1,168 @@
+syntax = "proto3";
+
+package prot;
+option go_package = "be-lms/prot";
+
+message ChatActionResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MessageCountResponse {
+  int32 total_messages = 1;
+}
+
+message ChatMessageFileResponse {
+  uint64 id = 1;
+  string file_name = 2;
+  string file_url = 3;
+  string file_type = 4;
+  int64 file_size = 5;
+  string mime_type = 6;
+}
+
+message ChatMediaResponse {
+  int64 id = 1;
+  string file_name = 2;
+  string file_path = 3;
+  string full_path = 4;
+  optional string file_type = 5;
+  optional int64 file_size = 6;
+  optional string file_extension = 7;
+  optional string disk_name = 8;
+  optional string static_url = 9;
+  int32 sort_order = 10;
+}
+
+message ChatUserResponse {
+  uint64 id = 1;
+  string username = 2;
+  string full_name = 3;
+  string avatar = 4;
+}
+
+message ChatMessageResponse {
+  uint64 id = 1;
+  uint64 course_id = 2;
+  uint64 user_id = 3;
+  string content = 4;
+  string message_type = 5;
+  bool is_pinned = 6;
+  bool is_edited = 7;
+  string edited_at = 8;
+  uint64 reply_to_message_id = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  ChatUserResponse user = 12;
+  ChatMessageResponse reply_to_message = 13;
+  repeated ChatMessageFileResponse files = 14;
+  repeated ChatMediaResponse medias = 15;
+  uint64 recipient_id = 16;
+  ChatUserResponse recipient = 17;
+}
+
+message PinnedMessagesResponse {
+  repeated ChatMessageResponse pinned_messages = 1;
+  int32 count = 2;
+}
+
+message RecentMessagesResponse {
+  repeated ChatMessageResponse recent_messages = 1;
+  int32 count = 2;
+}
+
+message UploadedMediaResponse {
+  int64 id = 1;
+  string file_name = 2;
+  string file_path = 3;
+  string full_path = 4;
+  optional string file_type = 5;
+  optional int64 file_size = 6;
+  optional string file_extension = 7;
+  optional string disk_name = 8;
+  optional string static_url = 9;
+}
+
+message UploadedMediasResponse {
+  repeated UploadedMediasResponse medias = 1;
+}
+
+message PaginationResponse {
+  int32 page = 1;
+  int32 limit = 2;
+  int32 total = 3;
+  int32 total_page = 4;
+  bool has_more = 5;
+}
+
+message ChatMessagesListResponse {
+  repeated ChatMessageResponse messages = 1;
+  PaginationResponse pagination = 2;
+}
+
+message RecentSender {
+  ChatUserResponse sender = 1;
+  ChatMessageResponse last_message = 2;
+}
+
+message RecentSendersResponse {
+  repeated RecentSender senders = 1;
+  int32 count = 2;
+}
+
+// SSE Event Messages
+message ChatSSEEvent {
+  string type = 1; // "message", "reply", "reaction", "pin", "delete", "private_message", "notification"
+  uint64 course_id = 2;
+  uint64 message_id = 3;
+  uint64 user_id = 4;
+  string timestamp = 5;
+  oneof data {
+    ChatSSEMessageEvent message = 6;
+    ChatSSEReplyEvent reply = 7;
+    ChatSSEReactionEvent reaction = 8;
+    ChatSSEPinEvent pin = 9;
+    ChatSSEDeleteEvent delete = 10;
+    ChatSSEPrivateMessageEvent private_message = 11;
+    ChatSSENotificationEvent notification = 12;
+  }
+}
+
+message ChatSSEMessageEvent {
+  ChatMessageResponse message = 1;
+}
+
+message ChatSSEReplyEvent {
+  ChatMessageResponse reply = 1;
+  uint64 parent_message_id = 2;
+}
+
+message ChatSSEReactionEvent {
+  string action = 1; // "add", "remove", "remove_all"
+  uint64 reaction_id = 2;
+  uint64 message_id = 3;
+  uint64 user_id = 4;
+  string emoji = 5;
+  int32 reaction_count = 6;
+}
+
+message ChatSSEPinEvent {
+  uint64 message_id = 1;
+  bool is_pinned = 2;
+  uint64 user_id = 3;
+}
+
+message ChatSSEDeleteEvent {
+  uint64 message_id = 1;
+  uint64 user_id = 2;
+}
+
+message ChatSSEPrivateMessageEvent {
+  ChatMessageResponse message = 1;
+  uint64 recipient_id = 2;
+}
+
+message ChatSSENotificationEvent {
+  string notification_type = 1;
+  string data = 2; // JSON string of notification data
+}

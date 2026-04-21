@@ -1,0 +1,287 @@
+{
+    "/api/manage/study-shifts": {
+        "get": {
+            "description": "API để lấy danh sách ca học",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "StudyShifts"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Trang hiện tại",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng mỗi trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách ca học",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo ca học mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "StudyShifts"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo ca học",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "studyShift",
+                    "description": "Thông tin ca học",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo ca học thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftDetail"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/study-shifts/{id}": {
+        "get": {
+            "summary": "Lấy chi tiết ca học",
+            "description": "API để lấy thông tin chi tiết của một ca học theo ID",
+            "tags": [
+                "StudyShifts"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của ca học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftDetail"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin ca học",
+            "description": "API để cập nhật một ca học theo ID",
+            "tags": [
+                "StudyShifts"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID ca học"
+                },
+                {
+                    "in": "body",
+                    "name": "studyShift",
+                    "description": "Thông tin ca học cập nhật",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Cập nhật thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShiftDetail"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xoá ca học",
+            "description": "API để xoá một ca học theo ID",
+            "tags": [
+                "StudyShifts"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID ca học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xoá thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/study-shifts/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục ca học",
+            "description": "API để khôi phục ca học đã xoá",
+            "tags": [
+                "StudyShifts"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID ca học"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Khôi phục thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.StudyShift"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,305 @@
+{
+  "/api/manage/skills": {
+    "get": {
+      "description": "API để lấy danh sách kỹ năng",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Skills"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "status",
+          "description": "Lọc theo trạng thái (1, 0)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "keyword",
+          "description": "Tìm kiếm từ khoá",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_id",
+          "description": "Sắp xếp theo id (asc, desc)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "sort_created_at",
+          "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Trang hiện tại",
+          "required": false
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false
+        }
+      ],
+      "summary": "Danh sách kỹ năng",
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.SkillListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "description": "API để tạo kỹ năng mới",
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "tags": [
+        "Skills"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "summary": "Tạo kỹ năng",
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "skill",
+          "description": "Thông tin kỹ năng",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SkillRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Tạo kỹ năng thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Skill"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/skills/{id}": {
+    "get": {
+      "summary": "Lấy chi tiết kỹ năng",
+      "description": "API để lấy thông tin chi tiết của một kỹ năng theo ID",
+      "tags": [
+        "Skills"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID của kỹ năng"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Skill"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật thông tin kỹ năng",
+      "description": "API để cập nhật một kỹ năng theo ID",
+      "tags": [
+        "Skills"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỹ năng"
+        },
+        {
+          "in": "body",
+          "name": "skill",
+          "description": "Thông tin kỹ năng cập nhật",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.SkillRequest"
+          }
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Cập nhật thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Skill"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xoá kỹ năng",
+      "description": "API để xoá một kỹ năng theo ID",
+      "tags": [
+        "Skills"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỹ năng"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xoá thành công",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "example": 200
+              },
+              "data": {
+                "nullable": true,
+                "type": "object",
+                "example": null
+              },
+              "message": {
+                "type": "string",
+                "example": "success"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/skills/{id}/restore": {
+    "patch": {
+      "summary": "Khôi phục kỹ năng",
+      "description": "API để khôi phục kỹ năng đã xoá",
+      "tags": [
+        "Skills"
+      ],
+      "produces": [
+        "application/json",
+        "application/x-protobuf"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "format": "uint64",
+          "description": "ID kỹ năng"
+        }
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Khôi phục thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Skill"
+          }
+        }
+      }
+    }
+  }
+}

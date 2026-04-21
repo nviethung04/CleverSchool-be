@@ -1,0 +1,101 @@
+{
+    "note": "This file documents the updated save-score/bulk API with contest_round_id support",
+    "api_updates": {
+        "endpoint": "/api/study/save-score/bulk",
+        "method": "POST",
+        "description": "Bulk API để lưu điểm với nhiều câu hỏi (hỗ trợ exam, homework, exercise, level_test, contest_round)",
+        "request_body_additions": {
+            "contest_round_id": {
+                "type": "integer",
+                "description": "ID vòng thi đấu",
+                "required": false,
+                "note": "Phải có ít nhất một trong các ID: exam_id, homework_id, exercise_id, level_test_id, hoặc contest_round_id"
+            },
+            "time": {
+                "type": "integer",
+                "description": "Thời gian làm bài (giây)",
+                "example": 270
+            }
+        },
+        "response_additions": {
+            "contest_round_id": {
+                "type": "integer",
+                "description": "ID vòng thi (chỉ có khi request có contest_round_id)"
+            },
+            "contest_round_name": {
+                "type": "string",
+                "description": "Tên vòng thi (chỉ có khi request có contest_round_id)"
+            }
+        },
+        "example_request_contest": {
+            "contest_round_id": 4,
+            "time": 270,
+            "list_answers": [
+                {
+                    "type_question": "fill_in_blanks",
+                    "question_id": 2,
+                    "data": {
+                        "answers": {
+                            "1": "answer1",
+                            "2": "answer2"
+                        }
+                    }
+                },
+                {
+                    "type_question": "dragdrop",
+                    "question_id": 3,
+                    "data": {
+                        "answers": {
+                            "10": 1,
+                            "11": 2,
+                            "12": 3
+                        }
+                    }
+                },
+                {
+                    "type_question": "labeling",
+                    "question_id": 4,
+                    "data": {
+                        "answers": {
+                            "2": 2,
+                            "3": 3,
+                            "4": 4
+                        }
+                    }
+                }
+            ]
+        },
+        "example_response_contest": {
+            "code": 200,
+            "message": "success",
+            "data": {
+                "contest_round_id": 4,
+                "contest_round_name": "Vòng 1",
+                "total_score": 8.5,
+                "ratio": 0.85,
+                "time": 270,
+                "fill_in_blank": [
+                    {
+                        "question_id": 2,
+                        "total_score": 2.0,
+                        "is_all_correct": true
+                    }
+                ],
+                "dragdrop": [
+                    {
+                        "question_id": 3,
+                        "total_score": 3.0,
+                        "is_all_correct": true
+                    }
+                ],
+                "labeling": [
+                    {
+                        "question_id": 4,
+                        "total_score": 3.5,
+                        "is_all_correct": false
+                    }
+                ]
+            }
+        }
+    }
+}

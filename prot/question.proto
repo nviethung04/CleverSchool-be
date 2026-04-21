@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/admin/prot";
+
+import "answer.proto";
+import "source_question.proto";
+
+message MapPosition {
+  int64 id = 1;
+  int32 position_x = 2;
+  int32 position_y = 3;
+  int32 position_width = 4;
+  int32 position_height = 5;
+}
+
+message Matching {
+  int64 id = 1;
+  string file_url = 2;
+  string kind = 3;
+  string content = 4;
+}
+
+message MediaQuestion {
+  string type = 1;
+  string url = 2;
+  bytes file = 3;
+}
+
+message QuestionContent {
+  string text = 1;
+  MediaQuestion media = 2;
+  repeated MediaQuestion medias = 3;
+}
+
+message QuestionMetaData {
+  string instructions = 1;
+  string description = 2;
+  double points = 3;
+  float time = 4;
+  bool is_random = 5;
+  string display = 6;
+}
+
+message QuestionOption {
+  repeated prot.AnswerContent answers = 1;
+  repeated prot.AnswerSource sources = 2;
+  repeated prot.AnswerTarget targets = 3;
+  repeated prot.AnswerContent labels = 4;
+  repeated prot.AnswerBlank blanks = 5;
+  repeated prot.AnswerContent items = 6;
+  repeated prot.GroupAnswer categories = 7;
+  repeated prot.AnswerContent questions = 8;
+  repeated prot.GroupPosition groups = 9;
+}
+
+message QuestionCorrectAnswers {
+  repeated int64 ids = 1;
+  map<string, string> list = 2;
+}
+
+message QuestionAttributeValue {
+  int64 id = 1;
+  string name = 2;
+  int32 weight = 3;
+}
+
+message QuestionAttributeInfo {
+  int64 id = 1;
+  string name = 2;
+  QuestionAttributeValue value = 3;
+}
+
+message QuestionSubjectInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+// Message for the question
+message Question {
+  int64 id = 1;
+  string type = 2;
+  prot.QuestionMetaData metadata = 3;
+  prot.QuestionContent content = 4;
+  int32 sort_position = 5;
+  int32 image_width = 6;
+  int32 image_height = 7;
+  prot.QuestionOption options = 8;
+  int64 source_question_id = 9;
+  bool status = 10;
+  prot.SourceQuestion source = 11;
+  prot.QuestionCorrectAnswers correct_answers = 12;
+  repeated QuestionAttributeInfo attributes = 13;
+  int64 subject_id = 14;
+  QuestionSubjectInfo subject = 15;
+  string created_at = 16;
+  string updated_at = 17;
+}
+
+// Request to create a new question
+message QuestionRequest {
+  int64 id = 1;
+  string type = 2;
+  prot.QuestionMetaData metadata = 3;
+  prot.QuestionContent content = 4;
+  int32 sort_position = 5;
+  int32 image_width = 6;
+  int32 image_height = 7;
+  prot.QuestionOption options = 8;
+  int64 source_question_id = 9;
+  bool status = 10;
+  prot.SourceQuestion source = 11;
+  int64 subject_id = 12;
+  string created_at = 13;
+  string updated_at = 14;
+}
+
+// Response for a single question
+message QuestionResponse {
+  Question question = 1;
+  string message = 2;
+}
+
+// Response for multiple questions
+message QuestionsResponse {
+  repeated Question questions = 1;
+  int64 total_count = 2;
+}
+
+message CreateQuestionRelationRequest {
+  int32 exam_id = 1;
+  int32 exercise_id = 2;
+  int32 lesson_plan_part_id = 3;
+  int32 homework_id = 4;
+  int32 level_test_id = 5;
+  int32 lesson_id = 6;
+  int32 contest_round_id = 7;
+  map<string, double> question_scores = 8;
+  map<string, double> source_question_scores = 9;
+  bool is_reset = 10;
+  bool reset_all = 11;
+  bool clear_self_scoring_questions = 12;
+  repeated int64 sort_question_ids = 13;
+  map<string, int32> questions_order = 14;
+  map<string, int32> source_questions_order = 15;
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative question.proto

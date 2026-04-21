@@ -1,0 +1,1570 @@
+﻿{
+    "swagger": "2.0",
+    "info": {
+        "title": "Contest Round API",
+        "description": "API for managing contest rounds and joiners",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "token"
+        }
+    },
+    "parameters": {
+        "AcceptHeader": {
+            "name": "Accept",
+            "in": "header",
+            "type": "string",
+            "default": "application/json",
+            "description": "Content-Type that is acceptable for the response"
+        },
+        "LocaleHeader": {
+            "name": "Accept-Language",
+            "in": "header",
+            "type": "string",
+            "default": "vi",
+            "description": "Language preference for the response"
+        }
+    },
+    "paths": {
+        "/api/manage/contest_rounds": {
+            "get": {
+                "summary": "Danh sÃ¡ch vÃ²ng thi",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch vÃ²ng thi",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "description": "Sá»‘ trang",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Sá»‘ lÆ°á»£ng item per page",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "name": "keyword",
+                        "description": "TÃ¬m kiáº¿m tá»« khoÃ¡",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "contest_id",
+                        "description": "ID cuá»™c thi",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Táº¡o vÃ²ng thi má»›i",
+                "description": "API Ä‘á»ƒ táº¡o vÃ²ng thi má»›i",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "body",
+                        "name": "contest_round",
+                        "description": "ThÃ´ng tin vÃ²ng thi",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}": {
+            "get": {
+                "summary": "Láº¥y thÃ´ng tin vÃ²ng thi",
+                "description": "API Ä‘á»ƒ láº¥y thÃ´ng tin vÃ²ng thi theo ID",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Cáº­p nháº­t vÃ²ng thi",
+                "description": "API Ä‘á»ƒ cáº­p nháº­t thÃ´ng tin vÃ²ng thi",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "contest_round",
+                        "description": "ThÃ´ng tin vÃ²ng thi cáº­p nháº­t",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "XÃ³a vÃ²ng thi",
+                "description": "API Ä‘á»ƒ xÃ³a vÃ²ng thi",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/restore": {
+            "patch": {
+                "summary": "KhÃ´i phá»¥c vÃ²ng thi",
+                "description": "API Ä‘á»ƒ khÃ´i phá»¥c vÃ²ng thi Ä‘Ã£ xÃ³a",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contests/{id}/contest_rounds": {
+            "get": {
+                "summary": "Láº¥y vÃ²ng thi theo cuá»™c thi",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch vÃ²ng thi cá»§a cuá»™c thi cá»¥ thá»ƒ",
+                "tags": [
+                    "Contest Rounds"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID cuộc thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/study/contest-rounds-by-student": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch joiners",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch joiners cá»§a vÃ²ng thi - tráº£ vá» táº¥t cáº£ loáº¡i joiners",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ThÃ nh cÃ´ng - Tráº£ vá» danh sÃ¡ch joiners",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "success"
+                                },
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "provinces": {
+                                            "type": "array",
+                                            "description": "Danh sÃ¡ch tá»‰nh thÃ nh",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "province_name": {
+                                                        "type": "string",
+                                                        "example": "HÃ  Ná»™i"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "schools": {
+                                            "type": "array",
+                                            "description": "Danh sÃ¡ch trÆ°á»ng há»c",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "school_name": {
+                                                        "type": "string",
+                                                        "example": "THPT Chu VÄƒn An"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "classes": {
+                                            "type": "array",
+                                            "description": "Danh sÃ¡ch lá»›p há»c",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "class_name": {
+                                                        "type": "string",
+                                                        "example": "12A1"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "persons": {
+                                            "type": "array",
+                                            "description": "Danh sÃ¡ch há»c sinh",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "person_name": {
+                                                        "type": "string",
+                                                        "example": "Nguyá»…n VÄƒn A"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "ThÃªm joiners",
+                "description": "API Ä‘á»ƒ thÃªm joiners vÃ o vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "joiner_data",
+                        "description": "ThÃ´ng tin joiner cáº§n thÃªm",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "join_level": {
+                                    "type": "string",
+                                    "enum": [
+                                        "province",
+                                        "school",
+                                        "class",
+                                        "person"
+                                    ],
+                                    "description": "Loáº¡i joiner"
+                                },
+                                "join_id": {
+                                    "type": "integer",
+                                    "description": "ID cá»§a entity tÆ°Æ¡ng á»©ng"
+                                }
+                            },
+                            "required": [
+                                "join_level",
+                                "join_id"
+                            ],
+                            "example": {
+                                "join_level": "school",
+                                "join_id": 123
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ThÃ nh cÃ´ng - Joiner Ä‘Ã£ Ä‘Æ°á»£c thÃªm",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "success"
+                                },
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "contest_round_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "join_level": {
+                                            "type": "string",
+                                            "example": "school"
+                                        },
+                                        "join_id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "XÃ³a joiners",
+                "description": "API Ä‘á»ƒ xÃ³a joiners khá»i vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "joiner_data",
+                        "description": "ThÃ´ng tin joiner cáº§n xÃ³a",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "join_level": {
+                                    "type": "string",
+                                    "enum": [
+                                        "province",
+                                        "school",
+                                        "class",
+                                        "person"
+                                    ],
+                                    "description": "Loáº¡i joiner"
+                                },
+                                "join_id": {
+                                    "type": "integer",
+                                    "description": "ID cá»§a entity tÆ°Æ¡ng á»©ng"
+                                }
+                            },
+                            "required": [
+                                "join_level",
+                                "join_id"
+                            ],
+                            "example": {
+                                "join_level": "school",
+                                "join_id": 123
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ThÃ nh cÃ´ng - Joiner Ä‘Ã£ Ä‘Æ°á»£c xÃ³a",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 200
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Joiner removed successfully"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/provinces": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch tá»‰nh thÃ nh",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch tá»‰nh thÃ nh tham gia vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/schools": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch trÆ°á»ng há»c",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch trÆ°á»ng há»c tham gia vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/classes": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch lá»›p há»c",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch lá»›p há»c tham gia vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/students": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch há»c sinh",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch há»c sinh tham gia vÃ²ng thi",
+                "tags": [
+                    "Contest Round Joiners"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/questions": {
+            "get": {
+                "summary": "Láº¥y danh sÃ¡ch cÃ¢u há»i",
+                "description": "API Ä‘á»ƒ láº¥y danh sÃ¡ch cÃ¢u há»i cá»§a vÃ²ng thi",
+                "tags": [
+                    "Contest Round Questions"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "GÃ¡n cÃ¢u há»i cho vÃ²ng thi",
+                "description": "API Ä‘á»ƒ gÃ¡n cÃ¢u há»i cho vÃ²ng thi",
+                "tags": [
+                    "Contest Round Questions"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "question_data",
+                        "description": "Danh sÃ¡ch ID cÃ¢u há»i",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "XÃ³a cÃ¢u há»i khá»i vÃ²ng thi",
+                "description": "API Ä‘á»ƒ xÃ³a cÃ¢u há»i khá»i vÃ²ng thi",
+                "tags": [
+                    "Contest Round Questions"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "body",
+                        "name": "question_data",
+                        "description": "Danh sÃ¡ch ID cÃ¢u há»i cáº§n xÃ³a",
+                        "required": true,
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/answers": {
+            "get": {
+                "summary": "Láº¥y cÃ¢u tráº£ lá»i cá»§a há»c sinh",
+                "description": "API Ä‘á»ƒ láº¥y cÃ¢u tráº£ lá»i cá»§a há»c sinh trong vÃ²ng thi",
+                "tags": [
+                    "Contest Round Results"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    },
+                    {
+                        "in": "query",
+                        "name": "user_id",
+                        "description": "ID há»c sinh",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/answers/student": {
+            "get": {
+                "summary": "Láº¥y cÃ¢u tráº£ lá»i cá»§a há»c sinh hiá»‡n táº¡i",
+                "description": "API Ä‘á»ƒ láº¥y cÃ¢u tráº£ lá»i cá»§a há»c sinh Ä‘ang Ä‘Äƒng nháº­p",
+                "tags": [
+                    "Contest Round Results"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/results": {
+            "get": {
+                "summary": "Láº¥y káº¿t quáº£ vÃ²ng thi",
+                "description": "API Ä‘á»ƒ láº¥y káº¿t quáº£ cá»§a táº¥t cáº£ há»c sinh trong vÃ²ng thi",
+                "tags": [
+                    "Contest Round Results"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/manage/contest_rounds/{id}/leaderboard": {
+            "get": {
+                "summary": "Láº¥y báº£ng xáº¿p háº¡ng vÃ²ng thi",
+                "description": "API Ä‘á»ƒ láº¥y báº£ng xáº¿p háº¡ng cá»§a vÃ²ng thi",
+                "tags": [
+                    "Contest Round Results"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/AcceptHeader"
+                    },
+                    {
+                        "$ref": "#/parameters/LocaleHeader"
+                    },
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "ID vÃ²ng thi",
+                        "required": true,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 200
+                },
+                "message": {
+                    "type": "string",
+                    "example": "success"
+                },
+                "data": {
+                    "type": "object"
+                }
+            }
+        },
+        "ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

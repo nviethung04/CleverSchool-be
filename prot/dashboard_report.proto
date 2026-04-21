@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// Dashboard Report Request
+message DashboardReportRequest {
+  int64 active_student_time = 1; // Unix timestamp để lọc học sinh hoạt động (mặc định: 15/9/2025)
+  int64 active_teacher_time = 2; // Unix timestamp để lọc giáo viên hoạt động (mặc định: 8/9/2025)
+}
+
+// Dashboard Report Response
+message DashboardReportResponse {
+  DashboardReportData data = 1;
+}
+
+// Dashboard Report Data
+message DashboardReportData {
+  int64 total_schools = 1;                    // Tổng số trường học trong hệ thống
+  int64 total_classes = 2;                    // Tổng số lớp học trong hệ thống
+  int64 total_users = 3;                      // Tổng số người dùng trong hệ thống
+  int64 student_active = 4;                   // Số học sinh hoạt động (role_id = 3) từ activity_logs
+  int64 teacher_active = 5;                   // Số giáo viên hoạt động (role_id = 2) từ activity_logs
+  int64 student_active_weekly = 6;            // Số học sinh hoạt động trong 7 ngày gần nhất (role_id = 3) từ activity_logs
+  int64 teacher_active_weekly = 7;            // Số giáo viên hoạt động trong 7 ngày gần nhất (role_id = 2) từ activity_logs
+  int64 frequent_login_students = 8;          // Số học sinh login thường xuyên (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần, created_at > active_student_time) từ activity_logs
+  int64 frequent_login_students_weekly = 9;   // Số học sinh login thường xuyên trong 7 ngày gần nhất (role_id = 3, path = '/api/login', status_code = 200, xuất hiện > 2 lần) từ activity_logs
+}
+
+//protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_report.proto

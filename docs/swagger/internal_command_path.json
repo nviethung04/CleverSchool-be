@@ -1,0 +1,751 @@
+{
+    "/api/internal/command/copy-homework-to-exercise": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Copy homework to exercise",
+            "description": "Copy homework data to exercise system for internal processing",
+            "operationId": "copyHomeworkToExercise",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "example": "Homework copied to exercise successfully"
+                            },
+                            "copied_count": {
+                                "type": "integer",
+                                "example": 25
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/clear-exercise": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Clear exercise data",
+            "description": "Clear exercise data for internal processing",
+            "operationId": "clearExercise",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "example": "Exercise data cleared successfully"
+                            },
+                            "cleared_count": {
+                                "type": "integer",
+                                "example": 100
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/update-homework-lesson-ids": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Update homework lesson IDs",
+            "description": "Update lesson_id for all homework-related tables based on homework_ref_lessons table. If a homework_id has multiple lesson_ids, the one with the latest created_at will be used.",
+            "operationId": "updateHomeworkLessonIds",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "example": "Update completed successfully"
+                            },
+                            "total_updated": {
+                                "type": "integer",
+                                "example": 150
+                            },
+                            "results": {
+                                "type": "object",
+                                "properties": {
+                                    "homework_comments": {
+                                        "type": "object",
+                                        "properties": {
+                                            "status": {
+                                                "type": "string",
+                                                "example": "success"
+                                            },
+                                            "message": {
+                                                "type": "string",
+                                                "example": "Updated successfully"
+                                            },
+                                            "updated": {
+                                                "type": "integer",
+                                                "example": 25
+                                            }
+                                        }
+                                    },
+                                    "homework_users": {
+                                        "type": "object",
+                                        "properties": {
+                                            "status": {
+                                                "type": "string",
+                                                "example": "success"
+                                            },
+                                            "message": {
+                                                "type": "string",
+                                                "example": "Updated successfully"
+                                            },
+                                            "updated": {
+                                                "type": "integer",
+                                                "example": 50
+                                            }
+                                        }
+                                    },
+                                    "homework_question_users": {
+                                        "type": "object",
+                                        "properties": {
+                                            "status": {
+                                                "type": "string",
+                                                "example": "success"
+                                            },
+                                            "message": {
+                                                "type": "string",
+                                                "example": "Updated successfully"
+                                            },
+                                            "updated": {
+                                                "type": "integer",
+                                                "example": 75
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/sync-homework-status-scoring": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Sync homework status scoring",
+            "description": "Synchronize homework status and scoring data for internal processing",
+            "operationId": "syncHomeworkStatusScoring",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string",
+                                "example": "Homework status scoring synced successfully"
+                            },
+                            "synced_count": {
+                                "type": "integer",
+                                "example": 200
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/sync-homework-user-questions": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Sync homework_user_questions from homework_question_user_* tables (async)",
+            "description": "Dispatch job to sync homework_user_questions from all homework_question_user_* tables. Job runs in background and this API returns immediately. Optionally filter by created_at range using start_date and/or end_date.",
+            "operationId": "syncHomeworkUserQuestions",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "in": "body",
+                    "name": "body",
+                    "required": false,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "start_date": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2025-01-01",
+                                "description": "Optional. Only sync records with created_at >= start_date (YYYY-MM-DD)."
+                            },
+                            "end_date": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2025-01-31",
+                                "description": "Optional. Only sync records with created_at <= end_date (YYYY-MM-DD)."
+                            }
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Job dispatched successfully",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": { "type": "boolean", "example": true },
+                            "message": {
+                                "type": "string",
+                                "example": "Đã dispatch job SyncHomeworkUserQuestionsJob, job đang chạy nền"
+                            },
+                            "processed_at": {
+                                "type": "string",
+                                "example": "2025-01-06 10:00:00"
+                            },
+                            "job_type": {
+                                "type": "string",
+                                "example": "sync_homework_user_questions"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-homework-total-questions": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Tính lại total_questions cho homeworks (async)",
+            "description": "Dispatch job tính lại cột total_questions cho tất cả homework từ cloned_questions. Job chạy async trong background và trả về ngay lập tức. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateHomeworkTotalQuestions",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "202": {
+                    "description": "Job được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "dispatched"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Job recalculate homework total questions has been dispatched successfully"
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "homework"
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-exam-total-questions": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Tính lại total_questions cho exams (async)",
+            "description": "Dispatch job tính lại cột total_questions cho tất cả exam từ cloned_questions. Job chạy async trong background và trả về ngay lập tức. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateExamTotalQuestions",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "202": {
+                    "description": "Job được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "dispatched"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Job recalculate exam total questions has been dispatched successfully"
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "exam"
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-exercise-total-questions": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Tính lại total_questions cho exercises (async)",
+            "description": "Dispatch job tính lại cột total_questions cho tất cả exercise từ cloned_questions. Job chạy async trong background và trả về ngay lập tức. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateExerciseTotalQuestions",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "202": {
+                    "description": "Job được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "dispatched"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Job recalculate exercise total questions has been dispatched successfully"
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "exercise"
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-all-total-questions": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Tính lại total_questions cho tất cả (homework, exam, exercise) (async)",
+            "description": "Dispatch job tính lại cột total_questions cho tất cả homework, exam, exercise từ cloned_questions. Job chạy async trong background và trả về ngay lập tức. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateAllTotalQuestions",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "202": {
+                    "description": "Jobs được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "dispatched"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Jobs recalculate all total questions (homework, exam, exercise) have been dispatched successfully"
+                            },
+                            "types": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "example": ["homework", "exam", "exercise"]
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-homework-users-data": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Chuẩn hóa dữ liệu homework_users (async)",
+            "description": "Dispatch job chuẩn hóa dữ liệu trong bảng homework_users: duyệt qua tất cả các hàng, cập nhật lại questions_completed (dùng CheckSubmitHomework), tính lại score và ratio (dùng logic submit-homework). Job chạy async trong background và trả về ngay lập tức. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateHomeworkUsersData",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "202": {
+                    "description": "Job được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "status": {
+                                "type": "string",
+                                "example": "dispatched"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Job recalculate homework users data has been dispatched successfully"
+                            },
+                            "type": {
+                                "type": "string",
+                                "example": "homework_users"
+                            }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/command/recalculate-homework-users-metrics": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Tính lại metrics cho homework_users (async) - Logic y hệt submit homework",
+            "description": "Dispatch job tính lại metrics (score, ratio, exp, star, is_completed, has_manual_scoring, status_scoring) cho các hàng trong bảng homework_users theo điều kiện. Áp dụng logic y hệt như submit homework (dùng CalculateHomeworkMetrics và lưu tất cả metrics). Job chạy async trong background và trả về ngay lập tức. Có thể filter theo created_at bằng start_date/end_date và chỉ xử lý những homework có score = 0 nếu only_homework_zero_score = true. Kết quả sẽ được ghi vào log.",
+            "operationId": "recalculateHomeworkUsersMetrics",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "name": "body",
+                    "in": "body",
+                    "required": false,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "start_date": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2025-01-01",
+                                "description": "Ngày bắt đầu (YYYY-MM-DD), optional. Filter theo created_at của homework_users."
+                            },
+                            "end_date": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2025-01-31",
+                                "description": "Ngày kết thúc (YYYY-MM-DD), optional. Filter theo created_at của homework_users."
+                            },
+                            "only_homework_zero_score": {
+                                "type": "boolean",
+                                "example": false,
+                                "description": "Nếu true, chỉ tính lại những homework có ratio = 0. Default: false."
+                            }
+                        }
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Job được dispatch thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "Đã dispatch job RecalculateHomeworkUsersMetricsJob, job đang chạy nền"
+                            },
+                            "processed_at": {
+                                "type": "string",
+                                "example": "2025-01-06 10:00:00"
+                            },
+                            "job_type": {
+                                "type": "string",
+                                "example": "recalculate_homework_users_metrics"
+                            }
+                        }
+                    }
+                },
+                "400": {
+                    "description": "Bad Request - Invalid date format or validation error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/internal/daily/all-statistic-courses": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Chạy toàn bộ Daily Course Statistics",
+            "description": "Dispatch tất cả các job thống kê daily và theo tuần cho courses (chạy background, trả về ngay)",
+            "operationId": "runAllDailyCourseStatistics",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": { "type": "boolean" },
+                            "message": { "type": "string" },
+                            "processed_at": { "type": "string" },
+                            "duration": { "type": "string" },
+                            "job_type": { "type": "string" }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                }
+            }
+        }
+    },
+    "/api/internal/daily/all-statistic-schools": {
+        "post": {
+            "tags": ["Internal Commands"],
+            "summary": "Chạy toàn bộ Daily School Statistics",
+            "description": "Dispatch tất cả các job thống kê daily và theo tuần cho schools (chạy background, trả về ngay)",
+            "operationId": "runAllDailySchoolStatistics",
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Success",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "success": { "type": "boolean" },
+                            "message": { "type": "string" },
+                            "processed_at": { "type": "string" },
+                            "duration": { "type": "string" },
+                            "job_type": { "type": "string" }
+                        }
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                },
+                "403": {
+                    "description": "Forbidden - Insufficient permissions",
+                    "schema": { "$ref": "#/definitions/ErrorResponse" }
+                }
+            }
+        }
+    }
+}
+

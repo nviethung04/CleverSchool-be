@@ -1,0 +1,89 @@
+{
+  "prot.AssignCourseParentRequest": {
+    "type": "object",
+    "required": [
+      "course_id",
+      "parent_course_id"
+    ],
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa hiện tại sẽ nhận lịch học"
+      },
+      "parent_course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa cha (phải có parent_course_id = 0)"
+      }
+    }
+  },
+  "prot.CourseScheduleActionResponse": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean",
+        "description": "Trạng thái xử lý"
+      },
+      "message": {
+        "type": "string",
+        "description": "Thông báo chi tiết"
+      },
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa con"
+      },
+      "parent_course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa cha được gán"
+      },
+      "copied_schedules": {
+        "type": "integer",
+        "format": "int32",
+        "description": "Số bản ghi lesson_schedules đã copy"
+      }
+    }
+  },
+  "prot.CourseFamilySyncRequest": {
+    "type": "object",
+    "required": [
+      "course_id"
+    ],
+    "properties": {
+      "course_id": {
+        "type": "integer",
+        "format": "int64",
+        "description": "ID khóa nguồn cần đồng bộ lịch cho cả family"
+      }
+    }
+  },
+  "prot.CourseFamilySyncResponse": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean"
+      },
+      "message": {
+        "type": "string"
+      },
+      "source_course_id": {
+        "type": "integer",
+        "format": "int64"
+      },
+      "synced_course_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "synced_count": {
+        "type": "integer",
+        "format": "int32"
+      }
+    }
+  }
+}
+

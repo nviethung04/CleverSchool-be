@@ -1,0 +1,12 @@
+{
+  "name": "lms",
+  "version": "1.0.0",
+  "description": "LMS",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "h5p-standalone": "^3.8.0",
+    "puppeteer": "^24.19.0"
+  }
+}

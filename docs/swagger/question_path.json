@@ -1,0 +1,550 @@
+{
+    "/api/manage/questions": {
+        "get": {
+            "description": "API để lấy danh sách câu hỏi",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Questions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "query",
+                    "name": "homework_id",
+                    "description": "Lấy theo id bài tập về nhà",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "lesson_plan_part_id",
+                    "description": "Lấy theo id kế hoạch bài học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "exam_id",
+                    "description": "Lấy theo id bài thi",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "level_test_id",
+                    "description": "Lấy theo id level",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "contest_round_id",
+                    "description": "Lấy theo id vòng thi đấu",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "keyword",
+                    "description": "Tìm kiếm từ khoá",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "question_type",
+                    "description": "Lấy theo loại câu hỏi (Ex: fill_in_blanks, multiple_choice,...)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "subject_id",
+                    "description": "Lấy theo id môn học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "attribute_ids",
+                    "description": "Lấy theo attribute ids (Ex: attribute_ids=1,2,3)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "status",
+                    "description": "Lấy theo trạng thái câu hỏi (1, 0)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_id",
+                    "description": "Sắp xếp theo id (asc, desc)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "sort_created_at",
+                    "description": "Sắp xếp theo ngày tạo (newest, oldest)",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "page",
+                    "description": "Lấy theo page",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "per_page",
+                    "description": "Số lượng items trên trang",
+                    "required": false
+                }
+            ],
+            "summary": "Danh sách câu hỏi",
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.QuestionListResponse"
+                    }
+                }
+            }
+        },
+        "post": {
+            "description": "API để tạo câu hỏi mới",
+            "consumes": [
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Questions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "summary": "Tạo câu hỏi",
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "question",
+                    "description": "Thông tin câu hỏi",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.QuestionRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tạo câu hỏi thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Question"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/questions/{id}": {
+        "get": {
+            "summary": "Lấy thông tin chi tiết câu hỏi",
+            "description": "API để lấy thông tin chi tiết của một câu hỏi theo ID",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của câu hỏi"
+                },
+                {
+                    "in": "query",
+                    "name": "homework_id",
+                    "description": "Lấy theo id bài tập về nhà",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "lesson_plan_part_id",
+                    "description": "Lấy theo id kế hoạch bài học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "exam_id",
+                    "description": "Lấy theo id bài thi",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "level_test_id",
+                    "description": "Lấy theo id level",
+                    "required": false
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Question"
+                    }
+                }
+            }
+        },
+        "put": {
+            "summary": "Cập nhật thông tin chi tiết câu hỏi",
+            "description": "API để cập nhật thông tin chi tiết của một câu hỏi theo ID",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của câu hỏi"
+                },
+                {
+                    "in": "query",
+                    "name": "homework_id",
+                    "description": "Cập nhật theo id bài tập về nhà",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "lesson_plan_part_id",
+                    "description": "Cập nhật theo id kế hoạch bài học",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "exam_id",
+                    "description": "Cập nhật theo id bài thi",
+                    "required": false
+                },
+                {
+                    "in": "query",
+                    "name": "level_test_id",
+                    "description": "Cập nhật theo id level",
+                    "required": false
+                },
+                {
+                    "in": "body",
+                    "name": "question",
+                    "description": "Thông tin câu hỏi",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.QuestionRequest"
+                    }
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Question"
+                    }
+                }
+            }
+        },
+        "delete": {
+            "summary": "Xóa câu hỏi",
+            "description": "API để xóa một câu hỏi theo ID",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của câu hỏi"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Xóa câu hỏi thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "nullable": true,
+                                "type": "object",
+                                "example": null
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/questions/{id}/restore": {
+        "patch": {
+            "summary": "Khôi phục câu hỏi",
+            "description": "API để khôi phục câu hỏi theo ID",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "integer",
+                    "format": "uint64",
+                    "description": "ID của câu hỏi"
+                }
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "$ref": "#/definitions/prot.Question"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/questions/export": {
+        "get": {
+            "summary": "Export thông tin câu hỏi",
+            "description": "API để export thông tin câu hỏi",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "example": "http://localhost:8080/public/exports/questions_1748944491.xlsx"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/questions/import": {
+        "post": {
+            "summary": "Import thông tin câu hỏi",
+            "description": "API để import thông tin câu hỏi",
+            "tags": [
+                "Questions"
+            ],
+            "produces": [
+                "application/json",
+                "application/x-protobuf"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "formData",
+                    "name": "file",
+                    "type": "file",
+                    "description": "File Excel để import",
+                    "required": true
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "code": {
+                                "type": "integer",
+                                "example": 200
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Import successful"
+                                    }
+                                }
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "success"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/question-relation": {
+        "post": {
+            "summary": "Cập nhật relation",
+            "description": "API để cập nhật relation",
+            "tags": [
+                "Questions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "$ref": "#/parameters/LocaleHeader"
+                },
+                {
+                    "in": "body",
+                    "name": "question",
+                    "description": "Thông tin câu hỏi",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/prot.RelationRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thành công"
+                }
+            }
+        }
+    }
+}

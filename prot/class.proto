@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+import "school.proto";
+import "grade.proto";
+import "faculty.proto";
+
+message TeacherInfo {
+  string name = 1;
+  string phone = 2;
+  string email = 3;
+}
+
+// Request để tạo hoặc cập nhật 1 class
+message ClassRequest {
+  int64 id = 1;
+  int64 grade_id = 2;
+  int64 school_id = 3;
+  string name = 4;
+  bool status = 5;
+  int64 sort_position = 6;
+  int32 max_students = 7;
+  School school = 8;
+  TeacherInfo teacher_info = 9;
+  int64 faculty_id = 10;
+}
+
+// Response cho 1 class đơn
+message ClassResponse {
+  int64 id = 1;
+  int64 grade_id = 2;
+  int64 school_id = 3;
+  string name = 4;
+  bool status = 5;
+  int64 sort_position = 6;
+  School school = 7;
+  Grade grade = 8;
+  int32 current_students = 9;
+  int32 max_students = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  TeacherInfo teacher_info = 13;
+  int64 faculty_id = 14;
+  Faculty faculty = 15;
+  int64 class_main_id = 16;
+  string class_main_name = 17;
+}
+
+// Response trả về danh sách class
+message ClassListResponse {
+  repeated ClassResponse classes = 1;
+  int64 total_count = 2;
+}
+
+message ClassByUser {
+  int64 id = 1;
+  int64 school_id = 2;
+  string name = 3;
+  TeacherInfo teacher_info = 11;
+}
+
+message CourseByUser {
+  int64 id = 1;
+  string name = 3;
+}
+
+message StudentInClass {
+  int64 id = 1;
+  string name = 2;
+  string username = 3;
+  string email = 4;
+  string avatar = 5;
+  bool is_activity = 6;
+  string activity_date = 7;
+}
+
+message ClassByUserResponse {
+  int64 total_student = 1;
+  int64 active_students = 2;
+  ClassByUser class = 3;
+  repeated CourseByUser courses = 4;
+  repeated StudentInClass students = 5;
+}

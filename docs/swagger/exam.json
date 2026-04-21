@@ -1,0 +1,373 @@
+{
+  "/api/manage/exams": {
+    "get": {
+      "summary": "Danh sách exam",
+      "description": "API để lấy danh sách exam",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "query",
+          "name": "lesson_id",
+          "description": "Lọc theo ID bài học",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "is_assigned",
+          "description": "Lọc theo trạng thái giao bài",
+          "required": false,
+          "type": "boolean"
+        },
+        {
+          "in": "query",
+          "name": "page",
+          "description": "Số trang",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "in": "query",
+          "name": "per_page",
+          "description": "Số lượng mỗi trang",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.ExamListResponse"
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Tạo exam",
+      "description": "API để tạo exam mới",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "body",
+          "name": "exam",
+          "description": "Thông tin exam",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.ExamRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Exam"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/exams/{id}": {
+    "get": {
+      "summary": "Chi tiết exam",
+      "description": "API để lấy chi tiết exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Exam"
+          }
+        }
+      }
+    },
+    "put": {
+      "summary": "Cập nhật exam",
+      "description": "API để cập nhật exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        },
+        {
+          "in": "body",
+          "name": "exam",
+          "description": "Thông tin exam",
+          "required": true,
+          "schema": {
+            "$ref": "#/definitions/prot.ExamRequest"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Exam"
+          }
+        }
+      }
+    },
+    "delete": {
+      "summary": "Xóa exam",
+      "description": "API để xóa exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Xóa thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/exams/{id}/cloned": {
+    "post": {
+      "summary": "Clone exam",
+      "description": "API để clone exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        },
+        {
+          "in": "body",
+          "name": "exam",
+          "description": "Dữ liệu clone",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "name": "Final Exam - Mathematics",
+              "lesson_id": 101,
+              "description": "This is the final exam covering all topics in the course."
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.Exam"
+          }
+        }
+      }
+    }
+  },
+  "/api/manage/exams/{id}/assigned": {
+    "post": {
+      "summary": "Assigned exam",
+      "description": "API để lấy assigned exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        },
+        {
+          "in": "body",
+          "name": "exam",
+          "description": "Dữ liệu assigned",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "example": {
+              "is_assigned": true,
+              "lesson_id": 101,
+              "course_id": 101
+            }
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công"
+        }
+      }
+    }
+  },
+  "/api/manage/exams/{id}/assigned-lessons": {
+    "get": {
+      "summary": "Bài học theo exam",
+      "description": "API để lấy bài học theo exam theo ID",
+      "tags": [
+        "Exams"
+      ],
+      "security": [
+        {
+          "ApiKeyAuth": []
+        }
+      ],
+      "produces": [
+        "application/json"
+      ],
+      "parameters": [
+        {
+          "$ref": "#/parameters/AcceptHeader"
+        },
+        {
+          "$ref": "#/parameters/LocaleHeader"
+        },
+        {
+          "in": "path",
+          "name": "id",
+          "required": true,
+          "type": "integer",
+          "description": "ID của exam"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Thành công",
+          "schema": {
+            "$ref": "#/definitions/prot.AssignedLessons"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "prot.Province": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "full_name": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.Ward": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "province_code": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "full_name": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ProvincesResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "provinces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Province"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.WardsResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "wards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Ward"
+            }
+          },
+          "total_count": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  },
+  "prot.ProvinceResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "province": {
+            "$ref": "#/definitions/prot.Province"
+          }
+        }
+      }
+    }
+  }
+}

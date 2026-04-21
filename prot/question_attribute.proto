@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+// QuestionAttribute message gốc
+message QuestionAttribute {
+  int64 id = 1;
+  int64 parent_id = 2;
+  int64 subject_id = 3;
+  string name = 4;
+  int32 level = 5;
+  double weight = 6;
+  string description = 7;
+  bool status = 8;
+  repeated QuestionAttribute nodes = 9;
+}
+
+// Request lấy 1 QuestionAttribute theo ID
+message GetQuestionAttributeRequest {
+  int64 id = 1;
+}
+
+// Response trả về 1 QuestionAttribute
+message QuestionAttributeResponse {
+  QuestionAttribute attribute = 1;
+  string message = 2;
+}
+
+// Request để lấy danh sách QuestionAttribute (có thể thêm paging, filter sau)
+message ListQuestionAttributesRequest {}
+
+// Request dùng để tạo hoặc update QuestionAttribute
+message QuestionAttributeRequest {
+  int64 id = 1;
+  int64 parent_id = 2;
+  int64 subject_id = 3;
+  string name = 4;
+  int32 level = 5;
+  double weight = 6;
+  string description = 7;
+  bool status = 8;
+}
+
+// Response trả về danh sách QuestionAttribute kèm tổng số bản ghi
+message QuestionAttributesResponse {
+  repeated QuestionAttribute attributes = 1;
+  uint64 total_count = 2;
+}
+
+// Request xoá QuestionAttribute theo ID
+message DeleteQuestionAttributeRequest {
+  int64 id = 1;
+}
+
+// Request khôi phục QuestionAttribute theo ID
+message RestoreQuestionAttributeRequest {
+  int64 id = 1;
+}

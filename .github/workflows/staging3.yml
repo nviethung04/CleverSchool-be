@@ -1,0 +1,100 @@
+name: Build and Deploy (staging3)
+
+on:
+  push:
+    branches:
+      - staging
+
+env:
+  HARBOR_REGISTRY: ${{ secrets.HARBOR_REGISTRY }}
+  HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+  HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+  HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
+  HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
+  DEPLOY_REPO: Enspire-Digital/be-lms-enspire-deploy
+  DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
+  KUSTOMIZE_PATH: src/staging3
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Harbor registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.HARBOR_REGISTRY }}
+          username: ${{ env.HARBOR_USERNAME }}
+          password: ${{ env.HARBOR_PASSWORD }}
+
+      - name: Set image variables
+        id: vars
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          IMAGE=${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${HARBOR_REPOSITORY}
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }}
+            ${{ steps.vars.outputs.IMAGE }}:staging3
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.repository }}
+
+  update-deploy-repo:
+    runs-on: self-hosted
+    needs: build-and-push
+    permissions:
+      contents: write
+    concurrency:
+      group: deploy-repo-enspire-main
+      cancel-in-progress: false
+    steps:
+      - name: Checkout deploy repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.DEPLOY_REPO }}
+          token: ${{ env.DEPLOY_REPO_TOKEN }}
+          path: deploy-repo
+          ref: main
+
+      - name: Compute image ref
+        id: vars
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          IMAGE=${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${HARBOR_REPOSITORY}
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Set up kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Update kustomize image tag
+        working-directory: deploy-repo/${{ env.KUSTOMIZE_PATH }}
+        run: |
+          kustomize edit set image ${{ steps.vars.outputs.IMAGE }}=${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update image to ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }} (staging3)"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

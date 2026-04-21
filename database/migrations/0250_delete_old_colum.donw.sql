@@ -1,0 +1,11 @@
+ALTER TABLE courses
+    ADD COLUMN IF NOT EXISTS clone_program_id BIGINT,
+    ADD COLUMN IF NOT EXISTS clone_info JSONB;
+
+ALTER TABLE chapters
+    ADD COLUMN IF NOT EXISTS course_id BIGINT,
+    ADD COLUMN IF NOT EXISTS clone_info JSONB;
+
+ALTER TABLE lessons
+    ADD COLUMN IF NOT EXISTS clone_info JSONB,
+    ADD COLUMN IF NOT EXISTS program_id BIGINT;

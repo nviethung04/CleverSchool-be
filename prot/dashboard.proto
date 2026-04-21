@@ -1,0 +1,437 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message DashboardAdminItem {
+    int32 total = 1;
+    int32 total_number = 2;
+    float change_value = 3;
+    string title = 4;
+    string message = 5;
+    string status = 6;
+}
+
+message DashboardAction {
+    string total = 1;
+    string title = 2;
+    string message = 3;
+}
+
+message DashboardUser {
+    int64 id = 1;
+    string username = 2;
+    string name = 3;
+    string avatar = 4;
+    string email = 5;
+    string time = 6;
+}
+
+message DashboardActivity {
+    string title = 1;
+    string time = 2;
+}
+
+message DashboardLastUsed {
+    string title = 1;
+    string message = 2;
+    repeated DashboardUser users = 3;
+}
+
+message DashboardLastActivity {
+    string title = 1;
+    string message = 2;
+    repeated DashboardActivity activities = 3;
+}
+
+message UserOverview {
+    DashboardAdminItem user = 1;
+    DashboardAdminItem student = 2;
+    DashboardAdminItem teacher = 3;
+    DashboardAdminItem activity = 4;
+    DashboardAdminItem school = 5;
+    DashboardAdminItem user_online = 6;
+}
+
+message CourseOverviewItem {
+    string title = 1;
+    int32 count = 2;
+}
+
+message CourseOverviewRate {
+    string title = 1;
+    int32 total = 2;
+    int32 complete_total = 3;
+    float percent = 4;
+}
+
+message CourseOverview {
+    repeated CourseOverviewItem overviews = 1;
+    repeated CourseOverviewRate rates = 2;
+}
+
+message ScoreDistribution {
+    int32 begin_score = 1;
+    int32 end_score = 2;
+    int32 percent = 3;
+}
+
+message MonthlyHitRate {
+    int32 month = 1;
+    int32 rate = 2;
+}
+
+message StudentClassification {
+    string type = 1;
+    int32 percent = 2;
+}
+
+message ImproveProgress {
+    int32 unit = 1;
+    int32 rate = 2;
+}
+
+message LearningScoreWeek {
+    int64 id = 1;
+    string week_label = 2;
+    float avg_score = 3;
+}
+
+message GemsByWeek {
+    int64 id = 1;
+    string week_label = 2;
+    int32 gem_count = 3;
+}
+
+message StudentScore {
+    int64 id = 1;
+    int64 type_id = 2;
+    int64 type_user_id = 3;
+    string student_name = 4;
+    string type_name = 5;
+    float score = 6;
+    string avatar = 7;
+    string class_name = 8;
+    string school_name = 9;
+    string type = 10;
+}
+
+message OverviewLearning {
+    repeated LearningScoreWeek avg_scores_by_week = 1;
+    repeated GemsByWeek gems_by_week = 2;
+    repeated StudentScore top_highest = 3;
+    repeated StudentScore top_lowest = 4;
+    int32 total_gem = 5;
+    string average_score = 6;
+    string highest_percent = 7;
+    string lowest_percent = 8;
+    string behavior_percent = 9;
+}
+
+message SystemUsageItem {
+    float percent = 1;
+    string rate = 2;
+    string title = 3;
+    string description = 4;
+}
+
+message AverageUsedItem {
+    string key = 1;
+    string title = 2;
+    string value = 3;
+}
+
+message ScoreDistributionItem {
+    string grade = 1;
+    repeated float scores = 2;
+    repeated float counts = 3;
+}
+
+message ScoreDistributionOverview {
+    repeated ScoreDistributionItem distributions = 1;
+}
+
+message SystemUsageOverview {
+    repeated WeeklyUsage weekly_usage = 1;
+    repeated DeviceUsage device_usages = 2;
+    repeated AverageUsedItem average_used = 3;
+}
+
+message WeeklyUsage {
+    string week_label = 1;
+    string average_duration = 2;
+    int32 average_duration_minute = 3;
+    bool is_current = 4;
+}
+
+message DeviceUsage {
+    string device_name = 1;
+    int32 user_count = 2;
+    float percentage = 3;
+}
+
+message GradingSummary {
+    int32 total_exercise = 1;
+    int32 total_assigned = 2;
+    int32 total_submissions = 3;
+    int32 graded_submissions = 4;
+    int32 ungraded_submissions = 5;
+    float ungraded_percent = 6;
+}
+
+message TeacherPerformanceOverview {
+    GradingSummary grading_summary = 1;
+    repeated WeeklyMarkingRate weekly_marking_rates = 2;
+    repeated WeeklyAssignAssignmentRate weekly_assign_assignment_rates = 3;
+    repeated WeeklySubmitRate weekly_submit_rates = 4;
+    repeated WeeklyPerformanceOverviewRate weekly_performance_overview_rates = 5;
+}
+
+message WeeklyAssignAssignmentRate {
+    int64 id = 1;
+    string week_label = 2;
+    int32 total = 3;
+    int32 assign_assignment = 4;
+    repeated NotAssignAssignment not_assign_assignment_exams = 5;
+    repeated NotAssignAssignment not_assign_assignment_homeworks = 6;
+    repeated NotAssignAssignment not_assign_assignment_exercises = 7;
+}
+
+message WeeklySubmitRate {
+    int64 id = 1;
+    string week_label = 2;
+    int32 total = 3;
+    int32 not_graded = 4;
+    repeated NotGraded not_graded_exams = 5;
+    repeated NotGraded not_graded_homeworks = 6;
+    repeated NotGraded not_graded_exercises = 7;
+}
+
+message WeeklyPerformanceOverviewRate {
+    int64 id = 1;
+    string week_label = 2;
+    float assign_assignment_percent = 3;
+    float submit_percent = 4;
+    float not_graded_percent = 5;
+    int32 total_required = 6;  // Tổng số bài cần làm
+    int32 total_submitted = 7;  // Tổng số đã làm
+    repeated NotSubmittedExam not_submitted_exams = 8;  // Danh sách exam chưa làm (nhóm theo submitted_id)
+    repeated NotSubmittedGrouped not_submitted_homeworks = 9;  // Danh sách homework chưa làm (nhóm theo submitted_id)
+    repeated NotSubmittedGrouped not_submitted_exercises = 10;  // Danh sách exercise chưa làm (nhóm theo submitted_id)
+}
+
+message NotSubmittedExam {
+    int64 submitted_id = 1;  // exam_id
+    string name = 2;  // exam_name
+    repeated int64 user_ids = 3;  // Danh sách user_id chưa làm bài này
+}
+
+message NotSubmittedGrouped {
+    int64 submitted_id = 1;  // homework_id hoặc exercise_id
+    string name = 2;  // homework_name hoặc exercise_name
+    string submitted_type = 3;  // "homework" hoặc "exercise"
+    repeated int64 student_ids = 4;  // Danh sách student_id chưa làm bài này
+}
+
+message NotGraded {
+    int64 teacher_id = 1;
+	int64 not_graded_id = 2;
+	int64 student_id = 3;
+	string teacher_name = 4;
+	string student_name = 5;
+	string not_graded_name = 6;
+	repeated int64 question_ids = 7;
+	int32 question_count = 8;
+	string submitted_at = 9;
+	int64 course_id = 10;
+	string course_name = 11;
+	string lesson_name = 12;
+}
+
+message NotAssignAssignment {
+    int64 teacher_id = 1;
+	int64 assign_assignment_id = 2;
+	string teacher_name = 3;
+	string assign_assignment_name = 4;
+	repeated int64 question_ids = 5;
+	int32 question_count = 6;
+}
+
+message UngradedSubmission {
+    int64 teacher_id = 1;
+	int64 exam_id = 2;
+	int64 student_id = 3;
+	string teacher_name = 4;
+	string student_name = 5;
+	string exam_name = 6;
+	repeated int64 question_ids = 7;
+	int32 question_count = 8;
+	string submitted_at = 9;
+}
+
+message WeeklyMarkingRate {
+    int64 id = 1;
+    string week_label = 2;
+    float marking_percent = 3;
+    int32 assigned_count = 4;
+    int32 marked_count = 5;
+    repeated UngradedSubmission ungraded_submission_exams = 6;
+    repeated UngradedSubmission ungraded_submission_homeworks = 7;
+    repeated UngradedSubmission ungraded_submission_exercises = 8;
+}
+
+message QuestionAttributeItem {
+    string name = 1;
+    repeated QuestionDistributionItem items = 2;
+}
+
+message QuestionDistributionItem {
+    string name = 1;
+    int32 count = 2;
+    float percent = 3;
+}
+
+message MediaUsage {
+    int32 total_questions = 1;
+    int32 with_audio = 2;
+    int32 with_image = 3;
+    float audio_percent = 4;
+    float image_percent = 5;
+}
+
+message QuestionTypeItem {
+    string type = 1;
+    int32 total = 2;
+    float percent = 3;
+}
+
+message QuestionBankOverview {
+    repeated QuestionAttributeItem attributes = 1;
+    repeated QuestionTypeItem types = 2;
+    MediaUsage media_usage = 3;
+}
+
+message InactiveStudent {
+    int64 id = 1;
+    string name = 2;
+    string class_name = 3;
+    string last_login = 4;
+    int32 absent_days = 5;
+    string avatar = 6;
+}
+
+message ScoreItem {
+    int64 id = 1;
+    float score = 2;
+}
+
+message DecliningStudent {
+    int64 id = 1;
+    string name = 2;
+    string class_name = 3;
+    repeated ScoreItem scores = 4;
+    string avatar = 5;
+}
+
+message SlowGradingTeacher {
+    int64 id = 1;
+    string name = 2;
+    int32 graded = 3;
+    int32 submitted = 4;
+    float avg_wait_hours = 5;
+    float percent = 6;
+    string avatar = 7;
+}
+
+message RiskAndWarning {
+    repeated InactiveStudent inactive_students = 1;
+    repeated DecliningStudent declining_students = 2;
+    repeated SlowGradingTeacher slow_grading_teachers = 3;
+}
+
+message DashboardAdminResponse {
+    UserOverview user_overview = 1;
+    CourseOverview course_overview = 2;
+    OverviewLearning overview_learning = 3;
+    ScoreDistributionOverview score_distribution_overview = 4;
+    SystemUsageOverview system_usage_overview = 5;
+    TeacherPerformanceOverview teacher_performance_overview = 6;
+    QuestionBankOverview question_bank_overview = 7;
+    RiskAndWarning risk_and_warning = 8;
+}
+
+message OldDashboardAdminResponse {
+    DashboardAdminItem user = 1;
+    DashboardAdminItem school = 2;
+    DashboardAdminItem course = 3;
+    DashboardAdminItem lesson = 4;
+    DashboardAction used = 5;
+    DashboardAction homework = 6;
+    DashboardAction system = 7;
+    DashboardLastUsed last_used = 8;
+    DashboardLastActivity last_activity = 9;
+}
+
+message DashboardTeacherItem {
+    string total = 1;
+    string total_compare = 2;
+    string title = 3;
+    string message = 4;
+    string status = 5;
+}
+
+message DashboardCourse {
+    int64 class_id = 1;
+    string class_name = 2;
+    string subject = 3;
+    int32 number = 4;
+    string time = 5;
+    string status = 6;
+}
+
+message DashboardCourses {
+    string title = 1;
+    string message = 2;
+    repeated DashboardCourse courses = 3;
+}
+
+message DashboardExercise {
+    int64 id = 1;
+    string title = 2;
+    string class_name = 3;
+    int32 count = 4;
+    string deadline = 5;
+}
+
+message DashboardExercises {
+    string title = 1;
+    string message = 2;
+    repeated DashboardExercise exams = 3;
+    repeated DashboardExercise homeworks = 4;
+}
+
+message DashboardStudent {
+    int64 id = 1;
+    string name = 2;
+    string class_name = 3;
+    string time = 4;
+    string exercise = 5;
+}
+
+message DashboardStudents {
+    string title = 1;
+    string message = 2;
+    repeated DashboardStudent update = 3;
+    repeated DashboardStudent warning = 4;
+}
+
+message DashboardTeacherResponse {
+    DashboardTeacherItem user = 1;
+    DashboardTeacherItem teaching = 2;
+    DashboardTeacherItem not_graded = 3;
+    DashboardTeacherItem completion_rate = 4;
+    DashboardCourses course = 5;
+    DashboardExercises exercise = 6;
+    DashboardStudents student = 7;
+}

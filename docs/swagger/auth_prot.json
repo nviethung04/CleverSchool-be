@@ -1,0 +1,172 @@
+{
+  "prot.UserLoginResponse": {
+    "type": "object",
+    "properties": {
+      "token": {
+        "type": "string"
+      },
+      "role_id": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "role_name": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string",
+        "description": "Phân loại role đang đăng nhập, ví dụ: admin, teacher, student"
+      },
+      "role_ids": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "description": "Danh sách tất cả các role_id của user"
+      },
+      "role_names": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Danh sách tên các role tương ứng"
+      }
+    }
+  },
+  "prot.Session": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "ip": {
+        "type": "string"
+      },
+      "user_agent": {
+        "type": "string"
+      },
+      "expires": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "login_at": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "is_current": {
+        "type": "boolean"
+      }
+    }
+  },
+  "prot.SessionListResponse": {
+    "type": "object",
+    "properties": {
+      "Code": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "Message": {
+        "type": "string"
+      },
+      "Data": {
+        "type": "object",
+        "properties": {
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/prot.Session"
+            }
+          }
+        }
+      }
+    }
+  },
+  "prot.ChangePassword": {
+    "type": "object",
+    "properties": {
+      "old_password": {
+        "type": "string"
+      },
+      "new_password": {
+        "type": "string"
+      },
+      "confirm_password": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ForgotPasswordRequest": {
+    "type": "object",
+    "properties": {
+      "username": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ForgotPasswordResponse": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean"
+      },
+      "message": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ResetPasswordRequest": {
+    "type": "object",
+    "properties": {
+      "token": {
+        "type": "string"
+      },
+      "new_password": {
+        "type": "string"
+      },
+      "confirm_password": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.ResetPasswordResponse": {
+    "type": "object",
+    "properties": {
+      "success": {
+        "type": "boolean"
+      },
+      "message": {
+        "type": "string"
+      }
+    }
+  },
+  "prot.RegisterRequest": {
+    "type": "object",
+    "properties": {
+      "full_name": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      },
+      "role_id": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "phone_number": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "username": {
+        "type": "string"
+      },
+      "member_type": {
+        "type": "string"
+      }
+    }
+  }
+}
