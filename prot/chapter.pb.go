@@ -672,7 +672,7 @@ const file_chapter_proto_rawDesc = "" +
 	"LessonSort\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"?\n" +
 	"\x11ChapterLessonSort\x12*\n" +
-	"\alessons\x18\x01 \x03(\v2\x10.prot.LessonSortR\alessonsB\rZ\vbe-lms/protb\x06proto3"
+	"\alessons\x18\x01 \x03(\v2\x10.prot.LessonSortR\alessonsB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_chapter_proto_rawDescOnce sync.Once

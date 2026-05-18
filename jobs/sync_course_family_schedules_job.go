@@ -1,9 +1,9 @@
 package jobs
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/services"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/services"
 	"errors"
 	"time"
 )

@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/models"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -469,10 +469,10 @@ func (s *userService) ExportUsersPDF(schoolID, classID int) ([]byte, string, err
 		}
 	}
 
-	// Sử dụng logo từ domain public của Enspire
-	logoURL := "https://enspire.vn/wp-content/uploads/2023/09/logo.png"
+	// Sử dụng logo từ domain public của Clever School
+	logoURL := "https://Clever School.vn/wp-content/uploads/2023/09/logo.png"
 
-	config.Log.Info("Using Enspire public logo URL:", logoURL)
+	config.Log.Info("Using Clever School public logo URL:", logoURL)
 
 	// Sử dụng Google Fonts với Vietnamese subset
 	fontCSS := `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=vietnamese');`
@@ -568,7 +568,7 @@ func (s *userService) ExportUsersPDF(schoolID, classID int) ([]byte, string, err
           %s
         </div>
         <div class="title">
-          <h1>Thông tin đăng nhập hệ thống LMS</h1>
+          <h1>Thông tin đăng nhập hệ thống Clever School</h1>
           <p>Danh sách tài khoản</p>
         </div>
       </div>
@@ -605,7 +605,7 @@ func (s *userService) ExportUsersPDF(schoolID, classID int) ([]byte, string, err
 </body>
 </html>`,
 		fontCSS,
-		fmt.Sprintf(`<img src="%s" alt="Enspire Logo"/>`, logoURL),
+		fmt.Sprintf(`<img src="%s" alt="Clever School Logo"/>`, logoURL),
 		schoolName, className,
 		rowsHTML,
 		schoolName, className)

@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/dto"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/resources"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
 )
 
 // Topic

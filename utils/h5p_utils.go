@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"be-lms/config"
+	"be-Clever School/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"

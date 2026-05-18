@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-lms/config"
+	"be-Clever School/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"

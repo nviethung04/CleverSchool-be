@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"be-lms/config"
+	"be-Clever School/config"
 )
 
 const (

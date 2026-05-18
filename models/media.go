@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"be-lms/config"
+	"be-Clever School/config"
 
 	"gorm.io/gorm"
 )

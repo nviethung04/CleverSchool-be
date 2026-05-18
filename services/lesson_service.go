@@ -1,20 +1,20 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/dto"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/resources"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"be-lms/database/db"
+	"be-Clever School/database/db"
 
 	"github.com/gin-gonic/gin"
 )

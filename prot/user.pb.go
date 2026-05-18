@@ -2163,7 +2163,7 @@ const file_user_proto_rawDesc = "" +
 	"\busername\x18\a \x01(\tR\busername\"D\n" +
 	"\x0eLogoutResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-lms/protb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once

@@ -219,7 +219,7 @@ const file_dashboard_teacher_exam_overview_proto_rawDesc = "" +
 	"\tcourse_id\x18\x03 \x01(\x03R\bcourseId\x12\x17\n" +
 	"\aexam_id\x18\x04 \x01(\x03R\x06examId\"f\n" +
 	"$DashboardTeacherExamOverviewResponse\x12>\n" +
-	"\boverview\x18\x01 \x01(\v2\".prot.DashboardTeacherExamOverviewR\boverviewB\rZ\vbe-lms/protb\x06proto3"
+	"\boverview\x18\x01 \x01(\v2\".prot.DashboardTeacherExamOverviewR\boverviewB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_teacher_exam_overview_proto_rawDescOnce sync.Once

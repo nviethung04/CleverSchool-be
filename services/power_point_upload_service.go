@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/dto"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/redis"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"context"
 	"fmt"
 	"io"

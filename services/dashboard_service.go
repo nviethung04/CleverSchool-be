@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/prot"
-	"be-lms/repositories"
+	"be-Clever School/config"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"sync"
 
 	"github.com/gin-gonic/gin"

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 func RunReindexQuestions() error {

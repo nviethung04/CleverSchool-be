@@ -419,7 +419,7 @@ const file_media_proto_rawDesc = "" +
 	"\x05files\x18\x01 \x03(\v2\n" +
 	".prot.FileR\x05files\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\x13Z\x11be-lms/admin/protb\x06proto3"
+	"totalCountB\x13Z\x11be-Clever School/admin/protb\x06proto3"
 
 var (
 	file_media_proto_rawDescOnce sync.Once

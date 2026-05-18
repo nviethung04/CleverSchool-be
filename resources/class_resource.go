@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-lms/dto"
-	"be-lms/i18n"
-	"be-lms/models"
-	"be-lms/prot"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 	"time"
 )
 

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/models"
-	"be-lms/repositories"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"fmt"
 	"time"
 )

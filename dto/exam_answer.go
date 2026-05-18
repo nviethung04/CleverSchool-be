@@ -1,6 +1,6 @@
 package dto
 
-import "be-lms/models"
+import "be-Clever School/models"
 
 type QuestionWithScore struct {
 	ID       int64   `gorm:"column:id" json:"id"`

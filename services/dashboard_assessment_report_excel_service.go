@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/repositories"
-	"be-lms/requests"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
 	"fmt"
 	"strconv"
 	"strings"

@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-lms/database/db"
-	"be-lms/dto"
-	"be-lms/i18n"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"encoding/json"
 	"errors"
 	"fmt"

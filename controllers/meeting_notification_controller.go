@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 

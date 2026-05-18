@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-lms/repositories"
-	"be-lms/requests"
-	"be-lms/resources"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"github.com/gin-gonic/gin"
 )
 

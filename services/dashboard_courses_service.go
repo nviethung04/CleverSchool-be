@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/dto"
-	"be-lms/repositories"
+	"be-Clever School/dto"
+	"be-Clever School/repositories"
 )
 
 type DashboardCoursesService interface {

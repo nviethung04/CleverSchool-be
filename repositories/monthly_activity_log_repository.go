@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/requests"
-	"be-lms/table_manager"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
+	"be-Clever School/table_manager"
 	"fmt"
 	"strings"
 	"time"

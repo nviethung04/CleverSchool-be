@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-lms/config"
+	"be-Clever School/config"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"

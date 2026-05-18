@@ -1,6 +1,6 @@
 package dto
 
-import "be-lms/models"
+import "be-Clever School/models"
 
 type AnswerWithScoreMultipleChoice struct {
 	models.Answer

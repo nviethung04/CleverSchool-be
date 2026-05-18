@@ -3,8 +3,8 @@ package repositories
 import (
 	"time"
 
-	"be-lms/database/db"
-	"be-lms/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 type AssessmentScoreRepository interface {

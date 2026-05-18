@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-lms/models"
-	"be-lms/prot"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 	"time"
 )
 

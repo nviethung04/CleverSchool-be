@@ -2,7 +2,7 @@
 package routes
 
 import (
-	"be-lms/controllers"
+	"be-Clever School/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

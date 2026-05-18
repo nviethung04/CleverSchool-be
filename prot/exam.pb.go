@@ -813,7 +813,7 @@ const file_exam_proto_rawDesc = "" +
 	"\x05exams\x18\x01 \x03(\v2\n" +
 	".prot.ExamR\x05exams\x124\n" +
 	"\x10exam_by_programs\x18\x02 \x03(\v2\n" +
-	".prot.ExamR\x0eexamByProgramsB\rZ\vbe-lms/protb\x06proto3"
+	".prot.ExamR\x0eexamByProgramsB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_exam_proto_rawDescOnce sync.Once

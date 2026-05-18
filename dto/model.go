@@ -1,6 +1,6 @@
 package dto
 
-import "be-lms/prot"
+import "be-Clever School/prot"
 
 type MyUploadResult struct {
 	Data *prot.File

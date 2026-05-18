@@ -1,8 +1,8 @@
 package observer
 
 import (
-	"be-lms/i18n"
-	"be-lms/models"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
 	"errors"
 
 	"gorm.io/gorm"

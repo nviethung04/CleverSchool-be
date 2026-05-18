@@ -545,7 +545,7 @@ const file_lesson_plan_part_proto_rawDesc = "" +
 	"\tcourse_id\x18\x15 \x01(\x03R\bcourseId\"^\n" +
 	"\x1aLessonPlanPartListResponse\x12*\n" +
 	"\x05parts\x18\x01 \x03(\v2\x14.prot.LessonPlanPartR\x05parts\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-lms/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_lesson_plan_part_proto_rawDescOnce sync.Once

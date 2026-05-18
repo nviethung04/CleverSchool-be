@@ -450,7 +450,7 @@ const file_exam_course_proto_rawDesc = "" +
 	"\x12ExamCourseResponse\x125\n" +
 	"\vcourse_info\x18\x01 \x01(\v2\x14.prot.ExamCourseInfoR\n" +
 	"courseInfo\x123\n" +
-	"\bchapters\x18\x02 \x03(\v2\x17.prot.ExamCourseChapterR\bchaptersB\rZ\vbe-lms/protb\x06proto3"
+	"\bchapters\x18\x02 \x03(\v2\x17.prot.ExamCourseChapterR\bchaptersB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_exam_course_proto_rawDescOnce sync.Once

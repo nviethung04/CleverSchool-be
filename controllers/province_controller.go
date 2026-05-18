@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/i18n"
-	"be-lms/prot"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/i18n"
+	"be-Clever School/prot"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 
 	"github.com/gin-gonic/gin"

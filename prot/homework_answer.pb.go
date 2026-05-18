@@ -539,7 +539,7 @@ const file_homework_answer_proto_rawDesc = "" +
 	"\fsubmit_files\x18\x06 \x03(\v2\x18.prot.HomeworkAnswerFileR\vsubmitFiles\x12!\n" +
 	"\fis_submitted\x18\a \x01(\bR\visSubmitted\x12\x1b\n" +
 	"\tis_scored\x18\b \x01(\bR\bisScored\x12\x12\n" +
-	"\x04rate\x18\t \x01(\tR\x04rateB\rZ\vbe-lms/protb\x06proto3"
+	"\x04rate\x18\t \x01(\tR\x04rateB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_homework_answer_proto_rawDescOnce sync.Once

@@ -1,10 +1,10 @@
 package base
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/i18n"
-	"be-lms/redis"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/redis"
 	"bytes"
 	"encoding/json"
 	"fmt"

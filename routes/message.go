@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"be-lms/controllers"
-	"be-lms/middleware"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/controllers"
+	"be-Clever School/middleware"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"

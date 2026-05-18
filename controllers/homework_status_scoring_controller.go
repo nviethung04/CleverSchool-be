@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-lms/jobs"
-	"be-lms/utils"
+	"be-Clever School/jobs"
+	"be-Clever School/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"

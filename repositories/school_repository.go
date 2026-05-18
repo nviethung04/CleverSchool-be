@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/repositories/base"
-	"be-lms/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
+	"be-Clever School/requests"
 	"errors"
 
 	"github.com/gin-gonic/gin"

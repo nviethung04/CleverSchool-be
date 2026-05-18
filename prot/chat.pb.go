@@ -1799,7 +1799,7 @@ const file_chat_proto_rawDesc = "" +
 	"\frecipient_id\x18\x02 \x01(\x04R\vrecipientId\"[\n" +
 	"\x18ChatSSENotificationEvent\x12+\n" +
 	"\x11notification_type\x18\x01 \x01(\tR\x10notificationType\x12\x12\n" +
-	"\x04data\x18\x02 \x01(\tR\x04dataB\rZ\vbe-lms/protb\x06proto3"
+	"\x04data\x18\x02 \x01(\tR\x04dataB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_chat_proto_rawDescOnce sync.Once

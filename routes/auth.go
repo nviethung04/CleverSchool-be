@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-lms/middleware"
-	"be-lms/redis"
-	"be-lms/repositories"
+	"be-Clever School/middleware"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
 	"time"
 
 	"github.com/gin-gonic/gin"

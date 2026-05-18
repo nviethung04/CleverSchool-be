@@ -468,7 +468,7 @@ const file_tag_proto_rawDesc = "" +
 	"\fTagsResponse\x12\x1d\n" +
 	"\x04tags\x18\x01 \x03(\v2\t.prot.TagR\x04tags\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\rZ\vbe-lms/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_tag_proto_rawDescOnce sync.Once

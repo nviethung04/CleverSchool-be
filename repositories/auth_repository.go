@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/i18n"
-	"be-lms/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
 
 	"gorm.io/gorm"
 

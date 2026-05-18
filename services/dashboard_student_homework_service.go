@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/prot"
-	"be-lms/repositories"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 )
 
 type DashboardStudentHomeworkService interface {

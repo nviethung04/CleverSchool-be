@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-lms/config"
-	"be-lms/jobs"
+	"be-Clever School/config"
+	"be-Clever School/jobs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

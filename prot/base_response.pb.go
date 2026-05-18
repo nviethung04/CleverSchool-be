@@ -99,7 +99,7 @@ const file_base_response_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12(\n" +
 	"\x04data\x18\x03 \x01(\v2\x14.google.protobuf.AnyR\x04data\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05errorB\rZ\vbe-lms/protb\x06proto3"
+	"\x05error\x18\x04 \x01(\tR\x05errorB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_base_response_proto_rawDescOnce sync.Once

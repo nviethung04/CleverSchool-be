@@ -3,10 +3,10 @@ package controllers
 import (
 	"fmt"
 
-	"be-lms/prot"
-	"be-lms/resources"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )

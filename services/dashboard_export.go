@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/i18n"
-	"be-lms/prot"
+	"be-Clever School/config"
+	"be-Clever School/i18n"
+	"be-Clever School/prot"
 	"bytes"
 	"fmt"
 	"strings"

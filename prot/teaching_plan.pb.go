@@ -495,7 +495,7 @@ const file_teaching_plan_proto_rawDesc = "" +
 	"\x15TeachingPlansResponse\x129\n" +
 	"\x0eteaching_plans\x18\x01 \x03(\v2\x12.prot.TeachingPlanR\rteachingPlans\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\rZ\vbe-lms/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_teaching_plan_proto_rawDescOnce sync.Once

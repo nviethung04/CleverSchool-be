@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-lms/config"
+	"be-Clever School/config"
 
 	"github.com/robfig/cron/v3"
 )

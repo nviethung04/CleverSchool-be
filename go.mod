@@ -1,4 +1,4 @@
-module be-lms
+module be-Clever School
 
 go 1.24.0
 

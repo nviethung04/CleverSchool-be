@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-lms/services"
+	"be-Clever School/services"
 
 	"github.com/gin-gonic/gin"
 )

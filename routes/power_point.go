@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"be-lms/controllers"
-	"be-lms/services"
+	"be-Clever School/controllers"
+	"be-Clever School/services"
 
 	"github.com/gin-gonic/gin"
 )

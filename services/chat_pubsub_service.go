@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-lms/redis"
+	"be-Clever School/redis"
 	"context"
 	"encoding/json"
 	"fmt"

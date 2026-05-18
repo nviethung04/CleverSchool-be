@@ -229,7 +229,7 @@ const file_dashboard_teacher_homework_overview_proto_rawDesc = "" +
 	"\vhomework_id\x18\x04 \x01(\x03R\n" +
 	"homeworkId\"x\n" +
 	"-DashboardTeacherHomeworkOverviewStatsResponse\x12G\n" +
-	"\boverview\x18\x01 \x01(\v2+.prot.DashboardTeacherHomeworkOverviewStatsR\boverviewB\rZ\vbe-lms/protb\x06proto3"
+	"\boverview\x18\x01 \x01(\v2+.prot.DashboardTeacherHomeworkOverviewStatsR\boverviewB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_teacher_homework_overview_proto_rawDescOnce sync.Once

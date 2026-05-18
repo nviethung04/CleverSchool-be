@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 )
 
 type DailySchoolStatisticsCronJob struct {

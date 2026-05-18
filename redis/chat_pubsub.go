@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"be-lms/database/db"
+	"be-Clever School/database/db"
 	"context"
 	"encoding/json"
 	"fmt"

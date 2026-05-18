@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/dto"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
 )
 
 type SchoolDashboardRepository interface {

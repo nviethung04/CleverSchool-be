@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"strconv"
 

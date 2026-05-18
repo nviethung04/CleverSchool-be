@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-lms/command"
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/jobs"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/command"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/jobs"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"strconv"
 	"time"

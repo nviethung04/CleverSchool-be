@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-lms/requests"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )

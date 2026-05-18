@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"time"
 )
 

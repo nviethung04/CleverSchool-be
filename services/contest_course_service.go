@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-lms/prot"
+	"be-Clever School/prot"
 )
 
 type ContestCourseService interface {

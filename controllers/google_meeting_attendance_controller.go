@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/config"
-	"be-lms/repositories"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"net/http"
 	"strconv"

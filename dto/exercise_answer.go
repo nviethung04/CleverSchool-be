@@ -1,6 +1,6 @@
 package dto
 
-import "be-lms/models"
+import "be-Clever School/models"
 
 // ExerciseAnswerMultipleChoice Multiple Choice: Lấy câu trả lời của người dùng và câu trả lời đúng (is_correct = true)
 type ExerciseAnswerMultipleChoice struct {

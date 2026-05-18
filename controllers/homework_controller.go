@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"be-lms/prot"
-	"be-lms/resources"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 
-	"be-lms/database/db"
-	"be-lms/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 
 	"github.com/gin-gonic/gin"
 )

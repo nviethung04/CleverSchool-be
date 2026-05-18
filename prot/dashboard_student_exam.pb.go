@@ -320,7 +320,7 @@ const file_dashboard_student_exam_proto_rawDesc = "" +
 	"\tavg_ratio\x18\x03 \x01(\x01R\bavgRatio\"\x94\x01\n" +
 	"\x1cDashboardStudentExamResponse\x12>\n" +
 	"\boverview\x18\x01 \x01(\v2\".prot.DashboardStudentExamOverviewR\boverview\x124\n" +
-	"\x05chart\x18\x02 \x03(\v2\x1e.prot.DashboardStudentExamWeekR\x05chartB\rZ\vbe-lms/protb\x06proto3"
+	"\x05chart\x18\x02 \x03(\v2\x1e.prot.DashboardStudentExamWeekR\x05chartB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_student_exam_proto_rawDescOnce sync.Once

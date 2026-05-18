@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-lms/config"
+	"be-Clever School/config"
 	"bytes"
 	"context"
 	"database/sql"

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-lms/dto"
-	"be-lms/prot"
-	"be-lms/repositories"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"math"
 )
 

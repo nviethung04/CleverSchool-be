@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/dto"
-	"be-lms/table_manager"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/table_manager"
 	"fmt"
 	"strings"
 	"sync"

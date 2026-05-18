@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 )
 
 type SourceQuestionResource interface {

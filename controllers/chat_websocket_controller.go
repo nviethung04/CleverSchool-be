@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"be-lms/config"
-	"be-lms/dto"
-	"be-lms/redis"
-	"be-lms/repositories"
-	"be-lms/resources"
-	"be-lms/services"
-	"be-lms/utils"
-	ws "be-lms/websocket"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
+	ws "be-Clever School/websocket"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"be-lms/database/db"
+	"be-Clever School/database/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -71,7 +71,7 @@ func getUpgrader() websocket.Upgrader {
 					return true
 				}
 
-				// Support domain matching (e.g., allow https://lmsx-pre-api-chat.xlms.vn and http://lmsx-pre-api-chat.xlms.vn)
+				// Support domain matching (e.g., allow https://Clever Schoolx-pre-api-chat.xClever School.vn and http://Clever Schoolx-pre-api-chat.xClever School.vn)
 				// Extract domain from allowed origin
 				allowedDomain := extractDomain(allowedOrigin)
 				requestDomain := extractDomain(origin)
@@ -83,9 +83,9 @@ func getUpgrader() websocket.Upgrader {
 
 				// Also check if the request is coming from the same domain as the API
 				// This handles cases where frontend and API are on different subdomains but same base domain
-				// e.g., frontend: https://lmsx-pre.xlms.vn, API: https://lmsx-pre-api-chat.xlms.vn
+				// e.g., frontend: https://Clever Schoolx-pre.xClever School.vn, API: https://Clever Schoolx-pre-api-chat.xClever School.vn
 				if allowedDomain != "" && requestDomain != "" {
-					// Check if they share the same base domain (e.g., both end with .xlms.vn)
+					// Check if they share the same base domain (e.g., both end with .xClever School.vn)
 					allowedBaseDomain := getBaseDomain(allowedDomain)
 					requestBaseDomain := getBaseDomain(requestDomain)
 
@@ -113,7 +113,7 @@ func getUpgrader() websocket.Upgrader {
 	}
 }
 
-// extractDomain extracts the domain from a URL (e.g., "https://lmsx-pre-api-chat.xlms.vn" -> "lmsx-pre-api-chat.xlms.vn")
+// extractDomain extracts the domain from a URL (e.g., "https://Clever Schoolx-pre-api-chat.xClever School.vn" -> "Clever Schoolx-pre-api-chat.xClever School.vn")
 func extractDomain(urlStr string) string {
 	if urlStr == "" {
 		return ""
@@ -135,7 +135,7 @@ func extractDomain(urlStr string) string {
 	return urlStr
 }
 
-// getBaseDomain extracts the base domain (e.g., "lmsx-pre-api-chat.xlms.vn" -> "xlms.vn")
+// getBaseDomain extracts the base domain (e.g., "Clever Schoolx-pre-api-chat.xClever School.vn" -> "xClever School.vn")
 // This helps match subdomains of the same base domain
 func getBaseDomain(domain string) string {
 	if domain == "" {
@@ -147,9 +147,9 @@ func getBaseDomain(domain string) string {
 		return domain
 	}
 
-	// Return last 2 parts (e.g., "xlms.vn")
+	// Return last 2 parts (e.g., "xClever School.vn")
 	// For domains like "example.co.uk", this would return "co.uk"
-	// For most cases like "xlms.vn", it returns "xlms.vn"
+	// For most cases like "xClever School.vn", it returns "xClever School.vn"
 	if len(parts) >= 2 {
 		return strings.Join(parts[len(parts)-2:], ".")
 	}

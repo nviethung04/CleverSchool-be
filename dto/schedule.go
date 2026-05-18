@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-lms/models"
+	"be-Clever School/models"
 	"time"
 )
 

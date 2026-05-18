@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/redis"
-	"be-lms/repositories"
-	"be-lms/resources"
-	"be-lms/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"fmt"
 	"io"
 	"net/http"

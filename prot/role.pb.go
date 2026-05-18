@@ -879,7 +879,7 @@ const file_role_proto_rawDesc = "" +
 	"\rsort_position\x18\x03 \x01(\x05R\fsortPosition\x123\n" +
 	"\aactions\x18\x04 \x03(\v2\x19.models.RoleActionDisplayR\aactions\"^\n" +
 	"\x1aRolePermissionsDisplayList\x12@\n" +
-	"\vpermissions\x18\x01 \x03(\v2\x1e.models.PermissionGroupDisplayR\vpermissionsB\rZ\vbe-lms/protb\x06proto3"
+	"\vpermissions\x18\x01 \x03(\v2\x1e.models.PermissionGroupDisplayR\vpermissionsB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_role_proto_rawDescOnce sync.Once

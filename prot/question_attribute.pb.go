@@ -550,7 +550,7 @@ const file_question_attribute_proto_rawDesc = "" +
 	"\x1eDeleteQuestionAttributeRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"1\n" +
 	"\x1fRestoreQuestionAttributeRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02idB\rZ\vbe-lms/protb\x06proto3"
+	"\x02id\x18\x01 \x01(\x03R\x02idB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_question_attribute_proto_rawDescOnce sync.Once

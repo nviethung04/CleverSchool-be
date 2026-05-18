@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package models;
 
-option go_package = "be-lms/prot";
+option go_package = "be-Clever School/prot";
 
 message PermissionGroup {
   string name = 1;

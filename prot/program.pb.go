@@ -716,7 +716,7 @@ const file_program_proto_rawDesc = "" +
 	"\vChapterSort\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"C\n" +
 	"\x12ProgramChapterSort\x12-\n" +
-	"\bchapters\x18\x01 \x03(\v2\x11.prot.ChapterSortR\bchaptersB\rZ\vbe-lms/protb\x06proto3"
+	"\bchapters\x18\x01 \x03(\v2\x11.prot.ChapterSortR\bchaptersB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_program_proto_rawDescOnce sync.Once

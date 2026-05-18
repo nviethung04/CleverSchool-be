@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"be-lms/config"
-	"be-lms/i18n"
+	"be-Clever School/config"
+	"be-Clever School/i18n"
 	"bytes"
 	"fmt"
 	"io"
@@ -14,7 +14,7 @@ import (
 	"time"
 	"unicode"
 
-	"be-lms/prot"
+	"be-Clever School/prot"
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"

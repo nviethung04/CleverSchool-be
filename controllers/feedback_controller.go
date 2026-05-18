@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-lms/dto"
-	"be-lms/prot"
-	"be-lms/resources"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

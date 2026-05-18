@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-lms/models"
-	"be-lms/repositories/base"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

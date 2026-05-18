@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-lms/dto"
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/dto"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 	_ "encoding/json"
 	"fmt"
 	"net/http"

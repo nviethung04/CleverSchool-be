@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"be-lms/i18n"
+	"be-Clever School/i18n"
 
 	"github.com/gin-gonic/gin"
 )

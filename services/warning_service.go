@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/requests"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
 	"fmt"
 	"strconv"
 	"time"

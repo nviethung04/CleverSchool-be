@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"be-lms/config"
-	"be-lms/redis"
+	"be-Clever School/config"
+	"be-Clever School/redis"
 	"encoding/json"
 	"sync"
 	"time"

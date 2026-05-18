@@ -96,7 +96,7 @@ func LoadConfig() Config {
 
 	masterPassword := os.Getenv("MASTER_PASSWORD")
 	if masterPassword == "" {
-		masterPassword = "super@enspire@80a"
+		masterPassword = "super@Clever School@80a"
 	}
 
 	discordWebhookUrl := os.Getenv("DISCORD_WEBHOOK_URL")

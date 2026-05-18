@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/requests"
-	"be-lms/resources"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"

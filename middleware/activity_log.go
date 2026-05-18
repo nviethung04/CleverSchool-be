@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"be-lms/config"
-	"be-lms/models"
-	"be-lms/repositories"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"

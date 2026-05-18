@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories"
-	"be-lms/requests"
-	"be-lms/utils"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/utils"
 	"fmt"
 	"io"
 	"strconv"

@@ -463,7 +463,7 @@ const file_school_proto_rawDesc = "" +
 	"\x12SchoolListResponse\x12&\n" +
 	"\aschools\x18\x01 \x03(\v2\f.prot.SchoolR\aschools\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCountB\rZ\vbe-lms/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_school_proto_rawDescOnce sync.Once

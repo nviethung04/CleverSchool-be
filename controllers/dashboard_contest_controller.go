@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/prot"
-	"be-lms/requests"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/prot"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 

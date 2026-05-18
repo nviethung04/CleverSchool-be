@@ -394,7 +394,7 @@ const file_dashboard_student_homework_list_proto_rawDesc = "" +
 	"\x04rate\x18\x15 \x01(\tR\x04rate\"\x82\x01\n" +
 	"$DashboardStudentHomeworkListResponse\x12D\n" +
 	"\thomeworks\x18\x01 \x03(\v2&.prot.DashboardStudentHomeworkListItemR\thomeworks\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-lms/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_student_homework_list_proto_rawDescOnce sync.Once

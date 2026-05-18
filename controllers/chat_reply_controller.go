@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/dto"
-	"be-lms/i18n"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"errors"
 	"net/http"
 	"strconv"

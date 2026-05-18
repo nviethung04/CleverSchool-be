@@ -1690,7 +1690,7 @@ const file_course_proto_rawDesc = "" +
 	"\fobject_title\x18\x03 \x01(\tR\vobjectTitle\x12A\n" +
 	"\x10children_courses\x18\x04 \x03(\v2\x16.prot.CourseFamilyItemR\x0fchildrenCourses\"\\\n" +
 	"\x19ListCoursesFamilyResponse\x12?\n" +
-	"\x0eparent_courses\x18\x01 \x03(\v2\x18.prot.CourseFamilyParentR\rparentCoursesB\rZ\vbe-lms/protb\x06proto3"
+	"\x0eparent_courses\x18\x01 \x03(\v2\x18.prot.CourseFamilyParentR\rparentCoursesB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_course_proto_rawDescOnce sync.Once

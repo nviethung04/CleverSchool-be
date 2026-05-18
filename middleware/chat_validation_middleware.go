@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"be-lms/i18n"
-	"be-lms/utils"
+	"be-Clever School/i18n"
+	"be-Clever School/utils"
 	"errors"
 	"net/http"
 	"strconv"

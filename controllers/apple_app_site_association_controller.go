@@ -40,7 +40,7 @@ func (ctrl *AppleAppSiteAssociationController) GetAppleAppSiteAssociation(c *gin
 			Apps: []interface{}{},
 			Details: []appLinksDetail{
 				{
-					AppID: "R5XX8GYUUL.vn.enspire.online",
+					AppID: "R5XX8GYUUL.vn.Clever School.online",
 					Paths: []string{"*"},
 				},
 			},

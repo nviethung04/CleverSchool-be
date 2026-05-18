@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"be-lms/config"
-	"be-lms/models"
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"

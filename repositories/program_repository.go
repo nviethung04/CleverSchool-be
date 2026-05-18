@@ -3,9 +3,9 @@ package repositories
 import (
 	"database/sql"
 
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"errors"
 
 	"gorm.io/gorm"

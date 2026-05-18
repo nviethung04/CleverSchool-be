@@ -1640,7 +1640,7 @@ const file_get_exam_answers_proto_rawDesc = "" +
 	"\vanswer_text\x18\x03 \x01(\tR\n" +
 	"answerText\x12\x14\n" +
 	"\x05score\x18\x04 \x01(\x02R\x05score\x12\x1b\n" +
-	"\tis_scored\x18\x05 \x01(\bR\bisScoredB\rZ\vbe-lms/protb\x06proto3"
+	"\tis_scored\x18\x05 \x01(\bR\bisScoredB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_get_exam_answers_proto_rawDescOnce sync.Once

@@ -947,7 +947,7 @@ const file_prot_dashboard_courses_proto_rawDesc = "" +
 	"start_date\x18\x02 \x01(\tR\tstartDate\x12\x19\n" +
 	"\bend_date\x18\x03 \x01(\tR\aendDate\"_\n" +
 	" DashboardCourseHomeworksResponse\x12;\n" +
-	"\thomeworks\x18\x01 \x03(\v2\x1d.prot.DashboardCourseHomeworkR\thomeworksB\rZ\vbe-lms/protb\x06proto3"
+	"\thomeworks\x18\x01 \x03(\v2\x1d.prot.DashboardCourseHomeworkR\thomeworksB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_prot_dashboard_courses_proto_rawDescOnce sync.Once

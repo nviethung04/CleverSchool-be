@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-lms/dto"
-	"be-lms/prot"
-	"be-lms/utils"
-	"be-lms/models"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
+	"be-Clever School/utils"
+	"be-Clever School/models"
 )
 
 func DashboardExamRankingResource(ranking dto.DashboardExamRanking) *prot.DashboardExamRanking {

@@ -268,7 +268,7 @@ const file_skip_question_proto_rawDesc = "" +
 	"homeworkId\x12\x1f\n" +
 	"\vquestion_id\x18\x04 \x01(\x03R\n" +
 	"questionId\x12\x17\n" +
-	"\auser_id\x18\x05 \x01(\x03R\x06userIdB\rZ\vbe-lms/protb\x06proto3"
+	"\auser_id\x18\x05 \x01(\x03R\x06userIdB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_skip_question_proto_rawDescOnce sync.Once

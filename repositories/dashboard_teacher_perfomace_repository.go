@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/dto"
-	"be-lms/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
 	"fmt"
 	"strconv"
 	"strings"

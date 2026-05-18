@@ -399,7 +399,7 @@ const file_chat_reactions_proto_rawDesc = "" +
 	"\x13GetReactionsRequest\x12\x1b\n" +
 	"\tcourse_id\x18\x01 \x01(\x04R\bcourseId\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x02 \x01(\x04R\tmessageIdB\rZ\vbe-lms/protb\x06proto3"
+	"message_id\x18\x02 \x01(\x04R\tmessageIdB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_chat_reactions_proto_rawDescOnce sync.Once

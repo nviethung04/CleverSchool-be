@@ -1,7 +1,7 @@
 package examples
 
 import (
-	"be-lms/services"
+	"be-Clever School/services"
 	"fmt"
 )
 

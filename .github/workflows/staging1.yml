@@ -11,7 +11,7 @@ env:
   HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
   HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
   HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
-  DEPLOY_REPO: Enspire-Digital/be-lms-enspire-deploy
+  DEPLOY_REPO: Clever School-Digital/be-Clever School-Clever School-deploy
   DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
   KUSTOMIZE_PATH: src/staging1
 
@@ -62,7 +62,7 @@ jobs:
     permissions:
       contents: write
     concurrency:
-      group: deploy-repo-enspire-main
+      group: deploy-repo-Clever School-main
       cancel-in-progress: false
     steps:
       - name: Checkout deploy repo

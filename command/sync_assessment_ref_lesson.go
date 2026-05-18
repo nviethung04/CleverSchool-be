@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-lms/services"
+	"be-Clever School/services"
 	"fmt"
 	"log"
 )

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"be-lms/models"
+	"be-Clever School/models"
 )
 
 type ScormUploadService struct {
@@ -199,7 +199,7 @@ func (s *ScormUploadService) parseManifest(manifestPath string, info *ScormPacka
 // findLaunchFile looks for common launch files in the package
 func (s *ScormUploadService) findLaunchFile(packageDir string, info *ScormPackageInfo) error {
 	commonLaunchFiles := []string{
-		"index_lms.html",
+		"index_Clever School.html",
 		"index_scorm.html",
 		"index.html",
 		"story_html5.html",

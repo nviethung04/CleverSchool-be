@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-lms/database/db"
+	"be-Clever School/database/db"
 	"gorm.io/gorm"
 )
 

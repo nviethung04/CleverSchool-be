@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"be-lms/config"
-	"be-lms/repositories"
+	"be-Clever School/config"
+	"be-Clever School/repositories"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"

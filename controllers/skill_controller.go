@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/resources"
-	"be-lms/services"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
 )
 
 type SkillController struct {

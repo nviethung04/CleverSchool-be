@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/repositories"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"

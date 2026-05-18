@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/utils"
 	"bytes"
 	"fmt"
 	"time"

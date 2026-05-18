@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-lms/config"
-	"be-lms/dto"
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -152,7 +152,7 @@ func (uc *UploadS3Controller) Extract(c *gin.Context) {
 func (uc *UploadS3Controller) ShowUploadPage(c *gin.Context) {
 	cfg := config.LoadConfig()
 	c.HTML(http.StatusOK, "upload_s3.html", gin.H{
-		"title":     "Upload File - LMS Enspire",
+		"title":     "Upload File - Clever School Clever School",
 		"apiDomain": cfg.APIDomain,
 	})
 }

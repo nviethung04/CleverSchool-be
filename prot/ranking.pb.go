@@ -199,7 +199,7 @@ const file_prot_ranking_proto_rawDesc = "" +
 	"\x03exp\x18\t \x01(\x01R\x03exp\"a\n" +
 	"\x13RankingListResponse\x124\n" +
 	"\bstudents\x18\x01 \x03(\v2\x18.prot.RankingStudentItemR\bstudents\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-lms/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_prot_ranking_proto_rawDescOnce sync.Once

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"be-lms/services"
+	"be-Clever School/services"
 	"net/http"
 	"strconv"
 

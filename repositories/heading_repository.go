@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-lms/database/db"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories/base"
 )
 
 type HeadingRepository interface {

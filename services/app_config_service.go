@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/models"
-	"be-lms/prot"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,7 +48,7 @@ func (s *appConfigService) GetConfig(c *gin.Context) (*prot.AppConfig, error) {
 		Mode:             models.ModeDebug,
 		Version:          s.getLatestVersion(platform),
 		Platform:         platform,
-		UrlVideoTutorial: "https://lms-7.gitbook.io/product-docs/",
+		UrlVideoTutorial: "https://Clever School-7.gitbook.io/product-docs/",
 	}
 
 	return config, nil

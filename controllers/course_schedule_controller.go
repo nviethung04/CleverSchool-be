@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-lms/repositories"
-	"be-lms/requests"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"

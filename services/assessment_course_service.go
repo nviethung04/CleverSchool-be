@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"be-lms/repositories"
-	"be-lms/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )

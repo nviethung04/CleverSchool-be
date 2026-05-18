@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"be-lms/config"
-	"be-lms/observer"
+	"be-Clever School/config"
+	"be-Clever School/observer"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"

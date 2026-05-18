@@ -1,8 +1,8 @@
 package jobs
 
 import (
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 
 	"github.com/robfig/cron/v3"
 )

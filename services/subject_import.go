@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"be-lms/models"
+	"be-Clever School/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"

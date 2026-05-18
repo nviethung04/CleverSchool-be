@@ -2,10 +2,10 @@ package repositories
 
 import (
 	"fmt"
-	"be-lms/database/db"
-	"be-lms/dto"
-	"be-lms/models"
-	"be-lms/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"strings"
 	"time"
 )

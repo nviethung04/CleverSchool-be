@@ -1,9 +1,9 @@
 package main
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/jobs"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/jobs"
 	"log"
 
 	"github.com/joho/godotenv"

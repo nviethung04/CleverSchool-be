@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

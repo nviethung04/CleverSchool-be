@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"be-lms/i18n"
-	"be-lms/repositories"
-	"be-lms/services"
-	"be-lms/utils"
+	"be-Clever School/i18n"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"encoding/json"
 	"errors"
 	"fmt"

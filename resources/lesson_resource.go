@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-lms/config"
-	"be-lms/dto"
-	"be-lms/models"
-	"be-lms/prot"
-	"be-lms/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/utils"
 	"sort"
 	"strings"
 )

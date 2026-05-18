@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"be-lms/command"
+	"be-Clever School/command"
 )
 
-// MEILI_ENABLED=true MEILI_HOST=http://localhost:7700 MEILI_API_KEY=lms_master go run cmd/reindex_questions.go
+// MEILI_ENABLED=true MEILI_HOST=http://localhost:7700 MEILI_API_KEY=Clever School_master go run cmd/reindex_questions.go
 
 func main() {
 	if err := command.RunReindexQuestions(); err != nil {

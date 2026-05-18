@@ -2,10 +2,10 @@
 package main
 
 import (
-	"be-lms/app"
-	"be-lms/command"
-	"be-lms/config"
-	"be-lms/database/db"
+	"be-Clever School/app"
+	"be-Clever School/command"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
 	"embed"
 	"fmt"
 	"log"

@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-lms/controllers"
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/controllers"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 )
 
 func NewAuthController() *controllers.AuthController {

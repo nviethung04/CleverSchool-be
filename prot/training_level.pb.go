@@ -339,7 +339,7 @@ const file_training_level_proto_rawDesc = "" +
 	"\x16TrainingLevelsResponse\x12<\n" +
 	"\x0ftraining_levels\x18\x01 \x03(\v2\x13.prot.TrainingLevelR\x0etrainingLevels\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\rZ\vbe-lms/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_training_level_proto_rawDescOnce sync.Once

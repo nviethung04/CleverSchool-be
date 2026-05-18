@@ -1371,7 +1371,7 @@ const file_prot_dashboard_list_entity_proto_rawDesc = "" +
 	"\x1eDashboardClassMainListResponse\x12=\n" +
 	"\vclass_mains\x18\x01 \x03(\v2\x1c.prot.DashboardClassMainListR\n" +
 	"classMains\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-lms/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_prot_dashboard_list_entity_proto_rawDescOnce sync.Once

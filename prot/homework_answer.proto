@@ -1,7 +1,7 @@
 syntax = "proto3";
 package prot;
 
-option go_package = "be-lms/prot";
+option go_package = "be-Clever School/prot";
 
 import "google/protobuf/struct.proto";
 

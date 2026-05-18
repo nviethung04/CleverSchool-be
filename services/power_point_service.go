@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-lms/config"
-	"be-lms/dto"
+	"be-Clever School/config"
+	"be-Clever School/dto"
 	"context"
 	"errors"
 	"fmt"

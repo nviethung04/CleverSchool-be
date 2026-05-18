@@ -1,9 +1,9 @@
 package command
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/redis"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/redis"
 	"flag"
 	"fmt"
 	"log"

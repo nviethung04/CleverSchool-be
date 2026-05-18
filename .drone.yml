@@ -63,14 +63,14 @@ steps:
     image: alpine:latest
     commands:
       - apk add --no-cache docker-cli docker-cli-compose
-      - cd /home/vps_010/apps/be-lms-enspire
+      - cd /home/vps_010/apps/be-Clever School-Clever School
       - docker compose stop app-develop || echo "App not running or already stopped"
       - docker compose rm -f app-develop || echo "App container already removed"
     volumes:
       - name: docker-sock
         path: /var/run/docker.sock
       - name: deploy-path
-        path: /home/vps_010/apps/be-lms-enspire
+        path: /home/vps_010/apps/be-Clever School-Clever School
     depends_on:
       - rebuild-cache
     when:
@@ -83,10 +83,10 @@ steps:
     commands:
       - apk add --no-cache docker-cli docker-cli-compose
       - echo "📦 Copying new binary to deployment directory..."
-      - cp /app/myapp /home/vps_010/apps/be-lms-enspire/develop/myapp
-      - chmod +x /home/vps_010/apps/be-lms-enspire/develop/myapp
+      - cp /app/myapp /home/vps_010/apps/be-Clever School-Clever School/develop/myapp
+      - chmod +x /home/vps_010/apps/be-Clever School-Clever School/develop/myapp
       - echo "▶️ Starting application with Docker Compose..."
-      - cd /home/vps_010/apps/be-lms-enspire
+      - cd /home/vps_010/apps/be-Clever School-Clever School
       - docker compose up -d app-develop
     volumes:
       - name: app-build
@@ -94,7 +94,7 @@ steps:
       - name: docker-sock
         path: /var/run/docker.sock
       - name: deploy-path
-        path: /home/vps_010/apps/be-lms-enspire
+        path: /home/vps_010/apps/be-Clever School-Clever School
     depends_on:
       - stop-app
     when:
@@ -131,7 +131,7 @@ volumes:
       path: /var/run/docker.sock
   - name: deploy-path
     host:
-      path: /home/vps_010/apps/be-lms-enspire
+      path: /home/vps_010/apps/be-Clever School-Clever School
 
 ---
 kind: pipeline
@@ -196,14 +196,14 @@ steps:
     image: alpine:latest
     commands:
       - apk add --no-cache docker-cli docker-cli-compose
-      - cd /home/vps_010/apps/be-lms-enspire
+      - cd /home/vps_010/apps/be-Clever School-Clever School
       - docker compose stop app-staging || echo "App not running or already stopped"
       - docker compose rm -f app-staging || echo "App container already removed"
     volumes:
       - name: docker-sock-staging
         path: /var/run/docker.sock
       - name: deploy-path-staging
-        path: /home/vps_010/apps/be-lms-enspire
+        path: /home/vps_010/apps/be-Clever School-Clever School
     depends_on:
       - rebuild-cache
     when:
@@ -216,10 +216,10 @@ steps:
     commands:
       - apk add --no-cache docker-cli docker-cli-compose
       - echo "📦 Copying new binary to staging deployment directory..."
-      - cp /app/myapp /home/vps_010/apps/be-lms-enspire/staging/myapp
-      - chmod +x /home/vps_010/apps/be-lms-enspire/staging/myapp
+      - cp /app/myapp /home/vps_010/apps/be-Clever School-Clever School/staging/myapp
+      - chmod +x /home/vps_010/apps/be-Clever School-Clever School/staging/myapp
       - echo "▶️ Starting staging application with Docker Compose..."
-      - cd /home/vps_010/apps/be-lms-enspire
+      - cd /home/vps_010/apps/be-Clever School-Clever School
       - docker compose up -d app-staging
     volumes:
       - name: app-build-staging
@@ -227,7 +227,7 @@ steps:
       - name: docker-sock-staging
         path: /var/run/docker.sock
       - name: deploy-path-staging
-        path: /home/vps_010/apps/be-lms-enspire
+        path: /home/vps_010/apps/be-Clever School-Clever School
     depends_on:
       - stop-app
     when:
@@ -264,4 +264,4 @@ volumes:
       path: /var/run/docker.sock
   - name: deploy-path-staging
     host:
-      path: /home/vps_010/apps/be-lms-enspire
+      path: /home/vps_010/apps/be-Clever School-Clever School

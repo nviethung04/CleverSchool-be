@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"be-lms/redis"
-	"be-lms/repositories"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
 	"errors"
 	"os"
 	"time"

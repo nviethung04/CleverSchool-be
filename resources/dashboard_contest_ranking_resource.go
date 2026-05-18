@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-lms/dto"
-	"be-lms/prot"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
 )
 
 func DashboardContestRankingCollection(rankings []dto.DashboardContestRanking) []*prot.DashboardContestRanking {

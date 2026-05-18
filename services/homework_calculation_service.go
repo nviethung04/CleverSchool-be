@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-lms/repositories"
+	"be-Clever School/repositories"
 	"fmt"
 )
 

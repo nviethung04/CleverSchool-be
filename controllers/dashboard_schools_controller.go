@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-lms/dto"
-	"be-lms/services"
+	"be-Clever School/dto"
+	"be-Clever School/services"
 	"fmt"
 	"net/http"
 	"strconv"

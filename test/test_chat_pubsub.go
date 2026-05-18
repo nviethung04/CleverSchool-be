@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"be-lms/redis"
-	"be-lms/services"
+	"be-Clever School/redis"
+	"be-Clever School/services"
 )
 
 // Test script for Redis Pub/Sub and WebSocket implementation

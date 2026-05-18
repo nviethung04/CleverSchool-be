@@ -675,7 +675,7 @@ const file_holiday_proto_rawDesc = "" +
 	"\vsemester_id\x18\x01 \x01(\x03R\n" +
 	"semesterId\"5\n" +
 	"\bHolidays\x12)\n" +
-	"\bholidays\x18\x01 \x03(\v2\r.prot.HolidayR\bholidaysB\rZ\vbe-lms/protb\x06proto3"
+	"\bholidays\x18\x01 \x03(\v2\r.prot.HolidayR\bholidaysB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_holiday_proto_rawDescOnce sync.Once

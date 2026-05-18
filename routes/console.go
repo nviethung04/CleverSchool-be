@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"be-lms/middleware"
+	"be-Clever School/middleware"
 	"net/http"
 	"os/exec"
 	"strings"

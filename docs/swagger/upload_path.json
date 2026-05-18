@@ -69,7 +69,7 @@
                                     },
                                     "object_url": {
                                         "type": "string",
-                                        "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                                        "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
                                     },
                                     "key": {
                                         "type": "string",
@@ -128,7 +128,7 @@
                             },
                             "url": {
                                 "type": "string",
-                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext",
+                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext",
                                 "description": "URL truy cập file"
                             },
                             "size": {
@@ -168,7 +168,7 @@
                             },
                             "final_url": {
                                 "type": "string",
-                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
                             },
                             "job_id": {
                                 "type": "string",
@@ -225,7 +225,7 @@
                             },
                             "url": {
                                 "type": "string",
-                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext.zip",
+                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext.zip",
                                 "description": "URL truy cập file"
                             },
                             "size": {
@@ -350,7 +350,7 @@
                                     },
                                     "final_url": {
                                         "type": "string",
-                                        "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
+                                        "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
                                     },
                                     "started_at": {
                                         "type": "string",

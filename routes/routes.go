@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"be-lms/command"
-	"be-lms/controllers"
-	"be-lms/middleware"
-	"be-lms/repositories"
-	"be-lms/services"
+	"be-Clever School/command"
+	"be-Clever School/controllers"
+	"be-Clever School/middleware"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 	"net/http"
 	"time"
 

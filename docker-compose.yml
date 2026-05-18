@@ -3,16 +3,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: lms-app
+    container_name: Clever School-app
     ports:
       - "8080:8080"
 
   postgres:
     image: postgres:15-alpine
-    container_name: lms-postgres
+    container_name: Clever School-postgres
     environment:
-      POSTGRES_DB: lms_db
-      POSTGRES_USER: lms_user
+      POSTGRES_DB: Clever School_db
+      POSTGRES_USER: Clever School_user
       POSTGRES_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
     ports:
       - "5432:5432"
@@ -20,11 +20,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - lms-network
+      - Clever School-network
 
   redis:
     image: redis:7-alpine
-    container_name: lms-redis
+    container_name: Clever School-redis
     command: redis-server --requirepass 0lJc4VUTFmyV
     ports:
       - "6379:6379"
@@ -32,10 +32,10 @@ services:
       - redis_data:/data
     restart: unless-stopped
     networks:
-      - lms-network
+      - Clever School-network
 
 networks:
-  lms-network:
+  Clever School-network:
     driver: bridge
 
 volumes:

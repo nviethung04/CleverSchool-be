@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-lms/prot"
-	"be-lms/redis"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

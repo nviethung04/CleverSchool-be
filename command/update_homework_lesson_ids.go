@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-lms/database/db"
+	"be-Clever School/database/db"
 	"fmt"
 	"net/http"
 	"strings"

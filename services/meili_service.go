@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"be-lms/config"
+	"be-Clever School/config"
 )
 
 type MeiliService interface {

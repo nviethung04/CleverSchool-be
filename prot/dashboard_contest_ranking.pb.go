@@ -258,7 +258,7 @@ const file_dashboard_contest_ranking_proto_rawDesc = "" +
 	"\x05total\x18\x02 \x01(\x03R\x05total\x12?\n" +
 	"\vscore_chart\x18\x03 \x03(\v2\x1e.prot.ContestScoreDistributionR\n" +
 	"scoreChart\x12'\n" +
-	"\x0fcurrent_ranking\x18\x04 \x01(\x03R\x0ecurrentRankingB\rZ\vbe-lms/protb\x06proto3"
+	"\x0fcurrent_ranking\x18\x04 \x01(\x03R\x0ecurrentRankingB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_contest_ranking_proto_rawDescOnce sync.Once

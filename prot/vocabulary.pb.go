@@ -967,7 +967,7 @@ const file_vocabulary_proto_rawDesc = "" +
 	"\rvocabulary_id\x18\x01 \x01(\x03R\fvocabularyId\x12\x1d\n" +
 	"\n" +
 	"audio_data\x18\x02 \x01(\tR\taudioData\x12\x1b\n" +
-	"\tword_type\x18\x03 \x01(\tR\bwordTypeB\rZ\vbe-lms/protb\x06proto3"
+	"\tword_type\x18\x03 \x01(\tR\bwordTypeB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_vocabulary_proto_rawDescOnce sync.Once

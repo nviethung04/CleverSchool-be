@@ -1,7 +1,7 @@
 package i18n
 
 import (
-	"be-lms/config"
+	"be-Clever School/config"
 	_ "embed"
 	"encoding/json"
 	"reflect"

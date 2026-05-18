@@ -1,9 +1,9 @@
 package base
 
 import (
-	"be-lms/config"
-	"be-lms/database/db"
-	"be-lms/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"fmt"
 	"reflect"
 	"strings"

@@ -80,7 +80,7 @@ const file_login_proto_rawDesc = "" +
 	"\vlogin.proto\x12\x04prot\"F\n" +
 	"\fLoginRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpasswordB\rZ\vbe-lms/protb\x06proto3"
+	"\bpassword\x18\x02 \x01(\tR\bpasswordB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_login_proto_rawDescOnce sync.Once
