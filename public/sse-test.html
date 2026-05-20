@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +31,7 @@
             background: white;
             border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
 
         .panel.full-width {
@@ -85,7 +86,9 @@
             font-size: 14px;
         }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 10px 12px;
             border: 2px solid #e5e7eb;
@@ -94,7 +97,9 @@
             transition: border-color 0.2s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -265,13 +270,14 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Connection Panel -->
         <div class="panel">
             <h1>🔌 SSE Connection</h1>
             <p class="subtitle">Kết nối với SSE endpoint để nhận real-time events</p>
-            
+
             <div id="status" class="status disconnected">Disconnected</div>
 
             <div class="form-group">
@@ -407,10 +413,10 @@
 
             const eventItem = document.createElement('div');
             eventItem.className = `event-item ${type}`;
-            
+
             const timestamp = new Date().toLocaleTimeString('vi-VN');
             const eventDataStr = JSON.stringify(data, null, 2);
-            
+
             eventItem.innerHTML = `
                 <div class="event-header">
                     <div>
@@ -454,7 +460,7 @@
             updateStatus('connecting', 'Connecting...');
 
             const url = `${apiUrl}/api/manage/courses/${courseId}/chat/events${since !== '0' ? `?since=${since}` : ''}`;
-            
+
             console.log('Connecting to:', url);
 
             abortController = new AbortController();
@@ -473,9 +479,9 @@
                 if (!response.ok) {
                     const errorText = await response.text();
                     updateStatus('disconnected', 'Connection Failed');
-                    addEvent('error', { 
+                    addEvent('error', {
                         error: `HTTP ${response.status}: ${response.statusText}`,
-                        details: errorText 
+                        details: errorText
                     }, null);
                     return;
                 }
@@ -489,7 +495,7 @@
 
                 while (true) {
                     const { done, value } = await reader.read();
-                    
+
                     if (done) {
                         updateStatus('disconnected', 'Disconnected');
                         addEvent('system', { message: 'SSE connection closed' }, null);
@@ -511,9 +517,9 @@
                                     const eventType = currentEvent.type || 'message';
                                     addEvent(eventType, data, data.version);
                                 } catch (err) {
-                                    addEvent(currentEvent.type || 'message', { 
-                                        raw: currentEvent.data, 
-                                        error: err.message 
+                                    addEvent(currentEvent.type || 'message', {
+                                        raw: currentEvent.data,
+                                        error: err.message
                                     }, null);
                                 }
                             }
@@ -535,9 +541,9 @@
                     addEvent('system', { message: 'SSE connection aborted' }, null);
                 } else {
                     updateStatus('disconnected', 'Connection Error');
-                    addEvent('error', { 
-                        error: 'Connection error', 
-                        details: error.message 
+                    addEvent('error', {
+                        error: 'Connection error',
+                        details: error.message
                     }, null);
                     console.error('SSE Error:', error);
                 }
@@ -586,7 +592,7 @@
 
                 const result = await response.json();
                 const resultDiv = document.getElementById('sendResult');
-                
+
                 if (response.ok) {
                     resultDiv.innerHTML = `<div style="color: #10b981; padding: 8px; background: #d1fae5; border-radius: 6px;">✅ Message sent successfully! ID: ${result.id || 'N/A'}</div>`;
                 } else {
@@ -608,27 +614,27 @@
         }
 
         // Auto-connect on page load if token exists
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             const token = localStorage.getItem('sse_test_token');
             const courseId = localStorage.getItem('sse_test_course_id');
             const apiUrl = localStorage.getItem('sse_test_api_url');
-            
+
             if (token) document.getElementById('token').value = token;
             if (courseId) document.getElementById('courseId').value = courseId;
             if (apiUrl) document.getElementById('apiUrl').value = apiUrl;
 
             // Save on change
-            document.getElementById('token').addEventListener('change', function() {
+            document.getElementById('token').addEventListener('change', function () {
                 localStorage.setItem('sse_test_token', this.value);
             });
-            document.getElementById('courseId').addEventListener('change', function() {
+            document.getElementById('courseId').addEventListener('change', function () {
                 localStorage.setItem('sse_test_course_id', this.value);
             });
-            document.getElementById('apiUrl').addEventListener('change', function() {
+            document.getElementById('apiUrl').addEventListener('change', function () {
                 localStorage.setItem('sse_test_api_url', this.value);
             });
         });
     </script>
 </body>
-</html>
 
+</html>
