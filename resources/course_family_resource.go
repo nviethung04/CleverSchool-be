@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/prot"
+	"be-cleverschool/dto"
+	"be-cleverschool/prot"
 )
 
 func CourseFamilyMemberResource(member dto.CourseFamilyMember) *prot.CourseFamilyMember {
@@ -32,4 +32,5 @@ func CourseFamilyResource(family *dto.CourseFamily) *prot.CourseFamilyResponse {
 
 	return resp
 }
+
 

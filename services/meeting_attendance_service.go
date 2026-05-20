@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
@@ -551,3 +551,4 @@ func (s *meetingAttendanceService) GenerateShortCode() string {
 	rand.Read(bytes)
 	return hex.EncodeToString(bytes)
 }
+

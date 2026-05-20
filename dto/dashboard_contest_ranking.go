@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 type DashboardContestRanking struct {
 	StudentID    int64            `json:"student_id"`
@@ -16,4 +16,5 @@ type ContestScoreChart struct {
 	ScoreRange   string `json:"score_range"`
 	StudentCount int64  `json:"student_count"`
 }
+
 

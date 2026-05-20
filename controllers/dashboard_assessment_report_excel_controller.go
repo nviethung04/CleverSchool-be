@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/requests"
-	"be-Clever School/services"
+	"be-cleverschool/requests"
+	"be-cleverschool/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -57,4 +57,5 @@ func (ctl *DashboardAssessmentReportExcelController) ReportExcel(c *gin.Context)
 		return
 	}
 }
+
 

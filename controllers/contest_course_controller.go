@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	// "be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	// "be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	// "net/http"
 	// "strconv"
@@ -47,3 +47,4 @@ func (ccc *ContestCourseController) RemoveContestFromCourse(c *gin.Context) {
 	}
 	utils.Respond(c, response, nil, "")
 }
+

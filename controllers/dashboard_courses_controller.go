@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/dto"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 	_ "encoding/json"
 	"fmt"
 	"net/http"
@@ -268,3 +268,4 @@ func (c *DashboardCoursesController) ExportDashboardCoursesAll(ctx *gin.Context)
 		return
 	}
 }
+

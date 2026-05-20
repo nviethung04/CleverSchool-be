@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -75,3 +75,4 @@ func (r *homeworkUserSkipQuestionRepository) ListSkippedNotRedoneQuestionIDs(hom
 		Pluck("question_id", &ids).Error
 	return ids, err
 }
+

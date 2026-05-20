@@ -1,15 +1,15 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/dto"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/requests"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/dto"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/requests"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -1119,3 +1119,4 @@ func safeString[T any](model *T, getter func(*T) string) string {
 	}
 	return ""
 }
+

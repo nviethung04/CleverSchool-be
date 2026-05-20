@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/requests"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/requests"
 )
 
 type DashboardTeacherExamRepository interface {
@@ -116,3 +116,4 @@ func (r *dashboardTeacherExamRepository) GetScoredExams(userID int64, onlyUserCo
 	err := query.Find(&exams).Error
 	return exams, totalCount, err
 }
+

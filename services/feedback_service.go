@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/repositories/base"
-	"be-Clever School/requests"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/repositories/base"
+	"be-cleverschool/requests"
+	"be-cleverschool/utils"
 	"fmt"
 	"time"
 
@@ -438,3 +438,4 @@ func dtoToProtoFeedback(feedback *dto.FeedbackResponse) *prot.Feedback {
 		RoleName:  feedback.RoleName,
 	}
 }
+

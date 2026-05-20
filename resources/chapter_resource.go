@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 	"sort"
 )
 
@@ -206,3 +206,4 @@ func (r *ChapterResourceImpl) FormatModelChapter(chapter *prot.ChapterRequest) *
 		Target:      chapter.Target,
 	}
 }
+

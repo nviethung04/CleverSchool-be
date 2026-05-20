@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/prot"
+	"be-cleverschool/dto"
+	"be-cleverschool/prot"
 )
 
 func DashboardTeacherExamOverviewResource(overview dto.DashboardTeacherExamOverview) *prot.DashboardTeacherExamOverview {

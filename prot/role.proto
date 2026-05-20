@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package models;
 
-option go_package = "be-Clever School/prot";
+option go_package = "be-cleverschool/prot";
 
 message PermissionGroup {
   string name = 1;
@@ -81,3 +81,4 @@ message PermissionGroupDisplay {
 message RolePermissionsDisplayList {
   repeated PermissionGroupDisplay permissions = 1;
 }
+

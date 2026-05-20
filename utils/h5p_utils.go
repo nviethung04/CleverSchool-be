@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"be-Clever School/config"
+	"be-cleverschool/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -236,3 +236,4 @@ func uploadFileToS3(s3Client *s3.Client, bucket, key, filePath string) error {
 	}
 	return nil
 }
+

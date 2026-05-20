@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -56,3 +56,4 @@ func (dc *DashboardController) Export(c *gin.Context) {
 
 	utils.Respond(c, nil, fmt.Errorf(i18n.Localize("messages.role_invalid")), "messages.role_invalid")
 }
+

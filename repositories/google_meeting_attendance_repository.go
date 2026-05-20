@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -118,3 +118,4 @@ func (r *googleMeetingAttendanceRepository) CheckUserAttended(meetingID, userID 
 		Count(&count).Error
 	return count > 0, err
 }
+

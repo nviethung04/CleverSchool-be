@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -128,3 +128,4 @@ func (s *questionService) GetKey(assignmentType string) (string, error) {
 
 	return filterKey, err
 }
+

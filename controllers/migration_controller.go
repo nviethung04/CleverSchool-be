@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-Clever School/config"
+	"be-cleverschool/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -126,3 +126,4 @@ func (mc *MigrationController) UploadPublicDirectory(c *gin.Context) {
 		"results": results,
 	})
 }
+

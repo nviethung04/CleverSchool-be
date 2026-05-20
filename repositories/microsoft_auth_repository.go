@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -104,3 +104,4 @@ func (r *microsoftAuthRepository) IsConnected(userID uint) bool {
 	db.ReplicaDB.Model(&models.MicrosoftAccount{}).Where("user_id = ? AND is_active = ?", userID, true).Count(&count)
 	return count > 0
 }
+

@@ -5471,7 +5471,7 @@ const file_contest_proto_rawDesc = "" +
 	"\x06rounds\x18\x01 \x03(\v2\x1f.prot.DashboardContestRoundItemR\x06rounds\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x03R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limitB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x05limit\x18\x04 \x01(\x05R\x05limitB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_contest_proto_rawDescOnce sync.Once
@@ -5611,3 +5611,4 @@ func file_contest_proto_init() {
 	file_contest_proto_goTypes = nil
 	file_contest_proto_depIdxs = nil
 }
+

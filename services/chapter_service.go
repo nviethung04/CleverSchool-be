@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -239,3 +239,4 @@ func (cs *chapterService) Validate(chapter *models.Chapter) error {
 	}
 	return nil
 }
+

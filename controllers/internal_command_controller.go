@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-Clever School/command"
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/jobs"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/command"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/jobs"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"strconv"
 	"time"
@@ -933,3 +933,4 @@ func (c *InternalCommandController) ClearDashboardCoursesData(ctx *gin.Context) 
 
 	utils.Respond(ctx, response, nil, "")
 }
+

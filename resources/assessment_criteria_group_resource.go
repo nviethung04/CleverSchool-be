@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type AssessmentCriteriaGroupResource interface {
@@ -72,3 +72,4 @@ func (r *assessmentCriteriaGroupResource) FormatModelGroup(req *prot.AssessmentC
 		HasFile:   req.HasFile,
 	}
 }
+

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/services"
+	"be-cleverschool/controllers"
+	"be-cleverschool/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,3 +18,4 @@ func RoutePowerPoint(router *gin.Engine) {
 	// Single catch-all for nested folders/packages and assets
 	powerPointGroup.GET("/*any", powerPointController.ServeDynamicPowerPoint)
 }
+

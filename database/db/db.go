@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"be-Clever School/config"
-	"be-Clever School/observer"
+	"be-cleverschool/config"
+	"be-cleverschool/observer"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
@@ -214,3 +214,4 @@ func TestPostgresConnection() error {
 
 	return nil
 }
+

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/config"
+	"be-cleverschool/config"
 	"fmt"
 	"mime"
 	"net/smtp"
@@ -184,3 +184,4 @@ func (s *emailService) generatePasswordResetEmailBody(username, resetURL string)
 </html>
 `, username, resetURL, resetURL)
 }
+

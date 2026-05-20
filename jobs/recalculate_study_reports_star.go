@@ -1,11 +1,11 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
 	"fmt"
 	"time"
 )
@@ -79,3 +79,4 @@ func RecalculateStudyReportsStarJob() (totalProcessed int64, totalUpdated int64,
 
 	return processed, updated, nil
 }
+

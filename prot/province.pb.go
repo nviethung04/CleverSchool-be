@@ -330,7 +330,7 @@ const file_province_proto_rawDesc = "" +
 	"\x05wards\x18\x01 \x03(\v2\n" +
 	".prot.WardR\x05wards\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
+	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_province_proto_rawDescOnce sync.Once
@@ -386,3 +386,4 @@ func file_province_proto_init() {
 	file_province_proto_goTypes = nil
 	file_province_proto_depIdxs = nil
 }
+

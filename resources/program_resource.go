@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"sort"
 )
 
@@ -188,3 +188,4 @@ func (r *ProgramResourceImpl) FormatModelProgram(program *prot.ProgramRequest) *
 		BookUrl:     program.BookUrl,
 	}
 }
+

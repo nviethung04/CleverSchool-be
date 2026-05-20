@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"fmt"
 	"mime/multipart"
 	"strconv"
@@ -1102,3 +1102,4 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 
 	return nil
 }
+

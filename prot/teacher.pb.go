@@ -118,7 +118,7 @@ const file_teacher_proto_rawDesc = "" +
 	"\bposition\x18\x04 \x01(\tR\bposition\x12\x17\n" +
 	"\auser_id\x18\x05 \x01(\x04R\x06userId\x12\x1e\n" +
 	"\x04user\x18\x06 \x01(\v2\n" +
-	".prot.UserR\x04userB\rZ\vbe-Clever School/protb\x06proto3"
+	".prot.UserR\x04userB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_teacher_proto_rawDescOnce sync.Once
@@ -170,3 +170,4 @@ func file_teacher_proto_init() {
 	file_teacher_proto_goTypes = nil
 	file_teacher_proto_depIdxs = nil
 }
+

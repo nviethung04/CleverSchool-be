@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"be-Clever School/config"
+	"be-cleverschool/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
@@ -416,3 +416,4 @@ func generateSafeFilename(original string) string {
 func detectMimeType(data []byte) string {
 	return http.DetectContentType(data)
 }
+

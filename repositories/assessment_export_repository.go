@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"sort"
 	"strings"
 
@@ -175,4 +175,5 @@ func (r *assessmentExportRepository) GetLessonIDByAssessmentAndCourse(assessment
 	
 	return lessonID, nil
 }
+
 

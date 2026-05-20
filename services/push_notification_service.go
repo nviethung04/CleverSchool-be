@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"fmt"
 	"time"
 )
@@ -298,3 +298,4 @@ func (s *PushNotificationService) GetNoticeByID(noticeID int64) (*models.Notice,
 	noticeRepo := repositories.NewNoticeRepository()
 	return noticeRepo.FindByID(int(noticeID))
 }
+

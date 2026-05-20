@@ -1,10 +1,10 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -219,3 +219,4 @@ func createContext() *gin.Context {
 
 	return c
 }
+

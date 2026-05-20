@@ -117,7 +117,7 @@ const file_course_ref_study_shift_proto_rawDesc = "" +
 	"\vday_of_week\x18\x04 \x01(\x05R\tdayOfWeek\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\tR\tcreatedAt\x12&\n" +
-	"\x05shift\x18\x06 \x01(\v2\x10.prot.StudyShiftR\x05shiftB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x05shift\x18\x06 \x01(\v2\x10.prot.StudyShiftR\x05shiftB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_course_ref_study_shift_proto_rawDescOnce sync.Once
@@ -169,3 +169,4 @@ func file_course_ref_study_shift_proto_init() {
 	file_course_ref_study_shift_proto_goTypes = nil
 	file_course_ref_study_shift_proto_depIdxs = nil
 }
+

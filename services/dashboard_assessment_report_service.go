@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/requests"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/requests"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -449,5 +449,6 @@ func (s *dashboardAssessmentReportService) GetAssessmentReport(c *gin.Context, r
 		Statistic: statistic,
 	}, nil
 }
+
 
 

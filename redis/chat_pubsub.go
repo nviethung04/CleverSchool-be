@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"be-Clever School/database/db"
+	"be-cleverschool/database/db"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -427,3 +427,4 @@ func GetChatPubSub() *ChatPubSub {
 	}
 	return chatPubSub
 }
+

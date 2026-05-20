@@ -1,7 +1,7 @@
 package examples
 
 import (
-	"be-Clever School/services"
+	"be-cleverschool/services"
 	"fmt"
 )
 
@@ -78,3 +78,4 @@ func ExampleUsageInController() {
 		fmt.Printf("API error: %s\n", result.Message)
 	}
 }
+

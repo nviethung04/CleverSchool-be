@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/utils"
 )
 
 func DashboardTeacherHomeworkStudentResource(student dto.DashboardTeacherHomeworkStudent) *prot.DashboardTeacherHomeworkStudent {
@@ -61,3 +61,4 @@ func DashboardTeacherHomeworkOverviewResource(overview dto.DashboardTeacherHomew
 		CompletedCount:        overview.CompletedCount,
 	}
 }
+

@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	_ "be-Clever School/prot"
-	"be-Clever School/requests"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	_ "be-cleverschool/prot"
+	"be-cleverschool/requests"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )

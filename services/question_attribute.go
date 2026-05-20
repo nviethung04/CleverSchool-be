@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 	"fmt"
 	"strconv"
 	"strings"
@@ -57,3 +57,4 @@ func (s *questionService) SaveAttributes(questionID int64, row []string, attribu
 
 	return nil
 }
+

@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/config"
 	"time"
 )
 
@@ -178,3 +178,4 @@ func (r *dashboardStudentHomeworkListRepository) GetStudentHomeworkList(userID i
 	}
 	return result, total, nil
 }
+

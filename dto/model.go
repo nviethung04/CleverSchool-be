@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/prot"
+import "be-cleverschool/prot"
 
 type MyUploadResult struct {
 	Data *prot.File
@@ -11,3 +11,4 @@ type MyExportResult struct {
 	Url string
 	Err error
 }
+

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 
 	"gorm.io/gorm"
 )
@@ -585,3 +585,4 @@ func (r *questionRelationRepository) IsAssignedExercise(exerciseId int64) (bool,
 
     return count > 0, nil
 }
+

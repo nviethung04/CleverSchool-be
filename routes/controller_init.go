@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/controllers"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 )
 
 func NewAuthController() *controllers.AuthController {
@@ -605,3 +605,4 @@ func NewTeachingPlanController() *controllers.TeachingPlanController {
 	service := services.NewTeachingPlanService(repo)
 	return controllers.NewTeachingPlanController(service)
 }
+

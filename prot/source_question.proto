@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-Clever School/admin/prot";
+option go_package = "be-cleverschool/admin/prot";
 
 // Message for the source question in the source_questions table
 message SourceQuestion {

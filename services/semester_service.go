@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -283,3 +283,4 @@ func (s *semesterService) StoreHolidays(c *gin.Context, id int64, req *prot.Seme
 
 	return nil
 }
+

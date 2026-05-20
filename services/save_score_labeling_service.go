@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/database/db"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -457,3 +457,4 @@ func (s *saveScoreLabelingService) SaveScoreLabelingExercise(req *prot.SaveScore
 //		IsAllCorrect: correctCount == numLabels,
 //	}, nil
 //}
+

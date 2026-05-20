@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-Clever School/prot";
+option go_package = "be-cleverschool/prot";
 
 // Media thông tin file
 message MediaFlashcard {
@@ -138,3 +138,4 @@ message FlashcardStats {
   double average_pronunciation_score = 16;
   double best_pronunciation_score = 17;
 }
+

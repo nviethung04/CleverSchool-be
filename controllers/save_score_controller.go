@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -781,3 +781,4 @@ func (s *SaveScoreController) TeacherEvaluate(c *gin.Context) {
 
 	utils.Respond(c, data, nil, "")
 }
+

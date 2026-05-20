@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 )
 
 type HomeworkResource interface {
@@ -128,3 +128,4 @@ func (r *HomeworkResourceImpl) FormatModelHomework(homework *prot.HomeworkReques
 		QuestionForm: questionForm,
 	}
 }
+

@@ -1,7 +1,7 @@
 package observer
 
 import (
-	"be-Clever School/models"
+	"be-cleverschool/models"
 
 	"gorm.io/gorm"
 )
@@ -52,3 +52,4 @@ func (u *QuestionObserver) AfterDelete(data interface{}, tx *gorm.DB) (err error
 	}
 	return nil
 }
+

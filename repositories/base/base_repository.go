@@ -1,10 +1,10 @@
 package base
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/i18n"
-	"be-Clever School/redis"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/i18n"
+	"be-cleverschool/redis"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -811,3 +811,4 @@ func (r *BaseRepository[T]) GetAdminSchoolId(ctx *gin.Context) int {
 
 	return 0
 }
+

@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
-	"be-Clever School/requests"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
+	"be-cleverschool/requests"
 	"errors"
 	"fmt"
 	"strings"
@@ -350,3 +350,4 @@ func (r *lessonPlanRepository) UpdateLessons(id int64, lessonIds []int64) error 
 
 	return nil
 }
+

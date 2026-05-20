@@ -1,11 +1,11 @@
 package repositories
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/requests"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/requests"
 	"errors"
 	"strings"
 	"time"
@@ -293,3 +293,4 @@ func (r *homeworkRepository) UpdateEvaluate(userId, homeworkId int64, score floa
 
 	return nil
 }
+

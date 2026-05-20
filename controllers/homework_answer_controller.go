@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"net/http"
 	"strconv"
 
@@ -86,3 +86,4 @@ func stringPtrToString(s *string) string {
 	}
 	return *s
 }
+

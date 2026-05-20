@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 	"encoding/json"
 
 	"google.golang.org/protobuf/types/known/structpb"
@@ -54,3 +54,4 @@ func (r *H5PResourceImpl) FormatH5Ps(h5ps []*models.H5pContent) []*prot.H5P {
 	}
 	return result
 }
+

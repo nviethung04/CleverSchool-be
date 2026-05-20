@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type DepartmentResource interface {
@@ -54,3 +54,4 @@ func (r *DepartmentResourceImpl) FormatModelDepartment(department *prot.Departme
 		Status:      department.Status,
 	}
 }
+

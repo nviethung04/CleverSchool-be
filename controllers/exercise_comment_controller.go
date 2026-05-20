@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -36,3 +36,4 @@ func (ctl *ExerciseCommentController) PostExerciseComment(c *gin.Context) {
 	resp := ctl.service.CreateExerciseComment(req.ExerciseID, req.StudentID, teacherID, req.Content)
 	utils.Respond(c, resp, nil, "")
 }
+

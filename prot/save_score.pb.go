@@ -3208,7 +3208,7 @@ const file_prot_save_score_proto_rawDesc = "" +
 	"homeworkId\x12(\n" +
 	"\x10contest_round_id\x18\x04 \x01(\x03R\x0econtestRoundId\x12\x17\n" +
 	"\auser_id\x18\x05 \x01(\x03R\x06userId\x12\x14\n" +
-	"\x05score\x18\x06 \x01(\x01R\x05scoreB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x05score\x18\x06 \x01(\x01R\x05scoreB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_save_score_proto_rawDescOnce sync.Once
@@ -3333,3 +3333,4 @@ func file_prot_save_score_proto_init() {
 	file_prot_save_score_proto_goTypes = nil
 	file_prot_save_score_proto_depIdxs = nil
 }
+

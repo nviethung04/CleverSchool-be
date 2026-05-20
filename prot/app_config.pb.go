@@ -163,7 +163,7 @@ const file_prot_app_config_proto_rawDesc = "" +
 	"\x12url_video_tutorial\x18\x06 \x01(\tR\x10urlVideoTutorial\"C\n" +
 	"\x11AppConfigResponse\x12.\n" +
 	"\n" +
-	"app_config\x18\x01 \x01(\v2\x0f.prot.AppConfigR\tappConfigB\rZ\vbe-Clever School/protb\x06proto3"
+	"app_config\x18\x01 \x01(\v2\x0f.prot.AppConfigR\tappConfigB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_app_config_proto_rawDescOnce sync.Once
@@ -214,3 +214,4 @@ func file_prot_app_config_proto_init() {
 	file_prot_app_config_proto_goTypes = nil
 	file_prot_app_config_proto_depIdxs = nil
 }
+

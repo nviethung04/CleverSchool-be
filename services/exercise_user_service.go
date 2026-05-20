@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"encoding/json"
 	_ "fmt"
 	"strconv"
@@ -219,3 +219,4 @@ func (s *exerciseUserService) SaveExerciseRatioService(exerciseID, userID int64,
 }
 
 func fmtInt64(v int64) string { return strconv.FormatInt(v, 10) }
+

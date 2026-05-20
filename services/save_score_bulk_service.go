@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -1872,3 +1872,4 @@ func (s *saveScoreBulkService) Evaluate(req *prot.EvaluateRequest) (*prot.Evalua
 
 	return nil, errors.New("invalid request")
 }
+

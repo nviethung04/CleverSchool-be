@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"be-Clever School/command"
+	"be-cleverschool/command"
 )
 
 // MEILI_ENABLED=true MEILI_HOST=http://localhost:7700 MEILI_API_KEY=Clever School_master go run cmd/reindex_questions.go
@@ -15,3 +15,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+

@@ -745,7 +745,7 @@ const file_push_notification_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1b\n" +
 	"\tnotice_id\x18\x03 \x01(\x03R\bnoticeId\x12\x16\n" +
-	"\x06target\x18\x04 \x01(\tR\x06targetB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x06target\x18\x04 \x01(\tR\x06targetB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_push_notification_proto_rawDescOnce sync.Once
@@ -808,3 +808,4 @@ func file_push_notification_proto_init() {
 	file_push_notification_proto_goTypes = nil
 	file_push_notification_proto_depIdxs = nil
 }
+

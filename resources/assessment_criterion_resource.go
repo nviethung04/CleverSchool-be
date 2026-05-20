@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type AssessmentCriterionResource interface {
@@ -74,3 +74,4 @@ func (r *assessmentCriterionResourceImpl) FormatModelAssessmentCriterion(req *pr
 		MaxScore:       req.MaxScore,
 	}
 }
+

@@ -485,7 +485,7 @@ const file_topic_proto_rawDesc = "" +
 	"\x0eTopicsResponse\x12#\n" +
 	"\x06topics\x18\x01 \x03(\v2\v.prot.TopicR\x06topics\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
+	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_topic_proto_rawDescOnce sync.Once
@@ -542,3 +542,4 @@ func file_topic_proto_init() {
 	file_topic_proto_goTypes = nil
 	file_topic_proto_depIdxs = nil
 }
+

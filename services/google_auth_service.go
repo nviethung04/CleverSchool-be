@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -287,3 +287,4 @@ func (s *googleAuthService) Disconnect(userID uint) error {
 	// Keep row for audit but clear tokens and deactivate
 	return s.repo.DeactivateAndClear(userID)
 }
+

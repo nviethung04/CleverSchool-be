@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"bytes"
 	"fmt"
 	"strconv"
@@ -921,3 +921,4 @@ func (s *questionService) appendKindPathOnlyRows(f *excelize.File, sheetName str
 		*row = *row + 1
 	}
 }
+

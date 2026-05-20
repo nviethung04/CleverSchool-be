@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,3 +31,4 @@ func (ctl *QuestionRelationController) Create(c *gin.Context) {
 		Message: "ok",
 	}, err, "")
 }
+

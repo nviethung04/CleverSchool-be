@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/repositories"
+	"be-cleverschool/repositories"
 )
 
 type HomeworkSkipQuestionService interface {
@@ -23,3 +23,4 @@ func (s *homeworkSkipQuestionService) UpdateDidItAgainIfSkipped(homeworkID, user
 	// Nếu có thì cập nhật thành true
 	return s.homeworkUserSkipQuestionRepo.UpdateDidItAgain(homeworkID, userID, questionID)
 }
+

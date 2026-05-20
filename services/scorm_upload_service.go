@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"be-Clever School/models"
+	"be-cleverschool/models"
 )
 
 type ScormUploadService struct {
@@ -279,3 +279,4 @@ func (s *ScormUploadService) GetPackageInfo(packageName string) (*ScormPackageIn
 
 	return s.validateScormPackage(packagePath)
 }
+

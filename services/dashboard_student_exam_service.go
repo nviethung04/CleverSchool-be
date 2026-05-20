@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
 )
 
 type DashboardStudentExamService interface {
@@ -45,3 +45,4 @@ func (s *dashboardStudentExamService) GetStudentExamStats(userID int64, courseID
 		Chart:    chart,
 	}, nil
 }
+

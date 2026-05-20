@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
 	"errors"
 
 	"gorm.io/gorm"
@@ -90,4 +90,5 @@ func (r *courseFamilyRepository) baseMemberQuery() *gorm.DB {
 		Where("c.deleted_at IS NULL").
 		Group("c.id, p.name")
 }
+
 

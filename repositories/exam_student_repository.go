@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -488,3 +488,4 @@ func (r *examStudentRepository) GetExamComment(examID, studentID int64) (string,
 		Scan(&content).Error
 	return content, err
 }
+

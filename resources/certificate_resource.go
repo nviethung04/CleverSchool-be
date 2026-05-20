@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"time"
 )
 
@@ -97,3 +97,4 @@ func (r *CertificateResourceImpl) FormatModelCertificate(certificate *prot.Certi
 		Rating:          certificate.Rating,
 	}
 }
+

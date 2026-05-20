@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/services"
+	"be-cleverschool/config"
+	"be-cleverschool/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -172,3 +172,4 @@ func (c *AIGradingController) GradeImage(ctx *gin.Context) {
 		"data":    result,
 	})
 }
+

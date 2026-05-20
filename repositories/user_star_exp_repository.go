@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 )
 
 type UserStarExpRepository interface {
@@ -42,3 +42,4 @@ func (r *userStarExpRepository) UpdateIsCurrentForUser(userID int64, isCurrent b
 		Where("user_id = ?", userID).
 		Update("is_current", isCurrent).Error
 }
+

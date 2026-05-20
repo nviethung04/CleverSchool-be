@@ -1,15 +1,15 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/dto"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/redis"
-	"be-Clever School/repositories"
-	"be-Clever School/repositories/base"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/dto"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/redis"
+	"be-cleverschool/repositories"
+	"be-cleverschool/repositories/base"
+	"be-cleverschool/utils"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -1819,3 +1819,4 @@ func (dcs *DashboardCacheService) formatRiskWarningData(dataItem dto.RiskAndWarn
 		SlowGradingTeachers: slowGradingTeachers,
 	}
 }
+

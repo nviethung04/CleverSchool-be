@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/i18n"
+	"be-cleverschool/config"
+	"be-cleverschool/i18n"
 	"bytes"
 	"fmt"
 	"io"
@@ -14,7 +14,7 @@ import (
 	"time"
 	"unicode"
 
-	"be-Clever School/prot"
+	"be-cleverschool/prot"
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"
@@ -736,3 +736,4 @@ func FormatMonthOrQuarter(quarter int32, year int32, locale string) string {
 func PtrInt64(i int64) *int64 {
 	return &i
 }
+

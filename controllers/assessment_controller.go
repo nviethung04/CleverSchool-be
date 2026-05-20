@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/requests"
-	"be-Clever School/resources"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/requests"
+	"be-cleverschool/resources"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -114,3 +114,4 @@ func (ctl *AssessmentController) UpdatePublish(c *gin.Context) {
 
 	utils.Respond(c, result, nil, "")
 }
+

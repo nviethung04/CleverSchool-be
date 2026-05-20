@@ -1,9 +1,9 @@
 package command
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/redis"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/redis"
 	"flag"
 	"fmt"
 	"log"
@@ -93,3 +93,4 @@ func RunDeleteUserCommand(t *testing.T, id int) {
 		t.Logf("✅ Test Passed: User %s was successfully deleted", name)
 	}
 }
+

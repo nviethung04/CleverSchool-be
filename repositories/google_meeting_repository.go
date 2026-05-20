@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -126,3 +126,4 @@ func (r *googleMeetingRepository) UpdateRecording(id uint, recordingURL, status 
 			"recording_duration_minutes": durationMinutes,
 		}).Error
 }
+

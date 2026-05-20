@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/jobs"
+	"be-cleverschool/config"
+	"be-cleverschool/jobs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,3 +37,4 @@ func (ctrl *RecalculateStudyReportsStarController) RecalculateStudyReportsStar(c
 		"type":    "study_reports",
 	})
 }
+

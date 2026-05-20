@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/requests"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/requests"
 	"strings"
 	"time"
 
@@ -153,3 +153,4 @@ func (r *assessmentCriterionRepository) RestoreRefCriterion(assessmentID, criter
 			"updated_at": now,
 		}).Error
 }
+

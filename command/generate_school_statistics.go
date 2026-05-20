@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-Clever School/jobs"
+	"be-cleverschool/jobs"
 	"flag"
 	"fmt"
 	"log"
@@ -81,3 +81,4 @@ func GenerateSchoolStatisticsCommand() {
 			stat.StudentsCompletedHomework)
 	}
 }
+

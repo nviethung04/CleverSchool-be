@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 )
 
 type DashboardStudentAssessmentRepository interface {
@@ -36,4 +36,5 @@ func (r *dashboardStudentAssessmentRepository) GetAssessmentsByCourseID(courseID
 		Find(&refs).Error
 	return refs, err
 }
+
 

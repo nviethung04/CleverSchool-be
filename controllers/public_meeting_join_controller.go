@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"net/http"
 
@@ -63,3 +63,4 @@ func (c *PublicMeetingJoinController) Join(ctx *gin.Context) {
 
 	utils.Respond(ctx, nil, fmt.Errorf("meeting not found"), "meeting not found", http.StatusNotFound)
 }
+

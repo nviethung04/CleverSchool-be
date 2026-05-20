@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/utils"
 	"bytes"
 	"fmt"
 	"time"
@@ -152,3 +152,4 @@ func (s *schoolService) Export(c *gin.Context) (string, error) {
 
 	return fileURL, nil
 }
+

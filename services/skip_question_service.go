@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
 	"strconv"
 	"time"
 )
@@ -374,3 +374,4 @@ func (s *skipQuestionService) updateQuestionsCompletedWithCorrectAnswers(homewor
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Update("questions_completed", correctQuestionsCount).Error
 }
+

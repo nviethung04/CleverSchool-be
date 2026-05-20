@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/redis"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/redis"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -552,3 +552,4 @@ func (s *authService) generateResetToken() string {
 	rand.Read(bytes)
 	return hex.EncodeToString(bytes)
 }
+

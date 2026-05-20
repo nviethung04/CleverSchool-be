@@ -1,14 +1,14 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"be-Clever School/config"
+	"be-cleverschool/config"
 
 	"gorm.io/gorm"
 )
@@ -465,3 +465,4 @@ WHERE m.type = 'folder'
 
 	return nil
 }
+

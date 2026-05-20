@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type NoticeResource interface {
@@ -127,3 +127,4 @@ func (r *NoticeResourceImpl) FormatModelNotice(notice *prot.Notice) *models.Noti
 		Type:        noticeType,
 	}
 }
+

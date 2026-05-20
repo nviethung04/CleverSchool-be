@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -235,3 +235,4 @@ func (r *homeworkAnswerRepository) GetSubmitFiles(homeworkID, userID int64) (mod
 	return homeworkUser.FileInfos, nil
 
 }
+

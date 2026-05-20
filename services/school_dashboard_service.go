@@ -2,8 +2,8 @@ package services
 
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
 
 	
 )
@@ -39,3 +39,4 @@ func (s *schoolDashboardService) GetAllSchoolsWithStats() ([]*prot.SchoolSummary
 	}
 	return result, nil
 }
+

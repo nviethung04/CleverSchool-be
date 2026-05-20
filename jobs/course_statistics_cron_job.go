@@ -1,11 +1,11 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 	"log"
 	"time"
 )
@@ -109,3 +109,4 @@ func (j *CourseStatisticsCronJob) RunForDateRange(startDate, endDate time.Time) 
 	duration := time.Since(startTime)
 	log.Printf("✅ Hoàn thành Course Statistics CronJob cho khoảng thời gian được chỉ định trong %v", duration)
 }
+

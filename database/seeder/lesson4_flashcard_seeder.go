@@ -1,8 +1,8 @@
 package main
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"fmt"
 	"log"
 )
@@ -143,3 +143,4 @@ func SeedLesson4Flashcards() {
 	fmt.Printf("   - %d vocabularies for lesson 4\n", len(vocabularies))
 	fmt.Printf("   - All linked to lesson: %s\n", lesson.Title)
 }
+

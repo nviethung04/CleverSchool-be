@@ -2,10 +2,10 @@
 package main
 
 import (
-	"be-Clever School/app"
-	"be-Clever School/command"
-	"be-Clever School/config"
-	"be-Clever School/database/db"
+	"be-cleverschool/app"
+	"be-cleverschool/command"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
 	"embed"
 	"fmt"
 	"log"
@@ -189,3 +189,4 @@ func forceMigration(version int) {
 
 	fmt.Printf("✅ Forced version to %d.\n", version)
 }
+

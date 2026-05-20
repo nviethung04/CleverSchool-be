@@ -1,10 +1,10 @@
 package services
 
 import (
-    "be-Clever School/models"
-    "be-Clever School/prot"
-    "be-Clever School/repositories"
-    "be-Clever School/utils"
+    "be-cleverschool/models"
+    "be-cleverschool/prot"
+    "be-cleverschool/repositories"
+    "be-cleverschool/utils"
 )
 
 type ExerciseStudentService interface {
@@ -72,5 +72,6 @@ func (s *exerciseStudentService) GetExerciseStudentsByExerciseIDService(exercise
         ExamInfo:   protoInfo,
     }, nil
 }
+
 
 

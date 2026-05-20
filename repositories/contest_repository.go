@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 	"fmt"
 	"time"
 
@@ -671,3 +671,4 @@ func (r *contestRoundRepository) BulkRemoveJoinerPersons(contestRoundId int64, u
 		WHERE contest_round_id = $3 AND user_id = ANY($4)
 	`, time.Now(), deletedBy, contestRoundId, userIds).Error
 }
+

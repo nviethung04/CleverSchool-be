@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
-	"be-Clever School/requests"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
+	"be-cleverschool/requests"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -162,3 +162,4 @@ func (r *schoolRepository) GetSchoolStudents(schoolId int64) ([]models.User, err
 
 	return students, err
 }
+
