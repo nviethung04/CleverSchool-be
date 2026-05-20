@@ -91,28 +91,29 @@ jobs:
             "$APP_DIR/current/myapp" migrate
 
             if [ ! -f /etc/systemd/system/cleverschool-be.service ]; then
-              cat >/etc/systemd/system/cleverschool-be.service <<EOF
-[Unit]
-Description=CleverSchool BE (develop)
-After=network-online.target docker.service
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$APP_DIR/current
-EnvironmentFile=$APP_DIR/.env
-ExecStart=$APP_DIR/current/myapp
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
+              printf '%s\n' \
+                '[Unit]' \
+                'Description=CleverSchool BE (develop)' \
+                'After=network-online.target docker.service' \
+                'Wants=network-online.target' \
+                '' \
+                '[Service]' \
+                'Type=simple' \
+                'User=root' \
+                "WorkingDirectory=$APP_DIR/current" \
+                "EnvironmentFile=$APP_DIR/.env" \
+                "ExecStart=$APP_DIR/current/myapp" \
+                'Restart=always' \
+                'RestartSec=5' \
+                '' \
+                '[Install]' \
+                'WantedBy=multi-user.target' \
+                >/etc/systemd/system/cleverschool-be.service
             fi
 
             systemctl daemon-reload
             systemctl enable cleverschool-be.service
             systemctl restart cleverschool-be.service
             systemctl --no-pager --full status cleverschool-be.service || true
+
 
