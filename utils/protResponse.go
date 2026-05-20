@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/i18n"
-	"be-Clever School/prot"
+	"be-cleverschool/config"
+	"be-cleverschool/i18n"
+	"be-cleverschool/prot"
 	"net/http"
 	"reflect"
 	"strings"
@@ -210,3 +210,4 @@ func Respond(c *gin.Context, data interface{}, err error, message string, status
 		"data":    data,
 	})
 }
+

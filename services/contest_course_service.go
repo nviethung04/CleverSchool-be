@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/prot"
+	"be-cleverschool/prot"
 )
 
 type ContestCourseService interface {
@@ -32,3 +32,4 @@ func (s *contestCourseService) RemoveContestFromCourse(contestID int64, courseID
 	// TODO: Implement logic to remove contest from course
 	return &prot.ContestCourseAssignmentResponse{Success: true, Message: "Contest removed from course successfully"}, nil
 }
+

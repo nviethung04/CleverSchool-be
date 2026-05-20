@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"be-Clever School/config"
+	"be-cleverschool/config"
 	"bytes"
 	"io"
 	"runtime/debug"
@@ -93,3 +93,4 @@ func SafeGo(fn func()) {
 		fn()
 	}()
 }
+

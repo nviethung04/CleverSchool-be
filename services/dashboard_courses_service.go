@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/repositories"
+	"be-cleverschool/dto"
+	"be-cleverschool/repositories"
 )
 
 type DashboardCoursesService interface {
@@ -23,3 +23,4 @@ func NewDashboardCoursesService(dashboardCoursesRepo repositories.DashboardCours
 func (s *dashboardCoursesService) GetDashboardCourses(schoolID int64, selectedStartDate, selectedEndDate string) ([]dto.DashboardCoursesResponse, error) {
 	return s.dashboardCoursesRepo.GetDashboardCourses(schoolID, 0, 0, selectedStartDate, selectedEndDate)
 }
+

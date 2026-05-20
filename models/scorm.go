@@ -14,7 +14,7 @@ type ScormActivity struct {
 	MaxTimeAllowed  string   `gorm:"type:varchar(32)"`                  // Thời gian tối đa cho phép
 	TimeLimitAction string   `gorm:"type:varchar(32)"`                  // Hành động khi hết thời gian
 	LaunchData      string   `gorm:"type:text"`                         // Dữ liệu khởi chạy
-	DataFromClever School     string   `gorm:"type:text"`                         // Dữ liệu từ Clever School
+	DataFromCleverSchool string   `gorm:"type:text"`                         // Dữ liệu từ Clever School
 	Status          string   `gorm:"type:varchar(32);default:'active'"` // active/inactive
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
@@ -81,3 +81,4 @@ type ScormSession struct {
 func (ScormSession) TableName() string {
 	return "scorm_sessions"
 }
+

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/repositories"
+	"be-cleverschool/dto"
+	"be-cleverschool/repositories"
 	"errors"
 
 	"gorm.io/gorm"
@@ -50,4 +50,5 @@ func (s *courseFamilyService) GetCourseFamily(courseID int64) (*dto.CourseFamily
 		Children: children,
 	}, nil
 }
+
 

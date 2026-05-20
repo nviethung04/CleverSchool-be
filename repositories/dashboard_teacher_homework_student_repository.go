@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/requests"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/requests"
 	"sort"
 	"strconv"
 	"strings"
@@ -771,3 +771,4 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetHomeworkOverview(req *req
 
 	return &overview, nil
 }
+

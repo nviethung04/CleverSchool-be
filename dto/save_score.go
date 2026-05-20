@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 type AnswerWithScoreMultipleChoice struct {
 	models.Answer
@@ -11,3 +11,4 @@ type AnswerWithScoreFillInBlank struct {
 	models.Answer
 	Score float64
 }
+

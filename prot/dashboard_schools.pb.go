@@ -329,7 +329,7 @@ const file_prot_dashboard_schools_proto_rawDesc = "" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x1f\n" +
 	"\vtotal_pages\x18\x05 \x01(\x05R\n" +
-	"totalPagesB\rZ\vbe-Clever School/protb\x06proto3"
+	"totalPagesB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_dashboard_schools_proto_rawDescOnce sync.Once
@@ -381,3 +381,4 @@ func file_prot_dashboard_schools_proto_init() {
 	file_prot_dashboard_schools_proto_goTypes = nil
 	file_prot_dashboard_schools_proto_depIdxs = nil
 }
+

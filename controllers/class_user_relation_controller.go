@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,3 +33,4 @@ func (ctl *ClassUserRelationController) UpdateUserClassRelation(c *gin.Context) 
 	resp, err := ctl.svc.UpdateUserClassRelation(c, req.ClassId, req.StudentIds, int64(updatedBy))
 	utils.Respond(c, resp, err, "")
 }
+

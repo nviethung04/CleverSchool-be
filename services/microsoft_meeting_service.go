@@ -15,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 )
 
 type MeetingPermissionInfo struct {
@@ -1071,3 +1071,4 @@ func (s *microsoftMeetingService) normalizeConferenceID(conferenceID, joinURL, c
 	}
 	return conferenceID
 }
+

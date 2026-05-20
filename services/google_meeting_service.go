@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
@@ -494,3 +494,4 @@ func (s *googleMeetingService) GetUpcomingMeetings(userID uint, limit int) ([]*m
 func (s *googleMeetingService) UpdateRecording(id uint, recordingURL, status string, durationMinutes int) error {
 	return s.repo.UpdateRecording(id, recordingURL, status, durationMinutes)
 }
+

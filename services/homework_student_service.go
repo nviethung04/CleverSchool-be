@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/repositories"
+	"be-cleverschool/repositories"
 )
 
 type HomeworkStudentService interface {

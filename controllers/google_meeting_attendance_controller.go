@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -227,3 +227,4 @@ func (c *GoogleMeetingAttendanceController) ExportAttendancesExcel(ctx *gin.Cont
 		return
 	}
 }
+

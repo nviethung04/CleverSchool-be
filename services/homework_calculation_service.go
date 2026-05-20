@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/repositories"
+	"be-cleverschool/repositories"
 	"fmt"
 )
 
@@ -71,4 +71,5 @@ func (s *homeworkCalculationService) CalculateHomeworkMetrics(homeworkID, userID
 
 	return result, nil
 }
+
 

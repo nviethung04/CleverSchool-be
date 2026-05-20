@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-Clever School/services"
+	"be-cleverschool/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -488,3 +488,4 @@ func (c *ScormUploadController) UploadForm(ctx *gin.Context) {
 	ctx.Header("Content-Type", "text/html")
 	ctx.String(http.StatusOK, html)
 }
+

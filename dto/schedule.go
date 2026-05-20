@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-Clever School/models"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -28,3 +28,4 @@ type LessonScheduleDetail struct {
 	Groups           []LessonSchedule
 	Semesters       []models.Semester
 }
+

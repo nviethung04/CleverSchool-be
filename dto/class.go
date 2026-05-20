@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 type Student struct {
 	ID           int64  `json:"id"`
@@ -24,3 +24,4 @@ type Class struct {
 	Courses        []Course  `json:"courses"`
 	Students       []Student `json:"students"`
 }
+

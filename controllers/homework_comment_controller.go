@@ -1,9 +1,9 @@
 package controllers
 
 import (
-    "be-Clever School/prot"
-    "be-Clever School/services"
-    "be-Clever School/utils"
+    "be-cleverschool/prot"
+    "be-cleverschool/services"
+    "be-cleverschool/utils"
     "net/http"
 
     "github.com/gin-gonic/gin"
@@ -36,5 +36,6 @@ func (ctl *HomeworkCommentController) PostHomeworkComment(c *gin.Context) {
     resp := ctl.service.CreateHomeworkComment(req.HomeworkID, req.StudentID, teacherID, req.Content)
     utils.Respond(c, resp, nil, "")
 }
+
 
 

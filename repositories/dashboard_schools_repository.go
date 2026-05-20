@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
 	"strings"
 
 	"gorm.io/gorm"
@@ -233,3 +233,4 @@ func (r *dashboardSchoolsRepository) GetDashboardSchoolsCount(search string) (in
 	err := baseQuery.Count(&count).Error
 	return count, err
 }
+

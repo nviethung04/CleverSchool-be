@@ -1,11 +1,11 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 	"fmt"
 	"time"
 )
@@ -180,4 +180,5 @@ func RecalculateHomeworkUsersMetricsJob(startDate, endDate *time.Time, onlyHomew
 
 	return processed, updated, nil
 }
+
 

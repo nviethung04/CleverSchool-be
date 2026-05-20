@@ -1,9 +1,9 @@
 package main
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"flag"
 	"fmt"
 	"log"
@@ -494,3 +494,4 @@ func (s *Seeder) UserClassAndCourse() {
 }
 
 //go run database/seeder/seeder.go --model=Role
+

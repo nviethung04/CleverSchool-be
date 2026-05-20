@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -261,3 +261,4 @@ func (s *zoomMeetingService) deleteZoomMeeting(accessToken, meetingID string) er
 
 	return nil
 }
+

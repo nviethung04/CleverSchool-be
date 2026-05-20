@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"time"
 )
 
@@ -150,3 +150,4 @@ func (r *ExamResourceImpl) FormatModelExam(exam *prot.ExamRequest) *models.Exam 
 		Type:             examType,
 	}
 }
+

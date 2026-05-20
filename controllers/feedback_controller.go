@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/prot"
-	"be-Clever School/resources"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/prot"
+	"be-cleverschool/resources"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -54,3 +54,4 @@ func (ctl *FeedbackController) UpdateStatus(c *gin.Context) {
 	data, err := ctl.svc.UpdateStatus(c, id, &req.Status, req.Response, req.Note, &req.Type)
 	utils.Respond(c, data, err, "")
 }
+

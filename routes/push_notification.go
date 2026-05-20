@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/middleware"
-	"be-Clever School/repositories"
+	"be-cleverschool/controllers"
+	"be-cleverschool/middleware"
+	"be-cleverschool/repositories"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,3 +29,4 @@ func RoutePushNotification(router *gin.Engine) {
 		api.POST("/notices/:id/send", pushCtrl.SendNoticeWithPush)
 	}
 }
+

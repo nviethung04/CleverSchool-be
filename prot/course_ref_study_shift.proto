@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-Clever School/prot";
+option go_package = "be-cleverschool/prot";
 
 import "study_shift.proto";
 
@@ -15,3 +15,4 @@ message CourseRefStudyShift {
 
   StudyShift shift = 6;
 }
+

@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 	"time"
 )
 
@@ -92,3 +92,4 @@ func (r *SemesterResourceImpl) FormatModelSemester(request *prot.SemesterRequest
 
 	return semester
 }
+

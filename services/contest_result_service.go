@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/repositories"
+	"be-cleverschool/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,3 +54,4 @@ func (s *contestResultService) GetContestRoundLeaderboard(c *gin.Context, contes
 	}
 	return leaderboard, nil
 }
+

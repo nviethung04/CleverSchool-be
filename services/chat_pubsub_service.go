@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/redis"
+	"be-cleverschool/redis"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -308,3 +308,4 @@ func StartChatEventListener(ctx context.Context, pubsubService ChatPubSubService
 	log.Printf("Started chat event listener for %d courses", len(courseIDs))
 	return nil
 }
+

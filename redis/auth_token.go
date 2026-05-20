@@ -1,9 +1,9 @@
 package redis
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -257,3 +257,4 @@ func GetLatestUserToken(userID int) (string, error) {
 	}
 	return latestToken, nil
 }
+

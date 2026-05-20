@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type EmployeePositionResource interface {
@@ -56,3 +56,4 @@ func (r *EmployeePositionResourceImpl) FormatModelEmployeePosition(employeePosit
 		Status:      employeePosition.Status,
 	}
 }
+

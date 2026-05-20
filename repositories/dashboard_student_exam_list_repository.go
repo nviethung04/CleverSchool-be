@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
 	"time"
 )
 
@@ -152,3 +152,4 @@ func extractCoverImageFromInfo(info interface{}) string {
 	// TODO: parse JSON nếu cần, hoặc trả về rỗng
 	return ""
 }
+

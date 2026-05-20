@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/requests"
-	"be-Clever School/resources"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/requests"
+	"be-cleverschool/resources"
 	"mime/multipart"
 
 	"github.com/gin-gonic/gin"
@@ -132,3 +132,4 @@ func (s *schoolService) GetSchoolStudents(c *gin.Context, schoolId int64) ([]mod
 	}
 	return students, nil
 }
+

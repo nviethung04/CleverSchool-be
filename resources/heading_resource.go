@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type HeadingResource interface {
@@ -70,3 +70,4 @@ func (r *HeadingResourceImpl) FormatModelHeading(heading *prot.HeadingRequest) *
 		Target:       heading.Target,
 	}
 }
+

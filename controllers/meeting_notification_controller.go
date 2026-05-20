@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"net/http"
 	"strconv"
 
@@ -110,3 +110,4 @@ func (c *MeetingNotificationController) CountUnread(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"count": count})
 }
+

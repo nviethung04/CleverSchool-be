@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -676,3 +676,4 @@ func callFlyPDFService(htmlContent string) ([]byte, error) {
 	config.Log.Info("PDF generated successfully, size:", len(pdfBuffer), "bytes")
 	return pdfBuffer, nil
 }
+

@@ -248,7 +248,7 @@ const file_prot_dashboard_report_proto_rawDesc = "" +
 	"\x15student_active_weekly\x18\x06 \x01(\x03R\x13studentActiveWeekly\x122\n" +
 	"\x15teacher_active_weekly\x18\a \x01(\x03R\x13teacherActiveWeekly\x126\n" +
 	"\x17frequent_login_students\x18\b \x01(\x03R\x15frequentLoginStudents\x12C\n" +
-	"\x1efrequent_login_students_weekly\x18\t \x01(\x03R\x1bfrequentLoginStudentsWeeklyB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x1efrequent_login_students_weekly\x18\t \x01(\x03R\x1bfrequentLoginStudentsWeeklyB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_dashboard_report_proto_rawDescOnce sync.Once
@@ -300,3 +300,4 @@ func file_prot_dashboard_report_proto_init() {
 	file_prot_dashboard_report_proto_goTypes = nil
 	file_prot_dashboard_report_proto_depIdxs = nil
 }
+

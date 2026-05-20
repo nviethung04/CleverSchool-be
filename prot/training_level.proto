@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-Clever School/prot";
+option go_package = "be-cleverschool/prot";
 
 message TrainingLevel {
   int64 id = 1;
@@ -32,3 +32,4 @@ message TrainingLevelsResponse {
   repeated TrainingLevel training_levels = 1;
   uint64 total_count = 2;
 }
+

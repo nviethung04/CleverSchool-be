@@ -1,8 +1,8 @@
 package observer
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/models"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
 	"errors"
 
 	"gorm.io/gorm"
@@ -89,3 +89,4 @@ func (u *UserObserver) AfterDelete(data interface{}, tx *gorm.DB) (err error) {
 	}
 	return nil
 }
+

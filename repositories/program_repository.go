@@ -3,9 +3,9 @@ package repositories
 import (
 	"database/sql"
 
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 	"errors"
 
 	"gorm.io/gorm"
@@ -500,3 +500,4 @@ func (r *programRepository) GetFailedUserIdsById(programId int64) ([]int64, erro
 	
 	return failedUserIds, nil
 }
+

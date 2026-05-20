@@ -376,7 +376,7 @@ const file_dashboard_student_homework_proto_rawDesc = "" +
 	"\raverage_ratio\x18\x06 \x01(\x01R\faverageRatio\"\xa0\x01\n" +
 	" DashboardStudentHomeworkResponse\x12B\n" +
 	"\boverview\x18\x01 \x01(\v2&.prot.DashboardStudentHomeworkOverviewR\boverview\x128\n" +
-	"\x05chart\x18\x02 \x03(\v2\".prot.DashboardStudentHomeworkWeekR\x05chartB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x05chart\x18\x02 \x03(\v2\".prot.DashboardStudentHomeworkWeekR\x05chartB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_dashboard_student_homework_proto_rawDescOnce sync.Once
@@ -430,3 +430,4 @@ func file_dashboard_student_homework_proto_init() {
 	file_dashboard_student_homework_proto_goTypes = nil
 	file_dashboard_student_homework_proto_depIdxs = nil
 }
+

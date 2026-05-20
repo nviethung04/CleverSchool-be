@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 )
 
 type UserDeviceRepository interface {
@@ -116,3 +116,4 @@ func (r *userDeviceRepository) GetCountDevice() int64 {
 
 	return userCount
 }
+

@@ -415,7 +415,7 @@ const file_scorm_proto_rawDesc = "" +
 	"\x06scorms\x18\x01 \x03(\v2\v.prot.ScormR\x06scorms\"L\n" +
 	"\rScormResponse\x12!\n" +
 	"\x05scorm\x18\x01 \x01(\v2\v.prot.ScormR\x05scorm\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-Clever School/protb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_scorm_proto_rawDescOnce sync.Once
@@ -471,3 +471,4 @@ func file_scorm_proto_init() {
 	file_scorm_proto_goTypes = nil
 	file_scorm_proto_depIdxs = nil
 }
+

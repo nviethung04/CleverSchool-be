@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/repositories"
+	"be-cleverschool/repositories"
 )
 
 type ClonedQuestionService interface {
@@ -27,3 +27,4 @@ func (s *clonedQuestionService) GetQuestionsMap(assignmentID int64, assignmentTy
 	}
 	return result, nil
 }
+

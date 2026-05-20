@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 
 	"gorm.io/gorm/clause"
 )
@@ -107,3 +107,4 @@ func (h *h5pContentRepository) GetContentUserDataByContentIdAndUser(contentId st
 
 	return rawResults, err
 }
+

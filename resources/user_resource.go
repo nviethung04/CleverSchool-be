@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"sort"
 	"time"
 )
@@ -339,3 +339,4 @@ func (r *UserResourceImpl) FormatModelUser(user *prot.User) *models.User {
 		IsFailedSubject:      user.IsFailedSubject,
 	}
 }
+

@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"fmt"
 	"sort"
 	"time"
@@ -384,3 +384,4 @@ func GetProgress(course models.Course) int32 {
 
 	return progress
 }
+

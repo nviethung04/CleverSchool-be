@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 )
 
 type LessonPlanResource interface {
@@ -145,3 +145,4 @@ func (r *LessonPlanResourceImpl) FormatModelLessonPlan(lessonPlan *prot.LessonPl
 		Views:          int(lessonPlan.Views),
 	}
 }
+

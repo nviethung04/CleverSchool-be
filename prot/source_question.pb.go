@@ -492,7 +492,7 @@ const file_source_question_proto_rawDesc = "" +
 	"\x17SourceQuestionsResponse\x12?\n" +
 	"\x10source_questions\x18\x01 \x03(\v2\x14.prot.SourceQuestionR\x0fsourceQuestions\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x04R\n" +
-	"totalCountB\x13Z\x11be-Clever School/admin/protb\x06proto3"
+	"totalCountB\x13Z\x11be-cleverschool/admin/protb\x06proto3"
 
 var (
 	file_source_question_proto_rawDescOnce sync.Once
@@ -551,3 +551,4 @@ func file_source_question_proto_init() {
 	file_source_question_proto_goTypes = nil
 	file_source_question_proto_depIdxs = nil
 }
+

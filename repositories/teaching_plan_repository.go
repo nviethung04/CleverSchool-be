@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 )
 
 type TeachingPlanRepository interface {
@@ -55,3 +55,4 @@ func (r *teachingPlanRepository) UpdateLessons(id int64, lessonIds []int64) erro
 
 	return nil
 }
+

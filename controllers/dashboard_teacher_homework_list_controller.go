@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/requests"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/requests"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,4 +28,5 @@ func (ctl *DashboardTeacherHomeworkListController) GetHomeworkList(c *gin.Contex
 	resp, err := ctl.svc.GetHomeworkList(c, &req)
 	utils.Respond(c, resp, err, "")
 }
+
 

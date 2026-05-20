@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -92,3 +92,4 @@ func (cc *ChapterController) RespondDetail(c *gin.Context, chapter *models.Chapt
 
 	utils.Respond(c, formattedChapter, nil, "")
 }
+

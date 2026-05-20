@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/dto"
-	"be-Clever School/redis"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/services"
-	"be-Clever School/utils"
-	ws "be-Clever School/websocket"
+	"be-cleverschool/config"
+	"be-cleverschool/dto"
+	"be-cleverschool/redis"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
+	ws "be-cleverschool/websocket"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"be-Clever School/database/db"
+	"be-cleverschool/database/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -698,3 +698,4 @@ func (c *ChatWebSocketController) GetConnectionStats(ctx *gin.Context) {
 		"status": "WebSocket hub running",
 	})
 }
+

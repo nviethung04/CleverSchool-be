@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 )
 
 type DegreeRepository interface {
@@ -18,3 +18,4 @@ func NewDegreeRepository() DegreeRepository {
 		BaseRepository: base.NewBaseRepository[models.Degree](),
 	}
 }
+

@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"fmt"
 	"strings"
 	"time"
@@ -473,3 +473,4 @@ func (s *contestRoundService) BulkRemoveJoinerPersons(c *gin.Context, contestRou
 	deletedBy := int64(utils.GetCurrentUserId(c))
 	return s.repo.BulkRemoveJoinerPersons(contestRoundId, userIds, deletedBy)
 }
+

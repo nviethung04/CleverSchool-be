@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 	"errors"
 	"reflect"
 	"time"
@@ -450,3 +450,4 @@ func (r *questionRepository) GetQuestionIdsByQuestionAttributeIds(questionAttrib
 
 	return questionIDs, nil
 }
+

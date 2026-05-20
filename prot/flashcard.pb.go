@@ -1161,7 +1161,7 @@ const file_flashcard_proto_rawDesc = "" +
 	"\x0ecurrent_streak\x18\x0e \x01(\x05R\rcurrentStreak\x12%\n" +
 	"\x0elongest_streak\x18\x0f \x01(\x05R\rlongestStreak\x12>\n" +
 	"\x1baverage_pronunciation_score\x18\x10 \x01(\x01R\x19averagePronunciationScore\x128\n" +
-	"\x18best_pronunciation_score\x18\x11 \x01(\x01R\x16bestPronunciationScoreB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x18best_pronunciation_score\x18\x11 \x01(\x01R\x16bestPronunciationScoreB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_flashcard_proto_rawDescOnce sync.Once
@@ -1224,3 +1224,4 @@ func file_flashcard_proto_init() {
 	file_flashcard_proto_goTypes = nil
 	file_flashcard_proto_depIdxs = nil
 }
+

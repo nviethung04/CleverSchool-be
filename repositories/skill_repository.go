@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -28,3 +28,4 @@ func NewSkillRepository() SkillRepository {
 func (s *skillRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {
 	return query
 }
+

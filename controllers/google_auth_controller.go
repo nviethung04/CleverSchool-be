@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"net/http"
 	"strings"
 
@@ -99,3 +99,4 @@ func (ctrl *GoogleAuthController) RefreshToken(c *gin.Context) {
 		"message": "Token refreshed successfully",
 	}, nil, "")
 }
+

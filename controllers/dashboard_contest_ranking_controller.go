@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/requests"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/requests"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,4 +28,5 @@ func (ctl *DashboardContestRankingController) GetContestRanking(c *gin.Context) 
 	resp, err := ctl.svc.GetContestRanking(c, &req)
 	utils.Respond(c, resp, err, "")
 }
+
 

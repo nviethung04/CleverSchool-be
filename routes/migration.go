@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/middleware"
+	"be-cleverschool/controllers"
+	"be-cleverschool/middleware"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -25,3 +25,4 @@ func RegisterMigrationRoutes(r *gin.Engine) {
 	api.POST("/extract", uploadController.Extract)
 	api.GET("/progress", uploadController.GetExtractProgress)
 }
+

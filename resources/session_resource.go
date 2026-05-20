@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/redis"
+	"be-cleverschool/prot"
+	"be-cleverschool/redis"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -43,3 +43,4 @@ func (r *SessionResourceImpl) FormatSessions(sessions []*redis.SessionInfo) []*p
 	}
 	return result
 }
+

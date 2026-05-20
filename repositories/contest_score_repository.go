@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"errors"
 	"fmt"
 	"time"
@@ -171,3 +171,4 @@ func (r *contestScoreRepository) UpdateEvaluate(userId, contestRoundId int64, sc
 
     return nil
 }
+

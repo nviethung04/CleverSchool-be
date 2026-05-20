@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -216,3 +216,4 @@ func detectDeviceType(platform string) string {
 
 	return ""
 }
+

@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type StudyShiftResource interface {
@@ -54,3 +54,4 @@ func (r *StudyShiftResourceImpl) FormatModelStudyShift(studyShift *prot.StudyShi
 		EndTime:   studyShift.EndTime,
 	}
 }
+

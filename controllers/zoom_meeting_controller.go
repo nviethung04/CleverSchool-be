@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/repositories"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"net/http"
 	"strconv"
 
@@ -257,3 +257,4 @@ func (zmc *ZoomMeetingController) CreateLessonMeeting(c *gin.Context) {
 
 	utils.Respond(c, meeting, nil, "Lesson meeting created successfully")
 }
+

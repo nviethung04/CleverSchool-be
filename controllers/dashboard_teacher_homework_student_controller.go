@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/requests"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/requests"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -278,3 +278,4 @@ func (ctl *DashboardTeacherHomeworkStudentController) createExcelFileForStudent(
 	// Write to response
 	return f.Write(ctx.Writer)
 }
+

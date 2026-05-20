@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/redis"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/redis"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"fmt"
 	"io"
 	"net/http"
@@ -437,3 +437,4 @@ func GetPermissionGroupAction(permissions []models.Permission) []*prot.Permissio
 
 	return allPermissions
 }
+

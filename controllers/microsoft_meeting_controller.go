@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -663,3 +663,4 @@ func (c *MicrosoftMeetingController) ResponseError(ctx *gin.Context, statusCode 
 
 	ctx.JSON(statusCode, response)
 }
+

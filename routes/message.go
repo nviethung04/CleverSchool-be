@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/middleware"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/controllers"
+	"be-cleverschool/middleware"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -104,3 +104,4 @@ func RouteMessage(router *gin.Engine) {
 	managementRouter.GET("/courses/:id/chat/messages/recipient/:recipientId", chatMessageController.GetFromRecipientMessage)
 	managementRouter.GET("/courses/:id/chat/messages/recent-senders", chatMessageController.GetRecentSenders)
 }
+

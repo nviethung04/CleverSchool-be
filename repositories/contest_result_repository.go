@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 )
 
 type ContestResultRepository interface {
@@ -151,3 +151,4 @@ func (r *contestResultRepository) GetContestRoundLeaderboard(contestRoundId int6
 
 	return leaderboard, err
 }
+

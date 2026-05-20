@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/utils"
 	"errors"
 	"net/http"
 	"strconv"
@@ -74,3 +74,4 @@ func ValidateEmoji() gin.HandlerFunc {
 		c.Next()
 	})
 }
+

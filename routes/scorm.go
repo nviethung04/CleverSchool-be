@@ -2,7 +2,7 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
+	"be-cleverschool/controllers"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -61,3 +61,4 @@ func RegisterScormRoutes(r *gin.Engine) {
 		v2004.POST("/terminate", scormController.TerminateScormSession)
 	}
 }
+

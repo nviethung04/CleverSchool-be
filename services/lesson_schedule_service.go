@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 	"errors"
 	"fmt"
 	"sort"
@@ -192,3 +192,4 @@ func (s *lessonScheduleService) SyncAllProgram(courseID int64) (*prot.LessonSche
 		FailedCount:     int32(len(failedCourses)),
 	}, nil
 }
+

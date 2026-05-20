@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"be-Clever School/middleware"
-	"be-Clever School/repositories"
+	"be-cleverschool/middleware"
+	"be-cleverschool/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,3 +28,4 @@ func RouteH5p(router *gin.Engine) {
 	h5pGroup.GET("/content-user-data/:contentId/:userId/:contextId", middleware.AuthMiddleware(authRepo), h5pController.GetContentUserDataByContentIdAndUser)
 
 }
+

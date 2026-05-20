@@ -145,7 +145,7 @@ const file_exam_comment_proto_rawDesc = "" +
 	"\acontent\x18\x03 \x01(\tR\acontent\"I\n" +
 	"\x13ExamCommentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-Clever School/protb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_exam_comment_proto_rawDescOnce sync.Once
@@ -195,3 +195,4 @@ func file_exam_comment_proto_init() {
 	file_exam_comment_proto_goTypes = nil
 	file_exam_comment_proto_depIdxs = nil
 }
+

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"errors"
 	"gorm.io/gorm"
 	"time"
@@ -80,3 +80,4 @@ func (r *saveScorePositionRepository) SaveBatchExerciseQuestionUserPositions(rec
 		Delete(&models.ExerciseQuestionUserPosition{}).Error; err != nil { return err }
 	return tx.CreateInBatches(records, len(records)).Error
 }
+

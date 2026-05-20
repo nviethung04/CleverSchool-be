@@ -444,7 +444,7 @@ const file_prot_dashboard_teacher_homework_scored_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x86\x01\n" +
 	"*DashboardTeacherHomeworkScoredListResponse\x12B\n" +
 	"\thomeworks\x18\x01 \x03(\v2$.prot.DashboardTeacherHomeworkScoredR\thomeworks\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-Clever School/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_dashboard_teacher_homework_scored_proto_rawDescOnce sync.Once
@@ -500,3 +500,4 @@ func file_prot_dashboard_teacher_homework_scored_proto_init() {
 	file_prot_dashboard_teacher_homework_scored_proto_goTypes = nil
 	file_prot_dashboard_teacher_homework_scored_proto_depIdxs = nil
 }
+

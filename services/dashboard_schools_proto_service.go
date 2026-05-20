@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
+	"be-cleverschool/dto"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
 	"math"
 )
 
@@ -92,3 +92,4 @@ func (s *dashboardSchoolsProtoService) GetDashboardSchoolsProto(req *prot.Dashbo
 		TotalPages:  totalPages,
 	}, nil
 }
+

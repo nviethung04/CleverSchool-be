@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 	"strconv"
 
@@ -130,3 +130,4 @@ func (cqc *ContestQuestionController) RemoveQuestionsFromContestRound(c *gin.Con
 		"message": "Questions removed successfully",
 	}, nil, "")
 }
+

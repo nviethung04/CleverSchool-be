@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type RoleResource interface {
@@ -66,3 +66,4 @@ func (r *RoleResourceImpl) FormatModelRole(role *prot.Role) *models.Role {
 		DefaultPageID: defaultPageId,
 	}
 }
+

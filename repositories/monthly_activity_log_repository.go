@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/requests"
-	"be-Clever School/table_manager"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/requests"
+	"be-cleverschool/table_manager"
 	"fmt"
 	"strings"
 	"time"
@@ -899,3 +899,4 @@ func detectDevice(agent string) string {
 		return "Tablet"
 	}
 }
+

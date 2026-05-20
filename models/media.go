@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"be-Clever School/config"
+	"be-cleverschool/config"
 
 	"gorm.io/gorm"
 )
@@ -108,3 +108,4 @@ func (m *MediaInfos) Scan(value interface{}) error {
 func (m MediaInfos) Value() (driver.Value, error) {
 	return json.Marshal(m)
 }
+

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"fmt"
 	"log"
 	"time"
@@ -219,4 +219,5 @@ func (s *assessmentRefLessonSyncService) SyncAssessmentRefLessons(programID int6
 	log.Printf("✅ Hoàn thành! Đã xử lý %d cặp, thêm %d records", totalProcessed, totalInserted)
 	return totalProcessed, totalInserted, nil
 }
+
 

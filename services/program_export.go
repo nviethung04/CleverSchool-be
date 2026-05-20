@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/repositories"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
@@ -739,3 +739,4 @@ func writeLessonPlanRow(
 		}
 	}
 }
+

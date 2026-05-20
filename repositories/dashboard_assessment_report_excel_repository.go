@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"sort"
 	"strings"
 
@@ -337,4 +337,5 @@ func (r *dashboardAssessmentReportExcelRepository) GetGradesByIDs(gradeIDs []int
 	
 	return result, nil
 }
+
 

@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -291,3 +291,4 @@ func (ctrl *GoogleMeetingController) UpdateRecording(c *gin.Context) {
 		Message: "Recording updated",
 	}, nil, "")
 }
+

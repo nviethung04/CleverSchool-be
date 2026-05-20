@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 // ExerciseAnswerMultipleChoice Multiple Choice: Lấy câu trả lời của người dùng và câu trả lời đúng (is_correct = true)
 type ExerciseAnswerMultipleChoice struct {
@@ -103,3 +103,4 @@ type ExerciseAnswerManual struct {
 	Score          float64          `json:"score"`
 	IsScored       bool             `json:"is_scored"`
 }
+

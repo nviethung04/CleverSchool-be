@@ -1,8 +1,8 @@
 package command
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -137,3 +137,4 @@ func (c *CopyHomeworkToExerciseCommand) Execute(ctx *gin.Context) {
 		"failed_homework_ids": res.FailedIDs,
 	})
 }
+

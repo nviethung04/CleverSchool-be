@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"gorm.io/gorm"
 	"time"
 )
@@ -130,3 +130,4 @@ func (r *saveScoreLabelingRepository) SaveBatchExerciseQuestionUserLabeling(reco
 //	}
 //	return tx.CreateInBatches(records, len(records)).Error
 //}
+

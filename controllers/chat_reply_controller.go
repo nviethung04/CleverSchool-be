@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/dto"
-	"be-Clever School/i18n"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/dto"
+	"be-cleverschool/i18n"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"errors"
 	"net/http"
 	"strconv"
@@ -112,3 +112,4 @@ func (c *ChatReplyController) GetMessageWithReplies(ctx *gin.Context) {
 
 	utils.Respond(ctx, result, nil, "", http.StatusOK)
 }
+

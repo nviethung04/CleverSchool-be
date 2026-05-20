@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 )
 
 type AssessmentSubcriterionResource interface {
@@ -58,3 +58,4 @@ func (r *assessmentSubcriterionResourceImpl) FormatModelAssessmentSubcriterion(r
 		MaxScore:    req.MaxScore,
 	}
 }
+

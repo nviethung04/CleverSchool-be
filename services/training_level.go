@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -107,3 +107,4 @@ func (s *trainingLevelService) Restore(c *gin.Context, id int) (*models.Training
 	}
 	return trainingLevel, nil
 }
+

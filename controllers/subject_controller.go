@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/resources"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/resources"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -82,3 +82,4 @@ func (sc *SubjectController) Import(c *gin.Context) {
 
 	utils.Respond(c, &prot.Import{Message: i18n.Localize("messages.import_complete")}, nil, "")
 }
+

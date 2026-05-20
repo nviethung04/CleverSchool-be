@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 	"errors"
 	"fmt"
 	"strconv"
@@ -703,3 +703,4 @@ func (r *courseRepository) GetCourseIdsBySubjectId(subjectId int64) ([]int64, er
 	err := query.Pluck("courses.id", &courseIds).Error
 	return courseIds, err
 }
+

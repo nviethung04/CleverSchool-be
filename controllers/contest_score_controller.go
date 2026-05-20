@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -187,3 +187,4 @@ func (csc *ContestScoreController) CheckSubmitContestRound(c *gin.Context) {
 
 	utils.Respond(c, result, nil, "")
 }
+

@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 type QuestionWithScore struct {
 	ID       int64   `gorm:"column:id" json:"id"`
@@ -112,3 +112,4 @@ type ExamAnswerManual struct {
 	Score          float64          `json:"score"`
 	IsScored       bool             `json:"is_scored"`
 }
+

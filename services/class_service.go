@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"errors"
 	"mime/multipart"
 	"strconv"
@@ -282,3 +282,4 @@ func (s *classService) AddUsers(c *gin.Context, id int64) ([]models.User, error)
 
 	return newStudents, nil
 }
+

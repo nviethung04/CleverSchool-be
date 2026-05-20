@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-Clever School/i18n"
-	"be-Clever School/prot"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/i18n"
+	"be-cleverschool/prot"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -49,3 +49,4 @@ func (ctl *ProvinceController) Wards(c *gin.Context) {
 
 	utils.Respond(c, &prot.WardsResponse{Wards: wards, TotalCount: uint64(count)}, err, "")
 }
+

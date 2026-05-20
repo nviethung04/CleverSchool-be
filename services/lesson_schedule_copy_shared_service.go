@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-Clever School/database/db"
+	"be-cleverschool/database/db"
 	"fmt"
 )
 
@@ -127,3 +127,4 @@ func (s *lessonScheduleCopySharedService) CopyLessonSchedulesBetweenCourses(sour
 		CopiedSchedulesCount: copiedCount,
 	}, nil
 }
+

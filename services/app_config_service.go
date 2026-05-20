@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/models"
-	"be-Clever School/prot"
+	"be-cleverschool/config"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
 
 	"github.com/gin-gonic/gin"
 )
@@ -80,3 +80,4 @@ func (s *appConfigService) getLatestVersion(platform string) string {
 		return "1.0"
 	}
 }
+

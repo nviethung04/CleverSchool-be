@@ -438,7 +438,7 @@ const file_prot_course_schedule_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12(\n" +
 	"\x10source_course_id\x18\x03 \x01(\x03R\x0esourceCourseId\x12*\n" +
 	"\x11synced_course_ids\x18\x04 \x03(\x03R\x0fsyncedCourseIds\x12!\n" +
-	"\fsynced_count\x18\x05 \x01(\x05R\vsyncedCountB\rZ\vbe-Clever School/protb\x06proto3"
+	"\fsynced_count\x18\x05 \x01(\x05R\vsyncedCountB\rZ\vbe-cleverschool/protb\x06proto3"
 
 var (
 	file_prot_course_schedule_proto_rawDescOnce sync.Once
@@ -494,3 +494,4 @@ func file_prot_course_schedule_proto_init() {
 	file_prot_course_schedule_proto_goTypes = nil
 	file_prot_course_schedule_proto_depIdxs = nil
 }
+

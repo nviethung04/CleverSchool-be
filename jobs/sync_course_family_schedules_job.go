@@ -1,9 +1,9 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/services"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/services"
 	"errors"
 	"time"
 )
@@ -46,3 +46,4 @@ func SyncCourseFamilySchedulesJob(courseID int64) error {
 	
 	return nil
 }
+

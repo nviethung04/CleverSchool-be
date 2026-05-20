@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"time"
 
 	"gorm.io/gorm"
@@ -64,3 +64,4 @@ func (r *passwordResetRepository) Update(passwordReset *models.PasswordReset) er
 func (r *passwordResetRepository) DeleteExpired() error {
 	return r.db.Where("expires_at < ?", time.Now()).Delete(&models.PasswordReset{}).Error
 }
+

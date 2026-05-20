@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-Clever School/config"
+	"be-cleverschool/config"
 	"context"
 	"fmt"
 	"os"
@@ -132,3 +132,4 @@ func getEnvInt(key string, defaultValue int) int {
 	}
 	return n
 }
+

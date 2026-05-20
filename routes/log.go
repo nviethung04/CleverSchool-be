@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"be-Clever School/middleware"
+	"be-cleverschool/middleware"
 	"bytes"
 	"context"
 	"io"
@@ -155,3 +155,4 @@ func ExtractDomainName(rawURL string) string {
 
 	return strings.ReplaceAll(host, "-", "_")
 }
+

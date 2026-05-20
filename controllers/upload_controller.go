@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"be-Clever School/config"
+	"be-cleverschool/config"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,3 +34,4 @@ func (c *UploadController) GetUploadStats(ctx *gin.Context) {
 		},
 	})
 }
+

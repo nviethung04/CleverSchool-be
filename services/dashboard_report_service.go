@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
 )
 
 type DashboardReportService interface {
@@ -44,3 +44,4 @@ func (s *dashboardReportService) GetDashboardReport(activeStudentTime, activeTea
 
 	return response, nil
 }
+

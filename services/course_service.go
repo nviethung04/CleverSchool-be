@@ -1,15 +1,15 @@
 package services
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/i18n"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/i18n"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"errors"
 	"fmt"
 	"math"
@@ -740,3 +740,4 @@ func (s *courseService) NotEligibleForFinalExamIds(c *gin.Context, courseId, use
 
 	return notEligibleForFinalExamIds
 }
+

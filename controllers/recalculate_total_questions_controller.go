@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-Clever School/command"
-	"be-Clever School/config"
+	"be-cleverschool/command"
+	"be-cleverschool/config"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -130,4 +130,5 @@ func (ctrl *RecalculateTotalQuestionsController) RecalculateAllTotalQuestions(c 
 		"types":   []string{"homework", "exam", "exercise"},
 	})
 }
+
 

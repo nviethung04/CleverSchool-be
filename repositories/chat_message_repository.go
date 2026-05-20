@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
-	"be-Clever School/models"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
 	"context"
 	"fmt"
 
@@ -372,4 +372,5 @@ func (r *chatMessageRepository) GetRecentSenders(ctx context.Context, courseId, 
 
 	return messages, nil
 }
+
 

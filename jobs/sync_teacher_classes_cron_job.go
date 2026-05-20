@@ -1,8 +1,8 @@
 package jobs
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/database/db"
+	"be-cleverschool/config"
+	"be-cleverschool/database/db"
 	"time"
 )
 
@@ -123,3 +123,4 @@ func syncTeacherClasses() error {
 	config.Log.Infof("Successfully inserted %d new user_class records", totalInserted)
 	return nil
 }
+

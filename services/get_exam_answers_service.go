@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-Clever School/config"
-	_ "be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	_ "be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 	"context"
 	"encoding/json"
 	"strconv"
@@ -747,3 +747,4 @@ func (s *getExamAnswersService) GetExamAnswers(ctx context.Context, req *prot.Ge
 		Overview:  overview,
 	}, nil
 }
+

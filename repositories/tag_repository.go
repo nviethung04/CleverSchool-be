@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-Clever School/models"
-	"be-Clever School/repositories/base"
+	"be-cleverschool/models"
+	"be-cleverschool/repositories/base"
 )
 
 type TagRepository interface {
@@ -18,3 +18,4 @@ func NewTagRepository() TagRepository {
 		BaseRepository: base.NewBaseRepository[models.Tag](),
 	}
 }
+

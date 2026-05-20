@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"be-Clever School/middleware"
+	"be-cleverschool/middleware"
 	"net/http"
 	"os/exec"
 	"strings"
@@ -58,3 +58,4 @@ func RegisterCliRoutes(r *gin.Engine) {
 		})
 	})
 }
+

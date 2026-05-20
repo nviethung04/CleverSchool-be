@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/dto"
-	"be-Clever School/table_manager"
+	"be-cleverschool/database/db"
+	"be-cleverschool/dto"
+	"be-cleverschool/table_manager"
 	"fmt"
 	"strings"
 	"sync"
@@ -175,3 +175,4 @@ func (r *dashboardReportRepository) GetDashboardReport(activeStudentTime, active
 		FrequentLoginStudentsWeekly: frequentLoginStudentsWeekly,
 	}, nil
 }
+

@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/table_manager"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/table_manager"
 	"fmt"
 	"strings"
 	"time"
@@ -277,3 +277,4 @@ func (r *dashboardReportSchoolsRepository) DeleteExistingReport(schoolID int64, 
 	return db.MasterDB.Where("school_id = ? AND start_date = ? AND end_date = ?", schoolID, startDate, endDate).
 		Delete(&models.DashboardReportSchoolWeeks{}).Error
 }
+

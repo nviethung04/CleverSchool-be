@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-Clever School/database/db"
-	"be-Clever School/models"
-	"be-Clever School/utils"
+	"be-cleverschool/database/db"
+	"be-cleverschool/models"
+	"be-cleverschool/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -110,3 +110,4 @@ func UpdateProgress(jobID, status string, progress int, message string) error {
 
 	return SaveProgress(jobID, prog)
 }
+

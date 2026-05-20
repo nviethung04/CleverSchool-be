@@ -3,11 +3,11 @@ package services
 import (
 	"fmt"
 
-	"be-Clever School/prot"
-	"be-Clever School/repositories"
-	"be-Clever School/requests"
-	"be-Clever School/resources"
-	"be-Clever School/utils"
+	"be-cleverschool/prot"
+	"be-cleverschool/repositories"
+	"be-cleverschool/requests"
+	"be-cleverschool/resources"
+	"be-cleverschool/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -157,3 +157,4 @@ func (s *dashboardStudentAssessmentService) GetStudentAssessments(c *gin.Context
 		Total:       int64(len(items)),
 	}, nil
 }
+

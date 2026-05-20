@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"be-Clever School/controllers"
-	"be-Clever School/middleware"
-	"be-Clever School/repositories"
-	"be-Clever School/services"
+	"be-cleverschool/controllers"
+	"be-cleverschool/middleware"
+	"be-cleverschool/repositories"
+	"be-cleverschool/services"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -53,3 +53,4 @@ func RouteDashboard(router *gin.Engine) {
 	api.GET("/dashboard/report/courses/homeworks", middleware.AuthMiddleware(authRepo), dashboardCoursesProtoController.GetCourseHomeworksProto)
 
 }
+

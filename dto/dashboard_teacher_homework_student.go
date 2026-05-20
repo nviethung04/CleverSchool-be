@@ -1,6 +1,6 @@
 package dto
 
-import "be-Clever School/models"
+import "be-cleverschool/models"
 
 type DashboardTeacherHomeworkStudent struct {
 	StudentID         int64      `json:"student_id"`

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-Clever School/config"
-	"be-Clever School/dto"
-	"be-Clever School/models"
-	"be-Clever School/services"
-	"be-Clever School/utils"
+	"be-cleverschool/config"
+	"be-cleverschool/dto"
+	"be-cleverschool/models"
+	"be-cleverschool/services"
+	"be-cleverschool/utils"
 	"bytes"
 	"net/http"
 	"strconv"
@@ -269,3 +269,4 @@ func (c *MeetingAttendanceController) ExportAttendancesToExcel(ctx *gin.Context)
 	ctx.Writer.WriteHeader(http.StatusOK)
 	_, _ = ctx.Writer.Write(buf.Bytes())
 }
+
