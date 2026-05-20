@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: cleverschool-app
     env_file:
       - .env
     environment:
@@ -34,7 +33,6 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: cleverschool-postgres
     environment:
       POSTGRES_DB: ${DB_MASTER_NAME:-clever_school}
       POSTGRES_USER: ${DB_MASTER_USER:-admin}
@@ -55,7 +53,6 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: cleverschool-redis
     # If you set REDIS_PASSWORD in .env you can enable auth; by default keep redis open for local testing
     command: [ "redis-server", "--appendonly", "yes" ]
     ports:
