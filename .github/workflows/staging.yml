@@ -40,6 +40,18 @@ jobs:
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "bundle=cleverschool-be-$SHORT_SHA.tar.gz" >> "$GITHUB_OUTPUT"
 
+      - name: Debug SSH inputs
+        run: |
+          echo "USER=${{ secrets.VPS_STAGING_USER }}"
+          echo "HOST=${{ secrets.VPS_STAGING_HOST }}"
+          echo "PORT=${{ secrets.VPS_STAGING_PORT }}"
+          if [ -n "${{ secrets.VPS_STAGING_SSH_KEY }}" ]; then
+            echo "KEY=SET"
+          else
+            echo "KEY=EMPTY"
+            exit 1
+          fi
+
       - name: Upload release bundle to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
