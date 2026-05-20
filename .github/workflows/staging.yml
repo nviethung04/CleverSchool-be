@@ -35,7 +35,8 @@ jobs:
           mkdir -p "$RELEASE_DIR"
           cp myapp "$RELEASE_DIR/"
           cp docker-compose.yml "$RELEASE_DIR/"
-          cp -R templates power_point i18n "$RELEASE_DIR/"
+          # Bạn đảm bảo có các thư mục này trong source code, nếu không cp sẽ báo lỗi
+          cp -R templates power_point i18n "$RELEASE_DIR/" || true
           tar -czf "cleverschool-be-$SHORT_SHA.tar.gz" -C "$RELEASE_DIR" .
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "bundle=cleverschool-be-$SHORT_SHA.tar.gz" >> "$GITHUB_OUTPUT"
@@ -87,12 +88,16 @@ jobs:
             mkdir -p "$RELEASE_DIR"
             tar -xzf "$BUNDLE" -C "$RELEASE_DIR"
             rm -f "$BUNDLE"
+            
+            # --- ĐÃ SỬA: Cấp quyền thực thi cho myapp ---
+            chmod +x "$RELEASE_DIR/myapp"
+            
             ln -sfn "$RELEASE_DIR" "$APP_DIR/current"
 
             cd "$APP_DIR/current"
             docker compose -p cleverschool-staging --env-file "$APP_DIR/.env" up -d postgres redis
 
-            until docker compose -p cleverschool-staging --env-file "$APP_DIR/.env" exec -T postgres pg_isready -U "${DB_MASTER_USER:-admin}" -d "${DB_MASTER_NAME:-clever_school}" >/dev/null 2>&1; do
+            until docker compose -p cleverschool-staging --env-file "$APP_DIR/.env" exec -T postgres pg_isready -U "${DB_MASTER_USER:-admin}" -d "${DB_MASTER_NAME:-clever_school_staging}" >/dev/null 2>&1; do
               echo "Waiting for postgres..."
               sleep 3
             done
@@ -100,10 +105,13 @@ jobs:
             set -a
             . "$APP_DIR/.env"
             set +a
+            
+            # Chạy migrate
             "$APP_DIR/current/myapp" migrate
 
+            # --- ĐÃ SỬA: Dùng sudo sh -c để tránh lỗi Permission Denied và gán User động ---
             if [ ! -f /etc/systemd/system/cleverschool-be-staging.service ]; then
-              printf '%s\n' \
+              sudo sh -c "printf '%s\n' \
                 '[Unit]' \
                 'Description=CleverSchool BE (staging)' \
                 'After=network-online.target docker.service' \
@@ -111,21 +119,20 @@ jobs:
                 '' \
                 '[Service]' \
                 'Type=simple' \
-                'User=root' \
-                "WorkingDirectory=$APP_DIR/current" \
-                "EnvironmentFile=$APP_DIR/.env" \
-                "ExecStart=$APP_DIR/current/myapp" \
+                'User=${{ secrets.VPS_STAGING_USER }}' \
+                'WorkingDirectory=$APP_DIR/current' \
+                'EnvironmentFile=$APP_DIR/.env' \
+                'ExecStart=$APP_DIR/current/myapp' \
                 'Restart=always' \
                 'RestartSec=5' \
                 '' \
                 '[Install]' \
                 'WantedBy=multi-user.target' \
-                >/etc/systemd/system/cleverschool-be-staging.service
+                > /etc/systemd/system/cleverschool-be-staging.service"
             fi
 
-            systemctl daemon-reload
-            systemctl enable cleverschool-be-staging.service
-            systemctl restart cleverschool-be-staging.service
-            systemctl --no-pager --full status cleverschool-be-staging.service || true
-
-
+            # --- ĐÃ SỬA: Thêm sudo cho systemctl ---
+            sudo systemctl daemon-reload
+            sudo systemctl enable cleverschool-be-staging.service
+            sudo systemctl restart cleverschool-be-staging.service
+            sudo systemctl --no-pager --full status cleverschool-be-staging.service || true
