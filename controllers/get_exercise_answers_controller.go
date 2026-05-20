@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/prot"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 
@@ -80,4 +80,3 @@ func (c *GetExerciseAnswersController) GetStudentExerciseAnswers(ctx *gin.Contex
 	response, err := c.service.GetExerciseAnswers(ctx, req)
 	utils.Respond(ctx, response, err, "")
 }
-

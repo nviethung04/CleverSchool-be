@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"strconv"
 	"strings"
 	"time"
@@ -206,4 +206,3 @@ func (r *lessonScheduleRepository) UpdateCourseIdByLesson(lessonId, chapterId, o
 
 	return nil
 }
-

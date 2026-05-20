@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 )
 
 type DailySchoolStatisticsCronJob struct {
@@ -116,4 +116,3 @@ func (j *DailySchoolStatisticsCronJob) getEndOfWeek(t time.Time) time.Time {
 	}
 	return t.AddDate(0, 0, 7-weekday)
 }
-

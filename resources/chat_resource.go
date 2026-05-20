@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
 )
 
 type ChatResource interface {
@@ -167,4 +167,3 @@ func (r *ChatResourceImpl) FormatChatMedias(medias []dto.UploadedMediaResponse) 
 	}
 	return result
 }
-

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
 	"fmt"
 	"strconv"
 	"time"
@@ -414,4 +414,3 @@ func (s *warningService) GetFailedLoginsWithPagingByTimeRange(startTime, endTime
 		Timestamp:         time.Now().Format("2006-01-02 15:04:05"),
 	}, nil
 }
-

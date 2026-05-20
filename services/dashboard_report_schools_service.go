@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"fmt"
 	"time"
 )
@@ -56,4 +56,3 @@ func (s *dashboardReportSchoolsService) GetAllSchoolStatistics(startDate, endDat
 	}
 	return statistics, nil
 }
-

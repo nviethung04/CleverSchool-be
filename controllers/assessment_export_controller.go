@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strings"
 
@@ -89,5 +89,4 @@ func (ctl *AssessmentExportController) ImportExcel(c *gin.Context) {
 
 	utils.Respond(c, result, nil, "")
 }
-
 

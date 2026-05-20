@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,4 +30,3 @@ func (ctl *AssessmentStudentController) GetStudentsWithAssessment(c *gin.Context
 	resp, err := ctl.svc.GetStudentsWithAssessment(c, &req)
 	utils.Respond(c, resp, err, "")
 }
-

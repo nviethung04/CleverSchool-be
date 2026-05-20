@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/utils"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/utils"
 	"errors"
 
 	"github.com/gin-gonic/gin"
@@ -71,4 +71,3 @@ func (s *homeworkRankingService) GetHomeworkRanking(c *gin.Context, req *request
 	}
 	return result, total, nil
 }
-

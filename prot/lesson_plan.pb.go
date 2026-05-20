@@ -997,7 +997,7 @@ const file_lesson_plan_proto_rawDesc = "" +
 	"isComplete\"\x92\x01\n" +
 	"\x12LessonPlanByCourse\x123\n" +
 	"\flesson_plans\x18\x01 \x03(\v2\x10.prot.LessonPlanR\vlessonPlans\x12G\n" +
-	"\x17lesson_plan_by_programs\x18\x02 \x03(\v2\x10.prot.LessonPlanR\x14lessonPlanByProgramsB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\x17lesson_plan_by_programs\x18\x02 \x03(\v2\x10.prot.LessonPlanR\x14lessonPlanByProgramsB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_lesson_plan_proto_rawDescOnce sync.Once
@@ -1067,4 +1067,3 @@ func file_lesson_plan_proto_init() {
 	file_lesson_plan_proto_goTypes = nil
 	file_lesson_plan_proto_depIdxs = nil
 }
-

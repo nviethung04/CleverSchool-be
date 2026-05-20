@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"be-cleverschool/command"
-	"be-cleverschool/controllers"
-	"be-cleverschool/middleware"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-Clever School/command"
+	"be-Clever School/controllers"
+	"be-Clever School/middleware"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 	"net/http"
 	"time"
 
@@ -733,4 +733,3 @@ func NewContestQuestionController() *controllers.ContestQuestionController {
 func NewContestResultController() *controllers.ContestResultController {
 	return controllers.NewContestResultController()
 }
-

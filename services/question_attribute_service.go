@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -125,4 +125,3 @@ func (s *questionAttributeService) GetParents(c *gin.Context) ([]models.Question
 	attributes, err := s.repo.GetParents()
 	return attributes, err
 }
-

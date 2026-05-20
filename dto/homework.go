@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-cleverschool/models"
+	"be-Clever School/models"
 	"time"
 
 	"gorm.io/gorm"
@@ -35,4 +35,3 @@ type HomeworkDTO struct {
 	QuestionForm            string           `gorm:"type:question_form_enum;not null"`
 	FileInfos               models.MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
 }
-

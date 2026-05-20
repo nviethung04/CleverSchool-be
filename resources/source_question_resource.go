@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 )
 
 type SourceQuestionResource interface {
@@ -85,4 +85,3 @@ func (r *SourceQuestionResourceImpl) FormatModelSourceQuestion(sourceQuestion *p
 		FileInfos: fileInfos,
 	}
 }
-

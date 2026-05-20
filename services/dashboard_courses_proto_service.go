@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"math"
 )
 
@@ -173,4 +173,3 @@ func (s *dashboardCoursesProtoService) GetCourseHomeworksProto(req *prot.Dashboa
 		Homeworks: protoHomeworks,
 	}, nil
 }
-

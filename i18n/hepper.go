@@ -1,7 +1,7 @@
 package i18n
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	_ "embed"
 	"encoding/json"
 	"reflect"
@@ -330,4 +330,3 @@ func SetFieldsWithProviderFallback(modelPtr interface{}, values map[string]strin
 	}
 	return updated
 }
-

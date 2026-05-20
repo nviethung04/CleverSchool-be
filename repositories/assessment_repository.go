@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"fmt"
 	"strings"
 
@@ -496,4 +496,3 @@ func (r *assessmentRepository) UpdatePublish(assessmentId, courseId int64, cours
 
 	return true
 }
-

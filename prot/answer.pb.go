@@ -1195,7 +1195,7 @@ const file_answer_proto_rawDesc = "" +
 	"\x10correct_position\x18\x0e \x01(\x05R\x0fcorrectPosition\"6\n" +
 	"\n" +
 	"AnswerList\x12(\n" +
-	"\bcontents\x18\x01 \x03(\v2\f.prot.AnswerR\bcontentsB\x13Z\x11be-cleverschool/admin/protb\x06proto3"
+	"\bcontents\x18\x01 \x03(\v2\f.prot.AnswerR\bcontentsB\x13Z\x11be-Clever School/admin/protb\x06proto3"
 
 var (
 	file_answer_proto_rawDescOnce sync.Once
@@ -1267,4 +1267,3 @@ func file_answer_proto_init() {
 	file_answer_proto_goTypes = nil
 	file_answer_proto_depIdxs = nil
 }
-

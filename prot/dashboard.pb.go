@@ -4522,7 +4522,7 @@ const file_dashboard_proto_rawDesc = "" +
 	"\x0fcompletion_rate\x18\x04 \x01(\v2\x1a.prot.DashboardTeacherItemR\x0ecompletionRate\x12.\n" +
 	"\x06course\x18\x05 \x01(\v2\x16.prot.DashboardCoursesR\x06course\x124\n" +
 	"\bexercise\x18\x06 \x01(\v2\x18.prot.DashboardExercisesR\bexercise\x121\n" +
-	"\astudent\x18\a \x01(\v2\x17.prot.DashboardStudentsR\astudentB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\astudent\x18\a \x01(\v2\x17.prot.DashboardStudentsR\astudentB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_dashboard_proto_rawDescOnce sync.Once
@@ -4698,4 +4698,3 @@ func file_dashboard_proto_init() {
 	file_dashboard_proto_goTypes = nil
 	file_dashboard_proto_depIdxs = nil
 }
-

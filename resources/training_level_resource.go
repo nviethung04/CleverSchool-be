@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 )
 
 type TrainingLevelResource interface {
@@ -54,4 +54,3 @@ func (r *TrainingLevelResourceImpl) FormatModelTrainingLevel(trainingLevel *prot
 		SortPosition: trainingLevel.SortPosition,
 	}
 }
-

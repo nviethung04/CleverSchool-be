@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"sort"
 	"strconv"
 
@@ -1207,4 +1207,3 @@ func (resource *QuestionResourceImpl) FormatGroups(question *prot.Question) []*p
 
 	return groups
 }
-

@@ -1360,7 +1360,7 @@ const file_homework_proto_rawDesc = "" +
 	"\tobject_id\x18\x02 \x01(\x03R\bobjectId\x12\x1f\n" +
 	"\vobject_type\x18\x03 \x01(\tR\n" +
 	"objectType\x12\x12\n" +
-	"\x04rate\x18\x04 \x01(\tR\x04rateB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\x04rate\x18\x04 \x01(\tR\x04rateB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_homework_proto_rawDescOnce sync.Once
@@ -1431,4 +1431,3 @@ func file_homework_proto_init() {
 	file_homework_proto_goTypes = nil
 	file_homework_proto_depIdxs = nil
 }
-

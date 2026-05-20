@@ -702,7 +702,7 @@ const file_semester_proto_rawDesc = "" +
 	"\x11SemestersResponse\x12,\n" +
 	"\tsemesters\x18\x01 \x03(\v2\x0e.prot.SemesterR\tsemesters\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_semester_proto_rawDescOnce sync.Once
@@ -764,4 +764,3 @@ func file_semester_proto_init() {
 	file_semester_proto_goTypes = nil
 	file_semester_proto_depIdxs = nil
 }
-

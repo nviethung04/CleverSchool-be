@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/repositories/base"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -749,4 +749,3 @@ func (s *assessmentService) UpdatePublish(c *gin.Context) (*prot.UpdatePublishAs
 		PublishCourseIds: req.PublishCourseIds,
 	}, nil
 }
-

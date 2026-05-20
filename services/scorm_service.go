@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"errors"
 	"fmt"
 	"time"
@@ -228,4 +228,3 @@ func (s *ScormService) CompleteScormAttempt(id string, status string) error {
 
 	return nil
 }
-

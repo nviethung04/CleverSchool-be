@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"context"
 	"fmt"
 	"io"
@@ -660,4 +660,3 @@ func (s *powerPointUploadService) MoveFolderToS3(localFolderPath, s3Prefix strin
 	config.Log.Info(fmt.Sprintf("Successfully moved folder %s to S3 prefix %s", localFolderPath, s3Prefix))
 	return nil
 }
-

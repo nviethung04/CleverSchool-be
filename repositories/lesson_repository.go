@@ -1,12 +1,12 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories/base"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -1750,4 +1750,3 @@ func (r *lessonRepository) HideLessonIds(studentId int64) []int64 {
 
 	return lessonIDs
 }
-

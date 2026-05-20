@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 
 	"gorm.io/gorm"
 )
@@ -175,4 +175,3 @@ func (r *studyReportCriteriaRepository) deleteRemovedSkills(tx *gorm.DB, criteri
 
 	return tx.Where("id IN ?", deleteIDs).Delete(&models.StudyReportSkill{}).Error
 }
-

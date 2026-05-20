@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	"bytes"
 	"context"
 	"fmt"
@@ -59,4 +59,3 @@ func UploadToS3(fileData []byte, filename string) (string, error) {
 	objectURL := fmt.Sprintf("%s/%s", strings.TrimRight(s3Disk.URL, "/"), key)
 	return objectURL, nil
 }
-

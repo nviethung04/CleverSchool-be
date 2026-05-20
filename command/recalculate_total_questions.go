@@ -1,10 +1,10 @@
 package command
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/services"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/services"
 	"fmt"
 	"strings"
 )
@@ -287,4 +287,3 @@ func RunRecalculateTotalQuestionsCommand(assignmentType string) error {
 // 		os.Exit(1)
 // 	}
 // }
-

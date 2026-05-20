@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"time"
 )
 
@@ -80,4 +80,3 @@ func (r *googleAuthRepository) IsConnected(userID uint) bool {
 	db.ReplicaDB.Model(&models.GoogleAccount{}).Where("user_id = ? AND is_active = ?", userID, true).Count(&count)
 	return count > 0
 }
-

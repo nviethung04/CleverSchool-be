@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/services"
+	"be-Clever School/dto"
+	"be-Clever School/services"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -153,4 +153,3 @@ func (c *DashboardSchoolsController) createExcelFile(ctx *gin.Context, schools [
 	// Write to response
 	return f.Write(ctx.Writer)
 }
-

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,4 +34,3 @@ func (ctl *CourseFamilyController) GetCourseFamily(c *gin.Context) {
 
 	utils.Respond(c, resources.CourseFamilyResource(family), nil, "")
 }
-

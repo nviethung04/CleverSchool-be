@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"time"
 
 	"gorm.io/gorm"
@@ -143,4 +143,3 @@ func (r *homeworkUserQuestionRepository) GetAllCorrectByHomeworkUser(homeworkID,
 	}
 	return records, nil
 }
-

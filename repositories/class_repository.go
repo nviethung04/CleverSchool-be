@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"errors"
 	"time"
 
@@ -327,4 +327,3 @@ func (r *classRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB
 
 	return query
 }
-

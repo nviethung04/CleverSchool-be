@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strings"
 
@@ -188,4 +188,3 @@ func (c *MicrosoftAuthController) ResponseError(ctx *gin.Context, statusCode int
 
 	ctx.JSON(statusCode, response)
 }
-

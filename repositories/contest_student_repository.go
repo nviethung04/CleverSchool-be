@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
 )
 
 type ContestStudentRepository interface {
@@ -123,4 +123,3 @@ func (r *contestStudentRepository) GetContestRoundsByStudent(userID int64, limit
 
 	return result, total, nil
 }
-

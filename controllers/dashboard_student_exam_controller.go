@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,4 +32,3 @@ func (ctl *DashboardStudentExamController) GetStudentExamStats(c *gin.Context) {
     stats, err := ctl.service.GetStudentExamStats(userID, req.CourseID, req.StartDate, req.EndDate)
     utils.Respond(c, stats, err, "")
 }
-

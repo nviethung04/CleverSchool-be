@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-cleverschool/services"
+	"be-Clever School/services"
 	"fmt"
 	"log"
 )
@@ -24,5 +24,4 @@ func SyncAssessmentRefLessonCommand() {
 	fmt.Printf("  - Số cặp đã xử lý: %d\n", totalProcessed)
 	fmt.Printf("  - Số records đã thêm: %d\n", totalInserted)
 }
-
 

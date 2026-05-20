@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"errors"
 	"fmt"
 )
@@ -213,5 +213,4 @@ func (s *courseScheduleService) SyncFamilySchedules(courseID int64) (*prot.Cours
 		SyncedCount:     int32(len(syncedCourseIDs)),
 	}, nil
 }
-
 

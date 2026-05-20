@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -628,5 +628,4 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceExercise(req *pr
 		Score:         utils.RoundTo2Decimal(score),
 	}, nil
 }
-
 

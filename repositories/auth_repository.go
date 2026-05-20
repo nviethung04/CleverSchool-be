@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
 
 	"gorm.io/gorm"
 
@@ -201,4 +201,3 @@ func (r *authRepository) GetRoleById(id int) (*models.Role, error) {
 
 	return &role, nil
 }
-

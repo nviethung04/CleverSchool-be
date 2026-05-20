@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -107,4 +107,3 @@ func (s *tagService) Restore(c *gin.Context, id int) (*models.Tag, error) {
 	}
 	return tag, nil
 }
-

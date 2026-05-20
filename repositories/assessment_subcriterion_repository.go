@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -115,4 +115,3 @@ func (r *assessmentSubcriterionRepository) GetIDsByCriterionID(criterionID int64
 	}
 	return ids, nil
 }
-

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -239,4 +239,3 @@ func (s *zoomAuthService) getZoomUserInfo(accessToken string) (*ZoomUserResponse
 
 	return &userResp, err
 }
-

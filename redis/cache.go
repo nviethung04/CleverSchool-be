@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
 	"context"
 	"crypto/sha1"
 	"encoding/json"
@@ -269,4 +269,3 @@ func CheckRedisMemoryAndClean(groupPrefix string, maxMemoryUsedMB int) error {
 
 	return nil
 }
-

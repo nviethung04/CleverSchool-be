@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -958,4 +958,3 @@ func (s *questionService) GetQuestionIdAndKey(assignmentID int64, assignmentType
 
 	return questionIDs, filterKey, nil
 }
-

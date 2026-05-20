@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 )
 
 type WardRepository interface {
@@ -45,4 +45,3 @@ func (r *wardRepository) GetByCode(code string) (*models.Ward, error) {
 	}
 	return &ward, nil
 }
-

@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
 	"github.com/gin-gonic/gin"
 )
 

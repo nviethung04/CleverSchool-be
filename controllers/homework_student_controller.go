@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 
@@ -84,4 +84,3 @@ func (ctl *HomeworkStudentController) GetHomeworkStudents(c *gin.Context) {
 	}
 	utils.Respond(c, resp, err, "")
 }
-

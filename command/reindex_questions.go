@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 func RunReindexQuestions() error {
@@ -99,4 +99,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-

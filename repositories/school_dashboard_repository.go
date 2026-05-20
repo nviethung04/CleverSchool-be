@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
 )
 
 type SchoolDashboardRepository interface {
@@ -39,5 +39,4 @@ func (r *schoolDashboardRepository) GetAllWithStats() ([]dto.SchoolSummaryRespon
 
 	return schools, err
 }
-
 

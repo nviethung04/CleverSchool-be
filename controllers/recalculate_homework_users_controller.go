@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/command"
-	"be-cleverschool/config"
+	"be-Clever School/command"
+	"be-Clever School/config"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -39,5 +39,4 @@ func (ctrl *RecalculateHomeworkUsersController) RecalculateHomeworkUsersData(c *
 		"type":    "homework_users",
 	})
 }
-
 

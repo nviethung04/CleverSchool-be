@@ -258,7 +258,7 @@ const file_certificate_proto_rawDesc = "" +
 	"\x17CertificateListResponse\x125\n" +
 	"\fcertificates\x18\x01 \x03(\v2\x11.prot.CertificateR\fcertificates\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_certificate_proto_rawDescOnce sync.Once
@@ -309,4 +309,3 @@ func file_certificate_proto_init() {
 	file_certificate_proto_goTypes = nil
 	file_certificate_proto_depIdxs = nil
 }
-

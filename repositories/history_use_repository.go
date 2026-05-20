@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/table_manager"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/table_manager"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -511,4 +511,3 @@ func (r *historyUseRepository) ActivityIds(start, end time.Time) (models.Activit
 
 	return models.ActivityIds{Ids: ids}, nil
 }
-

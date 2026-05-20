@@ -1,9 +1,9 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -110,4 +110,3 @@ func SyncMediaInfoForRecentlyUpdatedMediaJob(within time.Duration) {
 
 	config.Log.Info("Finished syncing MediaInfo for recently updated media")
 }
-

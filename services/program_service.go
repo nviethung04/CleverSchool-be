@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"mime/multipart"
 	"strconv"
 	"strings"
@@ -270,4 +270,3 @@ func (s *programService) SortChapters(c *gin.Context, id int, req *prot.ProgramC
 	}
 	return nil
 }
-

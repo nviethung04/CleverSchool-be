@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -1079,4 +1079,3 @@ func cleanJSONResponse(input string) string {
 
 	return input
 }
-

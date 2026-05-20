@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"crypto/sha256"
 	"encoding/hex"
 	"net"
@@ -257,4 +257,3 @@ func GetClientIP(c *gin.Context) string {
 
 	return ""
 }
-

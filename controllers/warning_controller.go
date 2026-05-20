@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"errors"
 	"net/http"
 	"strconv"
@@ -333,4 +333,3 @@ func (wc *WarningController) GetFailedLogins(c *gin.Context) {
 
 	utils.Respond(c, result, nil, "")
 }
-

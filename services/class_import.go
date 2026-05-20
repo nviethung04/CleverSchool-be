@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -94,4 +94,3 @@ func (s *classService) Import(c *gin.Context, fileHeader *multipart.FileHeader) 
 
 	return nil
 }
-

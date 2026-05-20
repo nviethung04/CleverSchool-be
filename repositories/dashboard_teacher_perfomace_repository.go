@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
 	"fmt"
 	"strconv"
 	"strings"
@@ -858,4 +858,3 @@ func (r *dashboardRepository) GetTeacherPerformance(filter dto.FilterDashboardAd
 		WeeklyPerformanceOverviewRates: weeklyPerformanceOverviewRates,
 	}, nil
 }
-

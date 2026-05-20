@@ -183,7 +183,7 @@ const file_employee_position_proto_rawDesc = "" +
 	"\x1cEmployeePositionListResponse\x12E\n" +
 	"\x12employee_positions\x18\x01 \x03(\v2\x16.prot.EmployeePositionR\x11employeePositions\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_employee_position_proto_rawDescOnce sync.Once
@@ -234,4 +234,3 @@ func file_employee_position_proto_init() {
 	file_employee_position_proto_goTypes = nil
 	file_employee_position_proto_depIdxs = nil
 }
-

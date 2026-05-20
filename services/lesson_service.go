@@ -1,20 +1,20 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"be-cleverschool/database/db"
+	"be-Clever School/database/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -1376,4 +1376,3 @@ func (s *lessonService) StoreTeachingPlans(c *gin.Context, id int64, req *prot.L
 
 	return nil
 }
-

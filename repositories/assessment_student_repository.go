@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
 )
 
 // AssessmentStudentRepository phục vụ API cũ /teacher/assessment/students
@@ -149,5 +149,4 @@ func (r *assessmentStudentRepository) GetStudentsByClass(classID int64, studentI
 
 	return students, total, nil
 }
-
 

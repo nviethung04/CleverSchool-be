@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"time"
 )
 
@@ -85,4 +85,3 @@ func (r *meetingNotificationRepository) MarkRead(id uint, userID uint) error {
 			"read_at": time.Now(),
 		}).Error
 }
-

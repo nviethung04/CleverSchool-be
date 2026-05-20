@@ -3,8 +3,8 @@ package repositories
 import (
 	"time"
 
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 type AssessmentScoreRepository interface {
@@ -134,4 +134,3 @@ func (r *assessmentScoreRepository) DeleteOldScores(assessmentID, studentID, cou
 
 	return nil
 }
-

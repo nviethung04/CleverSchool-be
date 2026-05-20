@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories/base"
 )
 
 type HeadingRepository interface {
@@ -78,4 +78,3 @@ func (r *headingRepository) ValidTime(heading *models.Heading) bool {
 
 	return totalHeadingTime+heading.Time <= chapterTime
 }
-

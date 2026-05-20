@@ -1,9 +1,9 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/repositories"
 	"fmt"
 	"time"
 
@@ -212,4 +212,3 @@ func SyncAllMonthlyHistoryUseJob() error {
 	config.Log.Info("Finished SyncAllMonthlyHistoryUseJob")
 	return nil
 }
-

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -28,4 +28,3 @@ func NewNoticeRepository() NoticeRepository {
 func (r *noticeRepository) BeforeQuery(query *gorm.DB, c *gin.Context) *gorm.DB {
 	return query
 }
-

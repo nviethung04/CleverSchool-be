@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -356,4 +356,3 @@ func (uc *UserController) RespondList(c *gin.Context, items []models.User, total
 
 	utils.Respond(c, list, err, "")
 }
-

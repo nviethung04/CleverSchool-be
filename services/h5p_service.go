@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -586,4 +586,3 @@ func convertToDatatypesJSON(m map[string]interface{}) (datatypes.JSON, error) {
 	}
 	return datatypes.JSON(b), nil
 }
-

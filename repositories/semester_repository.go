@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"errors"
 	"time"
 
@@ -222,4 +222,3 @@ func dateOnly(t time.Time) time.Time {
 	y, m, d := t.Date()
 	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 }
-

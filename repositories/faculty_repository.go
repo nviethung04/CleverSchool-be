@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"errors"
 
 	"gorm.io/gorm"
@@ -53,4 +53,3 @@ func (r *facultyRepository) CreateOrUpdateFaculty(faculty *models.Faculty) (int6
 
 	return 0, err
 }
-

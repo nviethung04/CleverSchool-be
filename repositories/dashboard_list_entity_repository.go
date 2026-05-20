@@ -1,11 +1,11 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
+	"be-Clever School/requests"
 	"strconv"
 	"strings"
 	"time"
@@ -739,4 +739,3 @@ func (r *dashboardListEntityRepository) GetClassMains(c *gin.Context, req *reque
 	err := query.Find(&classMains).Error
 	return classMains, totalCount, err
 }
-

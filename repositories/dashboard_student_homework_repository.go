@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
 	"fmt"
 	"time"
 )
@@ -174,4 +174,3 @@ func (r *dashboardStudentHomeworkRepository) GetStudentHomeworkStats(userID int6
 		Chart:    result,
 	}, nil
 }
-

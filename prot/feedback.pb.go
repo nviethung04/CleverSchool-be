@@ -457,7 +457,7 @@ const file_feedback_proto_rawDesc = "" +
 	"\x06status\x18\x01 \x01(\x03R\x06status\x12\x1a\n" +
 	"\bresponse\x18\x02 \x01(\tR\bresponse\x12\x12\n" +
 	"\x04note\x18\x03 \x01(\tR\x04note\x12\x12\n" +
-	"\x04type\x18\x04 \x01(\x03R\x04typeB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\x04type\x18\x04 \x01(\x03R\x04typeB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_feedback_proto_rawDescOnce sync.Once
@@ -510,4 +510,3 @@ func file_feedback_proto_init() {
 	file_feedback_proto_goTypes = nil
 	file_feedback_proto_depIdxs = nil
 }
-

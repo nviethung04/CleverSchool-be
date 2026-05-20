@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,4 +35,3 @@ func (s *classUserRelationService) UpdateUserClassRelation(c *gin.Context, class
 		Message: "Cập nhật thành công",
 	}, nil
 }
-

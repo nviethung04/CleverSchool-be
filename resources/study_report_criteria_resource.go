@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 	"encoding/json"
 	"sort"
 	"strings"
@@ -279,4 +279,3 @@ func notesSliceToJSON(notes []*prot.StudyReportNote) string {
 	}
 	return string(bytes)
 }
-

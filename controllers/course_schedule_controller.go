@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -287,4 +287,3 @@ func (ctl *CourseScheduleController) SyncFamily(c *gin.Context) {
 	// Return để đóng kết nối (Gin sẽ tự động đóng response writer)
 	return
 }
-

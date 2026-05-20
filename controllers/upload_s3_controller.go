@@ -10,10 +10,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -195,4 +195,3 @@ func (uc *UploadS3Controller) GetExtractProgress(c *gin.Context) {
 		"data":    progress,
 	})
 }
-

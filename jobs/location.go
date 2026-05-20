@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	"time"
 )
 
@@ -14,4 +14,3 @@ func Location() *time.Location {
 
 	return loc
 }
-

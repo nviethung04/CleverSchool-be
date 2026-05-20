@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"be-cleverschool/models"
+	"be-Clever School/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
@@ -131,4 +131,3 @@ func isNumeric(s string) bool {
 	}
 	return len(s) > 0
 }
-

@@ -1,9 +1,9 @@
 package base
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"fmt"
 	"reflect"
 	"strings"
@@ -321,4 +321,3 @@ func StripDomain(fullURL string, storage string) string {
 
 	return fullURL
 }
-

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
+	"be-Clever School/config"
+	"be-Clever School/dto"
 	"context"
 	"errors"
 	"fmt"
@@ -291,4 +291,3 @@ func (s *powerPointService) GetS3ObjectInfo(key string) (*S3ObjectInfo, error) {
 
 	return info, nil
 }
-

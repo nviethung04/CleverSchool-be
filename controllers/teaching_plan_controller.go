@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -54,4 +54,3 @@ func (tpc *TeachingPlanController) Approve(c *gin.Context) {
 	teachingPlanFormat := tpc.resource.FormatItem(teachingPlan)
 	utils.Respond(c, teachingPlanFormat, err, "")
 }
-

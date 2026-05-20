@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-cleverschool/models"
+	"be-Clever School/models"
 	"time"
 )
 
@@ -336,4 +336,3 @@ type FilterDashboardAdmin struct {
 	LastQuarter       int32
 	ObjectType        string
 }
-

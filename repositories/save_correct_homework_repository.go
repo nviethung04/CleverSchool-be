@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"errors"
 	"gorm.io/gorm"
 )
@@ -72,4 +72,3 @@ func (r *saveCorrectHomeworkRepository) UpsertHomeworkUserOnCorrect(homeworkID, 
 	}
 	return nil
 }
-

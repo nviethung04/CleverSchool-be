@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-cleverschool/jobs"
+	"be-Clever School/jobs"
 	"fmt"
 	"log"
 )
@@ -16,4 +16,3 @@ func DailyCourseStatisticsCommand() {
 	
 	fmt.Println("✅ Hoàn thành Daily Course Statistics Job")
 }
-

@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 )
 
 type SettingRepository interface {
@@ -42,4 +42,3 @@ func (s *settingRepository) IsKeyExists(key string, id int64) (bool, error) {
 
 	return count > 0, nil
 }
-

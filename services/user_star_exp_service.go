@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"fmt"
 	"time"
 )
@@ -75,5 +75,4 @@ func (s *userStarExpService) UpdateStarAndExp(userID int64, changeStar int64, ch
 
 	return nil
 }
-
 

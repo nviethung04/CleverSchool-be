@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -106,4 +106,3 @@ func (r *clonedQuestionRepository) GetClonedQuestions(assignmentID int64, assign
 func (r *clonedQuestionRepository) DeleteByAssignment(assignmentId int64, assignmentType string) error {
 	return db.MasterDB.Where("assignment_id = ? AND assignment_type = ?", assignmentId, assignmentType).Delete(&models.ClonedQuestion{}).Error
 }
-

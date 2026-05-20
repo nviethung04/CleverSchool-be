@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -337,4 +337,3 @@ func (s *homeworkUserService) CheckHomeworkHasManualScoringFromClonedQuestions(h
 func (s *homeworkUserService) SaveHomeworkHasManualScoringService(homeworkID, userID int64, hasManualScoring bool) error {
 	return s.repo.UpdateHomeworkUserHasManualScoring(homeworkID, userID, hasManualScoring)
 }
-

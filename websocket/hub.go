@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/redis"
+	"be-Clever School/config"
+	"be-Clever School/redis"
 	"encoding/json"
 	"sync"
 	"time"
@@ -425,4 +425,3 @@ func GetHub() *Hub {
 	})
 	return globalHub
 }
-

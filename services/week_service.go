@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"strconv"
 	"strings"
 
@@ -116,4 +116,3 @@ func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{})
 
 	return filter, nil
 }
-

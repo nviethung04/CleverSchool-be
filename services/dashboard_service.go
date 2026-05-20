@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -150,4 +150,3 @@ func (s *dashboardService) DashboardAdmin(c *gin.Context) (*prot.DashboardAdminR
 		}, nil
 	}
 }
-

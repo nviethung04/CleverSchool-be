@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
 )
 
 type TagController struct {
@@ -33,4 +33,3 @@ func NewTagController(service services.TagService) *TagController {
 		GenericController: genericController,
 	}
 }
-

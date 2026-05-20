@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"strings"
 	"time"
 
@@ -165,4 +165,3 @@ func (r *assessmentCriteriaGroupRepository) GetCriteriaIDsByGroupID(groupID int6
 
 	return criteriaIDs, nil
 }
-

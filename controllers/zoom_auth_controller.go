@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -129,4 +129,3 @@ func (zac *ZoomAuthController) RefreshToken(c *gin.Context) {
 		"message": "Token refreshed successfully",
 	}, nil, "")
 }
-

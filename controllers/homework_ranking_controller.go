@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/prot"
+	"be-Clever School/requests"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -52,4 +52,3 @@ func (ctl *HomeworkRankingController) GetHomeworkRanking(c *gin.Context) {
 
 	utils.Respond(c, response, nil, "")
 }
-

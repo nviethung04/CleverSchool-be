@@ -2,12 +2,12 @@ package services
 
 import (
 	"archive/zip"
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"bytes"
 	"errors"
 	"fmt"
@@ -1193,4 +1193,3 @@ func parseHumanReadableSize(sizeStr string) (int64, error) {
 
 	return int64(value * multiplier), nil
 }
-

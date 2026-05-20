@@ -1438,7 +1438,7 @@ const file_question_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\x1aG\n" +
 	"\x19SourceQuestionsOrderEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01B\x13Z\x11be-cleverschool/admin/protb\x06proto3"
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01B\x13Z\x11be-Clever School/admin/protb\x06proto3"
 
 var (
 	file_question_proto_rawDescOnce sync.Once
@@ -1545,4 +1545,3 @@ func file_question_proto_init() {
 	file_question_proto_goTypes = nil
 	file_question_proto_depIdxs = nil
 }
-

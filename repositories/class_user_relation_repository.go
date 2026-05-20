@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
+	"be-Clever School/database/db"
 	"time"
 )
 

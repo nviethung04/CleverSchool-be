@@ -162,7 +162,7 @@ const file_school_dashboard_proto_rawDesc = "" +
 	"\x0fclassroom_count\x18\x05 \x01(\x03R\x0eclassroomCount\x12!\n" +
 	"\fcourse_count\x18\x06 \x01(\x03R\vcourseCount\">\n" +
 	"\x11SchoolSummaryList\x12)\n" +
-	"\x05items\x18\x01 \x03(\v2\x13.prot.SchoolSummaryR\x05itemsB\x19Z\x17be-cleverschool/be-cleverschool/prot;protb\x06proto3"
+	"\x05items\x18\x01 \x03(\v2\x13.prot.SchoolSummaryR\x05itemsB\x19Z\x17be-Clever School/be-Clever School/prot;protb\x06proto3"
 
 var (
 	file_school_dashboard_proto_rawDescOnce sync.Once
@@ -213,4 +213,3 @@ func file_school_dashboard_proto_init() {
 	file_school_dashboard_proto_goTypes = nil
 	file_school_dashboard_proto_depIdxs = nil
 }
-

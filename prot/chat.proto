@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package prot;
-option go_package = "be-cleverschool/prot";
+option go_package = "be-Clever School/prot";
 
 message ChatActionResponse {
   bool success = 1;
@@ -166,4 +166,3 @@ message ChatSSENotificationEvent {
   string notification_type = 1;
   string data = 2; // JSON string of notification data
 }
-

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -352,4 +352,3 @@ func getEmailFromProfile(profile *MicrosoftUserProfile) string {
 	}
 	return profile.UserPrincipalName
 }
-

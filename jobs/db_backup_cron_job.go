@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	"bytes"
 	"context"
 	"database/sql"
@@ -464,4 +464,3 @@ func extractDomainName(rawURL string) string {
 
 	return strings.ReplaceAll(host, "-", "_")
 }
-

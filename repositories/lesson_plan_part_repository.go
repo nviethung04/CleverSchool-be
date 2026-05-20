@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -147,4 +147,3 @@ func (r *lessonPlanPartRepository) Delete(id int64, deletedBy int64) error {
 	}
 	return db.MasterDB.Delete(&model).Error
 }
-

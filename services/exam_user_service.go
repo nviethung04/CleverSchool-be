@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"encoding/json"
 	"strconv"
 )
@@ -447,4 +447,3 @@ func (s *examUserService) CalculateExerciseRatioService(exerciseID, userID int64
 func (s *examUserService) SaveExerciseRatioService(exerciseID, userID int64, score float64) error {
 	return s.repo.UpdateExerciseUserRatio(exerciseID, userID, score)
 }
-

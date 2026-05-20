@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 )
 
 type RoleRepository interface {
@@ -163,4 +163,3 @@ func (r *roleRepository) AddUserRole(roleId int64, userIds []int64) error {
 
 	return nil
 }
-

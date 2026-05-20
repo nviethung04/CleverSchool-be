@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"database/sql"
 	"errors"
 	"strconv"
@@ -190,4 +190,3 @@ func (r *chapterRepository) UpdatePositionById(programId, id, position int) erro
 
 	return err
 }
-

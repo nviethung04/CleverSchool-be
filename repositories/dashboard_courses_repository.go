@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/table_manager"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/table_manager"
 	"fmt"
 	"strconv"
 	"strings"
@@ -853,4 +853,3 @@ func (r *dashboardCoursesRepository) GetCourseHomeworks(courseID int64, startDat
 
 	return &response, nil
 }
-

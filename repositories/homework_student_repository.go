@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"encoding/json"
 	"time"
 )
@@ -161,4 +161,3 @@ func (r *homeworkStudentRepository) GetHomeworkStudents(homeworkID int64, course
 	}
 	return info, students, nil
 }
-

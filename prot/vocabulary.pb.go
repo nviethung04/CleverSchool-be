@@ -967,7 +967,7 @@ const file_vocabulary_proto_rawDesc = "" +
 	"\rvocabulary_id\x18\x01 \x01(\x03R\fvocabularyId\x12\x1d\n" +
 	"\n" +
 	"audio_data\x18\x02 \x01(\tR\taudioData\x12\x1b\n" +
-	"\tword_type\x18\x03 \x01(\tR\bwordTypeB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\tword_type\x18\x03 \x01(\tR\bwordTypeB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_vocabulary_proto_rawDescOnce sync.Once
@@ -1049,4 +1049,3 @@ func file_vocabulary_proto_init() {
 	file_vocabulary_proto_goTypes = nil
 	file_vocabulary_proto_depIdxs = nil
 }
-

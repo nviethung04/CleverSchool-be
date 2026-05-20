@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
+	"be-Clever School/database/db"
 	"gorm.io/gorm"
 )
 
@@ -91,4 +91,3 @@ func CheckAndCleanExistingAnswersWithTx(tx *gorm.DB, table string, homeworkID, u
 	// Cần lưu câu trả lời mới
 	return true, nil
 }
-

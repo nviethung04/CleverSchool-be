@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
 	"errors"
 	"os"
 	"time"
@@ -170,4 +170,3 @@ func CheckTokenForWebSocket(tokenStr string) (*CustomClaims, error) {
 
 	return claims, nil
 }
-

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"be-cleverschool/config"
+	"be-Clever School/config"
 )
 
 const (
@@ -195,5 +195,4 @@ func (c *Client) SendEvent(event WSEnvelope) error {
 	}
 	return ErrClientBufferFull
 }
-
 

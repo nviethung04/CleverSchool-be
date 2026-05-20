@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"sort"
 	"strings"
 )
@@ -115,4 +115,3 @@ GROUP BY u.id, u.name, u.avatar_info, agg_score.total_score
 
 	return rows, total, nil
 }
-

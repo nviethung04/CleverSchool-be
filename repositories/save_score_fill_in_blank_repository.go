@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"errors"
 	"gorm.io/gorm"
 	"time"
@@ -103,4 +103,3 @@ func (r *saveScoreFillInBlankRepository) CountHomeworkUserQuestions(homeworkID, 
 		Count(&count).Error
 	return count, err
 }
-

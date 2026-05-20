@@ -2550,7 +2550,7 @@ const file_study_report_proto_rawDesc = "" +
 	" UpdatePublishStudyReportResponse\x12\x1b\n" +
 	"\tcourse_id\x18\x01 \x01(\x03R\bcourseId\x12#\n" +
 	"\rassessment_id\x18\x02 \x01(\x03R\fassessmentId\x12\x18\n" +
-	"\apublish\x18\x03 \x01(\bR\apublishB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\apublish\x18\x03 \x01(\bR\apublishB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_study_report_proto_rawDescOnce sync.Once
@@ -2656,4 +2656,3 @@ func file_study_report_proto_init() {
 	file_study_report_proto_goTypes = nil
 	file_study_report_proto_depIdxs = nil
 }
-

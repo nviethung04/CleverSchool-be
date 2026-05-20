@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/requests"
 	"fmt"
 )
 
@@ -182,4 +182,3 @@ func (r *dashboardTeacherHomeworkUnscoredRepository) GetUnscoredHomeworks(userID
 
 	return homeworks, totalCount, nil
 }
-

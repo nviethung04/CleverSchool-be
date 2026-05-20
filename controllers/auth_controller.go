@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/i18n"
+	"be-Clever School/prot"
+	"be-Clever School/redis"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"errors"
 	"fmt"
 	"net/http"
@@ -206,4 +206,3 @@ func (ac *AuthController) AcceptRole(c *gin.Context) {
 
 	utils.Respond(c, nil, err, message)
 }
-

@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	_ "be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	_ "be-Clever School/models"
 	"encoding/json"
 	"fmt"
 
@@ -327,4 +327,3 @@ func (r *getExamAnswersRepository) GetExamComment(examID, userID int64) (string,
 	err := db.ReplicaDB.Table("exam_comments").Select("content").Where("exams_id = ? AND student_id = ?", examID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
 	return content, err
 }
-

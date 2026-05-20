@@ -1,11 +1,11 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/table_manager"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/table_manager"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -2895,4 +2895,3 @@ func (r *dashboardRepository) Percent(count, all int64) float32 {
 	}
 	return float32(count) * 100 / float32(all)
 }
-

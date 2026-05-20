@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -458,4 +458,3 @@ func (crc *ContestRoundController) BulkRemoveJoiners(c *gin.Context) {
 		"message": fmt.Sprintf("Successfully removed %d %s joiners", len(req.JoinerIds), req.JoinLevel),
 	}, nil, "")
 }
-

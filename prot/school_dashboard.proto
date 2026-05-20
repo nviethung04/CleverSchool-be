@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package prot;
-option go_package = "be-cleverschool/be-cleverschool/prot;prot";
+option go_package = "be-Clever School/be-Clever School/prot;prot";
 
 
 
@@ -17,5 +17,4 @@ message SchoolSummary {
 message SchoolSummaryList {
   repeated SchoolSummary items = 1;
 }
-
 

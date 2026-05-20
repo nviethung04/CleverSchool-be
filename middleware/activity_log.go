@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -458,4 +458,3 @@ func GenerateSessionId(ip, userAgent string) string {
 	hash := sha256.Sum256([]byte(raw))
 	return hex.EncodeToString(hash[:])
 }
-

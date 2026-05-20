@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,5 +73,4 @@ func (s *assessmentCourseService) AssignCoursesToAssessment(c *gin.Context, asse
 
 	return nil
 }
-
 

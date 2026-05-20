@@ -1,9 +1,9 @@
 package command
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"fmt"
 	"log"
 	"strings"
@@ -156,4 +156,3 @@ func processClassName(name string) string {
 
 	return strings.TrimSpace(name)
 }
-

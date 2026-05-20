@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
+	"be-Clever School/config"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -80,4 +80,3 @@ func clearOldExportFiles(exportDir string, beforeTime time.Time) (int, error) {
 
 	return deletedCount, nil
 }
-

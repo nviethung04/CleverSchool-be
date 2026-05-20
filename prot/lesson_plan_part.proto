@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-Clever School/prot";
 
 message LessonPlanPart {
   int64 id = 1;
@@ -59,4 +59,3 @@ message LessonPlanPartListResponse {
 
 
 //protoc --go_out=. --go_opt=paths=source_relative prot/lesson_plan_part.proto
-

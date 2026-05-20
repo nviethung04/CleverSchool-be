@@ -1,10 +1,10 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"time"
 
 	"gorm.io/gorm"
@@ -424,6 +424,5 @@ func syncFromHomeworkQuestionUserManualScoring(repo repositories.HomeworkUserQue
 
 	return processed, inserted, nil
 }
-
 
 

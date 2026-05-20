@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -166,5 +166,4 @@ func (s *homeworkUserQuestionService) SaveHomeworkUserQuestion(homeworkID, userI
 
 	return star, ratioScore, weight, numberTimeSent, nil
 }
-
 

@@ -514,7 +514,7 @@ const file_prot_dashboard_teacher_homework_student_proto_rawDesc = "" +
 	"\x11in_progress_count\x18\x06 \x01(\x03R\x0finProgressCount\x12'\n" +
 	"\x0fcompleted_count\x18\a \x01(\x03R\x0ecompletedCount\"n\n" +
 	"(DashboardTeacherHomeworkOverviewResponse\x12B\n" +
-	"\boverview\x18\x01 \x01(\v2&.prot.DashboardTeacherHomeworkOverviewR\boverviewB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\boverview\x18\x01 \x01(\v2&.prot.DashboardTeacherHomeworkOverviewR\boverviewB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_prot_dashboard_teacher_homework_student_proto_rawDescOnce sync.Once
@@ -571,4 +571,3 @@ func file_prot_dashboard_teacher_homework_student_proto_init() {
 	file_prot_dashboard_teacher_homework_student_proto_goTypes = nil
 	file_prot_dashboard_teacher_homework_student_proto_depIdxs = nil
 }
-

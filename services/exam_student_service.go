@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/utils"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -242,4 +242,3 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 		Total:   total,
 	}, nil
 }
-

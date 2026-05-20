@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/resources"
+	"be-Clever School/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -358,4 +358,3 @@ func appendSkillTypeWithChildren(dst *[]models.StudyReportSkillType, tp *prot.St
 		appendSkillTypeWithChildren(dst, child, &currentID, level+1, childSort, tempID)
 	}
 }
-

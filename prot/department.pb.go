@@ -175,7 +175,7 @@ const file_department_proto_rawDesc = "" +
 	"\x16DepartmentListResponse\x122\n" +
 	"\vdepartments\x18\x01 \x03(\v2\x10.prot.DepartmentR\vdepartments\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
-	"totalCountB\rZ\vbe-cleverschool/protb\x06proto3"
+	"totalCountB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_department_proto_rawDescOnce sync.Once
@@ -226,4 +226,3 @@ func file_department_proto_init() {
 	file_department_proto_goTypes = nil
 	file_department_proto_depIdxs = nil
 }
-

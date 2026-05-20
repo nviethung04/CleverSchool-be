@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
 )
 
 func DashboardTeacherHomeworkScoredResource(homework dto.DashboardTeacherHomeworkScored) *prot.DashboardTeacherHomeworkScored {
@@ -49,4 +49,3 @@ func dashboardTeacherHomeworkGraderCollection(graders []dto.DashboardTeacherHome
 	}
 	return result
 }
-

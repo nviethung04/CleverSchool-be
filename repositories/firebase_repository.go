@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"fmt"
 )
 
@@ -108,4 +108,3 @@ func (r *firebaseRepository) GetSchoolIDsByUserID(userID int64) ([]int64, error)
 
 	return schoolIDs, err
 }
-

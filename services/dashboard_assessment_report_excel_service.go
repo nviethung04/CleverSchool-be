@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
+	"be-Clever School/repositories"
+	"be-Clever School/requests"
 	"fmt"
 	"strconv"
 	"strings"
@@ -436,5 +436,4 @@ func getColumnNameForReport(col int) string {
 	}
 	return result
 }
-
 

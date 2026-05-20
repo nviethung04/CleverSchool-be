@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
+	"be-Clever School/config"
+	"be-Clever School/i18n"
+	"be-Clever School/prot"
 	"bytes"
 	"fmt"
 	"strings"
@@ -480,4 +480,3 @@ func (s *dashboardService) SetSheetUnmarkedHomeworks(f *excelize.File, sheetName
 
 	return nil
 }
-

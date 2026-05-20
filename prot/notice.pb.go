@@ -423,7 +423,7 @@ const file_notice_proto_rawDesc = "" +
 	"\x04data\x18\x04 \x01(\v2\x16.prot.NotificationDataR\x04data\x12\x17\n" +
 	"\asent_at\x18\x05 \x01(\tR\x06sentAt\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\tR\tcreatedAtB\rZ\vbe-cleverschool/protb\x06proto3"
+	"created_at\x18\x06 \x01(\tR\tcreatedAtB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_notice_proto_rawDescOnce sync.Once
@@ -478,4 +478,3 @@ func file_notice_proto_init() {
 	file_notice_proto_goTypes = nil
 	file_notice_proto_depIdxs = nil
 }
-

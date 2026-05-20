@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	_ "be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	_ "be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/database/db"
+	_ "be-Clever School/database/db"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	_ "be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"encoding/json"
 	"fmt"
 	_ "math"
@@ -342,4 +342,3 @@ func (s *saveScorePositionService) SaveScorePositionExercise(req *prot.SaveScore
 	}
 	return &prot.SaveScoreResponsePosition{QuestionId: req.QuestionId, TotalScore: utils.RoundTo2Decimal(totalScore), Answers: answerResults, IsAllCorrect: correctCount == numAnswers}, nil
 }
-

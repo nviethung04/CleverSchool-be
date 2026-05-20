@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
 	"errors"
 	"fmt"
 
@@ -266,4 +266,3 @@ func (r *studyReportRepository) UpdateTotalStarAndAvgStar(id int64, totalStar in
 			"avg_star":   avgStar,
 		}).Error
 }
-

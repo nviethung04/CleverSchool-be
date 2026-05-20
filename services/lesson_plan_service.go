@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/repositories"
+	"be-Clever School/repositories/base"
+	"be-Clever School/requests"
+	"be-Clever School/resources"
 
-	"be-cleverschool/utils"
+	"be-Clever School/utils"
 
 	"strconv"
 
@@ -185,4 +185,3 @@ func (s *lessonPlanService) StoreLessons(id int64, lessons []*prot.LessonPlanLes
 
 	return nil
 }
-

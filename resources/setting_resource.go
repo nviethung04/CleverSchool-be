@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 )
 
 type SettingResource interface {
@@ -74,4 +74,3 @@ func (r *SettingResourceImpl) FormatModelSetting(setting *prot.SettingRequest) *
 		IsInternal: setting.IsInternal,
 	}
 }
-

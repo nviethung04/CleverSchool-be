@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
 	"errors"
 	"fmt"
 	"time"
@@ -155,4 +155,3 @@ func (s *googleMeetingAttendanceService) JoinByShortCode(shortCode string, userI
 
 	return meeting, attendance, nil
 }
-

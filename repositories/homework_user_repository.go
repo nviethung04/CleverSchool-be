@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"errors"
 	"fmt"
 	"time"
@@ -463,4 +463,3 @@ func (r *homeworkUserRepository) UpdateOrCreate(homeworkUser *models.HomeworkUse
 
 	return nil
 }
-

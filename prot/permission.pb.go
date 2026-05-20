@@ -196,7 +196,7 @@ const file_permission_proto_rawDesc = "" +
 	"\n" +
 	"permission\x18\x01 \x01(\v2\x10.prot.PermissionR\n" +
 	"permission\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessageB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_permission_proto_rawDescOnce sync.Once
@@ -249,4 +249,3 @@ func file_permission_proto_init() {
 	file_permission_proto_goTypes = nil
 	file_permission_proto_depIdxs = nil
 }
-

@@ -1,9 +1,9 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/redis"
+	"be-Clever School/repositories"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -79,4 +79,3 @@ func StartCleanupCronJob() {
 
 	c.Start()
 }
-

@@ -1,11 +1,11 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/table_manager"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/repositories/base"
+	"be-Clever School/requests"
+	"be-Clever School/table_manager"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -1041,4 +1041,3 @@ func (r *userRepository) GetIdsByProgramStatus(notParticipated, failTheSubject, 
 	// No filter applied
 	return []int64{}, nil
 }
-

@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-Clever School/dto"
+	"be-Clever School/i18n"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 	"time"
 )
 
@@ -244,4 +244,3 @@ func (r *ClassResourceImpl) MapCoursesToDTOCourses(cousers []models.Course) []dt
 
 	return currentCousers
 }
-

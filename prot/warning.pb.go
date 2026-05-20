@@ -557,7 +557,7 @@ const file_warning_proto_rawDesc = "" +
 	"totalPages\x12\x1d\n" +
 	"\n" +
 	"time_range\x18\x06 \x01(\tR\ttimeRange\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\tR\ttimestampB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\ttimestamp\x18\a \x01(\tR\ttimestampB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_warning_proto_rawDescOnce sync.Once
@@ -613,4 +613,3 @@ func file_warning_proto_init() {
 	file_warning_proto_goTypes = nil
 	file_warning_proto_depIdxs = nil
 }
-

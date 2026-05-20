@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/i18n"
+	"be-Clever School/repositories"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -167,4 +167,3 @@ func authenticateToken(c *gin.Context, authRepo repositories.AuthRepository, tok
 
 	return claims, nil
 }
-

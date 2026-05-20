@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,4 +56,3 @@ func (s *SettingController) GetByKey(c *gin.Context) {
 
 	utils.Respond(c, item, nil, "")
 }
-

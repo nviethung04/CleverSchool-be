@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-cleverschool/models"
+	"be-Clever School/models"
 	"time"
 )
 
@@ -35,4 +35,3 @@ type DashboardCoursesResponse struct {
 	CreatedAt                       time.Time `json:"created_at"`
 	UpdatedAt                       time.Time `json:"updated_at"`
 }
-

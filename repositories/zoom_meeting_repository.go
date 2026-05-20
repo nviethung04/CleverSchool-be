@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 type ZoomMeetingRepository interface {
@@ -93,4 +93,3 @@ func (r *zoomMeetingRepository) UpdateStatus(zoomMeetingID string, status string
 		Where("zoom_meeting_id = ?", zoomMeetingID).
 		Update("status", status).Error
 }
-

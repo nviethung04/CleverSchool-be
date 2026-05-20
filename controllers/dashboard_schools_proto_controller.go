@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/prot"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"strconv"
 	"time"
 
@@ -67,4 +67,3 @@ func (c *DashboardSchoolsProtoController) GetDashboardSchoolsProto(ctx *gin.Cont
 	// Return protobuf response
 	utils.Respond(ctx, response, nil, "success", 200)
 }
-

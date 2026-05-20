@@ -1,8 +1,8 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -148,4 +148,3 @@ func updateIncompleteScoringStatus() error {
 	config.Log.Infof("Updated %d homework_users to status_scoring = 1 (incomplete scoring)", result.RowsAffected)
 	return nil
 }
-

@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"time"
 )
 
@@ -83,4 +83,3 @@ func (r *userSessionRepository) PermanentlyDeleteOldRecords() error {
 		Where("expires IS NOT NULL AND expires <= ?", time.Now()).
 		Delete(&model).Error
 }
-

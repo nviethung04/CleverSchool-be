@@ -1,9 +1,9 @@
 package services
 
 import (
-    "be-cleverschool/models"
-    "be-cleverschool/prot"
-    "be-cleverschool/repositories"
+    "be-Clever School/models"
+    "be-Clever School/prot"
+    "be-Clever School/repositories"
 )
 
 type HomeworkCommentService interface {
@@ -30,6 +30,5 @@ func (s *homeworkCommentService) CreateHomeworkComment(homeworkID, studentID, te
     }
     return &prot.ExamCommentResponse{Success: true, Message: "Comment saved successfully"}
 }
-
 
 

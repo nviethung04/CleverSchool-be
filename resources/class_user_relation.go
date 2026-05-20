@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-Clever School/dto"
+	"be-Clever School/prot"
 )
 
 func ClassUserRelationResponseResource(response dto.ClassUserRelationResponse) *prot.ClassUserRelationResponse {

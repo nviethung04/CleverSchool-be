@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/repositories"
+	"be-Clever School/dto"
+	"be-Clever School/repositories"
 )
 
 type DashboardSchoolsService interface {
@@ -23,4 +23,3 @@ func NewDashboardSchoolsService(dashboardSchoolsRepo repositories.DashboardSchoo
 func (s *dashboardSchoolsService) GetDashboardSchools(selectedStartDate, selectedEndDate string) ([]dto.DashboardSchoolsResponse, error) {
 	return s.dashboardSchoolsRepo.GetDashboardSchools(selectedStartDate, selectedEndDate)
 }
-

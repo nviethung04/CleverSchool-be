@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 )
 
 type ZoomAuthRepository interface {
@@ -54,4 +54,3 @@ func (r *zoomAuthRepository) IsConnected(userID int64) bool {
 		Count(&count)
 	return count > 0
 }
-

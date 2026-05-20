@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 	"context"
 	"fmt"
 	"mime/multipart"
@@ -911,4 +911,3 @@ func (s *chatMessageService) GetRecentSenders(c *gin.Context, courseId, currentU
 
 	return results, nil
 }
-

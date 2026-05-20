@@ -1,16 +1,16 @@
 package app
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	_ "be-cleverschool/docs"
-	"be-cleverschool/i18n"
-	"be-cleverschool/jobs"
-	"be-cleverschool/middleware"
-	"be-cleverschool/redis"
-	"be-cleverschool/routes"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/database/db"
+	_ "be-Clever School/docs"
+	"be-Clever School/i18n"
+	"be-Clever School/jobs"
+	"be-Clever School/middleware"
+	"be-Clever School/redis"
+	"be-Clever School/routes"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"fmt"
 	"log"
 	"net/http"
@@ -217,4 +217,3 @@ func CronJob() {
 	jobs.StartDailySchoolStatisticsCronJob()
 	jobs.StartDailyCourseStatisticsCronJob()
 }
-

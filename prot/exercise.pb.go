@@ -693,7 +693,7 @@ const file_exercise_proto_rawDesc = "" +
 	"isAssigned\"\x82\x01\n" +
 	"\x10ExerciseByCourse\x12,\n" +
 	"\texercises\x18\x01 \x03(\v2\x0e.prot.ExerciseR\texercises\x12@\n" +
-	"\x14exercise_by_programs\x18\x02 \x03(\v2\x0e.prot.ExerciseR\x12exerciseByProgramsB\rZ\vbe-cleverschool/protb\x06proto3"
+	"\x14exercise_by_programs\x18\x02 \x03(\v2\x0e.prot.ExerciseR\x12exerciseByProgramsB\rZ\vbe-Clever School/protb\x06proto3"
 
 var (
 	file_exercise_proto_rawDescOnce sync.Once
@@ -753,4 +753,3 @@ func file_exercise_proto_init() {
 	file_exercise_proto_goTypes = nil
 	file_exercise_proto_depIdxs = nil
 }
-

@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"be-cleverschool/config"
-	"be-cleverschool/repositories"
+	"be-Clever School/config"
+	"be-Clever School/repositories"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -320,4 +320,3 @@ func getBaseName(path string) string {
 	base := filepath.Base(path)
 	return strings.TrimSuffix(base, filepath.Ext(base)) // Bỏ ".rar"
 }
-

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/repositories"
+	"be-Clever School/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,4 +70,3 @@ func (s *contestScoreService) SkipContestQuestion(c *gin.Context, req interface{
 func (s *contestScoreService) CheckSubmitContestRound(c *gin.Context, contestRoundId int64) (interface{}, error) {
 	return s.repo.CheckSubmitContestRound(contestRoundId)
 }
-

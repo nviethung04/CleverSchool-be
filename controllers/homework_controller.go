@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
+	"be-Clever School/services"
+	"be-Clever School/utils"
 	"net/http"
 	"strconv"
 
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 
 	"github.com/gin-gonic/gin"
 )

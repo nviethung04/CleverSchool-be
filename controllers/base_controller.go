@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-Clever School/i18n"
+	"be-Clever School/prot"
+	"be-Clever School/utils"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -336,4 +336,3 @@ func mapOldDataToRequest[R any, C any](oldData *R, req C, originalReq C, jsonFie
 		}
 	}
 }
-

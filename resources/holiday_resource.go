@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-Clever School/models"
+	"be-Clever School/prot"
 	"time"
 )
 
@@ -96,4 +96,3 @@ func (r *HolidayResourceImpl) ProtToModel(request *prot.Holiday) *models.Holiday
 
 	return holidayWeek
 }
-

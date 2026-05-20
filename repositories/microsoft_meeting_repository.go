@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"fmt"
 	"strings"
 	"time"
@@ -184,4 +184,3 @@ func (r *microsoftMeetingRepository) UpdateRecordingShareURL(id uint, shareURL s
 			"updated_at":          time.Now(),
 		}).Error
 }
-

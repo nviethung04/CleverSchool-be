@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/models"
+	"be-Clever School/repositories"
+	"be-Clever School/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
@@ -861,4 +861,3 @@ func (s *programService) syncProgramSubjects(programID int64, subjectIDs []int64
 
 	return nil
 }
-

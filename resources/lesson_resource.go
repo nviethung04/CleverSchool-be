@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-Clever School/config"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/utils"
 	"sort"
 	"strings"
 )
@@ -709,4 +709,3 @@ func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.Asses
 
 	return assessments
 }
-

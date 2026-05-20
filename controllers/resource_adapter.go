@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
+	"be-Clever School/dto"
+	"be-Clever School/models"
+	"be-Clever School/prot"
+	"be-Clever School/resources"
 )
 
 // Topic
@@ -720,4 +720,3 @@ func (adapter *TeachingPlanResourceAdapter) FormatItem(item *models.TeachingPlan
 func (adapter *TeachingPlanResourceAdapter) FormatItems(items []*models.TeachingPlan) []*prot.TeachingPlan {
 	return adapter.resource.FormatTeachingPlans(items)
 }
-

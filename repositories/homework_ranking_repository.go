@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
+	"be-Clever School/requests"
 	"sort"
 	"strings"
 )
@@ -110,4 +110,3 @@ func (r *homeworkRankingRepository) GetHomeworkRanking(req *requests.HomeworkRan
 
 	return rows, totalCount, nil
 }
-

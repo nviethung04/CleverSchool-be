@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-Clever School/database/db"
+	"be-Clever School/models"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -117,4 +117,3 @@ func (rr *RolePermissionRedis) ClearCache() error {
 
 	return nil
 }
-
