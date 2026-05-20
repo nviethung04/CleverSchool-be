@@ -1,4 +1,4 @@
-name: Auto Deploy BE Binary to VPS (staging)
+name: Auto Deploy BE to VPS (staging)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - staging
 
 concurrency:
-  group: be-auto-deploy-staging
+  group: be-deploy-staging
   cancel-in-progress: true
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - name: Build Linux binary
         run: |
           go mod download
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o cleverschool-be .
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp .
 
       - name: Package release bundle
         id: bundle
@@ -33,8 +33,9 @@ jobs:
           SHORT_SHA=${GITHUB_SHA::7}
           RELEASE_DIR="release-$SHORT_SHA"
           mkdir -p "$RELEASE_DIR"
-          cp cleverschool-be "$RELEASE_DIR/myapp"
-          cp -R database templates power_point i18n "$RELEASE_DIR/"
+          cp myapp "$RELEASE_DIR/"
+          cp docker-compose.yml "$RELEASE_DIR/"
+          cp -R templates power_point i18n "$RELEASE_DIR/"
           tar -czf "cleverschool-be-$SHORT_SHA.tar.gz" -C "$RELEASE_DIR" .
           echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
           echo "bundle=cleverschool-be-$SHORT_SHA.tar.gz" >> "$GITHUB_OUTPUT"
@@ -64,28 +65,33 @@ jobs:
             RELEASE_DIR="$APP_DIR/releases/$SHORT_SHA"
             BUNDLE="$APP_DIR/cleverschool-be-$SHORT_SHA.tar.gz"
 
-            mkdir -p "$APP_DIR/releases" "$APP_DIR/current"
+            if [ ! -f "$APP_DIR/.env" ]; then
+              echo "Missing $APP_DIR/.env"
+              exit 1
+            fi
+
+            mkdir -p "$APP_DIR/releases"
             rm -rf "$RELEASE_DIR"
             mkdir -p "$RELEASE_DIR"
             tar -xzf "$BUNDLE" -C "$RELEASE_DIR"
             rm -f "$BUNDLE"
             ln -sfn "$RELEASE_DIR" "$APP_DIR/current"
 
-            cd "$APP_DIR"
-            docker compose up -d postgres redis
+            cd "$APP_DIR/current"
+            docker compose -p cleverschool-staging --env-file "$APP_DIR/.env" up -d postgres redis
 
-            until docker compose exec -T postgres pg_isready -U "${DB_MASTER_USER:-admin}" -d "${DB_MASTER_NAME:-clever_school}" >/dev/null 2>&1; do
+            until docker compose -p cleverschool-staging --env-file "$APP_DIR/.env" exec -T postgres pg_isready -U "${DB_MASTER_USER:-admin}" -d "${DB_MASTER_NAME:-clever_school}" >/dev/null 2>&1; do
               echo "Waiting for postgres..."
               sleep 3
             done
 
-            if [ ! -f "$APP_DIR/.env" ]; then
-              echo "Missing $APP_DIR/.env"
-              exit 1
-            fi
+            set -a
+            . "$APP_DIR/.env"
+            set +a
+            "$APP_DIR/current/myapp" migrate
 
             if [ ! -f /etc/systemd/system/cleverschool-be-staging.service ]; then
-              cat >/etc/systemd/system/cleverschool-be-staging.service <<'EOF'
+              cat >/etc/systemd/system/cleverschool-be-staging.service <<EOF
 [Unit]
 Description=CleverSchool BE (staging)
 After=network-online.target docker.service
@@ -94,9 +100,9 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/cleverschool/staging/current
-EnvironmentFile=/opt/cleverschool/staging/.env
-ExecStart=/opt/cleverschool/staging/current/myapp
+WorkingDirectory=$APP_DIR/current
+EnvironmentFile=$APP_DIR/.env
+ExecStart=$APP_DIR/current/myapp
 Restart=always
 RestartSec=5
 
@@ -109,3 +115,4 @@ EOF
             systemctl enable cleverschool-be-staging.service
             systemctl restart cleverschool-be-staging.service
             systemctl --no-pager --full status cleverschool-be-staging.service || true
+

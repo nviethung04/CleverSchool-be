@@ -48,7 +48,7 @@ services:
     networks:
       - cleverschool-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_MASTER_USER:-admin} -d ${DB_MASTER_NAME:-clever_school}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_MASTER_USER:-admin} -d ${DB_MASTER_NAME:-clever_school}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -57,7 +57,7 @@ services:
     image: redis:7-alpine
     container_name: cleverschool-redis
     # If you set REDIS_PASSWORD in .env you can enable auth; by default keep redis open for local testing
-    command: ["redis-server", "--appendonly", "yes"]
+    command: [ "redis-server", "--appendonly", "yes" ]
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -66,7 +66,7 @@ services:
     networks:
       - cleverschool-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 10
