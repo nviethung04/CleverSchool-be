@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cleverschool-postgres-wsl
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_MASTER_NAME:-lms}
+      POSTGRES_USER: ${DB_MASTER_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_MASTER_PASSWORD:-admin123}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_wsl:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_MASTER_USER:-admin} -d ${DB_MASTER_NAME:-lms}" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: cleverschool-redis-wsl
+    restart: unless-stopped
+    command: [ "redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-redis123}" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_wsl:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis123}", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cleverschool-be-wsl
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PORT: ${PORT:-8080}
+      DB_MASTER_HOST: postgres
+      DB_MASTER_PORT: 5432
+      REDIS_ENABLED: true
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+
+volumes:
+  postgres_data_wsl:
+  redis_data_wsl:

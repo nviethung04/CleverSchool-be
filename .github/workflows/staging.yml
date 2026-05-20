@@ -1,12 +1,12 @@
-name: Auto Deploy BE Binary to VPS (develop)
+name: Auto Deploy BE Binary to VPS (staging)
 
 on:
   push:
     branches:
-      - develop
+      - staging
 
 concurrency:
-  group: be-auto-deploy-develop
+  group: be-auto-deploy-staging
   cancel-in-progress: true
 
 jobs:
@@ -42,25 +42,25 @@ jobs:
       - name: Upload release bundle to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          host: ${{ secrets.VPS_STAGING_HOST }}
+          username: ${{ secrets.VPS_STAGING_USER }}
+          key: ${{ secrets.VPS_STAGING_SSH_KEY }}
+          port: ${{ secrets.VPS_STAGING_PORT }}
           source: ${{ steps.bundle.outputs.bundle }}
-          target: ${{ secrets.VPS_APP_DIR }}
+          target: ${{ secrets.VPS_STAGING_APP_DIR }}
 
       - name: Deploy release on VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          host: ${{ secrets.VPS_STAGING_HOST }}
+          username: ${{ secrets.VPS_STAGING_USER }}
+          key: ${{ secrets.VPS_STAGING_SSH_KEY }}
+          port: ${{ secrets.VPS_STAGING_PORT }}
           script_stop: true
           script: |
             set -e
             SHORT_SHA=${{ steps.bundle.outputs.short_sha }}
-            APP_DIR="${{ secrets.VPS_APP_DIR }}"
+            APP_DIR="${{ secrets.VPS_STAGING_APP_DIR }}"
             RELEASE_DIR="$APP_DIR/releases/$SHORT_SHA"
             BUNDLE="$APP_DIR/cleverschool-be-$SHORT_SHA.tar.gz"
 
@@ -84,19 +84,19 @@ jobs:
               exit 1
             fi
 
-            if [ ! -f /etc/systemd/system/cleverschool-be.service ]; then
-              cat >/etc/systemd/system/cleverschool-be.service <<'EOF'
+            if [ ! -f /etc/systemd/system/cleverschool-be-staging.service ]; then
+              cat >/etc/systemd/system/cleverschool-be-staging.service <<'EOF'
 [Unit]
-Description=CleverSchool BE (develop)
+Description=CleverSchool BE (staging)
 After=network-online.target docker.service
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/cleverschool/develop/current
-EnvironmentFile=/opt/cleverschool/develop/.env
-ExecStart=/opt/cleverschool/develop/current/myapp
+WorkingDirectory=/opt/cleverschool/staging/current
+EnvironmentFile=/opt/cleverschool/staging/.env
+ExecStart=/opt/cleverschool/staging/current/myapp
 Restart=always
 RestartSec=5
 
@@ -106,6 +106,6 @@ EOF
             fi
 
             systemctl daemon-reload
-            systemctl enable cleverschool-be.service
-            systemctl restart cleverschool-be.service
-            systemctl --no-pager --full status cleverschool-be.service || true
+            systemctl enable cleverschool-be-staging.service
+            systemctl restart cleverschool-be-staging.service
+            systemctl --no-pager --full status cleverschool-be-staging.service || true
