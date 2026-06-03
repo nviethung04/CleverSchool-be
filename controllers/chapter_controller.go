@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -44,10 +44,6 @@ func NewChapterController(service services.ChapterService) *ChapterController {
 		ctl.RespondDetail(c, item)
 	})
 
-	ctl.GenericController.WithUsedError(func() bool {
-		return true
-	})
-
 	return ctl
 }
 
@@ -78,18 +74,13 @@ func (cc *ChapterController) SortLessons(c *gin.Context) {
 func (cc *ChapterController) RespondDetail(c *gin.Context, chapter *models.Chapter) {
 	lessonRepo := repositories.NewLessonRepository()
 	lessonService := services.NewLessonService(lessonRepo)
-	hideLessonIds := lessonService.HideLessonIds(c)
-	studyingLessonIds := lessonService.StudyingLessonIds(c, 0, chapter.ID)
 	completeLessonIds := lessonService.CompletionLessonIds(c, 0, chapter.ID)
 
 	chapterResource := resources.NewChapterResource()
 	if impl, ok := chapterResource.(*resources.ChapterResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 	}
 	formattedChapter := chapterResource.FormatChapterDetail(chapter)
 
 	utils.Respond(c, formattedChapter, nil, "")
 }
-

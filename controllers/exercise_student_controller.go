@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,6 +32,5 @@ func (ctrl *ExerciseStudentController) GetExerciseStudents(c *gin.Context) {
     resp, err := ctrl.service.GetExerciseStudentsByExerciseIDService(req.ExerciseID, req.CourseID, req.Limit, req.Page)
     utils.Respond(c, resp, err, "")
 }
-
 
 

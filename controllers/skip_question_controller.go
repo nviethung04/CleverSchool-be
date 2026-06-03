@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -99,4 +99,3 @@ func (c *SkipQuestionController) CheckSubmitHomework(ctx *gin.Context) {
 	resp, err := c.service.CheckSubmitHomework(homeworkID, userID)
 	utils.Respond(ctx, resp, err, "")
 }
-

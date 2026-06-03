@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 )
 
 type TopicResource interface {
@@ -67,4 +67,3 @@ func (r *TopicResourceImpl) FormatModelTopic(topic *prot.TopicRequest) *models.T
 		Status:      topic.Status,
 	}
 }
-

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
+	"be-lms/database/db"
+	"be-lms/dto"
 )
 
 type ExerciseStudentRepository interface {
@@ -123,4 +123,3 @@ func (r *exerciseStudentRepository) GetExerciseComment(exerciseID, userID int64)
 		Scan(&content).Error
 	return content, err
 }
-

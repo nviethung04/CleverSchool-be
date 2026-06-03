@@ -38,25 +38,6 @@ func (HomeworkQuestionUser) TableName() string {
 	return "homework_question_users"
 }
 
-type HomeworkUserQuestion struct {
-	ID             int64     `gorm:"primaryKey;column:id" json:"id"`
-	HomeworkID     int64     `gorm:"column:homework_id" json:"homework_id"`
-	UserID         int64     `gorm:"column:user_id" json:"user_id"`
-	QuestionID     int64     `gorm:"column:question_id" json:"question_id"`
-	RatioScore     float64   `gorm:"column:ratio_score" json:"ratio_score"`
-	IsAllCorrect   bool      `gorm:"column:is_all_correct" json:"is_all_correct"`
-	Star           int       `gorm:"column:star" json:"star"`
-	NumberOptions  int       `gorm:"column:number_options" json:"number_options"`
-	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime" json:"created_at"`
-	LessonID       int64     `gorm:"column:lesson_id" json:"lesson_id"`
-	NumberTimeSent int       `gorm:"column:number_time_sent" json:"number_time_sent"`
-	Weight         float64   `gorm:"column:weight" json:"weight"`
-}
-
-func (HomeworkUserQuestion) TableName() string {
-	return "homework_user_questions"
-}
-
 type ExerciseQuestionUser struct {
 	ID           int64     `gorm:"primaryKey;column:id" json:"id"`
 	ExerciseID   int64     `gorm:"column:exercise_id" json:"exercise_id"`
@@ -376,9 +357,9 @@ type HomeworkQuestionUserManualScoring struct {
 	FileInfo   MediaInfo  `gorm:"type:jsonb" json:"file_info"`
 	Score      *float64   `gorm:"column:score"`      // numeric(5,2)
 	IsScored   bool       `gorm:"column:is_scored"`  // boolean
-	CreatedAt  *time.Time `gorm:"column:created_at"` // timestamp
-	ScoringBy  *int64     `gorm:"column:scoring_by"` // bigint
-	ScoringAt  *time.Time `gorm:"column:scoring_at"` // timestamp
+    CreatedAt  *time.Time `gorm:"column:created_at"` // timestamp
+    ScoringBy  *int64     `gorm:"column:scoring_by"` // bigint
+    ScoringAt  *time.Time `gorm:"column:scoring_at"` // timestamp
 }
 
 // TableName sets the insert table name for this struct type
@@ -394,8 +375,8 @@ type ExerciseQuestionUserManualScoring struct {
 	QuestionID int64      `gorm:"column:question_id"`
 	Answer     *string    `gorm:"column:answer"` // text
 	FileInfo   MediaInfo  `gorm:"type:jsonb" json:"file_info"`
-	Score      *float64   `gorm:"column:score"`      // numeric(5,2)
-	IsScored   bool       `gorm:"column:is_scored"`  // boolean
+	Score      *float64   `gorm:"column:score"`     // numeric(5,2)
+	IsScored   bool       `gorm:"column:is_scored"` // boolean
 	CreatedAt  *time.Time `gorm:"column:created_at"` // timestamp
 	ScoringBy  *int64     `gorm:"column:scoring_by"` // bigint
 	ScoringAt  *time.Time `gorm:"column:scoring_at"` // timestamp

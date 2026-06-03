@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
+	"be-lms/database/db"
+	"be-lms/dto"
 	"strings"
 
 	"gorm.io/gorm"
@@ -29,6 +29,7 @@ func (r *dashboardSchoolsRepository) GetDashboardSchools(selectedStartDate, sele
 	var schools []dto.DashboardSchoolsResponse
 
 	// Tính các khoảng thời gian
+	sep8 := "2025-09-08"
 	sep15 := "2025-09-15"
 
 	// Lấy tất cả school_id từ bảng schools
@@ -44,13 +45,10 @@ func (r *dashboardSchoolsRepository) GetDashboardSchools(selectedStartDate, sele
 		TotalTeachers  int64 `json:"total_teachers"`
 		ActiveTeachers int64 `json:"active_teachers"`
 	}
-	teacherQuery := r.db.Table("dashboard_report_schools").
+	r.db.Table("dashboard_report_schools").
 		Select("school_id, total_teachers, active_teachers").
-		Where("start_date = ?", sep15)
-	if selectedEndDate != "" {
-		teacherQuery = teacherQuery.Where("end_date = ?", selectedEndDate)
-	}
-	teacherQuery.Find(&sep8DataList)
+		Where("start_date = ?", sep8).
+		Find(&sep8DataList)
 
 	// Query 2: Lấy dữ liệu từ 15/9 (active_students, total_students, students_completed_homework)
 	var sep15DataList []struct {
@@ -59,13 +57,10 @@ func (r *dashboardSchoolsRepository) GetDashboardSchools(selectedStartDate, sele
 		ActiveStudents            int64 `json:"active_students"`
 		StudentsCompletedHomework int64 `json:"students_completed_homework"`
 	}
-	studentQuery := r.db.Table("dashboard_report_schools").
+	r.db.Table("dashboard_report_schools").
 		Select("school_id, total_students, active_students, students_completed_homework").
-		Where("start_date = ?", sep15)
-	if selectedEndDate != "" {
-		studentQuery = studentQuery.Where("end_date = ?", selectedEndDate)
-	}
-	studentQuery.Find(&sep15DataList)
+		Where("start_date = ?", sep15).
+		Find(&sep15DataList)
 
 	// Query 3: Lấy dữ liệu từ selected week (dựa trên start_date và end_date từ param)
 	var selectedWeekDataList []struct {
@@ -233,4 +228,3 @@ func (r *dashboardSchoolsRepository) GetDashboardSchoolsCount(search string) (in
 	err := baseQuery.Count(&count).Error
 	return count, err
 }
-

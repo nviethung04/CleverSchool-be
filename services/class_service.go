@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"errors"
 	"mime/multipart"
 	"strconv"
@@ -37,13 +37,12 @@ func NewClassService(repo repositories.ClassRepository) ClassService {
 }
 
 func (s *classService) GetAll(c *gin.Context) ([]models.Class, int64, error) {
-	allowedFilters := []string{"status", "school_id", "faculty_id"}
+	allowedFilters := []string{"status", "school_id"}
 	filter, page, perPage, keyword, sort, err := utils.ParsePaginationParams(c, allowedFilters)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	s.repo.SetContext(c)
 	s.repo.SetSearch(keyword, []string{"name", "id"})
 	s.repo.SetFilter(filter)
 	s.repo.SetLimit(perPage)
@@ -51,8 +50,6 @@ func (s *classService) GetAll(c *gin.Context) ([]models.Class, int64, error) {
 	s.repo.SetSort(sort)
 	s.repo.SetPreload([]string{
 		"Grade",
-		"Faculty",
-		"ClassMain",
 	})
 
 	classes, rows, err := s.repo.FindAll()
@@ -66,11 +63,8 @@ func (s *classService) GetAll(c *gin.Context) ([]models.Class, int64, error) {
 func (s *classService) GetByID(c *gin.Context, id int) (*prot.ClassResponse, error) {
 	s.repo.SetPreload([]string{
 		"Grade",
-		"Faculty",
-		"ClassMain",
 	})
 
-	s.repo.SetContext(c)
 	class, err := s.repo.FindByID(id)
 
 	if err != nil {
@@ -87,18 +81,6 @@ func (s *classService) Create(c *gin.Context, req *prot.ClassRequest) (*models.C
 	classResource := resources.NewClassResource()
 	class := classResource.FormatModelClass(req)
 
-	if class != nil && class.FacultyId > 0 {
-		facultyRepo := repositories.NewFacultyRepository()
-		facultyRepo.SetContext(c)
-
-		faculty, err := facultyRepo.FindByID(int(class.FacultyId))
-		if err != nil {
-			return nil, err
-		}
-
-		class.SchoolId = faculty.SchoolId
-	}
-
 	s.repo.SetContext(c)
 
 	err := s.repo.Create(class)
@@ -110,8 +92,6 @@ func (s *classService) Create(c *gin.Context, req *prot.ClassRequest) (*models.C
 	s.repo.UpdateCurrentStudentToClass(int64(id))
 	s.repo.SetPreload([]string{
 		"Grade",
-		"Faculty",
-		"ClassMain",
 	})
 	newClass, _ := s.repo.FindNewByID(id)
 
@@ -121,18 +101,6 @@ func (s *classService) Create(c *gin.Context, req *prot.ClassRequest) (*models.C
 func (s *classService) Update(c *gin.Context, req *prot.ClassRequest) (*models.Class, error) {
 	classResource := resources.NewClassResource()
 	class := classResource.FormatModelClass(req)
-
-	if class != nil && class.FacultyId > 0 {
-		facultyRepo := repositories.NewFacultyRepository()
-		facultyRepo.SetContext(c)
-
-		faculty, err := facultyRepo.FindByID(int(class.FacultyId))
-		if err != nil {
-			return nil, err
-		}
-
-		class.SchoolId = faculty.SchoolId
-	}
 
 	s.repo.SetContext(c)
 
@@ -145,8 +113,6 @@ func (s *classService) Update(c *gin.Context, req *prot.ClassRequest) (*models.C
 	s.repo.UpdateCurrentStudentToClass(int64(id))
 	s.repo.SetPreload([]string{
 		"Grade",
-		"Faculty",
-		"ClassMain",
 	})
 	updateClass, _ := s.repo.FindNewByID(id)
 
@@ -193,7 +159,7 @@ func (s *classService) GetUsers(c *gin.Context, id int64) ([]models.User, error)
 		roleModel, err = roleRepo.FindByID(roleId)
 	}
 
-	students, _, err := s.repo.GetUsers(id, roleModel.ID)
+	students, err := s.repo.GetUsers(id, roleModel.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +200,7 @@ func (s *classService) StoreUsers(c *gin.Context, id int64) ([]models.User, erro
 		return nil, err
 	}
 
-	newStudents, _, err := s.repo.GetUsers(id, roleModel.ID)
+	newStudents, err := s.repo.GetUsers(id, roleModel.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -275,11 +241,10 @@ func (s *classService) AddUsers(c *gin.Context, id int64) ([]models.User, error)
 		return nil, err
 	}
 
-	newStudents, _, err := s.repo.GetUsers(id, roleModel.ID)
+	newStudents, err := s.repo.GetUsers(id, roleModel.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return newStudents, nil
 }
-

@@ -20,18 +20,6 @@ var examRaw string
 //go:embed swagger/homework.json
 var homeworkRaw string
 
-//go:embed swagger/assessment.json
-var assessmentRaw string
-
-//go:embed swagger/assessment_criterion.json
-var assessmentCriterionRaw string
-
-//go:embed swagger/assessment_subcriterion.json
-var assessmentSubcriterionRaw string
-
-//go:embed swagger/assessment_criteria_group.json
-var assessmentCriteriaGroupRaw string
-
 //go:embed swagger/do_homework.json
 var doHomeworkRaw string
 
@@ -55,12 +43,6 @@ var courseProtRaw string
 
 //go:embed swagger/course_path.json
 var coursePathRaw string
-
-//go:embed swagger/course_schedule_prot.json
-var courseScheduleProtRaw string
-
-//go:embed swagger/course_schedule_path.json
-var courseSchedulePathRaw string
 
 //go:embed swagger/school_path.json
 var schoolPathRaw string
@@ -260,15 +242,6 @@ var examProtRaw string
 //go:embed swagger/homework_prot.json
 var homeworkProtRaw string
 
-//go:embed swagger/assessment_prot.json
-var assessmentProtRaw string
-
-//go:embed swagger/assessment_criterion_prot.json
-var assessmentCriterionProtRaw string
-
-//go:embed swagger/assessment_subcriterion_prot.json
-var assessmentSubcriterionProtRaw string
-
 //go:embed swagger/dashboard_teacher_scoring_path.json
 var dashboardTeacherScoringPathRaw string
 
@@ -277,6 +250,9 @@ var dashboardTeacherScoringProtRaw string
 
 //go:embed swagger/contest.json
 var contestRaw string
+
+//go:embed swagger/contest_round.json
+var contestRoundRaw string
 
 //go:embed swagger/contest_scoring.json
 var contestScoringRaw string
@@ -293,203 +269,110 @@ var dashboardReportPathRaw string
 //go:embed swagger/dashboard_report_prot.json
 var dashboardReportProtRaw string
 
-//go:embed swagger/dashboard_list_entity_prot.json
-var dashboardListEntityProtRaw string
-
 //go:embed swagger/dashboard_schools_path.json
 var dashboardSchoolsPathRaw string
 
 //go:embed swagger/dashboard_courses_path.json
 var dashboardCoursesPathRaw string
 
-//go:embed swagger/dashboard_list_entity_path.json
-var dashboardListEntityPathRaw string
-
 //go:embed swagger/submit_homework_prot.json
 var submitHomeworkProtRaw string
 
-//go:embed swagger/setting_path.json
-var settingPathRaw string
-
-//go:embed swagger/setting_prot.json
-var settingProtRaw string
-
-//go:embed swagger/dashboard_teacher_homework_list.json
-var dashboardTeacherHomeworkListPathRaw string
-
-//go:embed swagger/dashboard_teacher_homework_list_prot.json
-var dashboardTeacherHomeworkListProtRaw string
-
-//go:embed swagger/faculty_path.json
-var facultyPathRaw string
-
-//go:embed swagger/faculty_prot.json
-var facultyProtRaw string
-
-//go:embed swagger/study_report_path.json
-var studyReportPathRaw string
-
-//go:embed swagger/study_report_prot.json
-var studyReportProtRaw string
-
-//go:embed swagger/study_report_criteria_path.json
-var studyReportCriteriaPathRaw string
-
-//go:embed swagger/study_report_criteria_prot.json
-var studyReportCriteriaProtRaw string
-
-//go:embed swagger/heading_path.json
-var headingPathRaw string
-
-//go:embed swagger/heading_prot.json
-var headingProtRaw string
-
-//go:embed swagger/notice_path.json
-var noticePathRaw string
-
-//go:embed swagger/notice_prot.json
-var noticeProtRaw string
-
-//go:embed swagger/push_firebase_path.json
-var pushFirebasePathRaw string
-
-//go:embed swagger/push_firebase_prot.json
-var pushFirebaseProtRaw string
-
-//go:embed swagger/training_level_path.json
-var trainingLevelPathRaw string
-
-//go:embed swagger/training_level_prot.json
-var trainingLevelProtRaw string
-
-//go:embed swagger/teaching_plan_path.json
-var teachingPlanPathRaw string
-
-//go:embed swagger/teaching_plan_prot.json
-var teachingPlanProtRaw string
-
 var (
-	questionPath                     = trim(questionPathRaw)
-	lessonPlanPath                   = trim(lessonPlanPathRaw)
-	questionProt                     = trim(questionProtRaw)
-	lessonPlanProt                   = trim(lessonPlanProtRaw)
-	lessonPlanPart                   = trim(lessonPlanPartRaw)
-	exam                             = trim(examRaw)
-	homework                         = trim(homeworkRaw)
-	assessment                       = trim(assessmentRaw)
-	assessmentCriterion              = trim(assessmentCriterionRaw)
-	assessmentSubcriterion           = trim(assessmentSubcriterionRaw)
-	assessmentCriteriaGroup          = trim(assessmentCriteriaGroupRaw)
-	doHomework                       = trim(doHomeworkRaw)
-	courseProt                       = trim(courseProtRaw)
-	coursePath                       = trim(coursePathRaw)
-	courseScheduleProt               = trim(courseScheduleProtRaw)
-	courseSchedulePath               = trim(courseSchedulePathRaw)
-	schoolPath                       = trim(schoolPathRaw)
-	schoolProt                       = trim(schoolProtRaw)
-	subjectProt                      = trim(subjectProtRaw)
-	subjectPath                      = trim(subjectPathRaw)
-	chapterProt                      = trim(chapterProtRaw)
-	chapterPath                      = trim(chapterPathRaw)
-	roleProt                         = trim(roleProtRaw)
-	rolePath                         = trim(rolePathRaw)
-	permissionProt                   = trim(permissionProtRaw)
-	permissionPath                   = trim(permissionPathRaw)
-	authProt                         = trim(authProtRaw)
-	authPath                         = trim(authPathRaw)
-	userProt                         = trim(userProtRaw)
-	userPath                         = trim(userPathRaw)
-	sourceQuestionPath               = trim(sourceQuestionPathRaw)
-	sourceQuestionProt               = trim(sourceQuestionProtRaw)
-	lessonPath                       = trim(lessonPathRaw)
-	lessonProt                       = trim(lessonProtRaw)
-	mediaPath                        = trim(mediaPathRaw)
-	mediaProt                        = trim(mediaProtRaw)
-	classPath                        = trim(classPathRaw)
-	classProt                        = trim(classProtRaw)
-	employeePositionPath             = trim(employeePositionPathRaw)
-	employeePositionProt             = trim(employeePositionProtRaw)
-	departmentPath                   = trim(departmentPathRaw)
-	departmentsProt                  = trim(departmentProtRaw)
-	degreePath                       = trim(degreePathRaw)
-	degreeProt                       = trim(degreeProtRaw)
-	certificatePath                  = trim(certificatePathRaw)
-	certificateProt                  = trim(certificateProtRaw)
-	tagPath                          = trim(tagPathRaw)
-	tagProt                          = trim(tagProtRaw)
-	topicPath                        = trim(topicPathRaw)
-	topicProt                        = trim(topicProtRaw)
-	questionAttributePath            = trim(questionAttributePathRaw)
-	questionAttributeProt            = trim(questionAttributeProtRaw)
-	skillPath                        = trim(skillPathRaw)
-	skillProt                        = trim(skillProtRaw)
-	dashboardPath                    = trim(dashboardPathRaw)
-	dashboardProt                    = trim(dashboardProtRaw)
-	saveScore                        = trim(saveScoreRaw)
-	weekPath                         = trim(weekPathRaw)
-	weekProt                         = trim(weekProtRaw)
-	gradePath                        = trim(gradePathRaw)
-	gradeProt                        = trim(gradeProtRaw)
-	regionPath                       = trim(regionPathRaw)
-	regionProt                       = trim(regionProtRaw)
-	studyShiftPath                   = trim(studyShiftPathRaw)
-	studyShiftProt                   = trim(studyShiftProtRaw)
-	lessonSchedulePath               = trim(lessonSchedulePathRaw)
-	lessonScheduleProt               = trim(lessonScheduleProtRaw)
-	schoolDashboardPath              = trim(schoolDashboardPathRaw)
-	h5pPath                          = trim(h5pPathRaw)
-	h5pProt                          = trim(h5pProtRaw)
-	semesterPath                     = trim(semesterPathRaw)
-	semesterProt                     = trim(semesterProtRaw)
-	holidayPath                      = trim(holidayPathRaw)
-	holidayProt                      = trim(holidayProtRaw)
-	programPath                      = trim(programPathRaw)
-	programProt                      = trim(programProtRaw)
-	uploadPath                       = trim(uploadPathRaw)
-	chatPath                         = trim(chatPathRaw)
-	chatProt                         = trim(chatProtRaw)
-	warningPath                      = trim(warningPathRaw)
-	warningProt                      = trim(warningProtRaw)
-	flashcardPath                    = trim(flashcardPathRaw)
-	flashcardProt                    = trim(flashcardProtRaw)
-	examProt                         = trim(examProtRaw)
-	homeworkProt                     = trim(homeworkProtRaw)
-	assessmentProt                   = trim(assessmentProtRaw)
-	assessmentCriterionProt          = trim(assessmentCriterionProtRaw)
-	assessmentSubcriterionProt       = trim(assessmentSubcriterionProtRaw)
-	dashboardTeacherScoringPath      = trim(dashboardTeacherScoringPathRaw)
-	dashboardTeacherScoringProt      = trim(dashboardTeacherScoringProtRaw)
-	internalCommandPath              = trim(internalCommandPathRaw)
-	internalCommandProt              = trim(internalCommandProtRaw)
-	dashboardReportPath              = trim(dashboardReportPathRaw)
-	dashboardReportProt              = trim(dashboardReportProtRaw)
-	dashboardListEntityProt          = trim(dashboardListEntityProtRaw)
-	dashboardSchoolsPath             = trim(dashboardSchoolsPathRaw)
-	dashboardCoursesPath             = trim(dashboardCoursesPathRaw)
-	dashboardListEntityPath          = trim(dashboardListEntityPathRaw)
-	contest                          = trim(contestRaw)
-	contestScoring                   = trim(contestScoringRaw)
-	submitHomeworkProt               = trim(submitHomeworkProtRaw)
-	settingPath                      = trim(settingPathRaw)
-	settingProt                      = trim(settingProtRaw)
-	dashboardTeacherHomeworkListPath = trim(dashboardTeacherHomeworkListPathRaw)
-	dashboardTeacherHomeworkListProt = trim(dashboardTeacherHomeworkListProtRaw)
-	facultyPath                      = trim(facultyPathRaw)
-	facultyProt                      = trim(facultyProtRaw)
-	studyReportPath                  = trim(studyReportPathRaw)
-	studyReportProt                  = trim(studyReportProtRaw)
-	studyReportCriteriaPath          = trim(studyReportCriteriaPathRaw)
-	studyReportCriteriaProt          = trim(studyReportCriteriaProtRaw)
-	headingPath                      = trim(headingPathRaw)
-	headingProt                      = trim(headingProtRaw)
-	noticePath                       = trim(noticePathRaw)
-	noticeProt                       = trim(noticeProtRaw)
-	pushFirebasePath                 = trim(pushFirebasePathRaw)
-	pushFirebaseProt                 = trim(pushFirebaseProtRaw)
-	trainingLevelPath                = trim(trainingLevelPathRaw)
-	trainingLevelProt                = trim(trainingLevelProtRaw)
-	teachingPlanPath                 = trim(teachingPlanPathRaw)
-	teachingPlanProt                 = trim(teachingPlanProtRaw)
+	questionPath                = trim(questionPathRaw)
+	lessonPlanPath              = trim(lessonPlanPathRaw)
+	questionProt                = trim(questionProtRaw)
+	lessonPlanProt              = trim(lessonPlanProtRaw)
+	lessonPlanPart              = trim(lessonPlanPartRaw)
+	exam                        = trim(examRaw)
+	homework                    = trim(homeworkRaw)
+	doHomework                  = trim(doHomeworkRaw)
+	courseProt                  = trim(courseProtRaw)
+	coursePath                  = trim(coursePathRaw)
+	schoolPath                  = trim(schoolPathRaw)
+	schoolProt                  = trim(schoolProtRaw)
+	subjectProt                 = trim(subjectProtRaw)
+	subjectPath                 = trim(subjectPathRaw)
+	chapterProt                 = trim(chapterProtRaw)
+	chapterPath                 = trim(chapterPathRaw)
+	roleProt                    = trim(roleProtRaw)
+	rolePath                    = trim(rolePathRaw)
+	permissionProt              = trim(permissionProtRaw)
+	permissionPath              = trim(permissionPathRaw)
+	authProt                    = trim(authProtRaw)
+	authPath                    = trim(authPathRaw)
+	userProt                    = trim(userProtRaw)
+	userPath                    = trim(userPathRaw)
+	sourceQuestionPath          = trim(sourceQuestionPathRaw)
+	sourceQuestionProt          = trim(sourceQuestionProtRaw)
+	lessonPath                  = trim(lessonPathRaw)
+	lessonProt                  = trim(lessonProtRaw)
+	mediaPath                   = trim(mediaPathRaw)
+	mediaProt                   = trim(mediaProtRaw)
+	classPath                   = trim(classPathRaw)
+	classProt                   = trim(classProtRaw)
+	employeePositionPath        = trim(employeePositionPathRaw)
+	employeePositionProt        = trim(employeePositionProtRaw)
+	departmentPath              = trim(departmentPathRaw)
+	departmentsProt             = trim(departmentProtRaw)
+	degreePath                  = trim(degreePathRaw)
+	degreeProt                  = trim(degreeProtRaw)
+	certificatePath             = trim(certificatePathRaw)
+	certificateProt             = trim(certificateProtRaw)
+	tagPath                     = trim(tagPathRaw)
+	tagProt                     = trim(tagProtRaw)
+	topicPath                   = trim(topicPathRaw)
+	topicProt                   = trim(topicProtRaw)
+	questionAttributePath       = trim(questionAttributePathRaw)
+	questionAttributeProt       = trim(questionAttributeProtRaw)
+	skillPath                   = trim(skillPathRaw)
+	skillProt                   = trim(skillProtRaw)
+	dashboardPath               = trim(dashboardPathRaw)
+	dashboardProt               = trim(dashboardProtRaw)
+	saveScore                   = trim(saveScoreRaw)
+	weekPath                    = trim(weekPathRaw)
+	weekProt                    = trim(weekProtRaw)
+	gradePath                   = trim(gradePathRaw)
+	gradeProt                   = trim(gradeProtRaw)
+	regionPath                  = trim(regionPathRaw)
+	regionProt                  = trim(regionProtRaw)
+	studyShiftPath              = trim(studyShiftPathRaw)
+	studyShiftProt              = trim(studyShiftProtRaw)
+	lessonSchedulePath          = trim(lessonSchedulePathRaw)
+	lessonScheduleProt          = trim(lessonScheduleProtRaw)
+	schoolDashboardPath         = trim(schoolDashboardPathRaw)
+	h5pPath                     = trim(h5pPathRaw)
+	h5pProt                     = trim(h5pProtRaw)
+	semesterPath                = trim(semesterPathRaw)
+	semesterProt                = trim(semesterProtRaw)
+	holidayPath                 = trim(holidayPathRaw)
+	holidayProt                 = trim(holidayProtRaw)
+	programPath                 = trim(programPathRaw)
+	programProt                 = trim(programProtRaw)
+	uploadPath                  = trim(uploadPathRaw)
+	chatPath                    = trim(chatPathRaw)
+	chatProt                    = trim(chatProtRaw)
+	warningPath                 = trim(warningPathRaw)
+	warningProt                 = trim(warningProtRaw)
+	flashcardPath               = trim(flashcardPathRaw)
+	flashcardProt               = trim(flashcardProtRaw)
+	examProt                    = trim(examProtRaw)
+	homeworkProt                = trim(homeworkProtRaw)
+	dashboardTeacherScoringPath = trim(dashboardTeacherScoringPathRaw)
+	dashboardTeacherScoringProt = trim(dashboardTeacherScoringProtRaw)
+	internalCommandPath         = trim(internalCommandPathRaw)
+	internalCommandProt         = trim(internalCommandProtRaw)
+	dashboardReportPath         = trim(dashboardReportPathRaw)
+	dashboardReportProt         = trim(dashboardReportProtRaw)
+	dashboardSchoolsPath        = trim(dashboardSchoolsPathRaw)
+	dashboardCoursesPath        = trim(dashboardCoursesPathRaw)
+	contest                     = trim(contestRaw)
+	contestRound                = trim(contestRoundRaw)
+	contestScoring              = trim(contestScoringRaw)
+	submitHomeworkProt           = trim(submitHomeworkProtRaw)
+	//dashboardContestRankingPath = ""
+	//dashboardContestRankingProt = ""
+	//contestStudentPath          = ""
 )
 
 // Hàm cắt {}

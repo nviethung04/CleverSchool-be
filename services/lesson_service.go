@@ -1,20 +1,19 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"be-cleverschool/database/db"
+	"be-lms/database/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,9 +29,6 @@ type LessonService interface {
 	LessonSchedules(c *gin.Context, filters map[string]interface{}) (dto.LessonScheduleDetail, *time.Time, []models.Week, bool, error)
 	Completion(c *gin.Context, lessonCompletion *prot.LessonCompletion) (*prot.LessonCompletion, error)
 	CompletionLessonIds(c *gin.Context, courseId int64, chapterId int64) []int64
-	StudyingLessonIds(c *gin.Context, courseId int64, chapterId int64) []int64
-	Studying(c *gin.Context, lessonCompletion *prot.LessonStudying) (*prot.LessonStudying, error)
-	HideLessonIds(c *gin.Context) []int64
 
 	GetLessonPlanByCourse(c *gin.Context, lessonId, courseId int64) (*prot.LessonPlanByCourse, error)
 	StoreLessonPlanByCourse(c *gin.Context, lessonId, courseId int64, req *prot.LessonPlanByCourse) (*prot.LessonPlanByCourse, error)
@@ -45,15 +41,11 @@ type LessonService interface {
 }
 
 type lessonService struct {
-	repo              repositories.LessonRepository
-	assessmentService AssessmentCourseService
+	repo repositories.LessonRepository
 }
 
 func NewLessonService(repo repositories.LessonRepository) LessonService {
-	return &lessonService{
-		repo:              repo,
-		assessmentService: NewAssessmentCourseService(),
-	}
+	return &lessonService{repo}
 }
 
 func (s *lessonService) GetAll(c *gin.Context) ([]models.Lesson, int64, error) {
@@ -76,7 +68,6 @@ func (s *lessonService) GetAll(c *gin.Context) ([]models.Lesson, int64, error) {
 		"Skills",
 		"Tags",
 		"Topics",
-		"Heading",
 		"Chapter",
 		"Chapter.Program",
 		"Author",
@@ -87,10 +78,6 @@ func (s *lessonService) GetAll(c *gin.Context) ([]models.Lesson, int64, error) {
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
-		"Assessments",
-		"Assessments.AssessmentRefLessons",
-		"LessonPlans.Author",
-		"TeachingPlans",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -112,7 +99,6 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		"Skills",
 		"Tags",
 		"Topics",
-		"Heading",
 		"Chapter",
 		"Chapter.Program",
 		"Author",
@@ -126,10 +112,6 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
-		"Assessments",
-		"Assessments.AssessmentRefLessons",
-		"LessonPlans.Author",
-		"TeachingPlans",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -168,7 +150,6 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		homeworkIDs = append(homeworkIDs, hw.ID)
 	}
 	homeworkCompletedMap := map[int64]int32{}
-	homeworkSubmittedMap := map[int64]bool{}
 	if len(homeworkIDs) > 0 {
 		var rows []struct {
 			HomeworkID         int64
@@ -180,7 +161,6 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 			Scan(&rows)
 		for _, row := range rows {
 			homeworkCompletedMap[row.HomeworkID] = int32(row.QuestionsCompleted)
-			homeworkSubmittedMap[row.HomeworkID] = true
 		}
 	}
 
@@ -221,28 +201,17 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 
 	lessonResource := resources.NewLessonResourceWithCompletionAndQuestions(
 		examCompletionMap, examTotalQuestions, homeworkCompletedMap, homeworkTotalQuestions,
-		exerciseCompletionMap, exerciseTotalQuestions, homeworkSubmittedMap,
+		exerciseCompletionMap, exerciseTotalQuestions,
 	)
 
-	hideLessonIds := s.HideLessonIds(c)
-	studyingLessonIds := s.StudyingLessonIds(c, 0, 0)
 	completeLessonIds := s.CompletionLessonIds(c, 0, 0)
 	completeLessonPlanIds := s.CompletionLessonPlanIds(c, 0, 0, lesson.ID)
 	courseId, _ := strconv.Atoi(c.Query("course_id"))
-	var publishAssessmentIds []int64
-
-	if courseId > 0 {
-		assessmentRepo := repositories.NewAssessmentRepository()
-		publishAssessmentIds = assessmentRepo.GetPublishAssessmentIds(int64(courseId))
-	}
 
 	if impl, ok := lessonResource.(*resources.LessonResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 		impl.CompleteLessonPlanIds = completeLessonPlanIds
 		impl.CourseId = int64(courseId)
-		impl.PublishAssessmentIds = publishAssessmentIds
 	}
 
 	formattedLesson := lessonResource.FormatLesson(lesson)
@@ -256,33 +225,12 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 
 	s.repo.SetContext(c)
 
+
 	var sortPosition int
 	if lesson.ChapterID > 0 {
-		sortPosition, _ = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, 0)
+		sortPosition, _  = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, 0)
 	}
 	lesson.SortPosition = sortPosition
-
-	if lesson.ChapterID == 0 && req.ProgramId > 0 {
-		chapterId, err := s.repo.CreateChapter(req.ProgramId)
-
-		if err != nil {
-			return nil, err
-		}
-
-		lesson.ChapterID = chapterId
-	}
-
-	if lesson.HeadingID > 0 {
-		headingRepo := repositories.NewHeadingRepository()
-		heading, _ := headingRepo.FindByID(int(lesson.HeadingID))
-
-		if heading.ID > 0 && (heading.ChapterId == lesson.ChapterID || lesson.ChapterID == 0) {
-			lesson.ChapterID = heading.ChapterId
-		} else {
-			lesson.HeadingID = 0
-			config.Log.Info("Heading not found id: ", lesson.HeadingID)
-		}
-	}
 
 	err := s.repo.Create(lesson)
 	if err != nil {
@@ -298,9 +246,7 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 	s.StoreExams(c, int64(id), 0, req)
 	s.StoreHomeworks(c, int64(id), 0, req)
 	s.StoreExercises(c, int64(id), 0, req)
-	s.StoreAssessments(c, int64(id), 0, req)
 	s.StoreLessonPlans(c, int64(id), 0, req)
-	s.StoreTeachingPlans(c, int64(id), req)
 	// s.StoreSchedules(c, int64(id), req)
 
 	s.repo.SetPreload([]string{
@@ -308,7 +254,6 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 		"Skills",
 		"Tags",
 		"Topics",
-		"Heading",
 		"Chapter",
 		"Chapter.Program",
 		"Author",
@@ -322,10 +267,6 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
-		"Assessments",
-		"Assessments.AssessmentRefLessons",
-		"LessonPlans.Author",
-		"TeachingPlans",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -365,33 +306,9 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 	if courseId == 0 {
 		var sortPosition int
 		if lesson.ChapterID > 0 {
-			sortPosition, _ = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, req.Id)
+			sortPosition, _  = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, req.Id)
 		}
 		lesson.SortPosition = sortPosition
-
-		if lesson.ChapterID == 0 && req.ProgramId > 0 {
-			chapterId, err := s.repo.CreateChapter(req.ProgramId)
-
-			if err != nil {
-				return nil, err
-			}
-
-			lesson.ChapterID = chapterId
-		}
-
-		if lesson.HeadingID > 0 {
-			headingRepo := repositories.NewHeadingRepository()
-			heading, _ := headingRepo.FindByID(int(lesson.HeadingID))
-
-			config.Log.Info("Heading: ", heading)
-
-			if heading.ID > 0 && (heading.ChapterId == lesson.ChapterID || lesson.ChapterID == 0) {
-				lesson.ChapterID = heading.ChapterId
-			} else {
-				lesson.HeadingID = 0
-				config.Log.Info("Heading not found id: ", lesson.HeadingID)
-			}
-		}
 
 		err := s.repo.Update(lesson)
 		if err != nil {
@@ -403,13 +320,11 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 		s.StoreTopics(c, int64(id), req)
 		s.StoreSkills(c, int64(id), req)
 		s.StoreLessonPlans(c, int64(id), int64(courseId), req)
-		s.StoreTeachingPlans(c, int64(id), req)
 	}
 
 	s.StoreExams(c, int64(id), int64(courseId), req)
 	s.StoreHomeworks(c, int64(id), int64(courseId), req)
 	s.StoreExercises(c, int64(id), int64(courseId), req)
-	s.StoreAssessments(c, int64(id), int64(courseId), req)
 	// s.StoreSchedules(c, int64(id), req)
 
 	s.repo.SetPreload([]string{
@@ -417,7 +332,6 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 		"Skills",
 		"Tags",
 		"Topics",
-		"Heading",
 		"Chapter",
 		"Chapter.Program",
 		"Author",
@@ -431,10 +345,6 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
-		"Assessments",
-		"Assessments.AssessmentRefLessons",
-		"LessonPlans.Author",
-		"TeachingPlans",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -605,79 +515,19 @@ func (s *lessonService) StoreHomeworks(c *gin.Context, id, courseId int64, req *
 	return nil
 }
 
-func (s *lessonService) StoreAssessments(c *gin.Context, id, courseId int64, req *prot.LessonRequest) error {
-	assessmentIdMap := make(map[int64]struct{})
-	assessmentIds := []int64{}
-
-	for _, assessment := range req.Assessment {
-		if assessment.Id != 0 {
-			if _, exists := assessmentIdMap[assessment.Id]; !exists {
-				assessmentIdMap[assessment.Id] = struct{}{}
-				assessmentIds = append(assessmentIds, assessment.Id)
-			}
-		}
+func (s *lessonService) StoreLessonPlans(c *gin.Context, id, courseId int64, req *prot.LessonRequest) error {
+	var lessonPlanId int64
+	for _, lessonPlan := range req.LessonPlans {
+		lessonPlanId = lessonPlan.Id
+		break
 	}
 
-	// Nếu courseId = 0 (không truyền course_id hoặc create/update lesson ở program level)
-	if courseId == 0 {
-		// Thêm/update bản ghi assessment_ref_lessons với course_id = 0
-		err := s.repo.UpdateAssessmentRefLesson(id, 0, assessmentIds)
-		if err != nil {
-			return err
-		}
-
-		// Gọi service AssignCoursesToAssessment để gán cho tất cả courses thuộc program
-		for _, assessmentID := range assessmentIds {
-			if err := s.assessmentService.AssignCoursesToAssessment(c, assessmentID, id); err != nil {
-				// Log lỗi nhưng không dừng toàn bộ quá trình
-				config.Log.Error(fmt.Sprintf("Error assigning courses to assessment %d for lesson %d: %v", assessmentID, id, err))
-			}
-		}
-		return nil
-	}
-
-	// Nếu courseId > 0 (có truyền course_id - chỉ gán cho course cụ thể)
-	// Chỉ thêm bản ghi với course_id đó, không thêm với course_id = 0
-	// Không gọi AssignCoursesToAssessment
-	err := s.repo.UpdateAssessmentRefLesson(id, courseId, assessmentIds)
+	err := s.repo.UpdateLessonPlan(id, lessonPlanId)
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (s *lessonService) StoreLessonPlans(c *gin.Context, id, courseId int64, req *prot.LessonRequest) error {
-	isVtg := config.LoadConfig().IsVtg
-
-	if isVtg {
-		var lessonPlanIds []int64
-
-		for _, lessonPlan := range req.LessonPlans {
-			lessonPlanIds = append(lessonPlanIds, lessonPlan.Id)
-		}
-
-		config.Log.Info(lessonPlanIds)
-
-		err := s.repo.UpdateLessonPlans(id, lessonPlanIds)
-		if err != nil {
-			return err
-		}
-		return nil
-	} else {
-		var lessonPlanId int64
-		for _, lessonPlan := range req.LessonPlans {
-			lessonPlanId = lessonPlan.Id
-			break
-		}
-
-		err := s.repo.UpdateLessonPlan(id, lessonPlanId)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
 }
 
 func (s *lessonService) StoreSchedules(c *gin.Context, lessonID int64, req *prot.LessonRequest) error {
@@ -790,7 +640,7 @@ func (s *lessonService) StoreLessonSchedules(c *gin.Context, req *prot.LessonSch
 	weekLessonSet := make(map[int64]map[int64]bool) // map[weekID][lessonID] = true
 
 	// Set preload 1 lần
-	s.repo.SetPreload([]string{"Chapter", "LessonPlans"})
+	s.repo.SetPreload([]string{"Chapter"})
 
 	var newSchedules []models.LessonSchedule
 
@@ -826,26 +676,12 @@ func (s *lessonService) StoreLessonSchedules(c *gin.Context, req *prot.LessonSch
 				continue
 			}
 
-			var lessonPlanId int64
-
-			if len(lesson.LessonPlans) > 0 {
-				lessonPlanId = lesson.LessonPlans[0].ID
-			}
-
-			for _, lessonPlan := range sched.Lesson.LessonPlans {
-				if lessonPlan.IsActive {
-					lessonPlanId = lessonPlan.Id
-					break
-				}
-			}
-
 			newSchedules = append(newSchedules, models.LessonSchedule{
 				LessonID:      lessonID,
 				CourseID:      courseID,
 				ScheduledDate: startDate,
 				WeekID:        weekID,
 				SortPosition:  index,
-				LessonPlanID:  lessonPlanId,
 			})
 			weekLessonSet[weekID][lessonID] = true
 		}
@@ -861,7 +697,7 @@ func (s *lessonService) StoreLessonSchedules(c *gin.Context, req *prot.LessonSch
 }
 
 func (s *lessonService) LessonSchedules(c *gin.Context, filters map[string]interface{}) (dto.LessonScheduleDetail, *time.Time, []models.Week, bool, error) {
-	lessonIDs, err := s.repo.LessonIdsInSchedule(c, filters)
+	lessonIDs, err := s.repo.LessonIdsInSchedule(filters)
 	if err != nil {
 		return dto.LessonScheduleDetail{}, nil, []models.Week{}, false, err
 	}
@@ -1143,7 +979,7 @@ func (s *lessonService) ApplyFilter(c *gin.Context, filter map[string]interface{
 	}
 
 	if len(filters) > 0 {
-		lessonIDs, err := s.repo.LessonIdsInSchedule(c, filters)
+		lessonIDs, err := s.repo.LessonIdsInSchedule(filters)
 		if err != nil {
 			return nil, err
 		}
@@ -1159,9 +995,10 @@ func (s *lessonService) ApplyFilter(c *gin.Context, filter map[string]interface{
 		}
 	}
 
+	chapterIDStr := c.Query("chapter_id")
 	programIDStr := c.Query("program_id")
 
-	if programIDStr != "" {
+	if chapterIDStr == "" && programIDStr != "" {
 		filter["Chapter.program_id"] = programIDStr + ":lessons:chapters:chapter_id:id:program_id"
 	}
 
@@ -1178,31 +1015,6 @@ func (s *lessonService) CompletionLessonIds(c *gin.Context, courseId int64, chap
 		return []int64{}
 	}
 	return s.repo.CompletionLessonIds(int64(studentId), courseId, chapterId)
-}
-
-func (s *lessonService) StudyingLessonIds(c *gin.Context, courseId int64, chapterId int64) []int64 {
-	studentId := utils.GetCurrentUserId(c)
-	if utils.GetCurrentRoleId(c) != models.StudentRoleId {
-		return []int64{}
-	}
-	return s.repo.StudyingLessonIds(int64(studentId), courseId, chapterId)
-}
-
-func (s *lessonService) HideLessonIds(c *gin.Context) []int64 {
-	userId := utils.GetCurrentUserId(c)
-	roleId := utils.GetCurrentRoleId(c)
-
-	if roleId != models.StudentRoleId && roleId != models.TeacherRoleId {
-		return []int64{}
-	}
-
-	ids := s.repo.HideLessonIds(int64(userId))
-
-	return ids
-}
-
-func (s *lessonService) Studying(c *gin.Context, lessonStudying *prot.LessonStudying) (*prot.LessonStudying, error) {
-	return s.repo.Studying(lessonStudying)
 }
 
 func (s *lessonService) CompletionLessonPlanIds(c *gin.Context, courseId int64, chapterId int64, lessonId int64) []int64 {
@@ -1292,7 +1104,7 @@ func (s *lessonService) ReturnLessonPlanByCourse(lessonPlans, lessonPlanByCourse
 
 	return &prot.LessonPlanByCourse{
 		LessonPlanByPrograms: lessonPlanFormat,
-		LessonPlans:          lessonPlanByCourseFormat,
+		LessonPlans: lessonPlanByCourseFormat,
 	}, nil
 }
 
@@ -1315,7 +1127,7 @@ func (s *lessonService) ReturnExamByCourse(exams, examByCourses []*models.Exam, 
 
 	return &prot.ExamByCourse{
 		ExamByPrograms: examFormat,
-		Exams:          examByCourseFormat,
+		Exams: examByCourseFormat,
 	}, nil
 }
 
@@ -1337,7 +1149,7 @@ func (s *lessonService) ReturnHomeworkByCourse(homeworks, homeworkByCourses []*m
 	}
 
 	return &prot.HomeworkByCourse{
-		Homeworks:          homeworkByCourseFormat,
+		Homeworks: homeworkByCourseFormat,
 		HomeworkByPrograms: homeworkFormat,
 	}, nil
 }
@@ -1360,20 +1172,7 @@ func (s *lessonService) ReturnExerciseByCourse(exercises, exerciseByCourses []*m
 	}
 
 	return &prot.ExerciseByCourse{
-		Exercises:          exerciseByCourseFormat,
+		Exercises: exerciseByCourseFormat,
 		ExerciseByPrograms: exerciseFormat,
 	}, nil
 }
-
-func (s *lessonService) StoreTeachingPlans(c *gin.Context, id int64, req *prot.LessonRequest) error {
-	var teachingPlanIds []int64
-
-	if req.TeachingPlan != nil && req.TeachingPlan.Id > 0 {
-		teachingPlanIds = append(teachingPlanIds, req.TeachingPlan.Id)
-	}
-
-	s.repo.UpdateTeachingPlans(id, teachingPlanIds)
-
-	return nil
-}
-

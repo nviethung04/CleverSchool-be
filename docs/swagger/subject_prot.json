@@ -6,10 +6,6 @@
         "type": "integer",
         "format": "int64"
       },
-      "faculty_id": {
-        "type": "integer",
-        "format": "int64"
-      },
       "name": {
         "type": "string"
       },
@@ -26,45 +22,12 @@
       "updated_at": {
         "type": "string",
         "format": "date-time"
-      },
-      "vtg_info": {
-        "$ref": "#/definitions/prot.SubjectVTGInfo"
-      },
-      "training_levels": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/prot.TrainingLevel"
-        }
-      }
-    }
-  },
-  "prot.SubjectVTGInfo": {
-    "type": "object",
-    "properties": {
-      "code": {
-        "type": "string"
-      },
-      "level": {
-        "type": "string"
-      },
-      "enrollment": {
-        "type": "string"
-      },
-      "time": {
-        "type": "string"
-      },
-      "avatar": {
-        "type": "string"
       }
     }
   },
   "prot.SubjectRequest": {
     "type": "object",
     "properties": {
-      "faculty_id": {
-        "type": "integer",
-        "format": "int64"
-      },
       "name": {
         "type": "string"
       },
@@ -81,15 +44,6 @@
       "updated_at": {
         "type": "string",
         "format": "date-time"
-      },
-      "vtg_info": {
-        "$ref": "#/definitions/prot.SubjectVTGInfo"
-      },
-      "training_levels": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/prot.TrainingLevel"
-        }
       }
     }
   },

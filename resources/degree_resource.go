@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"time"
 )
 
@@ -88,4 +88,3 @@ func (r *DegreeResourceImpl) FormatModelDegree(degree *prot.Degree) *models.Degr
 		FileInfo:       fileInfo,
 	}
 }
-

@@ -1,10 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
 )
 
 type SourceQuestionResource interface {
@@ -24,23 +22,13 @@ func (r *SourceQuestionResourceImpl) FormatSourceQuestion(sourceQuestion *models
 		return nil
 	}
 
-	var medias []*prot.MediaSourceQuestion
-
-	for _, media := range sourceQuestion.FileInfos {
-		medias = append(medias, &prot.MediaSourceQuestion{
-			Type: media.Type,
-			Url:  utils.StaticURL(media.Path, models.Storage),
-		})
-	}
-
 	return &prot.SourceQuestion{
-		Id:        sourceQuestion.ID,
+		Id:        int64(sourceQuestion.ID),
 		Title:     sourceQuestion.Title,
 		Skill:     sourceQuestion.Skill,
 		Content:   sourceQuestion.Content,
 		Level:     sourceQuestion.Level,
 		Status:    sourceQuestion.Status,
-		Medias:    medias,
 		CreatedAt: sourceQuestion.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt: sourceQuestion.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
@@ -61,28 +49,12 @@ func (r *SourceQuestionResourceImpl) FormatModelSourceQuestion(sourceQuestion *p
 		return nil
 	}
 
-	var fileInfos []models.MediaDetail
-	mediaRepo := repositories.NewMediaRepository()
-
-	for _, media := range sourceQuestion.Medias {
-		fileUrl := utils.StripDomain(media.Url, models.Storage)
-		info := mediaRepo.GetMediaInfo(fileUrl, models.Storage)
-		fileInfos = append(fileInfos, models.MediaDetail{
-			Path: fileUrl,
-			Type: media.Type,
-			Disk: info.Disk,
-			Id:   info.Id,
-		})
-	}
-
 	return &models.SourceQuestion{
-		ID:        int64(sourceQuestion.Id),
-		Title:     sourceQuestion.Title,
-		Skill:     sourceQuestion.Skill,
-		Content:   sourceQuestion.Content,
-		Level:     sourceQuestion.Level,
-		Status:    sourceQuestion.Status,
-		FileInfos: fileInfos,
+		ID:      int64(sourceQuestion.Id),
+		Title:   sourceQuestion.Title,
+		Skill:   sourceQuestion.Skill,
+		Content: sourceQuestion.Content,
+		Level:   sourceQuestion.Level,
+		Status:  sourceQuestion.Status,
 	}
 }
-

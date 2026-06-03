@@ -1,16 +1,16 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -134,9 +134,9 @@ func (s *examService) Cloned(c *gin.Context, id int) (*prot.Exam, error) {
 	newExam.CreatedAt = now
 	newExam.CreatedBy = int64(createById)
 	newExam.CloneInfo = &models.CloneInfo{
-		CloneId:   int64(data.ID),
-		CourseId:  cloneCourseId,
-		ClonedAt:  &now,
+		CloneId: int64(data.ID),
+		CourseId: cloneCourseId,
+		ClonedAt: &now,
 		ProgramId: data.ProgramId,
 	}
 
@@ -169,9 +169,9 @@ func (s *examService) Cloned(c *gin.Context, id int) (*prot.Exam, error) {
 		newClonedQuestion.CreatedBy = int64(createById)
 		newClonedQuestion.CreatedAt = now
 		newClonedQuestion.CloneInfo = &models.CloneInfo{
-			CloneId:   int64(clonedQuestion.ID),
-			CourseId:  cloneCourseId,
-			ClonedAt:  &now,
+			CloneId: int64(clonedQuestion.ID),
+			CourseId: cloneCourseId,
+			ClonedAt: &now,
 			ProgramId: data.ProgramId,
 		}
 
@@ -194,7 +194,7 @@ func (s *examService) Cloned(c *gin.Context, id int) (*prot.Exam, error) {
 		lessonRepo.SetContext(c)
 		err := lessonRepo.CreateExamRefLesson(req.LessonId, newUpdateExam.ID)
 		if err != nil {
-			return nil, err
+			return nil,err
 		}
 	}
 
@@ -261,11 +261,11 @@ func (s *examService) AssignedLesson(c *gin.Context, id int) (*prot.AssignedLess
 			}
 		}
 		lessons = append(lessons, &prot.AssignedLesson{
-			Id:          lesson.ID,
-			Title:       lesson.Title,
+			Id: lesson.ID,
+			Title: lesson.Title,
 			Description: lesson.Description,
 			ObjectTitle: lesson.ObjectTitle,
-			IsAssigned:  isAssigned,
+			IsAssigned: isAssigned,
 		})
 	}
 
@@ -275,7 +275,7 @@ func (s *examService) AssignedLesson(c *gin.Context, id int) (*prot.AssignedLess
 		}
 		return lessons[i].Id < lessons[j].Id
 	})
-	return &prot.AssignedLessons{Lessons: lessons}, nil
+    return &prot.AssignedLessons{Lessons: lessons}, nil
 }
 
 func modelToProtoExam(exam *models.Exam) *prot.Exam {
@@ -297,25 +297,24 @@ func modelToProtoExam(exam *models.Exam) *prot.Exam {
 	}
 
 	return &prot.Exam{
-		Id:               exam.ID,
-		Name:             exam.Name,
-		Status:           int32(exam.Status),
-		TimeLimit:        exam.TimeLimit,
-		MaxScore:         float32(exam.MaxScore),
-		Description:      exam.Description,
-		CoverImage:       utils.StaticURL(exam.CoverImageInfo.Path, models.Storage),
-		CreatedAt:        exam.CreatedAt.Unix(),
-		CreatedBy:        exam.CreatedBy,
-		UpdatedAt:        exam.UpdatedAt.Unix(),
-		UpdatedBy:        exam.UpdatedBy,
-		Deadline:         exam.Deadline.Unix(),
-		IsAssigned:       isAssigned,
-		TotalQuestions:   int32(exam.TotalQuestions),
+		Id:             exam.ID,
+		Name:           exam.Name,
+		Status:         int32(exam.Status),
+		TimeLimit:      exam.TimeLimit,
+		MaxScore:       float32(exam.MaxScore),
+		Description:    exam.Description,
+		CoverImage:     utils.StaticURL(exam.CoverImageInfo.Path, models.Storage),
+		CreatedAt:      exam.CreatedAt.Unix(),
+		CreatedBy:      exam.CreatedBy,
+		UpdatedAt:      exam.UpdatedAt.Unix(),
+		UpdatedBy:      exam.UpdatedBy,
+		Deadline:       exam.Deadline.Unix(),
+		IsAssigned:     isAssigned,
+		TotalQuestions: int32(exam.TotalQuestions),
 		IsRandomQuestion: exam.IsRandomQuestion,
-		ObjectTitle:      exam.ObjectTitle,
-		QuestionForm:     exam.QuestionForm,
-		QuestionFiles:    questionFiles,
-		Type:             exam.Type,
+		ObjectTitle:    exam.ObjectTitle,
+		QuestionForm: exam.QuestionForm,
+		QuestionFiles: questionFiles,
 	}
 }
 
@@ -344,4 +343,3 @@ func UpdateExamTotalQuestions(examID int64) error {
 	}
 	return db.MasterDB.Model(&models.Exam{}).Where("id = ?", examID).Update("total_questions", int32(totalQuestions)).Error
 }
-

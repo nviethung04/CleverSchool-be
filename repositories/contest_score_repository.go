@@ -1,9 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"errors"
 	"fmt"
 	"time"
@@ -23,8 +22,6 @@ type ContestScoreRepository interface {
 	SkipContestQuestion(req interface{}) (interface{}, error)
 	CheckSubmitContestRound(contestRoundId int64) (interface{}, error)
 	UpdateOrCreateContestRoundUser(contestRoundUser *models.ContestRoundUser) error
-	GetContestRoundByID(id int64) (*models.ContestRound, error)
-	UpdateEvaluate(userId, contestRoundId int64, score float64) error
 }
 
 type contestScoreRepository struct{}
@@ -140,35 +137,3 @@ func (r *contestScoreRepository) UpdateOrCreateContestRoundUser(contestRoundUser
 
 	return nil
 }
-
-func (r *contestScoreRepository) GetContestRoundByID(id int64) (*models.ContestRound, error) {
-	var contestRound models.ContestRound
-
-	query := db.ReplicaDB.Model(&models.ContestRound{})
-
-	err := query.Where("id = ?", id).
-		First(&contestRound).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return &contestRound, nil
-}
-
-func (r *contestScoreRepository) UpdateEvaluate(userId, contestRoundId int64, score float64) error {
-    result := db.MasterDB.Table("contest_round_users").
-        Where("user_id = ? AND contest_round_id = ?", userId, contestRoundId).
-        Update("ratio", score)
-
-    if result.Error != nil {
-		config.Log.Errorf("Error updating evaluate: %v", result.Error)
-        return result.Error
-    }
-
-    if result.RowsAffected == 0 {
-		return errors.New("contest round user not found")
-    }
-
-    return nil
-}
-

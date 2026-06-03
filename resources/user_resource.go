@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"sort"
 	"time"
 )
@@ -17,15 +17,13 @@ type UserResource interface {
 }
 
 type UserResourceImpl struct {
-	CourseId       int64
-	FailedUserIds  []int64
+	CourseId int64
 	localeProvider i18n.LocaleProvider
 }
 
 func NewUserResource() UserResource {
 	return &UserResourceImpl{
-		CourseId:      0,
-		FailedUserIds: []int64{},
+		CourseId: 0,
 	}
 }
 
@@ -35,48 +33,41 @@ func (r *UserResourceImpl) FormatUser(user *models.User) *prot.User {
 	}
 
 	userInfo := &prot.UserInfo{}
-	var schools []*prot.SchoolInfo
-	var classes []*prot.ClassInfo
 
 	if user.UserClasses != nil && len(user.UserClasses) > 0 {
+		var userClass *models.UserClass
 
-		for _, uc := range user.UserClasses {
+		for i, uc := range user.UserClasses {
 			if uc.IsCurrent {
-				if uc.Class != nil {
-					school := &prot.SchoolInfo{}
+				userClass = &user.UserClasses[i]
+				break
+			}
+		}
 
-					if uc.Class.School != nil {
-						school.Id = uc.Class.School.ID
-						school.Name = uc.Class.School.Name
+		if userClass == nil {
+			userClass = &user.UserClasses[0]
+		}
 
-						schools = append(schools, school)
-					}
-
-					class := &prot.ClassInfo{
-						Id:     uc.Class.ID,
-						Name:   uc.Class.Name,
-						School: school,
-					}
-
-					classes = append(classes, class)
-
-					if uc.Class.Faculty != nil && userInfo.Faculty == nil {
-						userInfo.Faculty = &prot.FacultyInfo{
-							Id:   uc.Class.Faculty.ID,
-							Name: uc.Class.Faculty.Name,
-						}
-					}
+		if userClass != nil && userClass.Class != nil {
+			if userClass.Class.School != nil {
+				userInfo.School = &prot.SchoolInfo{
+					Id:   userClass.Class.School.ID,
+					Name: userClass.Class.School.Name,
 				}
+			}
+
+			userInfo.Class = &prot.ClassInfo{
+				Id:   userClass.Class.ID,
+				Name: userClass.Class.Name,
 			}
 		}
 	}
 
-	userInfo.Classes = classes
-	userInfo.Schools = schools
-
-	if len(classes) > 0 {
-		userInfo.Class = classes[0]
-		userInfo.School = classes[0].School
+	if userInfo.School == nil && user.School.ID != 0 {
+		userInfo.School = &prot.SchoolInfo{
+			Id:   user.School.ID,
+			Name: user.School.Name,
+		}
 	}
 
 	if user.UserAddress.ID != 0 {
@@ -98,17 +89,9 @@ func (r *UserResourceImpl) FormatUser(user *models.User) *prot.User {
 		var courses []*prot.CourseInfo
 		for _, uc := range user.UserCourses {
 			if uc.Course != nil {
-				var program *prot.UserProgramInfo
-				if uc.Course.Program.ID > 0 {
-					program = &prot.UserProgramInfo{
-						Id:   uc.Course.Program.ID,
-						Name: uc.Course.Program.Name,
-					}
-				}
 				courses = append(courses, &prot.CourseInfo{
-					Id:      uc.Course.ID,
-					Name:    uc.Course.Name,
-					Program: program,
+					Id:   uc.Course.ID,
+					Name: uc.Course.Name,
 				})
 			}
 
@@ -235,20 +218,6 @@ func (r *UserResourceImpl) FormatUser(user *models.User) *prot.User {
 		roleId = user.Roles[0].ID
 	}
 
-	memberType := models.MemberTypeInternal
-
-	if user.MemberType == models.MemberTypeExternal {
-		memberType = models.MemberTypeExternal
-	}
-
-	var isFailed bool
-	for _, fid := range r.FailedUserIds {
-		if fid == int64(user.ID) {
-			isFailed = true
-			break
-		}
-	}
-
 	return &prot.User{
 		Id:          int64(user.ID),
 		Email:       user.Email,
@@ -268,8 +237,6 @@ func (r *UserResourceImpl) FormatUser(user *models.User) *prot.User {
 		MainTeacher: mainTeacher,
 		TypeTeacher: int32(user.TypeTeacher),
 		DateOfBirth: user.DateOfBirth.Format("2006-01-02"),
-		MemberType:  memberType,
-		IsFailed:    isFailed,
 		CreatedAt:   user.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   user.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
@@ -313,30 +280,21 @@ func (r *UserResourceImpl) FormatModelUser(user *prot.User) *models.User {
 	mediaRepo := repositories.NewMediaRepository()
 	avatarInfo := mediaRepo.GetMediaInfo(avatar, models.Storage)
 
-	memberType := models.MemberTypeInternal
-	if user.MemberType == models.MemberTypeExternal {
-		memberType = models.MemberTypeExternal
-	}
-
 	return &models.User{
-		ID:                   int64(user.Id),
-		Identifier:           user.Identifier,
-		Username:             user.Username,
-		Code:                 user.Code,
-		Name:                 user.Name,
-		Address:              user.Address,
-		Status:               user.Status,
-		PhoneNumber:          user.PhoneNumber,
-		ParentID:             int(user.ParentId),
-		Email:                user.Email,
-		SchoolID:             schoolId,
-		Description:          user.Description,
-		AvatarInfo:           avatarInfo,
-		DateOfBirth:          dateOfBirth,
-		TypeTeacher:          int16(user.TypeTeacher),
-		MemberType:           memberType,
-		IsIndependentStudent: user.IsIndependentStudent,
-		IsFailedSubject:      user.IsFailedSubject,
+		ID:          int64(user.Id),
+		Identifier:  user.Identifier,
+		Username:    user.Username,
+		Code:        user.Code,
+		Name:        user.Name,
+		Address:     user.Address,
+		Status:      user.Status,
+		PhoneNumber: user.PhoneNumber,
+		ParentID:    int(user.ParentId),
+		Email:       user.Email,
+		SchoolID:    schoolId,
+		Description: user.Description,
+		AvatarInfo:  avatarInfo,
+		DateOfBirth: dateOfBirth,
+		TypeTeacher: int16(user.TypeTeacher),
 	}
 }
-

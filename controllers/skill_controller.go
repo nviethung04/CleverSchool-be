@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
 )
 
 type SkillController struct {
@@ -33,4 +33,3 @@ func NewSkillController(service services.SkillService) *SkillController {
 		GenericController: genericController,
 	}
 }
-

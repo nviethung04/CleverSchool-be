@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"fmt"
 	"time"
 )
@@ -255,4 +255,3 @@ func (r *ContestRoundResourceImpl) FormatModelContestRound(round *prot.ContestRo
 
 	return modelRound
 }
-

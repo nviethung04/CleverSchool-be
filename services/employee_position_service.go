@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -114,4 +114,3 @@ func (s *employeePositionService) Restore(c *gin.Context, id int) (*models.Emplo
 
 	return employeePosition, nil
 }
-

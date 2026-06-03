@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 )
 
 type SkillResource interface {
@@ -67,4 +67,3 @@ func (r *SkillResourceImpl) FormatModelSkill(skill *prot.SkillRequest) *models.S
 		Status:      skill.Status,
 	}
 }
-

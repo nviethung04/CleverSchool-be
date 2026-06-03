@@ -1,0 +1,1208 @@
+package repositories
+
+import (
+	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
+	"time"
+
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/redis"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+)
+
+type BaseRepositoryInterface[T any] interface {
+	GetAll() ([]T, error)
+	FindAll() ([]T, int64, error)
+	FindByID(id int) (*T, error)
+	FindNewByID(id int) (*T, error)
+	Create(entity *T) error
+	Update(entity *T) error
+	Delete(id int) error
+	Restore(id int) (*T, error)
+	SetFilter(filter map[string]interface{})
+	SetLimit(limit int)
+	SetPage(page int)
+	SetSort(sort map[string]string)
+	SetPreload(preload []string)
+	SetEnableRedis(enable bool)
+	SetRedisTime(time time.Duration)
+	SetContext(c *gin.Context)
+	SetSearch(value string, fields []string)
+	SetAlias(alias map[string]string)
+	PermanentlyDeleteOldRecords(before time.Time) error
+	SyncMediaInfo() error
+	SyncMediaInfoForRecentlyUpdatedMedia(within time.Duration) error
+	SyncMediaInfoByID(id int64, infoFieldName string, dbColumnName string) error
+}
+
+type BaseRepository[T any] struct {
+	filter       map[string]interface{}
+	preload      []string
+	sort         map[string]string
+	limit        int
+	page         int
+	enableRedis  bool
+	redisTime    time.Duration
+	ctx          *gin.Context
+	searchValue  string
+	searchFields []string
+	alias        map[string]string
+}
+
+func NewBaseRepository[T any]() *BaseRepository[T] {
+	return &BaseRepository[T]{
+		filter:      make(map[string]interface{}),
+		preload:     []string{},
+		sort:        make(map[string]string),
+		limit:       1000,
+		page:        1,
+		enableRedis: false,
+		redisTime:   time.Hour * 24 * 1,
+	}
+}
+
+func (r *BaseRepository[T]) SetFilter(filter map[string]interface{}) {
+	r.filter = filter
+}
+
+func (r *BaseRepository[T]) SetPreload(preload []string) {
+	r.preload = preload
+}
+
+func (r *BaseRepository[T]) SetSort(sort map[string]string) {
+	r.sort = sort
+}
+
+func (r *BaseRepository[T]) SetLimit(limit int) {
+	r.limit = limit
+}
+
+func (r *BaseRepository[T]) SetPage(page int) {
+	r.page = page
+}
+
+func (r *BaseRepository[T]) SetEnableRedis(enable bool) {
+	r.enableRedis = enable
+}
+
+func (r *BaseRepository[T]) SetRedisTime(time time.Duration) {
+	r.redisTime = time
+}
+
+func (r *BaseRepository[T]) SetContext(c *gin.Context) {
+	r.ctx = c
+}
+
+func (r *BaseRepository[T]) SetSearch(value string, fields []string) {
+	r.searchValue = value
+	r.searchFields = fields
+}
+
+func (r *BaseRepository[T]) SetAlias(alias map[string]string) {
+	r.alias = alias
+}
+
+func (r *BaseRepository[T]) applySearch(query *gorm.DB) *gorm.DB {
+	if r.searchValue == "" || len(r.searchFields) == 0 {
+		return query
+	}
+
+	likePattern := "%" + r.searchValue + "%"
+	// Using tsquery_pattern to create full-text search queries
+	// For example, 'con heo' (pig) would become 'con & heo' or 'con | heo' depending on the logic you want.
+	// For approximate and prefix searches, you might consider adding ":*" to the end of each word if you want to search for prefixes,
+	// or use `phraseto_tsquery` for more precise phrasing.
+	// Here we use `plainto_tsquery` for simplicity, it will handle words and the default AND operator.
+	tsQueryPattern := r.searchValue
+
+	orConditions := []string{}
+	values := []interface{}{}
+
+	var model T
+	stmt := &gorm.Statement{DB: query}
+	if err := stmt.Parse(&model); err != nil {
+		return query
+	}
+	tableName := stmt.Schema.Table
+	joinedTables := make(map[string]bool)
+	sortableFields := []string{}
+	seenFields := make(map[string]bool)
+
+	for _, field := range r.searchFields {
+		if strings.Count(field, ":") == 5 {
+			// Format: relationTable:relationFromKey:relationToKey:baseTableKey:targetTableKey:targetTable.col1,col2
+			// Example search users by classes.name,code with relation table user_classes: "user_classes:user_id:class_id:id:id:classes.name,code"
+			parts := strings.Split(field, ":")
+			if len(parts) != 6 {
+				continue
+			}
+			relationTable := parts[0]
+			relationFromKey := parts[1]
+			relationToKey := parts[2]
+			baseTableKey := parts[3]
+			targetTableKey := parts[4]
+			targetFieldStr := parts[5]
+
+			targetFieldParts := strings.Split(targetFieldStr, ".")
+			if len(targetFieldParts) != 2 {
+				continue
+			}
+			targetTable := targetFieldParts[0]
+			targetColumns := strings.Split(targetFieldParts[1], ",")
+
+			if !joinedTables[relationTable] {
+				query = query.Joins(fmt.Sprintf("LEFT JOIN %s ON %s.%s = %s.%s",
+					relationTable, relationTable, relationFromKey, tableName, baseTableKey))
+				joinedTables[relationTable] = true
+			}
+
+			if !joinedTables[targetTable] {
+				query = query.Joins(fmt.Sprintf("LEFT JOIN %s ON %s.%s = %s.%s",
+					targetTable, targetTable, targetTableKey, relationTable, relationToKey))
+				joinedTables[targetTable] = true
+			}
+
+			for _, col := range targetColumns {
+				col = strings.TrimSpace(col)
+				fullCol := fmt.Sprintf("%s.%s", targetTable, col)
+
+				if strings.HasSuffix(col, "id") {
+					if idInt, err := strconv.Atoi(r.searchValue); err == nil {
+						orConditions = append(orConditions, fmt.Sprintf("%s = ?", fullCol))
+						values = append(values, idInt)
+						if !seenFields[fullCol] {
+							sortableFields = append(sortableFields, fullCol)
+							seenFields[fullCol] = true
+						}
+						continue
+					}
+				}
+
+				// LIKE
+				orConditions = append(orConditions, fmt.Sprintf("unaccent(CAST(%s AS TEXT)) ILIKE unaccent(?)", fullCol))
+				values = append(values, likePattern)
+
+				// Full-Text Search
+				// Use 'simple' or 'vietnamese' depending on your text search configuration
+				orConditions = append(orConditions, fmt.Sprintf("to_tsvector('simple', unaccent(CAST(%s AS TEXT))) @@ plainto_tsquery('simple', unaccent(?))", fullCol))
+				values = append(values, tsQueryPattern)
+
+				if !seenFields[fullCol] {
+					sortableFields = append(sortableFields, fullCol)
+					seenFields[fullCol] = true
+				}
+			}
+
+		} else if strings.Count(field, ":") == 3 {
+			// Format: targetTable:targetFK:basePK:col1,col2
+			// Example search users from user_addresses.address by realated user_id: "user_addresses:user_id:id:user_addresses.address,ward_code",
+			// Example search users from districts.name,full_name by realated district_code: "districts:district_code:code:districts.name,full_name"
+			parts := strings.Split(field, ":")
+			if len(parts) != 4 {
+				continue
+			}
+
+			targetTable := parts[0]
+			targetFK := parts[1]
+			basePK := parts[2]
+			targetColumnsStr := parts[3]
+
+			joinCondition := fmt.Sprintf("%s.%s = %s.%s", tableName, basePK, targetTable, targetFK)
+			// Need to check if targetFK is the primary key of the original table,
+			// otherwise the join condition may fail if that field is not present in the schema
+			if stmt.Schema.LookUpField(targetFK) != nil {
+				// This condition may need to be reconsidered depending on the actual relationship.
+				// For now, keep your original logic intact.
+				joinCondition = fmt.Sprintf("%s.%s = %s.%s", targetTable, targetFK, tableName, basePK)
+			}
+
+			if !joinedTables[targetTable] {
+				query = query.Joins(fmt.Sprintf("LEFT JOIN %s ON %s", targetTable, joinCondition))
+				joinedTables[targetTable] = true
+			}
+
+			targetColumns := strings.Split(targetColumnsStr, ",")
+			for _, col := range targetColumns {
+				col = strings.TrimSpace(col)
+				fullCol := col
+				if !strings.Contains(col, ".") {
+					fullCol = fmt.Sprintf("%s.%s", targetTable, col)
+				}
+
+				// Search by id
+				if strings.HasSuffix(col, "id") {
+					if idInt, err := strconv.Atoi(r.searchValue); err == nil {
+						orConditions = append(orConditions, fmt.Sprintf("%s = ?", fullCol))
+						values = append(values, idInt)
+						if !seenFields[fullCol] {
+							sortableFields = append(sortableFields, fullCol)
+							seenFields[fullCol] = true
+						}
+						continue
+					}
+				}
+
+				// LIKE
+				orConditions = append(orConditions, fmt.Sprintf("unaccent(CAST(%s AS TEXT)) ILIKE unaccent(?)", fullCol))
+				values = append(values, likePattern)
+
+				// Full-Text Search
+				orConditions = append(orConditions, fmt.Sprintf("to_tsvector('simple', unaccent(CAST(%s AS TEXT))) @@ plainto_tsquery('simple', unaccent(?))", fullCol))
+				values = append(values, tsQueryPattern)
+
+				if !seenFields[fullCol] {
+					sortableFields = append(sortableFields, fullCol)
+					seenFields[fullCol] = true
+				}
+			}
+		} else {
+			// Search by table field
+			column := field
+			if !strings.Contains(field, ".") {
+				column = fmt.Sprintf("%s.%s", tableName, field)
+			}
+
+			// Search by id
+			if strings.HasSuffix(field, "id") {
+				if idInt, err := strconv.Atoi(r.searchValue); err == nil {
+					orConditions = append(orConditions, fmt.Sprintf("%s = ?", column))
+					values = append(values, idInt)
+					if !seenFields[column] {
+						sortableFields = append(sortableFields, column)
+						seenFields[column] = true
+					}
+					continue
+				}
+			}
+
+			// LIKE
+			orConditions = append(orConditions, fmt.Sprintf("unaccent(CAST(%s AS TEXT)) ILIKE unaccent(?)", column))
+			values = append(values, likePattern)
+
+			// Full-Text Search
+			orConditions = append(orConditions, fmt.Sprintf("to_tsvector('simple', unaccent(CAST(%s AS TEXT))) @@ plainto_tsquery('simple', unaccent(?))", column))
+			values = append(values, tsQueryPattern)
+
+			if !seenFields[column] {
+				sortableFields = append(sortableFields, column)
+				seenFields[column] = true
+			}
+		}
+	}
+
+	// Order by keyword
+	if len(orConditions) > 0 {
+		query = query.Where("("+strings.Join(orConditions, " OR ")+")", values...)
+
+		if len(sortableFields) > 0 {
+			keywordLower := strings.ToLower(r.searchValue)
+
+			orderExprParts := make([]string, 0, len(sortableFields))
+			orderVars := make([]interface{}, 0, len(sortableFields)*3)
+
+			for index, field := range sortableFields {
+				eqWeight := index + 1        // Top ranking for exact matches
+				preWeight := index*30 + 10   // Ranking for prefix matches
+				inWeight := index*30 + 20    // Rank for results containing keywords
+				fuzzyWeight := index*30 + 25 // Ranking for fuzzy (full-text search) results
+				elseWeight := index*30 + 30  // Lowest rating
+
+				expr := fmt.Sprintf(
+					`CASE
+                        WHEN LOWER(CAST(%s AS TEXT)) = ? THEN %d
+                        WHEN LOWER(CAST(%s AS TEXT)) LIKE ? THEN %d
+                        WHEN LOWER(CAST(%s AS TEXT)) LIKE ? THEN %d
+                        WHEN to_tsvector('simple', unaccent(CAST(%s AS TEXT))) @@ plainto_tsquery('simple', unaccent(?)) THEN %d
+                        ELSE %d
+                    END`,
+					field, eqWeight, // Exact match
+					field, preWeight, // Prefix match (e.g., "con heo%")
+					field, inWeight, // Contains match (e.g., "%con heo%")
+					field, fuzzyWeight, // Full-text search match
+					elseWeight, // Fallback
+				)
+
+				orderExprParts = append(orderExprParts, expr)
+				orderVars = append(orderVars, keywordLower, keywordLower+"%", "%"+keywordLower+"%", keywordLower)
+			}
+
+			fullOrder := "(" + strings.Join(orderExprParts, " + ") + ")"
+			query = query.Order(clause.Expr{SQL: fullOrder, Vars: orderVars})
+		}
+	}
+
+	return query
+}
+
+func (r *BaseRepository[T]) applyFilters(query *gorm.DB) *gorm.DB {
+	query = r.applySearch(query)
+
+	for key, value := range r.filter {
+		if strings.Contains(key, ".") {
+			// filter by releation table
+			parts := strings.SplitN(key, ".", 2)
+			relation := parts[0]
+
+			if strVal, ok := value.(string); ok {
+				if strings.Count(strVal, ":") == 7 {
+					// Example "1:user_courses:users:courses:user_id:course_id:id:id", Relation Courses
+					valueParts := strings.SplitN(strVal, ":", 8)
+
+					filterValue, relationRefTable, currentTable, relationTable :=
+						valueParts[0], valueParts[1], valueParts[2], valueParts[3]
+					currentRefKey, relationRefKey, currentKey, relationKey :=
+						valueParts[4], valueParts[5], valueParts[6], valueParts[7]
+
+					if filterValue == "0" {
+						query = query.
+							Joins(fmt.Sprintf("LEFT JOIN %s ON %s.%s = %s.%s",
+								relationRefTable, relationRefTable, currentRefKey, currentTable, currentKey)).
+							Where(fmt.Sprintf("%s.%s IS NULL", relationRefTable, relationRefKey))
+					} else {
+						// Has value
+						joinOn := fmt.Sprintf("%s.%s = %s.%s", relationRefTable, currentRefKey, currentTable, currentKey)
+						whereClause := fmt.Sprintf("%s.%s = ?", relationRefTable, relationRefKey)
+						relationWhere := fmt.Sprintf("%s.%s = ?", relationTable, relationKey)
+
+						query = query.
+							Joins("JOIN "+relationRefTable+" ON "+joinOn).
+							Where(whereClause, filterValue).
+							Preload(relation, func(db *gorm.DB) *gorm.DB {
+								return db.Where(relationWhere, filterValue)
+							})
+					}
+				} else if strings.Count(strVal, ":") == 5 {
+					// Example "01::users:user_address:id:user_id:province_code", Relation UserAddress
+					parts := strings.SplitN(strVal, ":", 6)
+
+					filterValue := parts[0]
+					currentTable := parts[1]
+					relationTable := parts[2]
+					currentKey := parts[3]
+					relationKey := parts[4]
+					filterField := parts[5]
+
+					joinOn := fmt.Sprintf("%s.%s = %s.%s", currentTable, currentKey, relationTable, relationKey)
+					preloadWhere := fmt.Sprintf("%s.%s = ?", relationTable, filterField)
+
+					if filterValue == "0" {
+						query = query.
+							Joins("LEFT JOIN " + relationTable + " ON " + joinOn).
+							Where(fmt.Sprintf("%s.%s IS NULL", relationTable, filterField))
+					} else {
+						// Has value
+						query = query.
+							Joins("JOIN "+relationTable+" ON "+joinOn).
+							Where(preloadWhere, filterValue).
+							Preload(relation, func(db *gorm.DB) *gorm.DB {
+								return db.Where(preloadWhere, filterValue)
+							})
+					}
+				}
+			} else {
+				// todo skip filter
+				return query
+			}
+		} else {
+			// filter by table field
+			lowerKey := strings.ToLower(key)
+
+			if strVal, ok := value.(string); ok {
+				found := false
+
+				// Check BETWEEN
+				// Example "between:2006-01-02,2006-01-03"
+				if strings.HasPrefix(strVal, "between:") {
+					vals := strings.Split(strings.TrimPrefix(strVal, "between:"), ",")
+					if len(vals) == 2 {
+						start := strings.TrimSpace(vals[0])
+						end := strings.TrimSpace(vals[1])
+						if start != "" && end != "" {
+							query = query.Where(fmt.Sprintf("%s BETWEEN ? AND ?", lowerKey), start, end)
+							found = true
+						}
+					}
+				}
+
+				// Check operators
+				// Example ">=:2006-01-02"
+				if !found {
+					operators := []string{">=:", "<=:", "!=:", ">:", "<:"}
+					for _, op := range operators {
+						if strings.HasPrefix(strVal, op) {
+							val := strings.TrimPrefix(strVal, op)
+							val = strings.TrimSpace(val)
+							if val != "" {
+								query = query.Where(fmt.Sprintf("%s %s ?", lowerKey, strings.TrimSuffix(op, ":")), val)
+								found = true
+								break
+							}
+						}
+					}
+				}
+
+				// Check IN
+				// Example "between:2006-01-02,2006-01-03"
+				if !found && strings.HasPrefix(strVal, "in:") {
+					rawIds := strings.Split(strings.TrimPrefix(strVal, "in:"), ",")
+					var ids []interface{}
+					for _, idStr := range rawIds {
+						idStr = strings.TrimSpace(idStr)
+						if idStr != "" {
+							ids = append(ids, idStr)
+						}
+					}
+					query = query.Where(lowerKey+" IN ?", ids)
+					found = true
+				}
+
+				// Default =
+				if !found {
+					query = query.Where(lowerKey+" = ?", strVal)
+				}
+			} else {
+				query = query.Where(lowerKey+" = ?", value)
+			}
+
+		}
+	}
+	return query
+}
+
+func (r *BaseRepository[T]) applyFiltersAndPagination(query *gorm.DB) *gorm.DB {
+	query = r.applyFilters(query)
+
+	offset := (r.page - 1) * r.limit
+	query = query.Offset(offset).Limit(r.limit)
+
+	return query
+}
+
+func (r *BaseRepository[T]) applySort(query *gorm.DB) *gorm.DB {
+	if r.searchValue != "" {
+		return query
+	}
+
+	for _, v := range r.sort {
+		order := strings.ToLower(v)
+		if order == "newest" {
+			return query.Order("created_at DESC")
+		}
+		if order == "oldest" {
+			return query.Order("created_at ASC")
+		}
+	}
+
+	for field, order := range r.sort {
+		lowerField := strings.ToLower(field)
+		query = query.Order(fmt.Sprintf("%s %s", lowerField, order))
+	}
+
+	return query
+}
+
+func (r *BaseRepository[T]) applyAlias(query *gorm.DB) *gorm.DB {
+	selects := make([]string, 0, len(r.alias))
+
+	// rename field in table
+	if len(r.alias) > 0 {
+		hasStar := false
+		for field, alias := range r.alias {
+			if field == "*" {
+				hasStar = true
+				continue
+			}
+			selects = append(selects, field+" AS "+alias)
+		}
+
+		if hasStar {
+			selects = append([]string{"*"}, selects...)
+		}
+
+		query = query.Select(strings.Join(selects, ", "))
+	}
+
+	return query
+}
+
+func (r *BaseRepository[T]) GetAll() ([]T, error) {
+	var entities []T
+
+	query := db.ReplicaDB.Model(new(T))
+	query = r.applyFilters(query)
+
+	for _, relation := range r.preload {
+		var relationName, relationCondition string
+		parts := strings.SplitN(relation, ":", 2)
+		relationName = strings.TrimSpace(parts[0])
+		if len(parts) == 2 {
+			relationCondition = strings.TrimSpace(parts[1])
+		}
+
+		if relationCondition != "" {
+			query = query.Preload(relationName, relationCondition)
+		} else {
+			query = query.Preload(relationName)
+		}
+	}
+
+	err := query.Order("id ASC").Model(new(T)).Find(&entities).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return entities, err
+}
+
+func (r *BaseRepository[T]) FindAll() ([]T, int64, error) {
+	var entities []T
+	var totalCount int64
+
+	entities, totalCount, _ = r.BeforeFindAll()
+
+	if len(entities) > 0 {
+		return entities, totalCount, nil
+	}
+
+	query := db.ReplicaDB.Model(new(T))
+	query = r.applyFilters(query)
+
+	if err := query.Count(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
+	query = db.ReplicaDB.Model(new(T))
+	query = r.applyFiltersAndPagination(query)
+
+	query = r.applySort(query)
+	query = r.applyAlias(query)
+
+	for _, relation := range r.preload {
+		var relationName, relationCondition string
+		parts := strings.SplitN(relation, ":", 2)
+		relationName = strings.TrimSpace(parts[0])
+		if len(parts) == 2 {
+			relationCondition = strings.TrimSpace(parts[1])
+		}
+
+		if relationCondition != "" {
+			query = query.Preload(relationName, relationCondition)
+		} else {
+			query = query.Preload(relationName)
+		}
+	}
+
+	query = query.Distinct()
+
+	err := query.Find(&entities).Error
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	r.AfterFindAll(entities, totalCount)
+
+	return entities, totalCount, err
+}
+
+func (r *BaseRepository[T]) FindByID(id int) (*T, error) {
+	var entity T
+
+	cachedEntity, _ := r.BeforeFindById(id)
+
+	if cachedEntity != nil {
+		return cachedEntity, nil
+	}
+
+	query := db.ReplicaDB.Model(new(T))
+	for _, relation := range r.preload {
+		var relationName, relationCondition string
+		parts := strings.SplitN(relation, ":", 2)
+		relationName = strings.TrimSpace(parts[0])
+		if len(parts) == 2 {
+			relationCondition = strings.TrimSpace(parts[1])
+		}
+
+		if relationCondition != "" {
+			query = query.Preload(relationName, relationCondition)
+		} else {
+			query = query.Preload(relationName)
+		}
+	}
+
+	query = r.applyAlias(query)
+
+	err := query.First(&entity, id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			msg := i18n.Localize("messages.no_records_found_by_id", map[string]interface{}{"ID": id})
+			return nil, fmt.Errorf(msg)
+		}
+		return nil, err
+	}
+
+	r.AfterFindById(id, &entity)
+
+	return &entity, nil
+}
+
+func (r *BaseRepository[T]) FindNewByID(id int) (*T, error) {
+	var entity T
+	query := db.MasterDB.Model(new(T))
+	query = r.applyAlias(query)
+
+	for _, relation := range r.preload {
+		var relationName, relationCondition string
+		parts := strings.SplitN(relation, ":", 2)
+		relationName = strings.TrimSpace(parts[0])
+		if len(parts) == 2 {
+			relationCondition = strings.TrimSpace(parts[1])
+		}
+
+		if relationCondition != "" {
+			query = query.Preload(relationName, relationCondition)
+		} else {
+			query = query.Preload(relationName)
+		}
+	}
+
+	err := query.First(&entity, id).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			msg := i18n.Localize("messages.no_records_found_by_id", map[string]interface{}{"ID": id})
+			return nil, fmt.Errorf(msg)
+		}
+		return nil, err
+	}
+	return &entity, nil
+}
+
+func (r *BaseRepository[T]) Create(entity *T) error {
+	r.BeforeCreate(entity)
+
+	return db.MasterDB.Omit("author_id").Create(entity).Error
+}
+
+func (r *BaseRepository[T]) Update(entity *T) error {
+	r.BeforeUpdate(entity)
+
+	return db.MasterDB.Omit("created_at", "created_by", "author_id").Save(entity).Error
+}
+
+func (r *BaseRepository[T]) Delete(id int) error {
+	var model T
+
+	if err := db.MasterDB.First(&model, id).Error; err != nil {
+		return err
+	}
+
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+
+	if err := db.MasterDB.Omit("author_id").Save(&model).Error; err != nil {
+		return err
+	}
+
+	modelVal := reflect.ValueOf(&model).Elem()
+	field := modelVal.FieldByName("ID")
+	if !field.IsValid() || !field.CanSet() {
+		return fmt.Errorf("field ID not found or not settable in %T", model)
+	}
+	field.SetInt(int64(id))
+
+	return db.MasterDB.Delete(&model).Error
+}
+
+func (r *BaseRepository[T]) Restore(id int) (*T, error) {
+	var model T
+
+	if err := db.MasterDB.Unscoped().First(&model, id).Error; err != nil {
+		return nil, err
+	}
+
+	if err := r.BeforeRestore(id, &model); err != nil {
+		return nil, err
+	}
+
+	modelVal := reflect.ValueOf(&model).Elem()
+	deletedAtField := modelVal.FieldByName("DeletedAt")
+	if !deletedAtField.IsValid() {
+		return nil, fmt.Errorf("field DeletedAt not found in %T", model)
+	}
+
+	deletedAtField.Set(reflect.Zero(deletedAtField.Type()))
+
+	if err := db.MasterDB.Unscoped().Save(&model).Error; err != nil {
+		return nil, err
+	}
+
+	return &model, nil
+}
+
+func (r *BaseRepository[T]) SyncMediaInfo() error {
+	items, err := r.GetAll()
+	if err != nil {
+		config.Log.Error("Failed to get all items:", err)
+		return err
+	}
+
+	fields := []struct {
+		urlFieldName       string
+		mediaInfoFieldName string
+		dbColumnName       string
+	}{
+		{"FileUrl", "FileInfo", "file_info"},
+		{"MatchingFileUrl", "MatchingFileInfo", "matching_file_info"},
+		{"Avatar", "AvatarInfo", "avatar_info"},
+		{"Image", "ImageInfo", "image_info"},
+		{"CoverImage", "CoverImageInfo", "cover_image_info"},
+		{"Link", "LinkInfo", "link_info"},
+		{"Logo", "LogoInfo", "logo_info"},
+		{"FileURL", "FileInfo", "file_info"},
+	}
+
+	for _, i := range items {
+		reflectValue := reflect.ValueOf(i)
+		if reflectValue.Kind() == reflect.Ptr {
+			reflectValue = reflectValue.Elem()
+		}
+
+		idField := reflectValue.FieldByName("ID")
+		var id any
+		if idField.IsValid() {
+			id = idField.Interface()
+		}
+
+		for _, f := range fields {
+			urlField := reflectValue.FieldByName(f.urlFieldName)
+			mediaInfoField := reflectValue.FieldByName(f.mediaInfoFieldName)
+
+			if urlField.IsValid() && mediaInfoField.IsValid() && (urlField.Kind() == reflect.String || urlField.Kind() == reflect.Ptr) {
+				fileUrl := urlField.String()
+
+				fileUrl = StripDomain(fileUrl, models.Storage)
+
+				newMediaInfo := models.SyncMediaInfoByPath(db.MasterDB, fileUrl)
+				oldMediaInfo := mediaInfoField.Interface()
+
+				if !reflect.DeepEqual(newMediaInfo, oldMediaInfo) {
+					err := db.MasterDB.Session(&gorm.Session{SkipHooks: true}).
+						Model(i).Update(f.dbColumnName, newMediaInfo).Error
+
+					if err != nil {
+						config.Log.Errorf("Failed to update %s for item ID %v: %v", f.dbColumnName, id, err)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *BaseRepository[T]) PermanentlyDeleteOldRecords(before time.Time) error {
+	var model T
+	return db.MasterDB.
+		Unscoped().
+		Where("deleted_at IS NOT NULL AND deleted_at <= ?", before).
+		Delete(&model).Error
+
+}
+
+func (r *BaseRepository[T]) BeforeDelete(id int, entity *T) error {
+	// check and clear redis
+	if r.enableRedis {
+		err := redis.DeleteCacheById[T](int(id))
+		if err != nil {
+			return fmt.Errorf("failed to delete cache: %w", err)
+		}
+	}
+
+	reflectValue := reflect.ValueOf(entity).Elem()
+	deletedByField := reflectValue.FieldByName("DeletedBy")
+
+	// check and set deleted_by
+	if deletedByField.IsValid() && deletedByField.CanSet() && deletedByField.Kind() == reflect.Int64 {
+		var userID int64 = 0
+
+		if userIDVal, ok := r.ctx.Get("userID"); ok {
+			switch v := userIDVal.(type) {
+			case int:
+				userID = int64(v)
+			case int64:
+				userID = v
+			case float64:
+				userID = int64(v)
+			}
+		}
+
+		deletedByField.SetInt(userID)
+	}
+
+	return nil
+}
+
+func (r *BaseRepository[T]) BeforeRestore(id int, entity *T) error {
+	// check and clear redis
+	if r.enableRedis {
+		err := redis.DeleteCacheById[T](int(id))
+		if err != nil {
+			return fmt.Errorf("failed to delete cache: %w", err)
+		}
+	}
+
+	reflectValue := reflect.ValueOf(entity).Elem()
+	deletedByField := reflectValue.FieldByName("DeletedBy")
+	updateByField := reflectValue.FieldByName("UpdatedBy")
+
+	// check and clear deleted_by
+	if deletedByField.IsValid() && deletedByField.CanSet() && deletedByField.Kind() == reflect.Int64 {
+		deletedByField.SetInt(0)
+	}
+
+	// check and set updated_by
+	if updateByField.IsValid() && updateByField.CanSet() && updateByField.Kind() == reflect.Int64 {
+		var userID int64 = 0
+
+		if userIDVal, ok := r.ctx.Get("userID"); ok {
+			switch v := userIDVal.(type) {
+			case int:
+				userID = int64(v)
+			case int64:
+				userID = v
+			case float64:
+				userID = int64(v)
+			}
+		}
+
+		updateByField.SetInt(userID)
+	}
+
+	return nil
+}
+
+func (r *BaseRepository[T]) BeforeFindAll() ([]T, int64, error) {
+	// check and get in redis
+	if r.enableRedis {
+		params := map[string]interface{}{
+			"filter": r.filter,
+			"page":   r.page,
+			"limit":  r.limit,
+		}
+
+		if r.searchValue != "" {
+			params["search"] = r.searchValue
+		}
+
+		for key, value := range r.filter {
+			params[key] = value
+		}
+
+		var cachedResult redis.CachedResult[T]
+		err := redis.GetFromCacheByKey(&cachedResult, params)
+		if err == nil && cachedResult.Entities != nil {
+			return cachedResult.Entities, cachedResult.TotalCount, nil
+		}
+	}
+
+	return nil, 0, nil
+}
+
+func (r *BaseRepository[T]) AfterFindAll(entities []T, totalCount int64) error {
+	// check and store redis
+	if r.enableRedis {
+		cachedResult := redis.CachedResult[T]{
+			Entities:   entities,
+			TotalCount: totalCount,
+		}
+
+		params := map[string]interface{}{
+			"filter": r.filter,
+			"page":   r.page,
+			"limit":  r.limit,
+		}
+
+		if r.searchValue != "" {
+			params["search"] = r.searchValue
+		}
+
+		for key, value := range r.filter {
+			params[key] = value
+		}
+
+		err := redis.SetToCacheByKey(cachedResult, params, r.redisTime)
+		if err != nil {
+			return fmt.Errorf("failed to set cache: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (r *BaseRepository[T]) BeforeFindById(id int) (*T, error) {
+	// check and get in redis
+	if r.enableRedis {
+		cachedEntity, err := redis.GetFromCacheById[*T](id)
+		if err != nil {
+			return nil, err
+		}
+
+		if cachedEntity != nil {
+			return cachedEntity, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (r *BaseRepository[T]) AfterFindById(id int, entity *T) error {
+	// check and store redis
+	if r.enableRedis {
+		err := redis.SetToCacheById(id, entity, r.redisTime)
+		if err != nil {
+			return fmt.Errorf("failed to set cache: %w", err)
+		}
+	}
+
+	// ✅ Async add views
+	go func(e *T) {
+		defer func() {
+			if rec := recover(); rec != nil {
+				fmt.Println("panic in async view update:", rec)
+			}
+		}()
+
+		val := reflect.ValueOf(e).Elem()
+		field := val.FieldByName("Views")
+
+		if field.IsValid() && field.Kind() == reflect.Int {
+			newViews := field.Int() + 1
+
+			if err := db.MasterDB.Model(e).Update("views", newViews).Error; err != nil {
+				fmt.Println("async update views error:", err)
+			}
+		}
+	}(entity)
+
+	return nil
+}
+
+func (r *BaseRepository[T]) BeforeCreate(entity *T) error {
+	// check and clear redis
+	if r.enableRedis {
+		err := redis.DeleteCacheByKey[T]()
+		if err != nil {
+			return err
+		}
+	}
+
+	reflectValue := reflect.ValueOf(entity).Elem()
+	createdByField := reflectValue.FieldByName("CreatedBy")
+
+	// check and set created_by
+	if createdByField.IsValid() && createdByField.CanSet() && createdByField.Kind() == reflect.Int64 {
+		if userIDVal, ok := r.ctx.Get("userID"); ok {
+			switch v := userIDVal.(type) {
+			case int:
+				createdByField.SetInt(int64(v))
+			case int64:
+				createdByField.SetInt(v)
+			case float64:
+				createdByField.SetInt(int64(v))
+			default:
+				createdByField.SetInt(0)
+			}
+		} else {
+			createdByField.SetInt(0)
+		}
+	}
+
+	return nil
+}
+
+func (r *BaseRepository[T]) BeforeUpdate(entity *T) error {
+	// check and store redis
+	if r.enableRedis {
+		reflectValue := reflect.ValueOf(entity)
+		reflectField := reflectValue.Elem().FieldByName("ID")
+
+		if !reflectField.IsValid() {
+			return fmt.Errorf("ID field not found in entity")
+		}
+
+		id := reflectField.Int()
+
+		err := redis.DeleteCacheById[T](int(id))
+		if err != nil {
+			return fmt.Errorf("failed to delete cache: %w", err)
+		}
+
+		err = redis.DeleteCacheByKey[T]()
+		if err != nil {
+			return err
+		}
+	}
+
+	reflectValue := reflect.ValueOf(entity).Elem()
+	updatedByField := reflectValue.FieldByName("UpdatedBy")
+
+	// check and set updated_by
+	if updatedByField.IsValid() && updatedByField.CanSet() && updatedByField.Kind() == reflect.Int64 {
+		if userIDVal, ok := r.ctx.Get("userID"); ok {
+			switch v := userIDVal.(type) {
+			case int:
+				updatedByField.SetInt(int64(v))
+			case int64:
+				updatedByField.SetInt(v)
+			case float64:
+				updatedByField.SetInt(int64(v))
+			default:
+				updatedByField.SetInt(0)
+			}
+		} else {
+			updatedByField.SetInt(0)
+		}
+	}
+
+	return nil
+}
+
+func StripDomain(fullURL string, storage string) string {
+	disk, ok := config.Disks[storage]
+	if !ok {
+		config.Log.Info("StripDomain disk error")
+		return fullURL
+	}
+
+	base := disk.URL
+
+	if fullURL == "" || base == "" {
+		return fullURL
+	}
+
+	if strings.HasPrefix(fullURL, base) {
+		trimmed := strings.TrimPrefix(fullURL, base)
+		return strings.TrimPrefix(trimmed, "/")
+	}
+
+	return fullURL
+}
+
+// Sync *_info field for a single record by ID
+func (r *BaseRepository[T]) SyncMediaInfoByID(
+	id int64,
+	infoFieldName string, // e.g. "FileInfo"
+	dbColumnName string, // e.g. "file_info"
+) error {
+	item, err := r.FindByID(int(id))
+	if err != nil {
+		return err
+	}
+	reflectValue := reflect.ValueOf(item)
+	if reflectValue.Kind() == reflect.Ptr {
+		reflectValue = reflectValue.Elem()
+	}
+
+	mediaInfoField := reflectValue.FieldByName(infoFieldName)
+	if !mediaInfoField.IsValid() {
+		return fmt.Errorf("Field %s not found", infoFieldName)
+	}
+	mediaInfo, ok := mediaInfoField.Interface().(models.MediaInfo)
+	if !ok {
+		return fmt.Errorf("Invalid MediaInfo type")
+	}
+	if mediaInfo.Id == 0 {
+		return nil // No media linked
+	}
+
+	mediaRepo := NewMediaRepository()
+	media, err := mediaRepo.FindById(mediaInfo.Id)
+	if err != nil {
+		return err
+	}
+	if media.StaticURL == nil || media.DiskName == nil {
+		return fmt.Errorf("Media info incomplete for id %d", media.ID)
+	}
+	newMediaInfo := models.MediaInfo{
+		Id:   media.ID,
+		Path: *media.StaticURL,
+		Disk: *media.DiskName,
+	}
+	if !reflect.DeepEqual(mediaInfo, newMediaInfo) {
+		err := db.MasterDB.Model(item).Update(dbColumnName, newMediaInfo).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// SyncMediaInfoForRecentlyUpdatedMedia syncs media info for records that have *_info.id
+// matching medias updated within the specified duration
+func (r *BaseRepository[T]) SyncMediaInfoForRecentlyUpdatedMedia(within time.Duration) error {
+	// Define fields that can contain media info
+	fields := []struct {
+		mediaInfoFieldName string
+		dbColumnName       string
+	}{
+		{"FileInfo", "file_info"},
+		{"MatchingFileInfo", "matching_file_info"},
+		{"AvatarInfo", "avatar_info"},
+		{"ImageInfo", "image_info"},
+		{"CoverImageInfo", "cover_image_info"},
+		{"LinkInfo", "link_info"},
+		{"LogoInfo", "logo_info"},
+	}
+
+	// Get media IDs updated recently
+	var mediaIDs []int64
+	err := db.MasterDB.
+		Model(&models.Media{}).
+		Where("updated_at >= ?", time.Now().Add(-within)).
+		Pluck("id", &mediaIDs).Error
+	if err != nil {
+		return err
+	}
+	if len(mediaIDs) == 0 {
+		return nil // No media updated recently
+	}
+
+	// Get table name for the current model
+	tableName := db.MasterDB.NamingStrategy.TableName(reflect.TypeOf(*new(T)).Name())
+
+	// For each field type, find records with matching media IDs and sync them
+	for _, field := range fields {
+		var ids []int64
+		err := db.MasterDB.
+			Table(tableName).
+			Where(fmt.Sprintf("%s->>'id' IN ?", field.dbColumnName), mediaIDs).
+			Pluck("id", &ids).Error
+		if err != nil {
+			config.Log.Errorf("Failed to get IDs for field %s: %v", field.dbColumnName, err)
+			continue
+		}
+		if len(ids) == 0 {
+			continue
+		}
+
+		// Sync each record for this field type
+		for _, id := range ids {
+			err := r.SyncMediaInfoByID(id, field.mediaInfoFieldName, field.dbColumnName)
+			if err != nil {
+				config.Log.Errorf("Failed to sync %s for record ID %d: %v", field.dbColumnName, id, err)
+			}
+		}
+	}
+
+	return nil
+}

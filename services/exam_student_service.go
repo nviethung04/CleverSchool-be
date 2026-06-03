@@ -1,20 +1,18 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/utils"
-
-	"github.com/gin-gonic/gin"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
+	"be-lms/utils"
 )
 
 type ExamStudentService interface {
 	GetExamStudentsByExamIDService(examID int64, courseID int64, limit, page int) (*prot.ExamStudentResponseWithCount, error)
 	GetExamInfoWithStats(examID int64) (dto.ExamStudentInfo, int32, int32, int32, float64, error)
-	GetExamByStudentService(c *gin.Context, req requests.GetExamByStudentRequest) (*prot.GetExamByStudentResponse, error)
+	GetExamByStudentService(req requests.GetExamByStudentRequest) (*prot.GetExamByStudentResponse, error)
 }
 
 type examStudentService struct {
@@ -112,7 +110,7 @@ func (s *examStudentService) GetExamInfoWithStats(examID int64) (dto.ExamStudent
 	return info, int32(len(students)), submittedCount, gradedCount, avgScore, nil
 }
 
-func (s *examStudentService) GetExamByStudentService(c *gin.Context, req requests.GetExamByStudentRequest) (*prot.GetExamByStudentResponse, error) {
+func (s *examStudentService) GetExamByStudentService(req requests.GetExamByStudentRequest) (*prot.GetExamByStudentResponse, error) {
 	offset := 0
 	if req.Page > 0 && req.Limit > 0 {
 		offset = (req.Page - 1) * req.Limit
@@ -120,7 +118,7 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 
 	var protoCourses []*prot.GetExamByStudentCourse
 
-	courses, total, err := s.repo.GetExamByStudentRepoWithDate(c, req.UserID, req.WeekID, req.CourseID, req.StartDate, req.EndDate, req.Limit, offset)
+	courses, total, err := s.repo.GetExamByStudentRepoWithDate(req.UserID, req.WeekID, req.CourseID, req.StartDate, req.EndDate, req.Limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +148,6 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 					Deadline:      e.Deadline,
 					IsSubmitted:   isSubmitted,
 					UnscoredCount: int32(unscoredCount),
-					Type:          e.Type,
 				})
 
 				seenExam[e.ID] = true
@@ -177,8 +174,6 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 					QuestionCompleted:       hw.QuestionCompleted,
 					CoverImage:              utils.StaticURL(hw.CoverImage, models.Storage),
 					LastQuestionIdCompleted: hw.LastQuestionIDCompleted,
-					QuestionForm:            hw.QuestionForm,
-					IsSubmitted:             hw.IsSubmitted,
 				})
 
 				seenHomework[hw.ID] = true
@@ -186,9 +181,7 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 
 			// Lấy danh sách exercises cho lesson này (logic tương tự exams)
 			exercises, err := s.repo.GetExercisesByLesson(lesson.ID, req.UserID, req.CourseID)
-			if err != nil {
-				return nil, err
-			}
+			if err != nil { return nil, err }
 			var protoExercises []*prot.GetExamByStudentExercise
 			seenExercise := make(map[int64]bool)
 			for _, ex := range exercises {
@@ -242,4 +235,3 @@ func (s *examStudentService) GetExamByStudentService(c *gin.Context, req request
 		Total:   total,
 	}, nil
 }
-

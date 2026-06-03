@@ -24,7 +24,6 @@ type ChatMessageResponse struct {
 	ID               uint64                    `json:"id"`
 	CourseID         uint64                    `json:"course_id"`
 	UserID           uint64                    `json:"user_id"`
-	RecipientID      *uint64                   `json:"recipient_id"`
 	Content          *string                   `json:"content"`
 	MessageType      string                    `json:"message_type"`
 	IsPinned         bool                      `json:"is_pinned"`
@@ -34,7 +33,6 @@ type ChatMessageResponse struct {
 	CreatedAt        time.Time                 `json:"created_at"`
 	UpdatedAt        time.Time                 `json:"updated_at"`
 	User             ChatUserResponse          `json:"user"`
-	Recipient        *ChatUserResponse         `json:"recipient,omitempty"`
 	ReplyToMessage   *ChatMessageResponse      `json:"reply_to_message,omitempty"`
 	Files            []ChatMessageFileResponse `json:"files,omitempty"`  // Deprecated, sử dụng medias thay thế
 	Medias           []ChatMediaResponse       `json:"medias,omitempty"` // Media files từ bảng medias
@@ -151,10 +149,4 @@ type EnhancedChatMessageResponse struct {
 type ChatActionResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
-}
-
-// Recent sender response
-type RecentSenderResponse struct {
-	Sender      ChatUserResponse    `json:"sender"`
-	LastMessage ChatMessageResponse `json:"last_message"`
 }

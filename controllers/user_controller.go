@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -104,10 +104,6 @@ func NewUserController(service services.UserService) *UserController {
 		return true
 	})
 
-	ctl.GenericController.WithRespondListHook(func(c *gin.Context, items []models.User, totalCount int64, err error) {
-		ctl.RespondList(c, items, totalCount, err)
-	})
-
 	return ctl
 }
 
@@ -134,24 +130,6 @@ func (uc *UserController) GetMyProfile(c *gin.Context) {
 	if err != nil {
 		utils.Respond(c, nil, err, "messages.data_existed", http.StatusNotFound)
 		return
-	}
-
-	// Lấy total_star và total_exp từ user_star_exp
-	userStarExpRepo := repositories.NewUserStarExpRepository()
-	userStarExp, err := userStarExpRepo.GetCurrentByUserID(userID)
-	if err != nil {
-		utils.Respond(c, nil, err, "")
-		return
-	}
-
-	// Set total_star và total_exp vào response
-	if userStarExp != nil {
-		user.TotalStar = userStarExp.TotalStar
-		user.TotalExp = userStarExp.TotalExp
-	} else {
-		// Nếu chưa có record, set mặc định là 0
-		user.TotalStar = 0
-		user.TotalExp = 0
 	}
 
 	utils.Respond(c, user, err, "")
@@ -305,7 +283,7 @@ func (uc *UserController) UserActivated(c *gin.Context) {
 	userFormat := userResource.FormatUsers(users)
 
 	utils.Respond(c, &prot.UsersResponse{
-		Users:      userFormat,
+		Users:  userFormat,
 		TotalCount: count,
 	}, err, "")
 }
@@ -325,35 +303,3 @@ func (sc *UserController) ResetPassword(c *gin.Context) {
 
 	utils.Respond(c, nil, err, "")
 }
-
-func (uc *UserController) RespondList(c *gin.Context, items []models.User, totalCount int64, err error) {
-	var userPtrs []*models.User
-	for i := range items {
-		userPtrs = append(userPtrs, &items[i])
-	}
-
-	userResource := resources.NewUserResource()
-
-	if programIDStr := c.Query("program_id"); programIDStr != "" {
-		if programID, err := strconv.ParseInt(programIDStr, 10, 64); err == nil {
-			programRepo := repositories.NewProgramRepository()
-			failedUserIds, _ := programRepo.GetFailedUserIdsById(programID)
-
-			if len(failedUserIds) > 0 {
-				if impl, ok := userResource.(*resources.UserResourceImpl); ok {
-					impl.FailedUserIds = failedUserIds
-				}
-			}
-		}
-	}
-
-	usersResponse := userResource.FormatUsers(userPtrs)
-
-	list := &prot.UsersResponse{
-		Users:      usersResponse,
-		TotalCount: int64(totalCount),
-	}
-
-	utils.Respond(c, list, err, "")
-}
-

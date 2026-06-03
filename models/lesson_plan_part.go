@@ -9,10 +9,10 @@ import (
 type LessonPlanPart struct {
 	ID             int64          `gorm:"primaryKey" json:"id"`
 	LessonPlanID   int64          `json:"lesson_plan_id"`
-	ProgramId      int64          `gorm:"null" json:"program_id"`
-	CourseID       int64          `gorm:"null" json:"course_id"`
+	ProgramId       int64     `gorm:"null" json:"program_id"`
+	CourseID       int64     `gorm:"null" json:"course_id"`
 	Title          string         `json:"title"`
-	ObjectTitle    string         `gorm:"size:255;not null" json:"object_title"`
+	ObjectTitle            string    `gorm:"size:255;not null" json:"object_title"`
 	Tag            string         `json:"tag"`
 	CoverImageInfo MediaInfo      `gorm:"type:jsonb" json:"cover_image_info"`
 	SortPosition   int16          `json:"sort_position"`

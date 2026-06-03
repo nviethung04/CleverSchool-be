@@ -1,13 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
-	"errors"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"fmt"
 	"sort"
 	"strconv"
@@ -18,19 +15,14 @@ import (
 
 type LessonScheduleService interface {
 	GetAll(c *gin.Context) ([]dto.ScheduleGroup, error)
-	SyncAllProgram(courseID int64) (*prot.LessonScheduleSyncResponse, error)
 }
 
 type lessonScheduleService struct {
-	repo        repositories.LessonScheduleRepository
-	copyService LessonScheduleCopySharedService
+	repo repositories.LessonScheduleRepository
 }
 
 func NewLessonScheduleService(repo repositories.LessonScheduleRepository) LessonScheduleService {
-	return &lessonScheduleService{
-		repo:        repo,
-		copyService: NewLessonScheduleCopySharedService(),
-	}
+	return &lessonScheduleService{repo: repo}
 }
 
 func (s *lessonScheduleService) GetAll(c *gin.Context) ([]dto.ScheduleGroup, error) {
@@ -116,80 +108,3 @@ func (s *lessonScheduleService) GroupSchedulesByWeek(schedules []models.LessonSc
 
 	return groups
 }
-
-func (s *lessonScheduleService) SyncAllProgram(courseID int64) (*prot.LessonScheduleSyncResponse, error) {
-	if courseID <= 0 {
-		return nil, errors.New("course_id phải lớn hơn 0")
-	}
-
-	// Lấy program_id từ course
-	var courseInfo struct {
-		ID        int64
-		ProgramID int64
-	}
-	err := db.ReplicaDB.Table("courses").
-		Select("id, program_id").
-		Where("id = ? AND deleted_at IS NULL", courseID).
-		Scan(&courseInfo).Error
-	if err != nil {
-		return nil, fmt.Errorf("không thể lấy thông tin khóa học: %w", err)
-	}
-
-	if courseInfo.ID == 0 {
-		return nil, errors.New("không tìm thấy khóa học")
-	}
-
-	if courseInfo.ProgramID == 0 {
-		return nil, errors.New("khóa học không có program_id")
-	}
-
-	// Tìm tất cả courses cùng program_id (trừ course nguồn)
-	var targetCourseIDs []int64
-	err = db.ReplicaDB.Table("courses").
-		Select("id").
-		Where("program_id = ? AND id != ? AND deleted_at IS NULL", courseInfo.ProgramID, courseID).
-		Pluck("id", &targetCourseIDs).Error
-	if err != nil {
-		return nil, fmt.Errorf("không thể lấy danh sách khóa học: %w", err)
-	}
-
-	if len(targetCourseIDs) == 0 {
-		return nil, errors.New("không có khóa học nào khác cùng program để đồng bộ")
-	}
-
-	// Copy lịch học từ course nguồn sang tất cả courses khác
-	var syncedCourseIDs []int64
-	var failedCourses []int64
-	for _, targetID := range targetCourseIDs {
-		copyResult, err := s.copyService.CopyLessonSchedulesBetweenCourses(courseID, targetID)
-		if err != nil {
-			failedCourses = append(failedCourses, targetID)
-			continue
-		}
-		if !copyResult.Success {
-			failedCourses = append(failedCourses, targetID)
-			continue
-		}
-		syncedCourseIDs = append(syncedCourseIDs, targetID)
-	}
-
-	if len(syncedCourseIDs) == 0 {
-		return nil, fmt.Errorf("không thể đồng bộ sang bất kỳ khóa học nào. Có %d khóa thất bại", len(failedCourses))
-	}
-
-	message := fmt.Sprintf("Đồng bộ thành công sang %d khóa học", len(syncedCourseIDs))
-	if len(failedCourses) > 0 {
-		message += fmt.Sprintf(", %d khóa thất bại", len(failedCourses))
-	}
-
-	return &prot.LessonScheduleSyncResponse{
-		Success:         true,
-		Message:         message,
-		SourceCourseId:  courseID,
-		SyncedCourseIds: syncedCourseIDs,
-		FailedCourseIds: failedCourses,
-		SyncedCount:     int32(len(syncedCourseIDs)),
-		FailedCount:     int32(len(failedCourses)),
-	}, nil
-}
-

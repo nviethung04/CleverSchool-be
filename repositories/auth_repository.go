@@ -1,10 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
 
 	"gorm.io/gorm"
 
@@ -104,18 +103,6 @@ func (r *authRepository) CreateUser(user models.User, roleId int64) (*models.Use
 		return nil, err, "messages.error_create_user"
 	}
 
-	if user.MemberType == models.MemberTypeExternal {
-		courseIds := config.LoadConfig().PublicCourseIds
-
-		for _, courseId := range courseIds {
-			userCourse := models.UserCourse{
-				UserId:   user.ID,
-				CourseId: int64(courseId),
-			}
-			db.MasterDB.Create(&userCourse)
-		}
-	}
-
 	return &user, nil, ""
 }
 
@@ -201,4 +188,3 @@ func (r *authRepository) GetRoleById(id int) (*models.Role, error) {
 
 	return &role, nil
 }
-

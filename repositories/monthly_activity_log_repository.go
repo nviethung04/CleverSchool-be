@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
-	"be-cleverschool/table_manager"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/requests"
+	"be-lms/table_manager"
 	"fmt"
 	"strings"
 	"time"
@@ -17,10 +17,10 @@ type MonthlyActivityLogRepository interface {
 	Create(activityLog models.ActivityLog) error
 	CreateWithTable(activityLog models.ActivityLog, tableName string) error
 	EnsureTableExists(tableName string) error
-	GetActiveUsersCount(minutes int, schoolID, courseID, programID int64) (int64, error)
-	GetActiveUsersCountByTimeRange(startTime, endTime time.Time, schoolID, courseID, programID int64) (int64, error)
+	GetActiveUsersCount(minutes int) (int64, error)
+	GetActiveUsersCountByTimeRange(startTime, endTime time.Time) (int64, error)
 	GetActiveUsersWithPaging(req *requests.GetActiveUsersRequest, c *gin.Context) ([]models.User, int64, error)
-	GetActiveUsersByTimeRange(startTime, endTime time.Time, page, limit int, schoolID, courseID, programID int64) ([]uint, int64, error)
+	GetActiveUsersByTimeRange(startTime, endTime time.Time, page, limit int) ([]uint, int64, error)
 	GetUserByID(userID uint) (*models.User, error)
 	GetUserLastActivityInTimeRange(userID uint, startTime, endTime time.Time) (*time.Time, error)
 	GetUsersLastActivityTime(userIDs []uint) (map[uint]time.Time, error)
@@ -132,7 +132,6 @@ func (r *monthlyActivityLogRepository) EnsureTableExists(tableName string) error
 		fmt.Sprintf("CREATE INDEX IF NOT EXISTS idx_%s_user_created_at ON %s(user_id, created_at DESC)", tableName, tableName),
 		fmt.Sprintf("CREATE INDEX IF NOT EXISTS idx_%s_device ON %s(device)", tableName, tableName),
 		fmt.Sprintf("CREATE INDEX IF NOT EXISTS idx_%s_device_created_at ON %s(device, created_at DESC)", tableName, tableName),
-		fmt.Sprintf("CREATE INDEX IF NOT EXISTS idx_%s_role_id_created_at ON %s(role_id, created_at)", tableName, tableName),
 	}
 
 	for _, indexSQL := range indexes {
@@ -145,7 +144,7 @@ func (r *monthlyActivityLogRepository) EnsureTableExists(tableName string) error
 }
 
 // GetActiveUsersCount đếm số lượng users có hoạt động trong X phút
-func (r *monthlyActivityLogRepository) GetActiveUsersCount(minutes int, schoolID, courseID, programID int64) (int64, error) {
+func (r *monthlyActivityLogRepository) GetActiveUsersCount(minutes int) (int64, error) {
 	timeThreshold := time.Now().Add(time.Duration(-minutes) * time.Minute)
 
 	// Lấy danh sách bảng cần query (tháng hiện tại và có thể tháng trước)
@@ -168,20 +167,12 @@ func (r *monthlyActivityLogRepository) GetActiveUsersCount(minutes int, schoolID
 			continue
 		}
 
-		// Build filter conditions
-		filterConditions, filterArgs := r.buildFilterConditions(schoolID, courseID, programID)
-
-		query := fmt.Sprintf(`
-			SELECT COUNT(DISTINCT al.user_id)
-			FROM %s al
-			WHERE al.user_id IS NOT NULL AND al.created_at > ?
-			%s
-		`, tableName, filterConditions)
-
-		args := append([]interface{}{timeThreshold}, filterArgs...)
-
 		var count int64
-		err = db.ReplicaDB.Raw(query, args...).Scan(&count).Error
+		err = db.ReplicaDB.Raw(fmt.Sprintf(`
+			SELECT COUNT(DISTINCT user_id)
+			FROM %s
+			WHERE user_id IS NOT NULL AND created_at > ?
+		`, tableName), timeThreshold).Scan(&count).Error
 
 		if err != nil {
 			continue
@@ -194,7 +185,7 @@ func (r *monthlyActivityLogRepository) GetActiveUsersCount(minutes int, schoolID
 }
 
 // GetActiveUsersCountByTimeRange đếm số lượng users có hoạt động trong khoảng thời gian cụ thể
-func (r *monthlyActivityLogRepository) GetActiveUsersCountByTimeRange(startTime, endTime time.Time, schoolID, courseID, programID int64) (int64, error) {
+func (r *monthlyActivityLogRepository) GetActiveUsersCountByTimeRange(startTime, endTime time.Time) (int64, error) {
 	// Lấy danh sách bảng cần query
 	tableNames := table_manager.GetTableNamesForDateRange("activity_logs", startTime, endTime)
 
@@ -215,20 +206,12 @@ func (r *monthlyActivityLogRepository) GetActiveUsersCountByTimeRange(startTime,
 			continue
 		}
 
-		// Build filter conditions
-		filterConditions, filterArgs := r.buildFilterConditions(schoolID, courseID, programID)
-
-		query := fmt.Sprintf(`
-			SELECT COUNT(DISTINCT al.user_id)
-			FROM %s al
-			WHERE al.user_id IS NOT NULL AND al.created_at >= ? AND al.created_at <= ?
-			%s
-		`, tableName, filterConditions)
-
-		args := append([]interface{}{startTime, endTime}, filterArgs...)
-
 		var count int64
-		err = db.ReplicaDB.Raw(query, args...).Scan(&count).Error
+		err = db.ReplicaDB.Raw(fmt.Sprintf(`
+			SELECT COUNT(DISTINCT user_id)
+			FROM %s
+			WHERE user_id IS NOT NULL AND created_at >= ? AND created_at <= ?
+		`, tableName), startTime, endTime).Scan(&count).Error
 
 		if err != nil {
 			continue
@@ -266,20 +249,13 @@ func (r *monthlyActivityLogRepository) GetActiveUsersWithPaging(req *requests.Ge
 			continue
 		}
 
-		// Build filter conditions
-		filterConditions, filterArgs := r.buildFilterConditions(req.SchoolID, req.CourseID, req.ProgramID)
-
-		query := fmt.Sprintf(`
-			SELECT DISTINCT al.user_id, MAX(al.created_at) as last_activity
-			FROM %s al
-			WHERE al.user_id IS NOT NULL AND al.created_at > ?
-			%s
-			GROUP BY al.user_id
-		`, tableName, filterConditions)
-
-		unionQueries = append(unionQueries, query)
+		unionQueries = append(unionQueries, fmt.Sprintf(`
+			SELECT DISTINCT user_id, MAX(created_at) as last_activity
+			FROM %s
+			WHERE user_id IS NOT NULL AND created_at > ?
+			GROUP BY user_id
+		`, tableName))
 		args = append(args, timeThreshold)
-		args = append(args, filterArgs...)
 	}
 
 	if len(unionQueries) == 0 {
@@ -303,9 +279,8 @@ func (r *monthlyActivityLogRepository) GetActiveUsersWithPaging(req *requests.Ge
 	}
 
 	// Get users with pagination
-	// Note: Filter đã được áp dụng trong UNION query, không cần filter lại ở đây
 	usersQuery := fmt.Sprintf(`
-		SELECT DISTINCT u.* FROM users u
+		SELECT u.* FROM users u
 		INNER JOIN (
 			SELECT DISTINCT user_id FROM (%s) as combined
 			ORDER BY user_id
@@ -327,7 +302,7 @@ func (r *monthlyActivityLogRepository) GetActiveUsersWithPaging(req *requests.Ge
 }
 
 // GetActiveUsersByTimeRange lấy danh sách user IDs có hoạt động trong khoảng thời gian cụ thể với phân trang
-func (r *monthlyActivityLogRepository) GetActiveUsersByTimeRange(startTime, endTime time.Time, page, limit int, schoolID, courseID, programID int64) ([]uint, int64, error) {
+func (r *monthlyActivityLogRepository) GetActiveUsersByTimeRange(startTime, endTime time.Time, page, limit int) ([]uint, int64, error) {
 	// Lấy danh sách bảng cần query
 	tableNames := table_manager.GetTableNamesForDateRange("activity_logs", startTime, endTime)
 
@@ -350,19 +325,12 @@ func (r *monthlyActivityLogRepository) GetActiveUsersByTimeRange(startTime, endT
 			continue
 		}
 
-		// Build filter conditions
-		filterConditions, filterArgs := r.buildFilterConditions(schoolID, courseID, programID)
-
-		query := fmt.Sprintf(`
-			SELECT DISTINCT al.user_id
-			FROM %s al
-			WHERE al.user_id IS NOT NULL AND al.created_at BETWEEN ? AND ?
-			%s
-		`, tableName, filterConditions)
-
-		unionQueries = append(unionQueries, query)
+		unionQueries = append(unionQueries, fmt.Sprintf(`
+			SELECT DISTINCT user_id
+			FROM %s
+			WHERE user_id IS NOT NULL AND created_at BETWEEN ? AND ?
+		`, tableName))
 		args = append(args, startTime, endTime)
-		args = append(args, filterArgs...)
 	}
 
 	if len(unionQueries) == 0 {
@@ -804,53 +772,6 @@ func (r *monthlyActivityLogRepository) GetFailedLoginsWithPagingByTimeRange(star
 	return failedLogins, total, nil
 }
 
-// buildFilterConditions tạo điều kiện filter và arguments cho school_id, course_id, program_id
-func (r *monthlyActivityLogRepository) buildFilterConditions(schoolID, courseID, programID int64) (string, []interface{}) {
-	var conditions []string
-	var args []interface{}
-
-	// Filter theo school_id: thông qua user_classes -> classes
-	if schoolID > 0 {
-		conditions = append(conditions, `
-			EXISTS (
-				SELECT 1 FROM user_classes uc
-				INNER JOIN classes c ON uc.class_id = c.id
-				WHERE uc.user_id = al.user_id AND c.school_id = ?
-			)
-		`)
-		args = append(args, schoolID)
-	}
-
-	// Filter theo course_id: thông qua user_courses
-	if courseID > 0 {
-		conditions = append(conditions, `
-			EXISTS (
-				SELECT 1 FROM user_courses uc
-				WHERE uc.user_id = al.user_id AND uc.course_id = ?
-			)
-		`)
-		args = append(args, courseID)
-	}
-
-	// Filter theo program_id: thông qua user_courses -> courses
-	if programID > 0 {
-		conditions = append(conditions, `
-			EXISTS (
-				SELECT 1 FROM user_courses uc
-				INNER JOIN courses c ON uc.course_id = c.id
-				WHERE uc.user_id = al.user_id AND c.program_id = ?
-			)
-		`)
-		args = append(args, programID)
-	}
-
-	if len(conditions) == 0 {
-		return "", []interface{}{}
-	}
-
-	return " AND " + strings.Join(conditions, " AND "), args
-}
-
 // PermanentlyDeleteOldRecords xóa các bản ghi cũ (xóa toàn bộ bảng của tháng cũ)
 func (r *monthlyActivityLogRepository) PermanentlyDeleteOldRecords(now time.Time) error {
 	// Lấy tên bảng của tháng trước
@@ -899,4 +820,3 @@ func detectDevice(agent string) string {
 		return "Tablet"
 	}
 }
-

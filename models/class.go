@@ -28,46 +28,24 @@ func (t *TeacherInfo) Scan(value interface{}) error {
 }
 
 type Class struct {
-	ID           int64    `json:"id" gorm:"primaryKey"`
-	SchoolId     int64    `gorm:"null" json:"school_id"`
-	FacultyId    int64    `gorm:"null" json:"faculty_id"`
-	GradeId      int64    `gorm:"null" json:"grade_id"`
-	Name         string   `json:"name"`
-	Status       bool     `gorm:"null" json:"status"`
-	SortPosition int      `json:"sort_position"`
-	School       *School  `gorm:"foreignKey:SchoolId"`
-	Grade        *Grade   `gorm:"foreignKey:GradeId"`
-	Faculty      *Faculty `gorm:"foreignKey:FacultyId"`
+	ID           int64   `json:"id" gorm:"primaryKey"`
+	SchoolId     int64   `gorm:"null" json:"school_id"`
+	GradeId      int64   `gorm:"null" json:"grade_id"`
+	Name         string  `json:"name"`
+	Status       bool    `gorm:"null" json:"status"`
+	SortPosition int     `json:"sort_position"`
+	School       *School `gorm:"foreignKey:SchoolId"`
+	Grade        *Grade  `gorm:"foreignKey:GradeId"`
 
 	CurrentStudents int32 `gorm:"null" json:"current_students"`
 	MaxStudents     int32 `gorm:"null" json:"max_students"`
 
 	TeacherInfo TeacherInfo `gorm:"type:jsonb" json:"teacher_info"`
 
-	ClassMainId int64     `gorm:"null" json:"class_main_id"`
-	ClassMain   *ClassMain `gorm:"foreignKey:ClassMainId"`
-
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	CreatedBy int64          `json:"created_by"`
 	UpdatedBy int64          `json:"updated_by"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index"`
 	DeletedBy int64          `gorm:"column:deleted_by"`
-}
-
-type ClassMain struct {
-	ID        int64          `json:"id" gorm:"primaryKey"`
-	Name      string         `json:"name"`
-	SchoolId  int64          `gorm:"null" json:"school_id"`
-	CreatedAt time.Time      `json:"created_at"`
-	CreatedBy int64          `json:"created_by"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	UpdatedBy int64          `json:"updated_by"`
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index"`
-	DeletedBy int64          `gorm:"column:deleted_by"`
-}
-
-// TableName chỉ định tên bảng cho ClassMain
-func (ClassMain) TableName() string {
-	return "classes_main"
 }

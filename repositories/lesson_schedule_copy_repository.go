@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/requests"
 	"fmt"
 )
 
@@ -119,4 +119,3 @@ func (r *lessonScheduleCopyRepository) CopyLessonSchedules(req *requests.CopyLes
 		CopiedSchedulesCount: copiedCount,
 	}, nil
 }
-

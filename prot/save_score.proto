@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
+
+import "google/protobuf/struct.proto";
 
 message SaveScoreResponse {
   int64 id = 1;
@@ -13,10 +15,6 @@ message SaveScoreResponse {
   repeated string true_answers = 6;
   bool is_correct = 7;
   double score = 8;
-  int32 star = 9;
-  double ratio_score = 10;
-  double weight = 11;
-  int32 number_time_sent = 12;
 }
 
 message AnswerResultFillInBlank {
@@ -32,10 +30,6 @@ message SaveScoreResponseFillInBlank {
   double total_score = 2;
   repeated AnswerResultFillInBlank answers = 3;
   bool is_all_correct = 4;
-  int32 star = 5;
-  double ratio_score = 6;
-  double weight = 7;
-  int32 number_time_sent = 8;
 }
 
 message AnswerResultPosition {
@@ -52,10 +46,6 @@ message SaveScoreResponsePosition {
   double total_score = 2;
   repeated AnswerResultPosition answers = 3;
   bool is_all_correct = 4;
-  int32 star = 5;
-  double ratio_score = 6;
-  double weight = 7;
-  int32 number_time_sent = 8;
 }
 
 message MatchingPair {
@@ -72,10 +62,6 @@ message SaveScoreResponseMatching {
   double total_score = 2;
   repeated MatchingPair matches = 3;
   bool is_all_correct = 4;
-  int32 star = 5;
-  double ratio_score = 6;
-  double weight = 7;
-  int32 number_time_sent = 8;
 }
 
 message LabelingPair {
@@ -92,10 +78,6 @@ message SaveScoreResponseLabeling {
   double total_score = 2;
   repeated LabelingPair labels = 3;
   bool is_all_correct = 4;
-  int32 star = 5;
-  double ratio_score = 6;
-  double weight = 7;
-  int32 number_time_sent = 8;
 }
 
 message GroupPair {
@@ -112,10 +94,6 @@ message SaveScoreResponseGroup {
   double total_score = 2;
   repeated GroupPair groups = 3;
   bool is_all_correct = 4;
-  int32 star = 5;
-  double ratio_score = 6;
-  double weight = 7;
-  int32 number_time_sent = 8;
 }
 
 message SaveScoreResponseManual {
@@ -260,15 +238,8 @@ message SaveScoreBulkRequest {
 
 message AnswerRequest {
   string type_question = 1;
-  oneof request {
-    SaveAnswerManualRequest manual_request = 2;
-    SaveScoreGroupRequest group_request = 3;
-    SaveScoreLabelingRequest labeling_request = 4;
-    SaveScoreMatchingRequest matching_request = 5;
-    SaveScorePositionRequest position_request = 6;
-    SaveScoreFillInBlankRequest fill_in_blank_request = 7;
-    SaveScoreMultipleChoiceRequest multiple_choice_request = 8;
-  }
+  int64 question_id = 2;
+  map<string, google.protobuf.Value> data = 3;
 }
 message SubmitHomeworkFile {
   string type = 1;
@@ -290,33 +261,6 @@ message SubmitHomeworkResponse {
   bool has_manual_scoring = 5;
   bool has_questions_need_manual_grading = 6;
   repeated SubmitHomeworkFile files = 7;
-  double star = 8;
-  bool is_completed = 9;
-  double exp = 10;
-  double total_exp = 11;
-  int64 total_star = 12;
-  double change_exp = 13;
-  int64 change_star = 14;
-  double completion_rate = 15;
-}
-
-message EvaluateRequest {
-  int64 exam_id = 1;
-  int64 exercise_id = 2;
-  int64 homework_id = 3;
-  int64 contest_round_id = 4;
-  int64 user_id = 5;
-  double score = 6;
-}
-
-message EvaluateResponse{
-  int64 exam_id = 1;
-  int64 exercise_id = 2;
-  int64 homework_id = 3;
-  int64 contest_round_id = 4;
-  int64 user_id = 5;
-  double score = 6;
 }
 
 //protoc --go_out=. --go_opt=paths=source_relative prot/save_score.proto
-

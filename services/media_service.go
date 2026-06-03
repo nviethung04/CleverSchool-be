@@ -2,12 +2,12 @@ package services
 
 import (
 	"archive/zip"
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/redis"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"bytes"
 	"errors"
 	"fmt"
@@ -18,7 +18,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -116,9 +115,9 @@ func (s *mediaService) UploadFile(c *gin.Context) (*prot.File, error) {
 
 	// B7: Get path và URL
 	filePath := filepath.Join(media.FilePath, media.FileName)
-	//if utils.DerefStr(media.DiskName) == models.Storage {
-	//	filePath = filepath.Join("public", filePath)
-	//}
+	if utils.DerefStr(media.DiskName) == models.Storage {
+		filePath = filepath.Join("public", filePath)
+	}
 
 	url := utils.DerefStr(media.StaticURL)
 	if url != "" {
@@ -593,10 +592,8 @@ func PaginateFiles(allMedias []models.Media, folderID int64, page int, perPage i
 
 	return filtered[start:end], total
 }
-
 func BuildMediaTree(flatList []models.Media, parentID int64) []*prot.MediaTree {
 	mediaMap := make(map[int64][]*prot.MediaTree)
-	rootParentID := parentID // Lưu parentID ban đầu
 
 	for _, media := range flatList {
 		segment := media.FileName
@@ -626,11 +623,6 @@ func BuildMediaTree(flatList []models.Media, parentID int64) []*prot.MediaTree {
 				node.FullPath = parentPath + "/" + strings.Trim(node.Path, "/")
 			}
 			node.Children = build(node.Id, node.FullPath)
-		}
-		if parentID != rootParentID {
-			sort.Slice(nodes, func(i, j int) bool {
-				return strings.ToLower(nodes[i].Path) < strings.ToLower(nodes[j].Path)
-			})
 		}
 		return nodes
 	}
@@ -709,54 +701,32 @@ func (s *mediaService) ExtractZip(zipPath, extractPath string) error {
 			return fmt.Errorf("illegal file path: %s", file.Name)
 		}
 
-		// KHÔNG bỏ qua file trong thư mục "data" - extract tất cả file để upload lên S3
-		// Nếu có lỗi permission thì sẽ được xử lý gracefully ở dưới (dòng 745-772)
-
 		if file.FileInfo().IsDir() {
 			if err := os.MkdirAll(destPath, file.Mode()); err != nil {
-				// Log warning nhưng tiếp tục với file khác
-				config.Log.Warn("failed to create directory during extraction: ", err.Error(), " path: ", destPath)
-				continue
+				return err
 			}
 			continue
 		}
 
 		// Make sure the parent directory exists
 		if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
-			// Log warning nhưng tiếp tục với file khác
-			config.Log.Warn("failed to create parent directory during extraction: ", err.Error(), " path: ", destPath)
-			continue
+			return err
 		}
 
 		// Create files
 		outFile, err := os.OpenFile(destPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
 		if err != nil {
-			// Xử lý lỗi permission một cách graceful
-			if strings.Contains(err.Error(), "permission denied") {
-				config.Log.Warn("permission denied when creating file during extraction, skipping: ", destPath)
-				continue
-			}
 			return err
 		}
 		srcFile, err := file.Open()
 		if err != nil {
 			outFile.Close()
-			// Xử lý lỗi khi mở file trong zip
-			if strings.Contains(err.Error(), "permission denied") {
-				config.Log.Warn("permission denied when opening file from zip, skipping: ", file.Name)
-				continue
-			}
 			return err
 		}
 
 		if _, err := io.Copy(outFile, srcFile); err != nil {
 			outFile.Close()
 			srcFile.Close()
-			// Xử lý lỗi khi copy file
-			if strings.Contains(err.Error(), "permission denied") {
-				config.Log.Warn("permission denied when copying file during extraction, skipping: ", destPath)
-				continue
-			}
 			return err
 		}
 
@@ -805,10 +775,6 @@ func (s *mediaService) ExtractZipOld(zipPath, extractPath string) error {
 		return err
 	}
 	defer reader.Close()
-
-	if filepath.Base(extractPath) == "Root" {
-		extractPath = filepath.Dir(extractPath)
-	}
 
 	// Tạo thư mục đích nếu chưa có
 	if err := os.MkdirAll(extractPath, 0755); err != nil {
@@ -1193,4 +1159,3 @@ func parseHumanReadableSize(sizeStr string) (int64, error) {
 
 	return int64(value * multiplier), nil
 }
-

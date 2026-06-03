@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"be-cleverschool/config"
+	"be-lms/config"
 )
 
 type MeiliService interface {
@@ -87,4 +87,3 @@ func (s *meiliService) DeleteDocument(index string, id interface{}) error {
 	}
 	return nil
 }
-

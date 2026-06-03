@@ -1,20 +1,19 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"mime/multipart"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -63,10 +62,8 @@ func (s *userService) GetAllStudentsByParentID(parentID int) ([]*prot.User, erro
 func (s *userService) GetAll(c *gin.Context) ([]models.User, int64, error) {
 	allowedFilters := []string{
 		"parent_id",
-		// "school_id",
+		"school_id",
 		"status",
-		// "is_independent_student",
-		// "is_failed_subject",
 	}
 
 	filter, page, perPage, keyword, sort, err := utils.ParsePaginationParams(c, allowedFilters)
@@ -75,12 +72,6 @@ func (s *userService) GetAll(c *gin.Context) ([]models.User, int64, error) {
 	}
 
 	filter, _ = s.ApplyFilter(c, filter)
-
-	// Qualify status filter with table name to avoid ambiguity
-	if statusVal, exists := filter["status"]; exists {
-		delete(filter, "status")
-		filter["users.status"] = statusVal
-	}
 
 	s.repo.SetSearch(keyword, []string{
 		"username",
@@ -106,8 +97,6 @@ func (s *userService) GetAll(c *gin.Context) ([]models.User, int64, error) {
 		"UserAddress",
 		"UserClasses.Class",
 		"UserClasses.Class.School",
-		"UserCourses.Course.Program",
-		"UserClasses.Class.Faculty",
 		"UserCourses.Course",
 		"Subjects",
 	})
@@ -133,8 +122,6 @@ func (s *userService) GetByID(c *gin.Context, id int) (*prot.User, error) {
 		"UserClasses.Class",
 		"UserClasses.Class.School",
 		"UserCourses.Course",
-		"UserCourses.Course.Program",
-		"UserClasses.Class.Faculty",
 		"Subjects",
 	})
 
@@ -224,8 +211,6 @@ func (s *userService) Create(c *gin.Context, req *prot.User) (*models.User, erro
 		"Positions",
 		"UserClasses.Class",
 		"UserClasses.Class.School",
-		"UserCourses.Course.Program",
-		"UserClasses.Class.Faculty",
 		"UserCourses.Course",
 		"Subjects",
 	})
@@ -353,17 +338,7 @@ func (s *userService) StoreUserClasses(userID int64, user *prot.User) {
 
 	allUserClasses, _ := s.repo.GetAllUserClassByUser(userID)
 
-	if len(user.UserInfo.Classes) > 0 {
-		for _, uc := range user.UserInfo.Classes {
-			userClasses = append(userClasses, models.UserClass{
-				UserId:    int64(userID),
-				ClassId:   int64(uc.Id),
-				IsCurrent: true,
-			})
-		}
-
-		allUserClasses = append(allUserClasses, userClasses...)
-	} else if user.UserInfo.Class != nil && user.UserInfo.Class.Id != 0 {
+	if user.UserInfo.Class != nil && user.UserInfo.Class.Id != 0 {
 		userClasses = append(userClasses, models.UserClass{
 			UserId:    int64(userID),
 			ClassId:   int64(user.UserInfo.Class.Id),
@@ -968,8 +943,6 @@ func (s *userService) UpdateUser(c *gin.Context, req *prot.User, updateRole bool
 		"Positions",
 		"UserClasses.Class",
 		"UserClasses.Class.School",
-		"UserCourses.Course.Program",
-		"UserClasses.Class.Faculty",
 		"UserCourses.Course",
 		"Subjects",
 	})
@@ -983,111 +956,12 @@ func (s *userService) UpdateUser(c *gin.Context, req *prot.User, updateRole bool
 }
 
 func (s *userService) ApplyFilter(c *gin.Context, filter map[string]interface{}) (map[string]interface{}, error) {
-	if classIDStr := c.Query("class_id"); classIDStr != "" {
-		filter["Classes.id"] = classIDStr + ":user_classes:users:classes:user_id:class_id:id:id"
-	} else if facultyIDStr := c.Query("faculty_id"); facultyIDStr != "" {
-		if facultyID, err := strconv.ParseInt(facultyIDStr, 10, 64); err == nil {
-			classRepo := repositories.NewClassRepository()
-			classRepo.SetContext(c)
-			classRepo.SetFilter(map[string]interface{}{
-				"faculty_id": facultyID,
-			})
-			classes, err := classRepo.GetAll()
-
-			if err == nil && len(classes) > 0 {
-				classIdStrs := make([]string, len(classes))
-				for i, class := range classes {
-					classIdStrs[i] = strconv.FormatInt(class.ID, 10)
-				}
-				filter["Classes.id"] = "in:" + strings.Join(classIdStrs, ",") + ":user_classes:users:classes:user_id:class_id:id:id"
-			}
-		}
-	}
-
 	if courseIDStr := c.Query("course_id"); courseIDStr != "" {
 		filter["Courses.id"] = courseIDStr + ":user_courses:users:courses:user_id:course_id:id:id"
-	} else if subjectIDStr := c.Query("subject_id"); subjectIDStr != "" {
-		if subjectID, err := strconv.ParseInt(subjectIDStr, 10, 64); err == nil {
-			courseRepo := repositories.NewCourseRepository()
-			courseIds, err := courseRepo.GetCourseIdsBySubjectId(subjectID)
+	}
 
-			if err == nil && len(courseIds) > 0 {
-				courseIdStrs := make([]string, len(courseIds))
-				for i, id := range courseIds {
-					courseIdStrs[i] = strconv.FormatInt(id, 10)
-				}
-				filter["Courses.id"] = "in:" + strings.Join(courseIdStrs, ",") + ":user_courses:users:courses:user_id:course_id:id:id"
-			}
-		}
-	} else if programIDStr := c.Query("program_id"); programIDStr != "" {
-		if programID, err := strconv.ParseInt(programIDStr, 10, 64); err == nil {
-			failTheSubjectStr := c.Query("fail_the_subject")
-			notParticipatedStr := c.Query("not_participated")
-
-			isFilterFailTheSubject := failTheSubjectStr != ""
-			isFilterNotParticipated := notParticipatedStr != ""
-
-			failTheSubject := failTheSubjectStr == "true"
-			notParticipated := notParticipatedStr == "true"
-
-			if isFilterNotParticipated || isFilterFailTheSubject {
-				// Use repository method to get filtered user IDs
-				userRepo := repositories.NewUserRepository()
-				userIds, err := userRepo.GetIdsByProgramStatus(
-					notParticipated,
-					failTheSubject,
-					isFilterNotParticipated,
-					isFilterFailTheSubject,
-					programID,
-				)
-
-				if err != nil {
-					config.Log.Errorf("Error getting users by program status: %v", err)
-					return filter, err
-				}
-
-				if isFilterNotParticipated && notParticipated {
-					// Special case: not_participated = true
-					// userIds contains participated users, we want to EXCLUDE them
-					if len(userIds) > 0 {
-						// Exclude these users using NOT IN
-						userIdStrs := make([]string, len(userIds))
-						for i, id := range userIds {
-							userIdStrs[i] = strconv.FormatInt(id, 10)
-						}
-						filter["users.id"] = "not_in:" + strings.Join(userIdStrs, ",")
-					}
-					// If no participated users, all users are valid (no filter needed)
-				} else {
-					// Normal case: filter by user IDs
-					if len(userIds) > 0 {
-						userIdStrs := make([]string, len(userIds))
-						for i, id := range userIds {
-							userIdStrs[i] = strconv.FormatInt(id, 10)
-						}
-						filter["users.id"] = "in:" + strings.Join(userIdStrs, ",")
-					} else {
-						// No users match criteria, return empty result
-						filter["users.id"] = "in:0"
-					}
-				}
-			} else {
-				// No specific filter, just get users in program courses
-				courseRepo := repositories.NewCourseRepository()
-				courseRepo.SetContext(c)
-				courseRepo.SetFilter(map[string]interface{}{
-					"program_id": programID,
-				})
-				courses, err := courseRepo.GetAll()
-				if err == nil && len(courses) > 0 {
-					courseIdStrs := make([]string, len(courses))
-					for i, course := range courses {
-						courseIdStrs[i] = strconv.FormatInt(course.ID, 10)
-					}
-					filter["Courses.id"] = "in:" + strings.Join(courseIdStrs, ",") + ":user_courses:users:courses:user_id:course_id:id:id"
-				}
-			}
-		}
+	if classIDStr := c.Query("class_id"); classIDStr != "" {
+		filter["Classes.id"] = classIDStr + ":user_classes:users:classes:user_id:class_id:id:id"
 	}
 
 	if wardCode := c.Query("ward_code"); wardCode != "" {
@@ -1119,4 +993,3 @@ func safeString[T any](model *T, getter func(*T) string) string {
 	}
 	return ""
 }
-

@@ -1,12 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
 	"time"
-
-	"github.com/gin-gonic/gin"
 )
 
 type ExamStudentRepository interface {
@@ -22,7 +20,7 @@ type ExamStudentRepository interface {
 	CountUnscoredManualExercise(exerciseID, userID int64) (int, error)
 	CountHomeworkQuestionsCompleted(homeworkID, userID int64) (int32, error)
 	GetExamComment(examID, studentID int64) (string, error)
-	GetExamByStudentRepoWithDate(c *gin.Context, userID, weekID, courseID int64, startDate, endDate *int64, limit, offset int) ([]dto.GetExamByStudentCourseDTO, int64, error)
+	GetExamByStudentRepoWithDate(userID, weekID, courseID int64, startDate, endDate *int64, limit, offset int) ([]dto.GetExamByStudentCourseDTO, int64, error)
 }
 
 type examStudentRepository struct{}
@@ -201,7 +199,7 @@ func (r *examStudentRepository) GetExamByStudentRepo(userID, weekID int64, limit
 	return result, total, nil
 }
 
-func (r *examStudentRepository) GetExamByStudentRepoWithDate(c *gin.Context, userID, weekID, courseID int64, startDate, endDate *int64, limit, offset int) ([]dto.GetExamByStudentCourseDTO, int64, error) {
+func (r *examStudentRepository) GetExamByStudentRepoWithDate(userID, weekID, courseID int64, startDate, endDate *int64, limit, offset int) ([]dto.GetExamByStudentCourseDTO, int64, error) {
 	// Lấy danh sách tuần
 	var weekIDs []int64
 	if startDate != nil && endDate != nil {
@@ -261,24 +259,6 @@ func (r *examStudentRepository) GetExamByStudentRepoWithDate(c *gin.Context, use
 	var total int64
 	totalQuery.Count(&total)
 
-	// memberType, _ := c.Get("memberType")
-
-	// if len(courses) == 0 && memberType.(string) == models.MemberTypeExternal {
-	// 	courseIds := config.LoadConfig().PublicCourseIds
-
-	// 	if courseID > 0 {
-	// 		courseIds = []int64{courseID}
-	// 	}
-
-	// 	db.ReplicaDB.Table("courses").
-	// 		Where("courses.id IN ?", courseIds).
-	// 		Joins("LEFT JOIN subjects ON subjects.id = courses.subject_id AND subjects.deleted_at IS NULL").
-	// 		Select(`courses.id, courses.name, courses.description, courses.status, subjects.name as subject_name, courses.type, courses.image_info, courses.level, courses.target`).
-	// 		Scan(&courses)
-
-	// 	total = int64(len(courseIds))
-	// }
-
 	// Lấy lessons theo từng course trong tuần
 	var result []dto.GetExamByStudentCourseDTO
 	for _, c := range courses {
@@ -306,7 +286,7 @@ func (r *examStudentRepository) GetExamByStudentRepoWithDate(c *gin.Context, use
 			// Lấy exams theo lesson qua bảng trung gian exam_ref_lessons
 			var exams []dto.GetExamByStudentExamDTO
 			err := db.ReplicaDB.Table("exams AS e").
-				Select("e.id, e.name, e.status::int as status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline, e.type").
+				Select("e.id, e.name, e.status::int as status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline").
 				Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
 				Where("erl.lesson_id = ? AND e.deleted_at IS NULL", l.ID).
 				Where("erl.course_id = ?", courseID).
@@ -346,7 +326,7 @@ func (r *examStudentRepository) GetExamByStudentRepoWithDate(c *gin.Context, use
 
 func (r *examStudentRepository) GetExamsByLesson(lessonID, userID, courseID int64, exams *[]dto.GetExamByStudentExamQuery) error {
 	return db.ReplicaDB.Table("exams AS e").
-		Select("e.id, e.name, e.status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline, e.type").
+		Select("e.id, e.name, e.status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline").
 		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
 		Where("erl.lesson_id = ? AND erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND e.deleted_at IS NULL AND erl.course_id = ?", lessonID, courseID).
 		Order("e.id ASC").
@@ -379,29 +359,19 @@ func (r *examStudentRepository) GetHomeworksByLesson(lessonID, userID, courseID 
 		TotalQuestion           int32
 		QuestionCompleted       int32
 		LastQuestionIDCompleted int64
-		QuestionForm            string
-		IsSubmitted             bool
 	}
 	err := db.ReplicaDB.Table("homeworks h").
-		Select(`h.id, h.name, h.status, h.description, h.cover_image_info, h.question_form,
-			COALESCE(hq.total_question, 0) AS total_question,
-			COALESCE(hu.questions_completed, 0) AS question_completed,
-			COALESCE(hu.last_question_id_completed, 0) AS last_question_id_completed,
-			CASE WHEN hu.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_submitted`).
-		Joins(`JOIN homework_ref_lessons hrl
-			ON hrl.homework_id = h.id
-			AND hrl.lesson_id = ?
-			AND hrl.assigned_by IS NOT NULL
-			AND hrl.assigned_by > 0
-			AND hrl.course_id = ?`, lessonID, courseID).
+		Select(`h.id, h.name, h.status, h.description, h.cover_image_info,
+			COALESCE(hq.total_question, 0) as total_question,
+			COALESCE(hu.questions_completed, 0) as question_completed,
+			COALESCE(hu.last_question_id_completed, 0) as last_question_id_completed`).
+		Joins(`JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id AND hrl.lesson_id = ? AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND hrl.course_id = ?`, lessonID, courseID).
 		Joins(`LEFT JOIN (
-			SELECT assignment_id AS homework_id, jsonb_array_length(questions) AS total_question
+			SELECT assignment_id as homework_id, jsonb_array_length(questions) as total_question
 			FROM cloned_questions
 			WHERE assignment_type = 'homework'
-		) AS hq ON hq.homework_id = h.id`).
-		Joins(`LEFT JOIN homework_users hu
-			ON hu.homework_id = h.id
-			AND hu.user_id = ?`, userID).
+		) as hq ON hq.homework_id = h.id`).
+		Joins(`LEFT JOIN homework_users hu ON hu.homework_id = h.id AND hu.user_id = ?`, userID).
 		Where("h.deleted_at IS NULL").
 		Order("h.id ASC").
 		Scan(&homeworks).Error
@@ -419,8 +389,6 @@ func (r *examStudentRepository) GetHomeworksByLesson(lessonID, userID, courseID 
 			QuestionCompleted:       h.QuestionCompleted,
 			CoverImage:              h.CoverImage,
 			LastQuestionIDCompleted: h.LastQuestionIDCompleted,
-			QuestionForm:            h.QuestionForm,
-			IsSubmitted:             h.IsSubmitted,
 		})
 	}
 	return result, nil
@@ -488,4 +456,3 @@ func (r *examStudentRepository) GetExamComment(examID, studentID int64) (string,
 		Scan(&content).Error
 	return content, err
 }
-

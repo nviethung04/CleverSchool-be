@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"time"
 )
 
@@ -202,9 +202,10 @@ func (r *saveScoreManualScoringRepository) CheckUnscoredQuestionsHomework(homewo
 
 func (r *saveScoreManualScoringRepository) UpdateHomeworkUserManualScoringStatus(homeworkID, userID int64, hasManualScoring bool) error {
     // Dùng cast tường minh để tránh lỗi encode plan khi driver cache kiểu cũ
+    now := time.Now().UTC()
     return db.MasterDB.Exec(
-        "UPDATE homework_users SET has_manual_scoring = ?::boolean WHERE homework_id = ? AND user_id = ?",
-        hasManualScoring, homeworkID, userID,
+        "UPDATE homework_users SET has_manual_scoring = ?::boolean, updated_at = ? WHERE homework_id = ? AND user_id = ?",
+        hasManualScoring, now, homeworkID, userID,
     ).Error
 }
 
@@ -241,4 +242,3 @@ func (r *saveScoreManualScoringRepository) UpdateExerciseUserManualScoringStatus
 		}).Error
 	}
 }
-

@@ -1,7 +1,7 @@
 package examples
 
 import (
-	"be-cleverschool/services"
+	"be-lms/services"
 	"fmt"
 )
 
@@ -78,4 +78,3 @@ func ExampleUsageInController() {
 		fmt.Printf("API error: %s\n", result.Message)
 	}
 }
-

@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/requests"
 )
 
 type ProvinceRepository interface {
@@ -51,4 +51,3 @@ func (r *provinceRepository) GetWards(code string) ([]models.Ward, error) {
 	}
 	return wards, nil
 }
-

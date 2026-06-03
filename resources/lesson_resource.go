@@ -1,11 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/utils"
 	"sort"
 	"strings"
 )
@@ -17,12 +16,9 @@ type LessonResource interface {
 }
 
 type LessonResourceImpl struct {
-	PublishAssessmentIds   []int64
-	HideLessonIds          []int64
-	StudyingLessonIds      []int64
 	CompleteLessonIds      []int64
 	CompleteLessonPlanIds  []int64
-	CourseId               int64
+	CourseId			   int64
 	Flashcard              *dto.FlashcardLessonDTO
 	examCompletionMap      map[int64]bool
 	examTotalQuestions     map[int64]int32
@@ -30,7 +26,6 @@ type LessonResourceImpl struct {
 	homeworkTotalQuestions map[int64]int32
 	exerciseCompletionMap  map[int64]bool
 	exerciseTotalQuestions map[int64]int32
-	homeworkSubmittedMap   map[int64]bool
 }
 
 func NewLessonResourceWithCompletionAndQuestions(
@@ -40,15 +35,11 @@ func NewLessonResourceWithCompletionAndQuestions(
 	homeworkTotalQuestions map[int64]int32,
 	exerciseCompletionMap map[int64]bool,
 	exerciseTotalQuestions map[int64]int32,
-	homeworkSubmittedMap map[int64]bool,
 ) LessonResource {
 	return &LessonResourceImpl{
-		PublishAssessmentIds:   []int64{},
-		HideLessonIds:          []int64{},
-		StudyingLessonIds:      []int64{},
 		CompleteLessonIds:      []int64{},
 		CompleteLessonPlanIds:  []int64{},
-		CourseId:               0,
+		CourseId:				0,
 		Flashcard:              nil,
 		examCompletionMap:      examCompletionMap,
 		examTotalQuestions:     examTotalQuestions,
@@ -56,15 +47,12 @@ func NewLessonResourceWithCompletionAndQuestions(
 		homeworkTotalQuestions: homeworkTotalQuestions,
 		exerciseCompletionMap:  exerciseCompletionMap,
 		exerciseTotalQuestions: exerciseTotalQuestions,
-		homeworkSubmittedMap:   homeworkSubmittedMap,
 	}
 }
 
 func NewLessonResource() LessonResource {
 	return &LessonResourceImpl{
-		HideLessonIds:         []int64{},
-		StudyingLessonIds:     []int64{},
-		CompleteLessonIds:     []int64{},
+		CompleteLessonIds: []int64{},
 		CompleteLessonPlanIds: []int64{},
 	}
 }
@@ -75,9 +63,9 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 	}
 
 	chapter := prot.ChapterInfo{
-		Id:          lesson.Chapter.ID,
-		Title:       lesson.Chapter.Title,
-		ObjectTitle: lesson.Chapter.ObjectTitle,
+		Id:    lesson.Chapter.ID,
+		Title: lesson.Chapter.Title,
+		ObjectTitle:	 lesson.Chapter.ObjectTitle,
 	}
 
 	tags := make([]*prot.TagInfo, 0, len(lesson.Tags))
@@ -115,7 +103,6 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 	exams := r.GetExams(lesson)
 	homeworks := r.GetHomeworks(lesson)
 	exercises := r.GetExercises(lesson)
-	assessments := r.GetAssessments(lesson)
 
 	lessonPlans := make([]*prot.LessonPlanInfo, 0, len(lesson.LessonPlans))
 	seen := make(map[int64]bool)
@@ -125,61 +112,34 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 		completeMap[id] = true
 	}
 
-	isVtg := config.LoadConfig().IsVtg
 	for _, attr := range lesson.LessonPlans {
 		if seen[attr.ID] {
 			continue
 		}
 		seen[attr.ID] = true
 
-		if len(lessonPlans) > 0 && !isVtg {
+		if len(lessonPlans) > 0 {
 			continue
-		}
-
-		var isActive bool
-
-		if r.CourseId > 0 {
-			for _, schedule := range lesson.Schedules {
-				if schedule.LessonPlanID == attr.ID && !isActive && r.CourseId == schedule.CourseID {
-					isActive = true
-				}
-			}
-		}
-
-		var author prot.LessonPlanAuthor
-		if attr.Author != nil {
-			author = prot.LessonPlanAuthor{
-				Id:     attr.Author.ID,
-				Name:   attr.Author.Name,
-				Avatar: utils.StaticURL(attr.Author.AvatarInfo.Path, models.Storage),
-			}
 		}
 
 		lessonPlans = append(lessonPlans, &prot.LessonPlanInfo{
 			Id:           attr.ID,
 			Name:         attr.Name,
 			Description:  attr.Description,
-			ObjectTitle:  attr.ObjectTitle,
+			ObjectTitle:	 attr.ObjectTitle,
 			CoverImage:   utils.StaticURL(attr.CoverImageInfo.Path, models.Storage),
 			Status:       int32(attr.Status),
 			SortPosition: int32(attr.SortPosition),
 			TotalTime:    int64(attr.TotalTime),
 			IsComplete:   completeMap[attr.ID],
-			IsActive:     isActive,
-			Author:       &author,
 		})
 	}
 
-	sort.SliceStable(lessonPlans, func(i, j int) bool {
-		if lessonPlans[i].IsActive != lessonPlans[j].IsActive {
-			return lessonPlans[i].IsActive
+	sort.Slice(lessonPlans, func(i, j int) bool {
+		if lessonPlans[i].SortPosition == lessonPlans[j].SortPosition {
+			return lessonPlans[i].Id < lessonPlans[j].Id
 		}
-
-		if lessonPlans[i].SortPosition != lessonPlans[j].SortPosition {
-			return lessonPlans[i].SortPosition < lessonPlans[j].SortPosition
-		}
-
-		return lessonPlans[i].Id < lessonPlans[j].Id
+		return lessonPlans[i].SortPosition < lessonPlans[j].SortPosition
 	})
 
 	var author prot.AuthorInfo
@@ -196,9 +156,9 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 	var program prot.LessonProgramInfo
 	if chapter.Id != 0 && lesson.Chapter.Program.ID != 0 {
 		program = prot.LessonProgramInfo{
-			Id:          lesson.Chapter.Program.ID,
-			Name:        lesson.Chapter.Program.Name,
-			Description: lesson.Chapter.Program.Description,
+			Id:   lesson.Chapter.Program.ID,
+			Name: lesson.Chapter.Program.Name,
+			Description:	 lesson.Chapter.Program.Description,
 		}
 	}
 
@@ -246,14 +206,6 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 		}
 	}
 
-	isStudying := false
-	for _, id := range r.StudyingLessonIds {
-		if id == lesson.ID {
-			isStudying = true
-			break
-		}
-	}
-
 	var vocabularies []*prot.Vocabulary
 
 	if r.Flashcard != nil {
@@ -297,67 +249,37 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 		}
 	}
 
-	var heading prot.HeadingInfo
-	if lesson.Heading.ID > 0 {
-		heading = prot.HeadingInfo{
-			Id:   lesson.Heading.ID,
-			Name: lesson.Heading.Name,
-		}
-	}
-
-	var teachingPlan *prot.TeachingPlan
-	teachingPlanResource := NewTeachingPlanResource()
-	for _, tp := range lesson.TeachingPlans {
-		teachingPlanFormat := teachingPlanResource.FormatTeachingPlan(&tp)
-		teachingPlan = teachingPlanFormat
-		break
-	}
-
 	return &prot.Lesson{
-		Id:              int64(lesson.ID),
-		Title:           lesson.Title,
-		Description:     lesson.Description,
-		ObjectTitle:     lesson.ObjectTitle,
-		Status:          lesson.Status,
-		Views:           int32(lesson.Views),
-		Heading:         &heading,
-		Chapter:         &chapter,
-		Program:         &program,
-		Tags:            tags,
-		Topics:          topics,
-		Skills:          skills,
-		Dependencies:    dependencies,
-		Exams:           exams,
-		Homeworks:       homeworks,
-		Exercises:       exercises,
-		Assessment:      assessments,
-		LessonPlans:     lessonPlans,
-		Schedules:       schedules,
-		Author:          &author,
-		TeachingPlan:    teachingPlan,
-		IsComplete:      isComplete,
-		IsStudying:      isStudying && !isComplete,
-		Vocabularies:    vocabularies,
+		Id:           int64(lesson.ID),
+		Title:        lesson.Title,
+		Description:  lesson.Description,
+		ObjectTitle:	 lesson.ObjectTitle,
+		Status:       lesson.Status,
+		Views:        int32(lesson.Views),
+		Chapter:      &chapter,
+		Program:       &program,
+		Tags:         tags,
+		Topics:       topics,
+		Skills:       skills,
+		Dependencies: dependencies,
+		Exams:        exams,
+		Homeworks:    homeworks,
+		Exercises:    exercises,
+		LessonPlans:  lessonPlans,
+		Schedules:    schedules,
+		Author:       &author,
+		IsComplete:   isComplete,
+		Vocabularies: vocabularies,
 		VocabularyCount: int32(len(vocabularies)),
-		CreatedAt:       lesson.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:       lesson.UpdatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt:    lesson.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:    lesson.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 
 func (r *LessonResourceImpl) FormatLessons(lessons []*models.Lesson) []*prot.Lesson {
 	result := make([]*prot.Lesson, 0, len(lessons))
-
-	hideLessonMap := make(map[int64]bool, len(r.StudyingLessonIds))
-	for _, id := range r.HideLessonIds {
-		hideLessonMap[id] = true
-	}
-
-	for _, l := range lessons {
-		if hideLessonMap[l.ID] {
-			continue
-		}
-
-		if formatted := r.FormatLesson(l); formatted != nil {
+	for _, u := range lessons {
+		if formatted := r.FormatLesson(u); formatted != nil {
 			result = append(result, formatted)
 		}
 	}
@@ -369,19 +291,14 @@ func (r *LessonResourceImpl) FormatModelLesson(lesson *prot.LessonRequest) *mode
 		return nil
 	}
 
-	var chapterID, headingID int64
+	var chapterID int64
 	if lesson.Chapter != nil {
 		chapterID = int64(lesson.Chapter.Id)
-	}
-
-	if lesson.Heading != nil {
-		headingID = int64(lesson.Heading.Id)
 	}
 
 	return &models.Lesson{
 		ID:          int64(lesson.Id),
 		ChapterID:   chapterID,
-		HeadingID:   headingID,
 		Title:       strings.TrimSpace(lesson.Title),
 		Description: strings.TrimSpace(lesson.Description),
 		Status:      lesson.Status,
@@ -406,8 +323,6 @@ func (r *LessonResourceImpl) GetHomeworks(lesson *models.Lesson) []*prot.Homewor
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
 					IsAssigned:         false,
 					IsProgram:          true,
-					QuestionForm:       attr.QuestionForm,
-					IsSubmitted:        r.homeworkSubmittedMap[attr.ID],
 				}
 				break
 			}
@@ -448,8 +363,6 @@ func (r *LessonResourceImpl) GetHomeworks(lesson *models.Lesson) []*prot.Homewor
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
 					IsAssigned:         isAssigned,
 					IsProgram:          false,
-					QuestionForm:       attr.QuestionForm,
-					IsSubmitted:        r.homeworkSubmittedMap[attr.ID],
 				}
 			}
 		}
@@ -476,17 +389,16 @@ func (r *LessonResourceImpl) GetExercises(lesson *models.Lesson) []*prot.Exercis
 		for _, ref := range attr.ExerciseRefLessons {
 			if ref.LessonId == lesson.ID && ref.ExerciseId == attr.ID && ref.CourseId == 0 {
 				exercisesMap[attr.ID] = &prot.ExerciseInfo{
-					Id:             attr.ID,
-					Name:           attr.Name,
-					Description:    attr.Description,
-					ObjectTitle:    attr.ObjectTitle,
+					Id:                 attr.ID,
+					Name:               attr.Name,
+					Description:        attr.Description,
+					ObjectTitle:        attr.ObjectTitle,
 					IsCompleted:    r.exerciseCompletionMap[attr.ID],
 					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
-					CreatedAt:      attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:     false,
-					IsProgram:      true,
+					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
+					IsAssigned:         false,
+					IsProgram:          true,
 					TimeLimit:      int32(attr.TimeLimit),
-					QuestionForm:   attr.QuestionForm,
 				}
 				break
 			}
@@ -518,17 +430,16 @@ func (r *LessonResourceImpl) GetExercises(lesson *models.Lesson) []*prot.Exercis
 				existing.IsAssigned = isAssigned
 			} else {
 				exercisesMap[attr.ID] = &prot.ExerciseInfo{
-					Id:             attr.ID,
-					Name:           attr.Name,
-					Description:    attr.Description,
-					ObjectTitle:    attr.ObjectTitle,
+					Id:                 attr.ID,
+					Name:               attr.Name,
+					Description:        attr.Description,
+					ObjectTitle:        attr.ObjectTitle,
 					IsCompleted:    r.exerciseCompletionMap[attr.ID],
 					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
-					CreatedAt:      attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:     isAssigned,
-					IsProgram:      false,
+					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
+					IsAssigned:         isAssigned,
+					IsProgram:          false,
 					TimeLimit:      int32(attr.TimeLimit),
-					QuestionForm:   attr.QuestionForm,
 				}
 			}
 		}
@@ -555,17 +466,16 @@ func (r *LessonResourceImpl) GetExams(lesson *models.Lesson) []*prot.ExamInfo {
 		for _, ref := range attr.ExamRefLessons {
 			if ref.LessonId == lesson.ID && ref.ExamId == attr.ID && ref.CourseId == 0 {
 				examsMap[attr.ID] = &prot.ExamInfo{
-					Id:             attr.ID,
-					Name:           attr.Name,
-					Description:    attr.Description,
-					ObjectTitle:    attr.ObjectTitle,
+					Id:                 attr.ID,
+					Name:               attr.Name,
+					Description:        attr.Description,
+					ObjectTitle:        attr.ObjectTitle,
 					IsCompleted:    r.exerciseCompletionMap[attr.ID],
 					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
-					CreatedAt:      attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:     false,
-					IsProgram:      true,
+					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
+					IsAssigned:         false,
+					IsProgram:          true,
 					TimeLimit:      int32(attr.TimeLimit),
-					QuestionForm:   attr.QuestionForm,
 				}
 				break
 			}
@@ -597,17 +507,16 @@ func (r *LessonResourceImpl) GetExams(lesson *models.Lesson) []*prot.ExamInfo {
 				existing.IsAssigned = isAssigned
 			} else {
 				examsMap[attr.ID] = &prot.ExamInfo{
-					Id:             attr.ID,
-					Name:           attr.Name,
-					Description:    attr.Description,
-					ObjectTitle:    attr.ObjectTitle,
+					Id:                 attr.ID,
+					Name:               attr.Name,
+					Description:        attr.Description,
+					ObjectTitle:        attr.ObjectTitle,
 					IsCompleted:    r.exerciseCompletionMap[attr.ID],
 					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
-					CreatedAt:      attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:     isAssigned,
-					IsProgram:      false,
+					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
+					IsAssigned:         isAssigned,
+					IsProgram:          false,
 					TimeLimit:      int32(attr.TimeLimit),
-					QuestionForm:   attr.QuestionForm,
 				}
 			}
 		}
@@ -626,87 +535,3 @@ func (r *LessonResourceImpl) GetExams(lesson *models.Lesson) []*prot.ExamInfo {
 
 	return exams
 }
-
-func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.AssessmentInfo {
-	assessmentsMap := make(map[int64]*prot.AssessmentInfo)
-
-	for _, attr := range lesson.Assessments {
-		for _, ref := range attr.AssessmentRefLessons {
-			if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == 0 {
-				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
-					Id:          attr.ID,
-					Name:        attr.Name,
-					Description: attr.Description,
-					Type:        string(attr.Type),
-					ObjectTitle: attr.Name,
-					IsAssigned:  false,
-					IsProgram:   true,
-				}
-				break
-			}
-		}
-	}
-
-	if r.CourseId != 0 {
-		for _, attr := range lesson.Assessments {
-			var (
-				hasCourseRef bool
-				isAssigned   bool
-			)
-
-			for _, ref := range attr.AssessmentRefLessons {
-				if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == r.CourseId {
-					hasCourseRef = true
-					if ref.AssignedBy != nil && *ref.AssignedBy > 0 {
-						isAssigned = true
-						break
-					}
-				}
-			}
-
-			if !hasCourseRef {
-				continue
-			}
-
-			if existing, ok := assessmentsMap[attr.ID]; ok {
-				existing.IsAssigned = isAssigned
-			} else {
-				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
-					Id:          attr.ID,
-					Name:        attr.Name,
-					Description: attr.Description,
-					Type:        string(attr.Type),
-					ObjectTitle: attr.Name,
-					IsAssigned:  isAssigned,
-					IsProgram:   false,
-				}
-			}
-		}
-	}
-
-	for i, a := range assessmentsMap {
-		publish := false
-
-		for _, id := range r.PublishAssessmentIds {
-			if id == a.Id {
-				publish = true
-				assessmentsMap[i].Publish = publish
-				break
-			}
-		}
-	}
-
-	ids := make([]int64, 0, len(assessmentsMap))
-	for id := range assessmentsMap {
-		ids = append(ids, id)
-	}
-	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
-
-	assessments := make([]*prot.AssessmentInfo, 0, len(ids))
-	for _, id := range ids {
-		assessments = append(assessments, assessmentsMap[id])
-	}
-
-	return assessments
-}
-

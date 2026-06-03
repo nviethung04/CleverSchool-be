@@ -1,2 +1,0 @@
-ALTER TABLE headings
-    DROP COLUMN IF EXISTS target;

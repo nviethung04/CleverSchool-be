@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message ExerciseFile {
   string type = 1;
@@ -70,4 +70,3 @@ message ExerciseByCourse {
 }
 
 //protoc --go_out=. --go_opt=paths=source_relative prot/exercise.proto
-

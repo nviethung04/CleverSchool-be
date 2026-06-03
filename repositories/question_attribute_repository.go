@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 )
 
 type QuestionAttributeRepository interface {
@@ -34,4 +34,3 @@ func (r *questionAttributeRepository) GetParents() ([]models.QuestionAttribute, 
 
 	return entities, err
 }
-

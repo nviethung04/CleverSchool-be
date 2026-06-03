@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/config"
+	"be-lms/config"
 	"fmt"
 	"mime"
 	"net/smtp"
@@ -36,7 +36,7 @@ func (s *emailService) SendPasswordResetEmail(email, token, username string) err
 	}
 	fromName := os.Getenv("FROM_NAME")
 	if fromName == "" {
-		fromName = "Clever School System"
+		fromName = "LMS System"
 	}
 
 	// URL reset password
@@ -47,7 +47,7 @@ func (s *emailService) SendPasswordResetEmail(email, token, username string) err
 	resetURL := frontendURL + "/reset-password?token=" + token
 
 	// content email
-	subject := "Đặt lại mật khẩu - Clever School System"
+	subject := "Đặt lại mật khẩu - LMS System"
 	encodedSubject := mime.QEncoding.Encode("utf-8", subject)
 	body := s.generatePasswordResetEmailBody(username, resetURL)
 
@@ -152,7 +152,7 @@ func (s *emailService) generatePasswordResetEmailBody(username, resetURL string)
         <div class="content">
             <p>Xin chào <strong>%s</strong>,</p>
 
-            <p>Bạn nhận được email này vì bạn đã yêu cầu đặt lại mật khẩu cho tài khoản Clever School của mình.</p>
+            <p>Bạn nhận được email này vì bạn đã yêu cầu đặt lại mật khẩu cho tài khoản LMS của mình.</p>
 
             <p>Vui lòng nhấp vào nút bên dưới để đặt lại mật khẩu:</p>
 
@@ -172,7 +172,7 @@ func (s *emailService) generatePasswordResetEmailBody(username, resetURL string)
             <p>Nếu nút không hoạt động, bạn có thể copy và paste link sau vào trình duyệt:</p>
             <p style="word-break: break-all; color: #0066cc;">%s</p>
 
-            <p>Trân trọng,<br>Đội ngũ Clever School System</p>
+            <p>Trân trọng,<br>Đội ngũ LMS System</p>
         </div>
 
         <div class="footer">
@@ -184,4 +184,3 @@ func (s *emailService) generatePasswordResetEmailBody(username, resetURL string)
 </html>
 `, username, resetURL, resetURL)
 }
-

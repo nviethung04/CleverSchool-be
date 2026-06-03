@@ -1,20 +1,18 @@
 package app
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	_ "be-cleverschool/docs"
-	"be-cleverschool/i18n"
-	"be-cleverschool/jobs"
-	"be-cleverschool/middleware"
-	"be-cleverschool/redis"
-	"be-cleverschool/routes"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/database/db"
+	_ "be-lms/docs"
+	"be-lms/i18n"
+	"be-lms/jobs"
+	"be-lms/middleware"
+	"be-lms/redis"
+	"be-lms/routes"
+	"be-lms/utils"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -42,8 +40,6 @@ func RunAppServer() {
 	config.Log.Warn("🚀 Ứng dụng đang khởi động...")
 	config.Log.Warnf("🔧 App Debug Mode: %v", cfg.AppDebug)
 	config.Log.Warnf("🌐 Port: %s", cfg.Port)
-	config.Log.Warnf("🗄️  DB: host=%s port=%s name=%s", os.Getenv("DB_MASTER_HOST"), os.Getenv("DB_MASTER_PORT"), os.Getenv("DB_MASTER_NAME"))
-	config.Log.Warnf("📦 Redis: enabled=%v host=%s port=%s db=%d", cfg.RedisEnabled, cfg.RedisHost, cfg.RedisPort, cfg.RedisDB)
 
 	// Set logging level based on LOG_LEVEL environment variable
 	// This is separate from Gin's debug mode
@@ -89,22 +85,6 @@ func RunAppServer() {
 		log.Fatal("❌ Critical startup failure:", err)
 	}
 
-	if err := db.TestPostgresConnection(); err != nil {
-		config.Log.Warnf("⚠️ TestPostgresConnection: %v", err)
-	} else {
-		config.Log.Info("✅ TestPostgresConnection OK")
-	}
-
-	// Initialize Firebase from FIREBASE_CREDENTIALS_JSON env variable
-	if firebaseCredsJSON := os.Getenv("FIREBASE_CREDENTIALS_JSON"); firebaseCredsJSON != "" {
-		config.Log.Info("🔥 Initializing Firebase from FIREBASE_CREDENTIALS_JSON...")
-		if _, err := services.InitFirebase(firebaseCredsJSON); err != nil {
-			config.Log.Warnf("⚠️ Failed to initialize Firebase: %v. Push notifications will be disabled.", err)
-		}
-	} else {
-		config.Log.Warn("⚠️ FIREBASE_CREDENTIALS_JSON not set. Push notifications disabled.")
-	}
-
 	r := gin.Default()
 	r.MaxMultipartMemory = 4 << 30
 
@@ -126,14 +106,13 @@ func RunAppServer() {
 
 	// Set locale by header
 	locale := "vi"
-	i18n.Init(locale) //
+	i18n.Init(locale)
 	r.Use(middleware.I18nMiddleware())
 
 	// Set rate limit
 	r = RateLimit(r)
 
 	// Set cors by config
-	// Note: WebSocket requires specific headers for upgrade
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: cfg.AllowOrigins,
 		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
@@ -143,16 +122,11 @@ func RunAppServer() {
 			"Tus-Resumable", "Upload-Length", "Upload-Metadata", "Upload-Offset",
 			"Upload-Defer-Length", "Upload-Concat", "Upload-Checksum", "Tus-Extension", "Tus-Max-Size",
 			"Accept-Patch",
-			// WebSocket headers
-			"Upgrade", "Connection", "Sec-WebSocket-Key", "Sec-WebSocket-Version",
-			"Sec-WebSocket-Extensions", "Sec-WebSocket-Protocol", "Sec-WebSocket-Accept",
 		},
 		ExposeHeaders: []string{
 			"Content-Length", "Content-Type", "Date",
 			"Location", "Tus-Resumable", "Tus-Version", "Tus-Extension", "Tus-Max-Size",
 			"Upload-Offset", "Upload-Length", "Upload-Checksum",
-			// WebSocket headers
-			"Upgrade", "Connection", "Sec-WebSocket-Accept",
 		},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
@@ -175,15 +149,11 @@ func RunAppServer() {
 	// --- Setting timeout ---
 	serverAddr := ":" + cfg.Port
 	s := &http.Server{
-		Addr:    serverAddr,
-		Handler: r,
-		// ReadTimeout:  5 * time.Minute,
-		// WriteTimeout: 2 * time.Minute,
-		// IdleTimeout:  10 * time.Minute,
-
-		ReadTimeout:  0, // 0 = no timeout (required for WebSocket)
-		WriteTimeout: 0, // 0 = no timeout (required for WebSocket)
-		IdleTimeout:  0, // 0 = no timeout (required for WebSocket)
+		Addr:         serverAddr,
+		Handler:      r,
+		ReadTimeout:  30 * time.Minute,
+		WriteTimeout: 30 * time.Minute,
+		IdleTimeout:  30 * time.Minute,
 	}
 
 	config.Log.Warnf("Server starting on %s", serverAddr)
@@ -212,9 +182,8 @@ func CronJob() {
 	jobs.StartDatabaseBackupCronJob()
 	jobs.StartS3CleanupCronJob()
 	jobs.StartHomeworkStatusScoringCronJob()
-
+	
 	// Daily Statistics Jobs - chạy lúc 1h sáng hàng ngày
 	jobs.StartDailySchoolStatisticsCronJob()
 	jobs.StartDailyCourseStatisticsCronJob()
 }
-

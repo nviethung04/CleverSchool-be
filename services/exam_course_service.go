@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/repositories"
+	"be-lms/repositories"
 )
 
 type ExamCourseService interface {

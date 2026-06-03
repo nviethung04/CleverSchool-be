@@ -1,18 +1,18 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"strconv"
 
-	"be-cleverschool/middleware"
+	"be-lms/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -184,4 +184,3 @@ func (qc *QuestionController) Import(c *gin.Context) {
 
 	utils.Respond(c, &prot.Import{Message: i18n.Localize("messages.import_complete")}, nil, "")
 }
-

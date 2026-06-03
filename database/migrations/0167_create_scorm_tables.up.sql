@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS scorm_activities (
     max_time_allowed VARCHAR(32),
     time_limit_action VARCHAR(32),
     launch_data TEXT,
-    data_from_clever_school TEXT,
+    data_from_lms TEXT,
     status VARCHAR(32) DEFAULT 'active',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

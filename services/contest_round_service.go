@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"fmt"
 	"strings"
 	"time"
@@ -37,12 +37,6 @@ type ContestRoundService interface {
 	AddPersonJoiner(c *gin.Context, contestRoundId int64, userIds []int64) error
 	GetPersonJoiners(c *gin.Context, contestRoundId int64) (interface{}, error)
 	RemovePersonJoiner(c *gin.Context, contestRoundId int64, userId int64) error
-
-	// Bulk remove methods
-	BulkRemoveJoinerSchools(c *gin.Context, contestRoundId int64, schoolIds []int64) error
-	BulkRemoveJoinerProvinces(c *gin.Context, contestRoundId int64, provinceIds []int64) error
-	BulkRemoveJoinerClasses(c *gin.Context, contestRoundId int64, classIds []int64) error
-	BulkRemoveJoinerPersons(c *gin.Context, contestRoundId int64, userIds []int64) error
 }
 
 type contestRoundService struct {
@@ -384,7 +378,8 @@ func (s *contestRoundService) RemoveJoiner(c *gin.Context, contestRoundId int64,
 	case "class":
 		return s.repo.RemoveJoinerClass(contestRoundId, joinerId, deletedBy)
 	case "person":
-		return s.repo.RemoveJoinerPerson(contestRoundId, joinerId, deletedBy)
+		// Disabled due to technical issues
+		return fmt.Errorf("person join level is temporarily disabled")
 	}
 
 	return nil
@@ -445,32 +440,3 @@ func (s *contestRoundService) RemovePersonJoiner(c *gin.Context, contestRoundId 
 	deletedBy := int64(utils.GetCurrentUserId(c))
 	return s.repo.RemovePersonJoiner(contestRoundId, userId, deletedBy)
 }
-
-// BulkRemoveJoinerSchools - Bulk remove school joiners
-func (s *contestRoundService) BulkRemoveJoinerSchools(c *gin.Context, contestRoundId int64, schoolIds []int64) error {
-	s.repo.SetContext(c)
-	deletedBy := int64(utils.GetCurrentUserId(c))
-	return s.repo.BulkRemoveJoinerSchools(contestRoundId, schoolIds, deletedBy)
-}
-
-// BulkRemoveJoinerProvinces - Bulk remove province joiners
-func (s *contestRoundService) BulkRemoveJoinerProvinces(c *gin.Context, contestRoundId int64, provinceIds []int64) error {
-	s.repo.SetContext(c)
-	deletedBy := int64(utils.GetCurrentUserId(c))
-	return s.repo.BulkRemoveJoinerProvinces(contestRoundId, provinceIds, deletedBy)
-}
-
-// BulkRemoveJoinerClasses - Bulk remove class joiners
-func (s *contestRoundService) BulkRemoveJoinerClasses(c *gin.Context, contestRoundId int64, classIds []int64) error {
-	s.repo.SetContext(c)
-	deletedBy := int64(utils.GetCurrentUserId(c))
-	return s.repo.BulkRemoveJoinerClasses(contestRoundId, classIds, deletedBy)
-}
-
-// BulkRemoveJoinerPersons - Bulk remove person joiners
-func (s *contestRoundService) BulkRemoveJoinerPersons(c *gin.Context, contestRoundId int64, userIds []int64) error {
-	s.repo.SetContext(c)
-	deletedBy := int64(utils.GetCurrentUserId(c))
-	return s.repo.BulkRemoveJoinerPersons(contestRoundId, userIds, deletedBy)
-}
-

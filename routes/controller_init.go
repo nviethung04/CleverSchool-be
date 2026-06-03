@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-cleverschool/controllers"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-lms/controllers"
+	"be-lms/repositories"
+	"be-lms/services"
 )
 
 func NewAuthController() *controllers.AuthController {
@@ -66,34 +66,6 @@ func NewHomeworkController() *controllers.HomeworkController {
 	return controllers.NewHomeworkController(homeworkService)
 }
 
-func NewAssessmentController() *controllers.AssessmentController {
-	repo := repositories.NewAssessmentRepository()
-	service := services.NewAssessmentService(repo)
-	return controllers.NewAssessmentController(service)
-}
-
-func NewAssessmentExportController() *controllers.AssessmentExportController {
-	return controllers.NewAssessmentExportController()
-}
-
-func NewAssessmentCriterionController() *controllers.AssessmentCriterionController {
-	repo := repositories.NewAssessmentCriterionRepository()
-	service := services.NewAssessmentCriterionService(repo)
-	return controllers.NewAssessmentCriterionController(service)
-}
-
-func NewAssessmentSubcriterionController() *controllers.AssessmentSubcriterionController {
-	repo := repositories.NewAssessmentSubcriterionRepository()
-	service := services.NewAssessmentSubcriterionService(repo)
-	return controllers.NewAssessmentSubcriterionController(service)
-}
-
-func NewAssessmentCriteriaGroupController() *controllers.AssessmentCriteriaGroupController {
-	repo := repositories.NewAssessmentCriteriaGroupRepository()
-	service := services.NewAssessmentCriteriaGroupService(repo)
-	return controllers.NewAssessmentCriteriaGroupController(service)
-}
-
 func NewProgramController() *controllers.ProgramController {
 	repo := repositories.NewProgramRepository()
 	service := services.NewProgramService(repo)
@@ -104,10 +76,6 @@ func NewCourseController() *controllers.CourseController {
 	courseRepo := repositories.NewCourseRepository()
 	courseService := services.NewCourseService(courseRepo)
 	return controllers.NewCourseController(courseService)
-}
-
-func NewCourseScheduleController() *controllers.CourseScheduleController {
-	return controllers.NewCourseScheduleController()
 }
 
 func NewSubjectController() *controllers.SubjectController {
@@ -142,8 +110,7 @@ func NewRoleController() *controllers.RoleController {
 
 func NewSourceQuestionController() *controllers.SourceQuestionController {
 	sourceQuestionRepo := repositories.NewSourceQuestionRepository()
-	questionRepo := repositories.NewQuestionRepository()
-	sourceQuestionService := services.NewSourceQuestionService(sourceQuestionRepo, questionRepo)
+	sourceQuestionService := services.NewSourceQuestionService(sourceQuestionRepo)
 	return controllers.NewSourceQuestionController(sourceQuestionService)
 }
 
@@ -191,19 +158,9 @@ func NewSaveScoreController() *controllers.SaveScoreController {
 	saveScoreGRepo := repositories.NewSaveScoreGroupRepository()
 	saveScoreGService := services.NewSaveScoreGroupService(saveScoreGRepo, clonedQuestionService)
 
-	// Homework User Service
-	homeworkUserRepo := repositories.NewHomeworkUserRepository()
-	manualScoringRepo := repositories.NewSaveScoreManualScoringRepository()
-	homeworkRepo := repositories.NewHomeworkRepository()
-	homeworkUserService := services.NewHomeworkUserService(homeworkUserRepo, homeworkRepo, clonedQuestionService, manualScoringRepo)
-
-	// Homework User Question Service (dùng chung cho nhiều dạng câu hỏi, bao gồm manual scoring)
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
-	homeworkUserQuestionService := services.NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService)
-
 	// Save Answer Manual Scoring
 	saveAnswerMSRepo := repositories.NewManualScoringRepository()
-	saveAnswerMSService := services.NewManualScoringService(saveAnswerMSRepo, homeworkUserQuestionService)
+	saveAnswerMSService := services.NewManualScoringService(saveAnswerMSRepo)
 
 	// Exam User Service
 	examUserRepo := repositories.NewExamUserRepository()
@@ -225,21 +182,20 @@ func NewSaveScoreController() *controllers.SaveScoreController {
 		examUserService,
 	)
 
-	// Homework Skip Question Service
-	homeworkSkipQuestionService := services.NewHomeworkSkipQuestionService()
-
-	// Homework Calculation Service
-	homeworkCalculationService := services.NewHomeworkCalculationService(homeworkUserService)
-
-	// User Star Exp Service
-	userStarExpService := services.NewUserStarExpService()
+	// Homework User Service
+	homeworkUserRepo := repositories.NewHomeworkUserRepository()
+	manualScoringRepo := repositories.NewSaveScoreManualScoringRepository()
+	homeworkUserService := services.NewHomeworkUserService(homeworkUserRepo, clonedQuestionService, manualScoringRepo)
 
 	// Save Score Manual Scoring
 	saveScoreManualScoringRepo := repositories.NewSaveScoreManualScoringRepository()
-	saveScoreManualScoringService := services.NewSaveScoreManualScoringService(saveScoreManualScoringRepo, examUserService, homeworkUserService, homeworkUserQuestionService, homeworkCalculationService, userStarExpService)
+	saveScoreManualScoringService := services.NewSaveScoreManualScoringService(saveScoreManualScoringRepo, examUserService, homeworkUserService)
+
+	// Homework Skip Question Service
+	homeworkSkipQuestionService := services.NewHomeworkSkipQuestionService()
 
 	// Controller
-	return controllers.NewSaveScoreController(saveScoreService, saveScoreFIBService, saveScorePService, saveScoreMService, saveScoreLService, saveScoreGService, saveScoreBService, saveAnswerMSService, saveScoreManualScoringService, homeworkUserService, homeworkSkipQuestionService, homeworkCalculationService, userStarExpService)
+	return controllers.NewSaveScoreController(saveScoreService, saveScoreFIBService, saveScorePService, saveScoreMService, saveScoreLService, saveScoreGService, saveScoreBService, saveAnswerMSService, saveScoreManualScoringService, homeworkUserService, homeworkSkipQuestionService)
 }
 
 func NewDepartmentController() *controllers.DepartmentController {
@@ -413,15 +369,6 @@ func NewDashboardStudentHomeworkListController() *controllers.DashboardStudentHo
 	return controllers.NewDashboardStudentHomeworkListController(service)
 }
 
-func NewDashboardStudentAssessmentController() *controllers.DashboardStudentAssessmentController {
-	service := services.NewDashboardStudentAssessmentService()
-	return controllers.NewDashboardStudentAssessmentController(service)
-}
-
-func NewDashboardAssessmentReportExcelController() *controllers.DashboardAssessmentReportExcelController {
-	return controllers.NewDashboardAssessmentReportExcelController()
-}
-
 func NewFeedbackController() *controllers.FeedbackController {
 	repo := repositories.NewFeedbackRepository()
 	service := services.NewFeedbackService(repo)
@@ -462,14 +409,6 @@ func NewDashboardTeacherHomeworkScoredController() *controllers.DashboardTeacher
 	return controllers.NewDashboardTeacherHomeworkScoredController()
 }
 
-func NewDashboardTeacherHomeworkListController() *controllers.DashboardTeacherHomeworkListController {
-	return controllers.NewDashboardTeacherHomeworkListController()
-}
-
-func NewAssessmentStudentController() *controllers.AssessmentStudentController {
-	return controllers.NewAssessmentStudentController()
-}
-
 func NewClassUserRelationController() *controllers.ClassUserRelationController {
 	return controllers.NewClassUserRelationController()
 }
@@ -478,22 +417,24 @@ func NewDashboardExamRankingController() *controllers.DashboardExamRankingContro
 	return controllers.NewDashboardExamRankingController()
 }
 
-func NewRecalculateTotalQuestionsController() *controllers.RecalculateTotalQuestionsController {
-	return controllers.NewRecalculateTotalQuestionsController()
-}
-
-func NewRecalculateHomeworkUsersController() *controllers.RecalculateHomeworkUsersController {
-	return controllers.NewRecalculateHomeworkUsersController()
-}
-
 func NewChatMessageController() *controllers.ChatMessageController {
 	chatMessageRepo := repositories.NewChatMessageRepository()
 	userRepo := repositories.NewUserRepository()
 	courseRepo := repositories.NewCourseRepository()
+	reactionRepo := repositories.NewChatMessageReactionRepository()
 	messageMediaRepo := repositories.NewMessageMediaRepository()
 	mediaRepo := repositories.NewMediaRepository()
-	chatMessageService := services.NewChatMessageService(chatMessageRepo, userRepo, courseRepo, messageMediaRepo, mediaRepo)
+	chatMessageService := services.NewChatMessageService(chatMessageRepo, userRepo, courseRepo, reactionRepo, messageMediaRepo, mediaRepo)
 	return controllers.NewChatMessageController(chatMessageService)
+}
+
+func NewChatMessageReactionController() *controllers.ChatMessageReactionController {
+	reactionRepo := repositories.NewChatMessageReactionRepository()
+	chatMessageRepo := repositories.NewChatMessageRepository()
+	userRepo := repositories.NewUserRepository()
+	courseRepo := repositories.NewCourseRepository()
+	reactionService := services.NewChatMessageReactionService(reactionRepo, chatMessageRepo, userRepo, courseRepo)
+	return controllers.NewChatMessageReactionController(reactionService)
 }
 
 func NewChatReplyController() *controllers.ChatReplyController {
@@ -522,87 +463,7 @@ func NewWarningController() *controllers.WarningController {
 	return controllers.NewWarningController(warningService)
 }
 
-func NewZoomAuthController() *controllers.ZoomAuthController {
-	return controllers.NewZoomAuthController()
-}
-
-func NewZoomMeetingController() *controllers.ZoomMeetingController {
-	return controllers.NewZoomMeetingController()
-}
-
-// Google Meet Controllers
-func NewGoogleAuthController() *controllers.GoogleAuthController {
-	return controllers.NewGoogleAuthController()
-}
-
-func NewGoogleMeetingController() *controllers.GoogleMeetingController {
-	return controllers.NewGoogleMeetingController()
-}
-
-// Microsoft Teams Controllers
-func NewMicrosoftAuthController() *controllers.MicrosoftAuthController {
-	return controllers.NewMicrosoftAuthController()
-}
-
-func NewMicrosoftMeetingController() *controllers.MicrosoftMeetingController {
-	return controllers.NewMicrosoftMeetingController()
-}
-
 func NewAIGradingController() *controllers.AIGradingController {
 	aiGradingService := services.NewAIGradingService()
 	return controllers.NewAIGradingController(aiGradingService)
 }
-
-func NewSettingController() *controllers.SettingController {
-	repo := repositories.NewSettingRepository()
-	settingService := services.NewSettingService(repo)
-	return controllers.NewSettingController(settingService)
-}
-
-func NewNoticeController() *controllers.NoticeController {
-	repo := repositories.NewNoticeRepository()
-	noticeService := services.NewNoticeService(repo)
-	return controllers.NewNoticeController(noticeService)
-}
-
-func NewAppConfigController() *controllers.AppConfigController {
-	appConfigService := services.NewAppConfigService()
-	return controllers.NewAppConfigController(appConfigService)
-}
-
-func NewFacultyController() *controllers.FacultyController {
-	repo := repositories.NewFacultyRepository()
-	service := services.NewFacultyService(repo)
-	return controllers.NewFacultyController(service)
-}
-
-func NewStudyReportCriteriaController() *controllers.StudyReportCriteriaController {
-	repo := repositories.NewStudyReportCriteriaRepository()
-	service := services.NewStudyReportCriteriaService(repo)
-	return controllers.NewStudyReportCriteriaController(service)
-}
-
-func NewStudyReportController() *controllers.StudyReportController {
-	repo := repositories.NewStudyReportRepository()
-	service := services.NewStudyReportService(repo)
-	return controllers.NewStudyReportController(service)
-}
-
-func NewHeadingController() *controllers.HeadingController {
-	repo := repositories.NewHeadingRepository()
-	service := services.NewHeadingService(repo)
-	return controllers.NewHeadingController(service)
-}
-
-func NewTrainingLevelController() *controllers.TrainingLevelController {
-	repo := repositories.NewTrainingLevelRepository()
-	service := services.NewTrainingLevelService(repo)
-	return controllers.NewTrainingLevelController(service)
-}
-
-func NewTeachingPlanController() *controllers.TeachingPlanController {
-	repo := repositories.NewTeachingPlanRepository()
-	service := services.NewTeachingPlanService(repo)
-	return controllers.NewTeachingPlanController(service)
-}
-

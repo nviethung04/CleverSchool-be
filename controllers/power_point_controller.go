@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -187,4 +187,3 @@ func (pc *PowerPointController)  FixURL(s string) string {
 	s = strings.ReplaceAll(s, "%20", "+")
 	return s
 }
-

@@ -1,8 +1,8 @@
 package jobs
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-lms/repositories"
+	"be-lms/services"
 
 	"github.com/robfig/cron/v3"
 )
@@ -25,4 +25,3 @@ func StartSyncKeywordCronJob() {
 
 	c.Start()
 }
-

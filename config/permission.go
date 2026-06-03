@@ -99,30 +99,6 @@ func GetPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
 		},
-		"assessments": {
-			Group:        "Đánh giá",
-			SortPosition: 15,
-			Names:        []string{"Xem danh sách đánh giá", "Tạo đánh giá", "Sửa đánh giá", "Xoá đánh giá", "Xem chi tiết đánh giá"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"assessment-criteria": {
-			Group:        "Tiêu chí đánh giá",
-			SortPosition: 15,
-			Names:        []string{"Xem danh sách tiêu chí đánh giá", "Tạo tiêu chí đánh giá", "Sửa tiêu chí đánh giá", "Xoá tiêu chí đánh giá", "Xem chi tiết tiêu chí đánh giá"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"assessment-subcriteria": {
-			Group:        "Tiêu chí con",
-			SortPosition: 15,
-			Names:        []string{"Xem danh sách tiêu chí con", "Tạo tiêu chí con", "Sửa tiêu chí con", "Xoá tiêu chí con", "Xem chi tiết tiêu chí con"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"assessment-criteria-groups": {
-			Group:        "Nhóm tiêu chí đánh giá",
-			SortPosition: 15,
-			Names:        []string{"Xem danh sách nhóm tiêu chí", "Tạo nhóm tiêu chí", "Sửa nhóm tiêu chí", "Xoá nhóm tiêu chí", "Xem chi tiết nhóm tiêu chí"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
 		"departments": {
 			Group:        "Phòng ban",
 			SortPosition: 15,

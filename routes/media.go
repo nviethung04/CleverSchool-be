@@ -1,16 +1,14 @@
 package routes
 
 import (
-	"be-cleverschool/middleware"
-	"be-cleverschool/repositories"
-	"time"
+	"be-lms/middleware"
+	"be-lms/repositories"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RouteMedia(router *gin.Engine) {
 	api := router.Group("/api")
-	api.Use(middleware.TimeoutWithSkip(30*time.Second, []string{}))
 	authRepo := repositories.NewAuthRepository()
 	mediaController := NewMediaController()
 	mediaGroup := api.Group("/", middleware.AuthMiddleware(authRepo))
@@ -27,4 +25,3 @@ func RouteMedia(router *gin.Engine) {
 		mediaGroup.DELETE("/medias/folder-and-files/:folder_id", mediaController.DeleteFolderAndFiles)
 	}
 }
-

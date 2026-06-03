@@ -1,175 +1,45 @@
 {
-    "/ws/chat": {
+    "/api/manage/courses/{id}/chat/events": {
         "get": {
-            "description": "WebSocket endpoint để kết nối real-time chat. Upgrade HTTP connection to WebSocket.",
+            "description": "Server-Sent Events endpoint để nhận real-time chat events cho course",
             "produces": [
-                "application/json"
+                "text/event-stream"
             ],
             "tags": [
-                "Chat WebSocket"
+                "Chat SSE"
             ],
             "parameters": [
-                {
-                    "type": "string",
-                    "description": "JWT Authentication Token",
-                    "name": "token",
-                    "in": "query",
-                    "required": true
-                },
-                {
-                    "type": "integer",
-                    "description": "Course ID",
-                    "name": "course_id",
-                    "in": "query",
-                    "required": true
-                }
-            ],
-            "responses": {
-                "101": {
-                    "description": "Switching Protocols - WebSocket connection established"
-                },
-                "400": {
-                    "description": "Bad Request - Missing token or course_id, or invalid course_id",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                },
-                "401": {
-                    "description": "Unauthorized - Invalid token",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                }
-            }
-        }
-    },
-    "/api/manage/ws/stats": {
-        "get": {
-            "description": "Lấy thống kê WebSocket connections",
-            "produces": [
-                "application/json"
-            ],
-            "tags": [
-                "Chat WebSocket"
-            ],
-            "security": [
-                {
-                    "ApiKeyAuth": []
-                }
-            ],
-            "parameters": [
-                {
-                    "$ref": "#/parameters/AcceptHeader"
-                },
-                {
-                    "type": "integer",
-                    "description": "Course ID (optional)",
-                    "name": "course_id",
-                    "in": "query",
-                    "required": false
-                }
-            ],
-            "responses": {
-                "200": {
-                    "description": "Thống kê WebSocket connections",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "status": {
-                                "type": "string",
-                                "example": "WebSocket hub running"
-                            },
-                            "course_id": {
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "client_count": {
-                                "type": "integer",
-                                "example": 5
-                            },
-                            "online_users": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer"
-                                },
-                                "example": [485, 486, 487]
-                            }
-                        }
-                    }
-                },
-                "400": {
-                    "description": "Bad Request",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                },
-                "401": {
-                    "description": "Unauthorized",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                }
-            }
-        }
-    },
-    "/api/manage/courses/{id}/ws/online-users": {
-        "get": {
-            "description": "Lấy danh sách users đang online trong course",
-            "produces": [
-                "application/json"
-            ],
-            "tags": [
-                "Chat WebSocket"
-            ],
-            "security": [
-                {
-                    "ApiKeyAuth": []
-                }
-            ],
-            "parameters": [
-                {
-                    "$ref": "#/parameters/AcceptHeader"
-                },
                 {
                     "type": "integer",
                     "description": "Course ID",
                     "name": "id",
                     "in": "path",
                     "required": true
+                },
+                {
+                    "type": "string",
+                    "description": "JWT Authentication Token",
+                    "name": "token",
+                    "in": "query",
+                    "required": true
                 }
             ],
             "responses": {
                 "200": {
-                    "description": "Danh sách users online",
+                    "description": "SSE stream với các events: connected, message, reply, reaction, pin, delete, heartbeat",
                     "schema": {
-                        "type": "object",
-                        "properties": {
-                            "course_id": {
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "online_users": {
-                                "type": "array",
-                                "items": {
-                                    "type": "integer"
-                                },
-                                "example": [485, 486, 487]
-                            },
-                            "count": {
-                                "type": "integer",
-                                "example": 3
-                            }
-                        }
+                        "type": "string",
+                        "example": "event: connected\\ndata: {\"course_id\": 1, \"user_id\": 485, \"timestamp\": \"2025-09-11T16:49:53+07:00\"}\\n\\nevent: message\\ndata: {\"type\": \"message\", \"message_id\": 123, \"data\": {...}}\\n\\n"
                     }
                 },
-                "400": {
-                    "description": "Bad Request - Invalid course ID",
+                "401": {
+                    "description": "Unauthorized - Token không hợp lệ",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
                 },
-                "401": {
-                    "description": "Unauthorized",
+                "400": {
+                    "description": "Bad Request - Course ID không hợp lệ",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
@@ -242,9 +112,74 @@
             }
         },
         "post": {
-            "description": "Gửi tin nhắn mới với media attachments. Hỗ trợ cả JSON và multipart/form-data.",
+            "description": "Gửi tin nhắn mới với media attachments",
             "consumes": [
-                "application/json",
+                "application/json"
+            ],
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Chat Messages"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "type": "integer",
+                    "description": "Course ID",
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "description": "Dữ liệu tin nhắn",
+                    "name": "body",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/SendChatMessageRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Tin nhắn đã được gửi",
+                    "schema": {
+                        "$ref": "#/definitions/ChatMessageResponse"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request - Dữ liệu không hợp lệ",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "500": {
+                    "description": "Internal Server Error",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/courses/{id}/chat/messages/upload-files-to-medias": {
+        "post": {
+            "description": "Upload files để tạo media records cho chat",
+            "consumes": [
                 "multipart/form-data"
             ],
             "produces": [
@@ -270,36 +205,28 @@
                     "required": true
                 },
                 {
-                    "description": "Dữ liệu tin nhắn (JSON) hoặc form data với 'content' và 'files'/'file'",
-                    "name": "body",
-                    "in": "body",
-                    "required": true,
-                    "schema": {
-                        "$ref": "#/definitions/SendChatMessageRequest"
-                    }
+                    "type": "file",
+                    "description": "Files để upload (multiple files)",
+                    "name": "files",
+                    "in": "formData",
+                    "required": true
                 }
             ],
             "responses": {
                 "200": {
-                    "description": "Tin nhắn đã được gửi",
+                    "description": "Files đã được upload thành công",
                     "schema": {
-                        "$ref": "#/definitions/ChatMessageResponse"
+                        "$ref": "#/definitions/UploadFilesResponse"
                     }
                 },
                 "400": {
-                    "description": "Bad Request - Dữ liệu không hợp lệ hoặc message rỗng",
+                    "description": "Bad Request - File không hợp lệ",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
                 },
                 "401": {
                     "description": "Unauthorized",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                },
-                "500": {
-                    "description": "Internal Server Error",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
@@ -702,9 +629,9 @@
             }
         }
     },
-    "/api/manage/courses/{id}/chat/messages/recipient/{recipientId}": {
+    "/api/manage/courses/{id}/chat/messages/{messageId}/reactions": {
         "post": {
-            "description": "Gửi tin nhắn tới 1 người cụ thể (private message). Người gửi được xác định từ token.",
+            "description": "Thêm reaction vào tin nhắn",
             "consumes": [
                 "application/json"
             ],
@@ -712,7 +639,7 @@
                 "application/json"
             ],
             "tags": [
-                "Chat Messages"
+                "Chat Reactions"
             ],
             "security": [
                 {
@@ -732,30 +659,30 @@
                 },
                 {
                     "type": "integer",
-                    "description": "Recipient ID - ID của người nhận tin nhắn",
-                    "name": "recipientId",
+                    "description": "Message ID",
+                    "name": "messageId",
                     "in": "path",
                     "required": true
                 },
                 {
-                    "description": "Dữ liệu tin nhắn",
+                    "description": "Dữ liệu reaction",
                     "name": "body",
                     "in": "body",
                     "required": true,
                     "schema": {
-                        "$ref": "#/definitions/SendChatMessageRequest"
+                        "$ref": "#/definitions/AddReactionRequest"
                     }
                 }
             ],
             "responses": {
                 "200": {
-                    "description": "Tin nhắn đã được gửi",
+                    "description": "Reaction đã được thêm",
                     "schema": {
-                        "$ref": "#/definitions/ChatMessageResponse"
+                        "$ref": "#/definitions/ReactionResponse"
                     }
                 },
                 "400": {
-                    "description": "Bad Request - Dữ liệu không hợp lệ hoặc recipient không tồn tại",
+                    "description": "Bad Request",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
@@ -765,28 +692,19 @@
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
                     }
-                },
-                "404": {
-                    "description": "Recipient not found",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
-                },
-                "500": {
-                    "description": "Internal Server Error",
-                    "schema": {
-                        "$ref": "#/definitions/ErrorResponse"
-                    }
                 }
             }
         },
-        "get": {
-            "description": "Lấy danh sách tin nhắn giữa current user (từ token) và recipient. Filter tự động theo người gửi từ token.",
+        "delete": {
+            "description": "Xóa reaction khỏi tin nhắn",
+            "consumes": [
+                "application/json"
+            ],
             "produces": [
                 "application/json"
             ],
             "tags": [
-                "Chat Messages"
+                "Chat Reactions"
             ],
             "security": [
                 {
@@ -806,31 +724,79 @@
                 },
                 {
                     "type": "integer",
-                    "description": "Recipient ID - ID của người nhận/nhắn tin",
-                    "name": "recipientId",
+                    "description": "Message ID",
+                    "name": "messageId",
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "description": "Dữ liệu reaction để xóa",
+                    "name": "body",
+                    "in": "body",
+                    "required": true,
+                    "schema": {
+                        "$ref": "#/definitions/RemoveReactionRequest"
+                    }
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Reaction đã được xóa",
+                    "schema": {
+                        "$ref": "#/definitions/ReactionResponse"
+                    }
+                },
+                "400": {
+                    "description": "Bad Request",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        },
+        "get": {
+            "description": "Lấy danh sách reactions của tin nhắn",
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Chat Reactions"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                },
+                {
+                    "type": "integer",
+                    "description": "Course ID",
+                    "name": "id",
                     "in": "path",
                     "required": true
                 },
                 {
                     "type": "integer",
-                    "description": "Số trang (mặc định: 1)",
-                    "name": "page",
-                    "in": "query",
-                    "default": 1
-                },
-                {
-                    "type": "integer",
-                    "description": "Số lượng message mỗi trang (mặc định: 20, tối đa: 100)",
-                    "name": "limit",
-                    "in": "query",
-                    "default": 20
+                    "description": "Message ID",
+                    "name": "messageId",
+                    "in": "path",
+                    "required": true
                 }
             ],
             "responses": {
                 "200": {
-                    "description": "Danh sách tin nhắn giữa 2 người",
+                    "description": "Danh sách reactions",
                     "schema": {
-                        "$ref": "#/definitions/ChatMessagesResponse"
+                        "$ref": "#/definitions/MessageReactionsResponse"
                     }
                 },
                 "400": {
@@ -848,14 +814,14 @@
             }
         }
     },
-    "/api/manage/courses/{id}/chat/messages/recent-senders": {
-        "get": {
-            "description": "Lấy danh sách người gửi tin nhắn gần đây kèm 1 tin nhắn cuối cùng từ mỗi người. Filter tự động theo current user từ token.",
+    "/api/manage/courses/{id}/chat/messages/{messageId}/reactions/all": {
+        "delete": {
+            "description": "Xóa tất cả reactions của tin nhắn (admin only)",
             "produces": [
                 "application/json"
             ],
             "tags": [
-                "Chat Messages"
+                "Chat Reactions"
             ],
             "security": [
                 {
@@ -875,23 +841,99 @@
                 },
                 {
                     "type": "integer",
-                    "description": "Số lượng người gửi (mặc định: 20, tối đa: 50)",
-                    "name": "limit",
-                    "in": "query",
-                    "default": 20
+                    "description": "Message ID",
+                    "name": "messageId",
+                    "in": "path",
+                    "required": true
                 }
             ],
             "responses": {
                 "200": {
-                    "description": "Danh sách người gửi tin nhắn gần đây",
+                    "description": "Tất cả reactions đã được xóa",
                     "schema": {
-                        "$ref": "#/definitions/RecentSendersResponse"
+                        "$ref": "#/definitions/ChatActionResponse"
                     }
                 },
                 "400": {
                     "description": "Bad Request",
                     "schema": {
                         "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                },
+                "403": {
+                    "description": "Forbidden - Không có quyền admin",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/chat/channels": {
+        "get": {
+            "description": "Lấy danh sách active chat channels (monitoring)",
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Chat Monitoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Danh sách active channels",
+                    "schema": {
+                        "$ref": "#/definitions/ActiveChannelsResponse"
+                    }
+                },
+                "401": {
+                    "description": "Unauthorized",
+                    "schema": {
+                        "$ref": "#/definitions/ErrorResponse"
+                    }
+                }
+            }
+        }
+    },
+    "/api/manage/chat/channels/stats": {
+        "get": {
+            "description": "Lấy thống kê subscribers của chat channels",
+            "produces": [
+                "application/json"
+            ],
+            "tags": [
+                "Chat Monitoring"
+            ],
+            "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+            ],
+            "parameters": [
+                {
+                    "$ref": "#/parameters/AcceptHeader"
+                }
+            ],
+            "responses": {
+                "200": {
+                    "description": "Thống kê channels",
+                    "schema": {
+                        "$ref": "#/definitions/ChannelStatsResponse"
                     }
                 },
                 "401": {

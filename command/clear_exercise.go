@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-cleverschool/database/db"
+	"be-lms/database/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -81,4 +81,3 @@ func (c *ClearExerciseCommand) Execute(ctx *gin.Context) {
 		"note": "Hard delete executed for all exercise-related tables and cloned_questions with assignment_type=exercise",
 	})
 }
-

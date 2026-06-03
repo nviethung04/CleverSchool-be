@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"strconv"
 
@@ -78,42 +78,11 @@ func (lc *LessonController) Completion(c *gin.Context) {
 	completion, err := lc.service.Completion(c, lessonCompletion)
 
 	if err != nil {
-		utils.Respond(c, nil, err, err.Error())
+		utils.Respond(c, nil, err, "")
 		return
 	}
 
 	utils.Respond(c, completion, nil, "")
-}
-
-func (lc *LessonController) Studying(c *gin.Context) {
-	roleId := utils.GetCurrentRoleId(c)
-
-	if roleId != models.StudentRoleId {
-		utils.Respond(c, nil, fmt.Errorf("%s", i18n.Localize("messages.role_invalid")), "messages.role_invalid")
-		return
-	}
-
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
-		return
-	}
-
-	req, err, _ := utils.GetBody[*prot.LessonStudying](c, func() *prot.LessonStudying {
-		return &prot.LessonStudying{}
-	})
-
-	req.Id = int64(id)
-	req.StudentId = int64(utils.GetCurrentUserId(c))
-
-	studying, err := lc.service.Studying(c, req)
-
-	if err != nil {
-		utils.Respond(c, nil, err, err.Error())
-		return
-	}
-
-	utils.Respond(c, studying, nil, "")
 }
 
 func (lc *LessonController) RespondList(c *gin.Context, lessons []models.Lesson, totalCount int64, err error) {
@@ -122,13 +91,9 @@ func (lc *LessonController) RespondList(c *gin.Context, lessons []models.Lesson,
 		lessonPtrs = append(lessonPtrs, &lessons[i])
 	}
 
-	hideLessonIds := lc.service.HideLessonIds(c)
-	studyingLessonIds := lc.service.StudyingLessonIds(c, 0, 0)
 	completeLessonIds := lc.service.CompletionLessonIds(c, 0, 0)
 	lessonResource := resources.NewLessonResource()
 	if impl, ok := lessonResource.(*resources.LessonResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 	}
 	lessonsResponse := lessonResource.FormatLessons(lessonPtrs)
@@ -142,8 +107,6 @@ func (lc *LessonController) RespondList(c *gin.Context, lessons []models.Lesson,
 }
 
 func (lc *LessonController) RespondDetail(c *gin.Context, lesson *models.Lesson) {
-	hideLessonIds := lc.service.HideLessonIds(c)
-	studyingLessonIds := lc.service.StudyingLessonIds(c, 0, 0)
 	completeLessonIds := lc.service.CompletionLessonIds(c, 0, 0)
 	lessonResource := resources.NewLessonResource()
 	courseId, _ := strconv.Atoi(c.Query("course_id"))
@@ -153,8 +116,6 @@ func (lc *LessonController) RespondDetail(c *gin.Context, lesson *models.Lesson)
 	lessonVocabularies, _ := flashcardService.GetLessonVocabularies(lesson.ID, nil)
 
 	if impl, ok := lessonResource.(*resources.LessonResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 		impl.Flashcard = lessonVocabularies
 		impl.CourseId = int64(courseId)
@@ -358,4 +319,3 @@ func (lc *LessonController) StoreExerciseByCourse(c *gin.Context) {
 
 	utils.Respond(c, lessonPlans, err, "")
 }
-

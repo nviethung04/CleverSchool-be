@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 
 	"gorm.io/gorm"
 )
@@ -483,24 +483,14 @@ func (r *questionRelationRepository) DeleteAllExamQuestions(examID int64, tx *go
 	if examID == 0 {
 		return nil
 	}
-	if tx == nil {
-		tx = db.MasterDB
-	}
-	// Exams now use cloned_questions instead of exam_questions
-	return tx.Where("assignment_id = ? AND assignment_type = ?", examID, models.ClonedQuestionTypeExam).
-		Delete(&models.ClonedQuestion{}).Error
+	return tx.Where("exam_id = ?", examID).Delete(&models.ExamQuestion{}).Error
 }
 
 func (r *questionRelationRepository) DeleteAllHomeworkQuestions(homeworkID int64, tx *gorm.DB) error {
 	if homeworkID == 0 {
 		return nil
 	}
-	if tx == nil {
-		tx = db.MasterDB
-	}
-	// Homeworks now use cloned_questions instead of homework_questions
-	return tx.Where("assignment_id = ? AND assignment_type = ?", homeworkID, models.ClonedQuestionTypeHomework).
-		Delete(&models.ClonedQuestion{}).Error
+	return tx.Where("homework_id = ?", homeworkID).Delete(&models.HomeworkQuestion{}).Error
 }
 
 func (r *questionRelationRepository) DeleteAllQuestionsInAssignment(examID, homeworkID int64) error {
@@ -585,4 +575,3 @@ func (r *questionRelationRepository) IsAssignedExercise(exerciseId int64) (bool,
 
     return count > 0, nil
 }
-

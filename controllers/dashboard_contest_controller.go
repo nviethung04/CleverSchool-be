@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 	"strconv"
 
@@ -108,4 +108,3 @@ func (dcc *DashboardContestController) GetContestRoundList(c *gin.Context) {
 	}
 	utils.Respond(c, &prot.DashboardContestRoundListResponse{Rounds: list, Total: total}, nil, "")
 }
-

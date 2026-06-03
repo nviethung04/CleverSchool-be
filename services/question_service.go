@@ -1,20 +1,19 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
 	"mime/multipart"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -50,20 +49,10 @@ func NewQuestionService(repo repositories.QuestionRepository) QuestionService {
 }
 
 func (s *questionService) GetAll(c *gin.Context) ([]models.Question, int64, error) {
-	allowedFilters := []string{"status", "question_type", "subject_id", "source_question_id"}
+	allowedFilters := []string{"status", "question_type", "subject_id"}
 	filter, page, perPage, keyword, sort, err := utils.ParsePaginationParams(c, allowedFilters)
 	if err != nil {
 		return nil, 0, err
-	}
-
-	// Convert source_question_id từ danh sách ID (phân cách bởi dấu phẩy) thành format in:1,2,3
-	if sourceQuestionIdVal, ok := filter["source_question_id"]; ok {
-		if sourceQuestionIdStr, ok := sourceQuestionIdVal.(string); ok {
-			if strings.Contains(sourceQuestionIdStr, ",") {
-				// Nếu có dấu phẩy, convert thành format in:1,2,3
-				filter["source_question_id"] = "in:" + sourceQuestionIdStr
-			}
-		}
 	}
 
 	scores := []repositories.QuesstionScore{}
@@ -90,7 +79,6 @@ func (s *questionService) GetAll(c *gin.Context) ([]models.Question, int64, erro
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
 		"Subject",
-		"Source",
 	})
 
 	questions, rows, err = s.repo.FindAll()
@@ -154,7 +142,6 @@ func (s *questionService) GetByID(c *gin.Context, id int) (*prot.Question, error
 		"RefAttributes",
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
-		"Source",
 	})
 
 	question, err := s.repo.FindByID(id)
@@ -199,7 +186,6 @@ func (s *questionService) Create(c *gin.Context, req *prot.Question) (*models.Qu
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
 		"Subject",
-		"Source",
 	})
 
 	newQuestion, _ := s.repo.FindNewByID(int(questionID))
@@ -240,7 +226,6 @@ func (s *questionService) Update(c *gin.Context, req *prot.Question) (*models.Qu
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
 		"Subject",
-		"Source",
 	})
 
 	question, err := s.repo.FindByID(id)
@@ -301,7 +286,6 @@ func (s *questionService) Delete(c *gin.Context, id int) error {
 		"RefAttributes",
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
-		"Source",
 	})
 
 	question, err := s.repo.FindByID(id)
@@ -427,6 +411,8 @@ func (s *questionService) UpdateCloned(c *gin.Context, id int, assignmentID int,
 	} else if assignmentType == models.ClonedQuestionTypeExam {
 		isAssigned, _ = questionRelationRepo.IsAssignedExam(int64(assignmentID), 0)
 	}
+
+	config.Log.Info("isAssigned: ", isAssigned)
 
 	if isAssigned {
 		return nil, fmt.Errorf(i18n.Localize("messages.error_is_assigned"))
@@ -628,7 +614,6 @@ func (s *questionService) UpdateCloned(c *gin.Context, id int, assignmentID int,
 func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bool) {
 	clonedRepo := repositories.NewClonedQuestionRepository()
 	questionResource := resources.NewQuestionResource()
-	currentUserID := int64(utils.GetCurrentUserId(c))
 
 	var assignmentID int64
 	var assignmentType string
@@ -639,6 +624,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("homework_id") != "":
 		id, err := strconv.ParseInt(c.Query("homework_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid homework_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -647,6 +633,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("exam_id") != "":
 		id, err := strconv.ParseInt(c.Query("exam_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid exam_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -655,6 +642,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("contest_round_id") != "":
 		id, err := strconv.ParseInt(c.Query("contest_round_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid contest_round_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -663,6 +651,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("exercise_id") != "":
 		id, err := strconv.ParseInt(c.Query("exercise_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid exercise_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -671,6 +660,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("lesson_plan_part_id") != "":
 		id, err := strconv.ParseInt(c.Query("lesson_plan_part_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid lesson_plan_part_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -679,6 +669,7 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("level_test_id") != "":
 		id, err := strconv.ParseInt(c.Query("level_test_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid lesson_plan_part_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
@@ -687,11 +678,13 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	case c.Query("contest_round_id") != "":
 		id, err := strconv.ParseInt(c.Query("contest_round_id"), 10, 64)
 		if err != nil {
+			config.Log.Error("invalid contest_round_id:", err.Error())
 			return nil, 0, hasCloned
 		}
 		assignmentID = id
 		assignmentType = models.ClonedQuestionTypeContestRound
 		hasCloned = true
+		config.Log.Info(fmt.Sprintf("🔍 Contest round ID: %d, AssignmentType: %s, HasCloned: %t", assignmentID, assignmentType, hasCloned))
 	default:
 		return nil, 0, hasCloned
 	}
@@ -700,23 +693,24 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 	cloned, err := clonedRepo.FindByAssignment(assignmentID, assignmentType)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			config.Log.Info(fmt.Sprintf("🔍 No cloned questions found for assignmentID: %d, assignmentType: %s", assignmentID, assignmentType))
 			return questions, 0, hasCloned
 		}
+		config.Log.Error("find cloned error:", err.Error())
 		return questions, 0, hasCloned
 	}
+	config.Log.Info(fmt.Sprintf("🔍 Found cloned questions for assignmentID: %d, assignmentType: %s", assignmentID, assignmentType))
 
 	var rawQuestions []json.RawMessage
 	if err := json.Unmarshal(cloned.Questions, &rawQuestions); err != nil {
-		config.Log.Info("unmarshal rawQuestions error: %v", err)
+		config.Log.Error("unmarshal rawQuestions error:", err.Error())
 		return nil, 0, hasCloned
 	}
 
-	sourceQuestionIdStr := c.Query("source_question_id")
-	sourceQuestionId, _ := strconv.ParseInt(sourceQuestionIdStr, 10, 64)
 	for _, q := range rawQuestions {
 		question, err := questionResource.ParseProtQuestionFromJSON(q)
 		if err != nil {
-			config.Log.Info("parse question error: %v", err)
+			config.Log.Error("parse question error:", err.Error())
 			return questions, 0, hasCloned
 		}
 
@@ -724,49 +718,39 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 		question = questionResource.FormatStaticURL(question)
 		question = questionResource.FormatMediaUrls(question)
 
-		if sourceQuestionId > 0 && question.SourceQuestionId != sourceQuestionId {
-			continue
-		}
-
 		questions = append(questions, question)
 	}
 
 	roleId := int64(utils.GetCurrentRoleId(c))
-	userId := currentUserID
 	if roleId == models.StudentRoleId {
 		switch assignmentType {
 		case models.ClonedQuestionTypeHomework:
 			homeworkRepo := repositories.NewHomeworkRepository()
-			randomFlag, err := homeworkRepo.IsRandomQuestion(int64(assignmentID))
-			if err != nil {
-				config.Log.Info("Homework IsRandomQuestion error: %v (assignment_id=%d, user_id=%d)", err, assignmentID, userId)
-				break
-			}
+			userId := int64(utils.GetCurrentUserId(c))
+			homework, err := homeworkRepo.GetByID(int64(assignmentID), userId, c)
 
-			if randomFlag {
-				isRandom = true
+			if err == nil && homework.ID > 0 {
+				if homework.IsRandomQuestion {
+					isRandom = true
+				}
 			}
 		case models.ClonedQuestionTypeExam:
 			examRepo := repositories.NewExamRepository()
-			randomFlag, err := examRepo.IsRandomQuestion(int64(assignmentID))
-			if err != nil {
-				config.Log.Info("Exam IsRandomQuestion error: %v (assignment_id=%d, user_id=%d)", err, assignmentID, userId)
-				break
-			}
+			exam, _ := examRepo.GetByID(int64(assignmentID), c)
 
-			if randomFlag {
-				isRandom = true
+			if err == nil && exam.ID > 0 {
+				if exam.IsRandomQuestion {
+					isRandom = true
+				}
 			}
 		case models.ClonedQuestionTypeExercise:
 			exerciseRepo := repositories.NewExerciseRepository()
-			randomFlag, err := exerciseRepo.IsRandomQuestion(int64(assignmentID))
-			if err != nil {
-				config.Log.Info("Exercise IsRandomQuestion error: %v (assignment_id=%d, user_id=%d)", err, assignmentID, userId)
-				break
-			}
+			exercise, _ := exerciseRepo.GetByID(int64(assignmentID), c)
 
-			if randomFlag {
-				isRandom = true
+			if err == nil && exercise.ID > 0 {
+				if exercise.IsRandomQuestion {
+					isRandom = true
+				}
 			}
 		}
 	}
@@ -775,32 +759,6 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 		rand.Shuffle(len(questions), func(i, j int) {
 			questions[i], questions[j] = questions[j], questions[i]
 		})
-	} else {
-		if len(cloned.SortQuestionIds) > 0 {
-			var sortQuestionIds []int64
-			if err := json.Unmarshal(cloned.SortQuestionIds, &sortQuestionIds); err == nil && len(sortQuestionIds) > 0 {
-				sortOrder := make(map[int64]int)
-				for i, id := range sortQuestionIds {
-					sortOrder[id] = i
-				}
-
-				sort.Slice(questions, func(i, j int) bool {
-					posI, existsI := sortOrder[questions[i].Id]
-					posJ, existsJ := sortOrder[questions[j].Id]
-
-					if existsI && existsJ {
-						return posI < posJ
-					}
-					if existsI {
-						return true
-					}
-					if existsJ {
-						return false
-					}
-					return i < j
-				})
-			}
-		}
 	}
 
 	return questions, int64(len(questions)), hasCloned
@@ -958,4 +916,3 @@ func (s *questionService) GetQuestionIdAndKey(assignmentID int64, assignmentType
 
 	return questionIDs, filterKey, nil
 }
-

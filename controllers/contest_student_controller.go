@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -46,4 +46,3 @@ func (ctrl *ContestStudentController) GetContestRoundsByStudent(c *gin.Context) 
 	resp, err := ctrl.service.GetContestRoundsByStudent(userID, limit, page)
 	utils.Respond(c, resp, err, "")
 }
-

@@ -1,7 +1,7 @@
 package services
 
 import (
-	"be-cleverschool/redis"
+	"be-lms/redis"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -15,7 +15,6 @@ type ChatPubSubService interface {
 	NotifyNewReply(courseID, messageID, parentMessageID, userID uint64, replyData interface{}) error
 	NotifyMessageDeleted(courseID, messageID, userID uint64) error
 	NotifyMessagePinned(courseID, messageID, userID uint64, isPinned bool) error
-	NotifyNewPrivateMessage(courseID, messageID, senderID, recipientID uint64, messageData interface{}) error
 
 	// Reaction events
 	NotifyReactionAdded(courseID, messageID, userID uint64, reactionID uint64, emoji string, totalCount int) error
@@ -29,8 +28,6 @@ type ChatPubSubService interface {
 	SubscribeToCourse(courseID uint64) (<-chan *redis.ChatPubSubMessage, func(), error)
 	SubscribeToUser(userID uint64) (<-chan *redis.ChatPubSubMessage, func(), error)
 	SubscribeToMultipleCourses(courseIDs []uint64) (<-chan *redis.ChatPubSubMessage, func(), error)
-	SubscribeToPrivateMessages(courseID, userID1, userID2 uint64) (<-chan *redis.ChatPubSubMessage, func(), error)
-	SubscribeToAllPrivateMessages(courseID, userID uint64) (<-chan *redis.ChatPubSubMessage, func(), error)
 
 	// Monitoring
 	GetActiveChannels() ([]string, error)
@@ -125,12 +122,6 @@ func (s *chatPubSubService) NotifyUser(userID uint64, notificationType string, d
 	return s.pubsub.PublishUserNotification(userID, notification)
 }
 
-// NotifyNewPrivateMessage publishes a new private message event
-func (s *chatPubSubService) NotifyNewPrivateMessage(courseID, messageID, senderID, recipientID uint64, messageData interface{}) error {
-	log.Printf("Publishing new private message event: courseID=%d, messageID=%d, senderID=%d, recipientID=%d", courseID, messageID, senderID, recipientID)
-	return s.pubsub.PublishPrivateMessage(courseID, messageID, senderID, recipientID, messageData)
-}
-
 // SubscribeToCourse subscribes to course chat events
 func (s *chatPubSubService) SubscribeToCourse(courseID uint64) (<-chan *redis.ChatPubSubMessage, func(), error) {
 	log.Printf("Subscribing to course chat: courseID=%d", courseID)
@@ -147,18 +138,6 @@ func (s *chatPubSubService) SubscribeToUser(userID uint64) (<-chan *redis.ChatPu
 func (s *chatPubSubService) SubscribeToMultipleCourses(courseIDs []uint64) (<-chan *redis.ChatPubSubMessage, func(), error) {
 	log.Printf("Subscribing to multiple courses: %v", courseIDs)
 	return s.pubsub.SubscribeToMultipleCourses(courseIDs)
-}
-
-// SubscribeToPrivateMessages subscribes to private messages between two users in a course
-func (s *chatPubSubService) SubscribeToPrivateMessages(courseID, userID1, userID2 uint64) (<-chan *redis.ChatPubSubMessage, func(), error) {
-	log.Printf("Subscribing to private messages: courseID=%d, userID1=%d, userID2=%d", courseID, userID1, userID2)
-	return s.pubsub.SubscribeToPrivateMessages(courseID, userID1, userID2)
-}
-
-// SubscribeToAllPrivateMessages subscribes to all private messages for a user in a course
-func (s *chatPubSubService) SubscribeToAllPrivateMessages(courseID, userID uint64) (<-chan *redis.ChatPubSubMessage, func(), error) {
-	log.Printf("Subscribing to all private messages: courseID=%d, userID=%d", courseID, userID)
-	return s.pubsub.SubscribeToAllPrivateMessages(courseID, userID)
 }
 
 // GetActiveChannels returns active chat channels
@@ -308,4 +287,3 @@ func StartChatEventListener(ctx context.Context, pubsubService ChatPubSubService
 	log.Printf("Started chat event listener for %d courses", len(courseIDs))
 	return nil
 }
-

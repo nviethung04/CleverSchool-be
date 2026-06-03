@@ -7,11 +7,11 @@ import (
 	"log"
 	"time"
 
-	"be-cleverschool/redis"
-	"be-cleverschool/services"
+	"be-lms/redis"
+	"be-lms/services"
 )
 
-// Test script for Redis Pub/Sub and WebSocket implementation
+// Test script for Redis Pub/Sub and SSE implementation
 func main() {
 	log.Println("=== Testing Chat Redis Pub/Sub System ===")
 
@@ -330,4 +330,3 @@ func testDataStructures() {
 	log.Printf("📖 Parsed message: type=%s, courseID=%d", parsedMessage.Type, parsedMessage.CourseID)
 	log.Println("✅ Data structures test completed")
 }
-

@@ -28,10 +28,6 @@
         "type": "integer",
         "format": "int64"
       },
-      "faculty_id": {
-        "type": "integer",
-        "format": "int64"
-      },
       "name": {
         "type": "string"
       },
@@ -73,10 +69,6 @@
         "format": "int64"
       },
       "grade_id": {
-        "type": "integer",
-        "format": "int64"
-      },
-      "faculty_id": {
         "type": "integer",
         "format": "int64"
       },

@@ -1,13 +1,11 @@
 package services
 
 import (
-	"errors"
-
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,12 +25,14 @@ func NewDashboardTeacherHomeworkUnscoredService() DashboardTeacherHomeworkUnscor
 }
 
 func (s *dashboardTeacherHomeworkUnscoredService) GetUnscoredHomeworks(c *gin.Context, req *requests.DashboardTeacherHomeworkUnscoredListRequest) (*prot.DashboardTeacherHomeworkUnscoredListResponse, error) {
-	if req.StartDate <= 0 || req.EndDate <= 0 {
-		return nil, errors.New("start_date and end_date are required")
-	}
-
+	roleID := utils.GetCurrentRoleId(c)
 	userID := utils.GetCurrentUserId(c)
-	onlyUserCourses := userID > 0
+
+	// Nếu role_id = 2 hoặc 3, chỉ lấy homework cùng khóa
+	onlyUserCourses := false
+	if (roleID == 2 || roleID == 3) && userID > 0 {
+		onlyUserCourses = true
+	}
 
 	homeworks, totalCount, err := s.repo.GetUnscoredHomeworks(int64(userID), onlyUserCourses, req)
 	if err != nil {
@@ -44,4 +44,3 @@ func (s *dashboardTeacherHomeworkUnscoredService) GetUnscoredHomeworks(c *gin.Co
 		Total:     totalCount,
 	}, nil
 }
-

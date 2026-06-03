@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 )
 
 type ExamCommentRepository interface {
@@ -28,4 +28,3 @@ func (r *examCommentRepository) CreateExamComment(comment *models.ExamComment) e
 	}
 	return db.MasterDB.Create(comment).Error
 }
-

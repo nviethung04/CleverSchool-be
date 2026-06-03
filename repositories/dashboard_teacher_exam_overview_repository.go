@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/requests"
 
 	"gorm.io/gorm"
 )
@@ -85,4 +85,3 @@ func (r *dashboardTeacherExamOverviewRepository) GetOverview(userID int64, onlyU
 
 	return &overview, nil
 }
-

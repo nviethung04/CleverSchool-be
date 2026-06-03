@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"strconv"
 )
 
@@ -560,4 +560,3 @@ func (s *questionService) GetMediaInFo(url string) models.MediaInfo {
 
 	return mediaInfo
 }
-

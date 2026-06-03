@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -125,4 +125,3 @@ func (htl *H5pController) GetContentUserDataByContentIdAndUser(c *gin.Context) {
 		"state": state,
 	})
 }
-

@@ -10,7 +10,6 @@ type Course struct {
 	ID              int64     `gorm:"primaryKey;autoIncrement" json:"id"`
 	SubjectId       int64     `gorm:"null" json:"subject_id"`
 	ProgramId       int64     `gorm:"null" json:"program_id"`
-	ParentCourseId  int64     `gorm:"default:0" json:"parent_course_id"`
 	Name            string    `gorm:"size:255;not null" json:"name"`
 	ObjectTitle            string    `gorm:"size:255;not null" json:"object_title"`
 	Description     string    `gorm:"type:text;not null" json:"description"`

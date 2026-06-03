@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/utils"
 )
 
 func DashboardTeacherHomeworkStudentResource(student dto.DashboardTeacherHomeworkStudent) *prot.DashboardTeacherHomeworkStudent {
@@ -27,18 +27,15 @@ func DashboardTeacherHomeworkStudentCollection(students []dto.DashboardTeacherHo
 
 func DashboardTeacherHomeworkStudentStatsResource(student dto.DashboardTeacherHomeworkStudentStats) *prot.DashboardTeacherHomeworkStudentStats {
 	return &prot.DashboardTeacherHomeworkStudentStats{
-		StudentId:                student.StudentID,
-		StudentName:              student.StudentName,
-		StudentAvatar:            utils.StaticURL(student.StudentAvatar.Path, models.Storage),
-		TotalHomework:            student.TotalHomework,
-		TotalAssignedHomeworks:   student.TotalAssignedHomeworks,
-		InProgressHomework:       student.InProgressHomework,
-		CompletedHomework:        student.CompletedHomework,
-		NotStartedHomework:       student.NotStartedHomework,
-		AverageRatio:             student.AverageRatio,
-		CompletedHomeworkRatio:   student.CompletedHomeworkRatio,
-		TotalQuestions:           student.TotalQuestions,
-		QuestionsCompleted:       student.QuestionsCompleted,
+		StudentId:              student.StudentID,
+		StudentName:            student.StudentName,
+		StudentAvatar:          utils.StaticURL(student.StudentAvatar.Path, models.Storage),
+		TotalHomework:          student.TotalHomework,
+		TotalAssignedHomeworks: student.TotalAssignedHomeworks,
+		InProgressHomework:     student.InProgressHomework,
+		CompletedHomework:      student.CompletedHomework,
+		NotStartedHomework:     student.NotStartedHomework,
+		AverageRatio:           student.AverageRatio,
 	}
 }
 
@@ -61,4 +58,3 @@ func DashboardTeacherHomeworkOverviewResource(overview dto.DashboardTeacherHomew
 		CompletedCount:        overview.CompletedCount,
 	}
 }
-

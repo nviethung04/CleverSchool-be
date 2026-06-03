@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/models"
+	"be-lms/repositories/base"
 )
 
 type EmployeePositionRepository interface {
@@ -18,4 +18,3 @@ func NewEmployeePositionRepository() EmployeePositionRepository {
 		BaseRepository: base.NewBaseRepository[models.EmployeePosition](),
 	}
 }
-

@@ -1,14 +1,12 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	_ "encoding/json"
+	"be-lms/dto"
+	"be-lms/services"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,13 +15,11 @@ import (
 
 type DashboardCoursesController struct {
 	dashboardCoursesService services.DashboardCoursesService
-	dashboardCoursesRepo    repositories.DashboardCoursesRepository
 }
 
 func NewDashboardCoursesController(dashboardCoursesService services.DashboardCoursesService) *DashboardCoursesController {
 	return &DashboardCoursesController{
 		dashboardCoursesService: dashboardCoursesService,
-		dashboardCoursesRepo:    repositories.NewDashboardCoursesRepository(),
 	}
 }
 
@@ -42,7 +38,7 @@ func (c *DashboardCoursesController) GetDashboardCourses(ctx *gin.Context) {
 	// Parse start_date and end_date from query parameters (Unix timestamp)
 	startDateStr := ctx.Query("start_date")
 	endDateStr := ctx.Query("end_date")
-
+	
 	var startDate, endDate string
 	// Convert Unix timestamp to YYYY-MM-DD format
 	if startDateStr != "" {
@@ -78,11 +74,11 @@ func (c *DashboardCoursesController) GetDashboardCourses(ctx *gin.Context) {
 func (c *DashboardCoursesController) ExportDashboardCourses(ctx *gin.Context) {
 	// Parse school_id from query parameter
 	schoolID := int64(0)
-
+	
 	// Parse start_date and end_date from query parameters (Unix timestamp)
 	startDateStr := ctx.Query("start_date")
 	endDateStr := ctx.Query("end_date")
-
+	
 	var startDate, endDate string
 	// Convert Unix timestamp to YYYY-MM-DD format
 	if startDateStr != "" {
@@ -135,11 +131,10 @@ func (c *DashboardCoursesController) createExcelFile(ctx *gin.Context, courses [
 
 	// Set headers
 	headers := []string{
-		"Course ID", "Course Name", "Object Title", "School ID", "School Name", "Total Students", "Total Teachers", "Teacher IDs", "Teacher Username", "Teacher Name",
-		"Active Teachers", "Active Students", "Students Completed Homework",
-		"Total Homeworks", "Assigned Homeworks",
-		"Students Completed All Homeworks", "Students Doing Homeworks", "Students Not Started Any Homework",
-		"Student Active Not Started Any Homework", "Homework Over 50% Student Complete",
+		"ID", "Course ID", "Course Name", "Object Title", "School ID", "School Name", "Total Students", "Total Teachers", "Teacher IDs", "Teacher Infos",
+		"Active Teachers (Sep 8)", "Active Students (Sep 15)", "Students Completed Homework (Sep 15)",
+		"Students Completed Homework (Selected Week)", "Active Students (Selected Week)", "Active Teachers (Selected Week)",
+		"Total Homeworks", "Assigned Homeworks", "Completed Homeworks",
 	}
 
 	// Write headers
@@ -152,39 +147,27 @@ func (c *DashboardCoursesController) createExcelFile(ctx *gin.Context, courses [
 	for row, course := range courses {
 		rowIndex := row + 2 // Start from row 2 (after headers)
 
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowIndex), course.CourseID)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowIndex), course.CourseName)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowIndex), course.ObjectTitle)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowIndex), course.SchoolID)
-		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowIndex), course.SchoolName)
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowIndex), course.TotalStudents)
-		f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowIndex), course.TotalTeachers)
-		f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowIndex), course.TeacherIDs)
-		// Convert TeacherInfos to comma-separated strings
-		var teacherUsernames []string
-		var teacherNames []string
-		for _, teacher := range course.TeacherInfos {
-			teacherUsernames = append(teacherUsernames, teacher.Username)
-			teacherNames = append(teacherNames, teacher.Name)
-		}
-		teacherUsernameStr := ""
-		teacherNameStr := ""
-		if len(teacherUsernames) > 0 {
-			teacherUsernameStr = strings.Join(teacherUsernames, ",")
-			teacherNameStr = strings.Join(teacherNames, ",")
-		}
-		f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowIndex), teacherUsernameStr)
-		f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowIndex), teacherNameStr)
-		f.SetCellValue(sheetName, fmt.Sprintf("K%d", rowIndex), course.ActiveTeachersSelectedWeek)
-		f.SetCellValue(sheetName, fmt.Sprintf("L%d", rowIndex), course.ActiveStudentsSelectedWeek)
-		f.SetCellValue(sheetName, fmt.Sprintf("M%d", rowIndex), course.StudentsCompletedHomeworkSelectedWeek)
-		f.SetCellValue(sheetName, fmt.Sprintf("N%d", rowIndex), course.TotalHomeworks)
-		f.SetCellValue(sheetName, fmt.Sprintf("O%d", rowIndex), course.AssignedHomeworks)
-		f.SetCellValue(sheetName, fmt.Sprintf("P%d", rowIndex), course.StudentsCompletedAllHomeworks)
-		f.SetCellValue(sheetName, fmt.Sprintf("Q%d", rowIndex), course.StudentsDoingHomeworks)
-		f.SetCellValue(sheetName, fmt.Sprintf("R%d", rowIndex), course.StudentsNotStartedAnyHomework)
-		f.SetCellValue(sheetName, fmt.Sprintf("S%d", rowIndex), course.StudentActiveNotStartedAnyHomework)
-		f.SetCellValue(sheetName, fmt.Sprintf("T%d", rowIndex), course.HomeworkOver50PercentStudentComplete)
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowIndex), course.ID)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowIndex), course.CourseID)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowIndex), course.CourseName)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowIndex), course.ObjectTitle)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowIndex), course.SchoolID)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowIndex), course.SchoolName)
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowIndex), course.TotalStudents)
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowIndex), course.TotalTeachers)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowIndex), course.TeacherIDs)
+		// Convert TeacherInfos to JSON string for Excel
+		teacherInfosJSON, _ := json.Marshal(course.TeacherInfos)
+		f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowIndex), string(teacherInfosJSON))
+		f.SetCellValue(sheetName, fmt.Sprintf("K%d", rowIndex), course.ActiveTeachersFromSep8)
+		f.SetCellValue(sheetName, fmt.Sprintf("L%d", rowIndex), course.ActiveStudentsFromSep15)
+		f.SetCellValue(sheetName, fmt.Sprintf("M%d", rowIndex), course.StudentsCompletedHomeworkFromSep15)
+		f.SetCellValue(sheetName, fmt.Sprintf("N%d", rowIndex), course.StudentsCompletedHomeworkSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("O%d", rowIndex), course.ActiveStudentsSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("P%d", rowIndex), course.ActiveTeachersSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("Q%d", rowIndex), course.TotalHomeworks)
+		f.SetCellValue(sheetName, fmt.Sprintf("R%d", rowIndex), course.AssignedHomeworks)
+		f.SetCellValue(sheetName, fmt.Sprintf("S%d", rowIndex), course.CompletedHomeworks)
 	}
 
 	// Auto-fit columns
@@ -209,41 +192,23 @@ func (c *DashboardCoursesController) ExportDashboardCoursesAll(ctx *gin.Context)
 		}
 	}
 
-	// Parse teacher_id from query parameter
-	teacherIDStr := ctx.Query("teacher_id")
-	teacherID := int64(0)
-	if teacherIDStr != "" {
-		if id, err := strconv.ParseInt(teacherIDStr, 10, 64); err == nil {
-			teacherID = id
-		}
-	}
+    // Parse start_date and end_date from query parameters (Unix timestamp -> YYYY-MM-DD)
+    startDateStr := ctx.Query("start_date")
+    endDateStr := ctx.Query("end_date")
+    var startDate, endDate string
+    if startDateStr != "" {
+        if ts, err := strconv.ParseInt(startDateStr, 10, 64); err == nil {
+            startDate = time.Unix(ts, 0).Format("2006-01-02")
+        }
+    }
+    if endDateStr != "" {
+        if ts, err := strconv.ParseInt(endDateStr, 10, 64); err == nil {
+            endDate = time.Unix(ts, 0).Format("2006-01-02")
+        }
+    }
 
-	// Parse course_id from query parameter
-	courseIDStr := ctx.Query("course_id")
-	courseID := int64(0)
-	if courseIDStr != "" {
-		if id, err := strconv.ParseInt(courseIDStr, 10, 64); err == nil {
-			courseID = id
-		}
-	}
-
-	// Parse start_date and end_date from query parameters (Unix timestamp -> YYYY-MM-DD)
-	startDateStr := ctx.Query("start_date")
-	endDateStr := ctx.Query("end_date")
-	var startDate, endDate string
-	if startDateStr != "" {
-		if ts, err := strconv.ParseInt(startDateStr, 10, 64); err == nil {
-			startDate = time.Unix(ts, 0).Format("2006-01-02")
-		}
-	}
-	if endDateStr != "" {
-		if ts, err := strconv.ParseInt(endDateStr, 10, 64); err == nil {
-			endDate = time.Unix(ts, 0).Format("2006-01-02")
-		}
-	}
-
-	// Get all dashboard courses với filter (không phân trang) - gọi repository trực tiếp
-	courses, err := c.dashboardCoursesRepo.GetDashboardCourses(schoolID, teacherID, courseID, startDate, endDate)
+	// Get all dashboard courses (không phân trang)
+	courses, err := c.dashboardCoursesService.GetDashboardCourses(schoolID, startDate, endDate)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
@@ -268,4 +233,3 @@ func (c *DashboardCoursesController) ExportDashboardCoursesAll(ctx *gin.Context)
 		return
 	}
 }
-

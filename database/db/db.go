@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"be-cleverschool/config"
-	"be-cleverschool/observer"
+	"be-lms/config"
+	"be-lms/observer"
 
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
@@ -45,15 +45,13 @@ func ConnectPostgres(cfg config.Config) error {
 	if cfg.DBReplicaURL != "" {
 		ReplicaDB, err = gorm.Open(postgres.Open(cfg.DBReplicaURL), &gorm.Config{})
 		if err != nil {
-			log.Println("⚠️ Failed to connect to replica database, fallback to use master database for replica:", err)
-			ReplicaDB = MasterDB
-			return nil
+			log.Println("Failed to connect to replica database:", err)
+			return err
 		}
 		replicaSql, err := ReplicaDB.DB()
 		if err != nil {
-			log.Println("⚠️ Failed to get replica database sql.DB, fallback to use master database for replica:", err)
-			ReplicaDB = MasterDB
-			return nil
+			log.Println("Failed to get replica database:", err)
+			return err
 		}
 		replicaSql.SetMaxOpenConns(20)
 		replicaSql.SetMaxIdleConns(5)
@@ -192,31 +190,22 @@ func TestPostgresConnection() error {
 		return fmt.Errorf("master database not initialized")
 	}
 
-	if !MasterDB.Migrator().HasTable("users") {
-		return fmt.Errorf("users table does not exist; run database migrations before using the app")
-	}
-
 	err := MasterDB.Table("users").Count(&count).Error
 	if err != nil {
 		config.Log.Error("❌ Failed to count users on MasterDB:", err)
 		return err
 	}
-	config.Log.Infof("✅ MasterDB: users table has %d rows", count)
+	config.Log.Info("✅ MasterDB: users table has %d rows", count)
 
 	// Test ReplicaDB (nếu có)
 	if ReplicaDB != nil {
-		if !ReplicaDB.Migrator().HasTable("users") {
-			config.Log.Warn("⚠️ ReplicaDB users table does not exist, skipping replica check")
-			return nil
-		}
-
 		count = 0
 		err := ReplicaDB.Table("users").Count(&count).Error
 		if err != nil {
 			config.Log.Error("❌ Failed to count users on ReplicaDB:", err)
 			return err
 		}
-		config.Log.Infof("✅ ReplicaDB: users table has %d rows", count)
+		config.Log.Info("✅ ReplicaDB: users table has %d rows", count)
 	} else {
 		config.Log.Warn("⚠️ ReplicaDB is nil, skipping replica check")
 	}

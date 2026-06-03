@@ -350,60 +350,6 @@
             }
         }
     },
-    "/api/manage/lessons/{id}/studying": {
-        "put": {
-            "summary": "Cập nhật trạng thái bài học",
-            "description": "API để cập nhật trạng thái bài học",
-            "tags": [
-                "Lessons"
-            ],
-            "produces": [
-                "application/json",
-                "application/x-protobuf"
-            ],
-            "parameters": [
-                {
-                    "name": "id",
-                    "in": "path",
-                    "required": true,
-                    "type": "integer",
-                    "format": "uint64",
-                    "description": "ID của bài học"
-                },
-                {
-                    "in": "body",
-                    "name": "body",
-                    "required": true,
-                    "description": "Trạng thái hoàn thành bài học",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "is_studying": {
-                                "type": "boolean",
-                                "example": true
-                            }
-                        },
-                        "required": [
-                            "is_studying"
-                        ]
-                    }
-                }
-            ],
-            "security": [
-                {
-                    "ApiKeyAuth": []
-                }
-            ],
-            "responses": {
-                "200": {
-                    "description": "Thành công",
-                    "schema": {
-                        "$ref": "#/definitions/prot.LessonStudying"
-                    }
-                }
-            }
-        }
-    },
     "/api/manage/lessons/schedules": {
         "get": {
             "description": "API để lấy lịch học theo tuần",

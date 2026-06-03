@@ -1,11 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"time"
 )
 
@@ -15,7 +14,7 @@ type ExamResource interface {
 	FormatModelExam(exam *prot.ExamRequest) *models.Exam
 }
 
-type ExamResourceImpl struct {
+type ExamResourceImpl struct{
 	CourseId int64
 }
 
@@ -51,25 +50,24 @@ func (r *ExamResourceImpl) FormatExam(exam *models.Exam) *prot.Exam {
 	}
 
 	return &prot.Exam{
-		Id:               exam.ID,
-		Name:             exam.Name,
-		Status:           int32(exam.Status),
-		TimeLimit:        exam.TimeLimit,
-		MaxScore:         float32(exam.MaxScore),
-		Description:      exam.Description,
-		CoverImage:       utils.StaticURL(exam.CoverImageInfo.Path, models.Storage),
-		CreatedAt:        exam.CreatedAt.Unix(),
-		CreatedBy:        exam.CreatedBy,
-		UpdatedAt:        exam.UpdatedAt.Unix(),
-		UpdatedBy:        exam.UpdatedBy,
-		Deadline:         exam.Deadline.Unix(),
-		IsAssigned:       isAssigned,
-		TotalQuestions:   int32(exam.TotalQuestions),
-		ObjectTitle:      exam.ObjectTitle,
+		Id:             exam.ID,
+		Name:           exam.Name,
+		Status:         int32(exam.Status),
+		TimeLimit:      exam.TimeLimit,
+		MaxScore:       float32(exam.MaxScore),
+		Description:    exam.Description,
+		CoverImage:     utils.StaticURL(exam.CoverImageInfo.Path, models.Storage),
+		CreatedAt:      exam.CreatedAt.Unix(),
+		CreatedBy:      exam.CreatedBy,
+		UpdatedAt:      exam.UpdatedAt.Unix(),
+		UpdatedBy:      exam.UpdatedBy,
+		Deadline:       exam.Deadline.Unix(),
+		IsAssigned:     isAssigned,
+		TotalQuestions: int32(exam.TotalQuestions),
+		ObjectTitle:	exam.ObjectTitle,
 		IsRandomQuestion: exam.IsRandomQuestion,
-		QuestionForm:     exam.QuestionForm,
-		QuestionFiles:    questionFiles,
-		Type:             exam.Type,
+		QuestionForm: exam.QuestionForm,
+		QuestionFiles: questionFiles,
 	}
 }
 
@@ -120,34 +118,19 @@ func (r *ExamResourceImpl) FormatModelExam(exam *prot.ExamRequest) *models.Exam 
 		questionForm = models.QuestionFormQuestionType
 	}
 
-	isVtg := config.LoadConfig().IsVtg
-	examType := ""
-
-	if isVtg {
-		if exam.Type != models.ExamTypeFrequent && exam.Type != models.ExamTypeEvaluate {
-			examType = models.ExamTypeFrequent
-		} else {
-			examType = exam.Type
-		}
-	} else {
-		examType = models.ExamTypeExam
-	}
-
 	return &models.Exam{
-		ID:               exam.Id,
-		Name:             exam.Name,
-		Status:           int16(exam.Status),
-		TimeLimit:        exam.TimeLimit,
-		MaxScore:         float64(exam.MaxScore),
-		Description:      exam.Description,
-		CoverImageInfo:   coverImageInfo,
-		Deadline:         deadlineTime,
-		TotalQuestions:   exam.TotalQuestions,
-		ObjectTitle:      exam.ObjectTitle,
+		ID:             exam.Id,
+		Name:           exam.Name,
+		Status:         int16(exam.Status),
+		TimeLimit:      exam.TimeLimit,
+		MaxScore:       float64(exam.MaxScore),
+		Description:    exam.Description,
+		CoverImageInfo: coverImageInfo,
+		Deadline:       deadlineTime,
+		TotalQuestions: exam.TotalQuestions,
+		ObjectTitle:	exam.ObjectTitle,
 		IsRandomQuestion: exam.IsRandomQuestion,
-		FileInfos:        fileInfos,
-		QuestionForm:     questionForm,
-		Type:             examType,
+		FileInfos: fileInfos,
+		QuestionForm: questionForm,
 	}
 }
-

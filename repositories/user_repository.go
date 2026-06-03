@@ -1,15 +1,14 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/table_manager"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/table_manager"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -94,8 +93,6 @@ type UserRepository interface {
 	DeleteUserRefRolesByUserID(userID int64) error
 	GetUserRefRolesByUserID(userID int64) ([]models.UserRefRole, error)
 	DeleteUserRefRolesByUserAndRoleID(userID int64, roleID int64) error
-
-	GetIdsByProgramStatus(notParticipated, failTheSubject, isFilterNotParticipated, isFilterFailTheSubject bool, programId int64) ([]int64, error)
 }
 
 type userRepository struct {
@@ -277,7 +274,7 @@ func (r *userRepository) FindByUsername(username string) (*models.User, error) {
 
 func (r *userRepository) UsernameExits(username string, id int64) (bool, error) {
 	var user models.User
-	query := db.MasterDB.Where("username = ?", username)
+	query := db.MasterDB.Unscoped().Where("username = ?", username)
 
 	if id > 0 {
 		query = query.Where("id != ?", id)
@@ -299,8 +296,8 @@ func (r *userRepository) UsernameExits(username string, id int64) (bool, error) 
 func (r *userRepository) UserExists(key string, excludeID int64) (bool, error) {
 	var user models.User
 
-	query := db.MasterDB.
-		Where("(username = ? OR identifier = ? OR code = ?) AND deleted_at IS NULL", key, key, key)
+	query := db.MasterDB.Unscoped().
+		Where("(username = ? OR identifier = ? OR code = ?)", key, key, key)
 
 	if excludeID > 0 {
 		query = query.Where("id != ?", excludeID)
@@ -386,7 +383,7 @@ func (r *userRepository) DeleteNotExitCertificate(userID int64, exitsIds []int64
 }
 
 func (r *userRepository) DeleteDegreeByUserID(userID int64) error {
-	return db.MasterDB.Where("user_id = ?", userID).First(&models.Degree{}).Error
+	return db.MasterDB.Where("user_id = ?, userID").First(&models.Degree{}).Error
 }
 
 func (r *userRepository) ExitsDegree(degree models.Degree) bool {
@@ -754,32 +751,17 @@ func (r *userRepository) GetActivityLogByUserIds(userIDs []int64, start, end tim
 }
 
 func (r *userRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {
-	// Handle nil context (when called from non-HTTP context like services)
-	if ctx == nil || ctx.Request == nil {
-		return query
+	schoolId := r.GetAdminSchoolId(ctx)
+
+	if schoolId > 0 {
+		query = query.Joins(`
+			LEFT JOIN user_classes uc ON uc.user_id = users.id
+			LEFT JOIN classes c ON c.id = uc.class_id
+		`).Where(`
+			(users.school_id = ? OR c.school_id = ?)
+		`, schoolId, schoolId).
+			Group("users.id")
 	}
-
-	reqSchoolIDStr := ctx.Query("school_id")
-	var finalSchoolID int
-
-	if reqSchoolIDStr != "" {
-		if id, err := strconv.Atoi(reqSchoolIDStr); err == nil {
-			finalSchoolID = id
-		}
-	} else {
-		finalSchoolID = r.GetAdminSchoolId(ctx)
-	}
-
-	if finalSchoolID <= 0 {
-		return query
-	}
-
-	// Filter theo school_id
-	query = query.
-		Joins(`LEFT JOIN user_classes uc ON uc.user_id = users.id`).
-		Joins(`LEFT JOIN classes c ON c.id = uc.class_id`).
-		Where(`users.school_id = ? OR c.school_id = ?`, finalSchoolID, finalSchoolID).
-		Group("users.id")
 
 	return query
 }
@@ -908,137 +890,3 @@ func (r *userRepository) UpdateOrCreateUserRefRole(userRole models.UserRefRole) 
 
 	return nil
 }
-
-func (r *userRepository) GetIdsByProgramStatus(notParticipated, failTheSubject, isFilterNotParticipated, isFilterFailTheSubject bool, programId int64) ([]int64, error) {
-	// Get all courses in the program
-	var courseIDs []int64
-	if err := db.ReplicaDB.Model(&models.Course{}).
-		Where("program_id = ?", programId).
-		Pluck("id", &courseIDs).Error; err != nil {
-		return nil, err
-	}
-
-	if len(courseIDs) == 0 {
-		return []int64{}, nil
-	}
-
-	var resultUserIds []int64
-
-	// Case 1: Only filter by not_participated
-	if isFilterNotParticipated && !isFilterFailTheSubject {
-		if notParticipated {
-			// Users NOT in any course of the program
-			// Get all participated users first, then we'll exclude them
-			var participatedUserIds []int64
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ?", courseIDs).
-				Distinct("user_id").
-				Pluck("user_id", &participatedUserIds)
-
-			// Return participated IDs to be excluded (will be handled in service layer)
-			// or return empty to indicate these should be excluded
-			// For now, return the participated IDs with a marker
-			return participatedUserIds, nil
-		} else {
-			// Users participated in at least one course of the program
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ?", courseIDs).
-				Distinct("user_id").
-				Pluck("user_id", &resultUserIds)
-			return resultUserIds, nil
-		}
-	}
-
-	// Case 2: Only filter by fail_the_subject
-	if !isFilterNotParticipated && isFilterFailTheSubject {
-		if failTheSubject {
-			// Users who failed in the program
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ? AND is_failed = ?", courseIDs, true).
-				Distinct("user_id").
-				Pluck("user_id", &resultUserIds)
-			return resultUserIds, nil
-		} else {
-			// Users participated but NOT failed
-			// Get all participated users
-			var participatedUserIds []int64
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ?", courseIDs).
-				Distinct("user_id").
-				Pluck("user_id", &participatedUserIds)
-
-			// Get failed users
-			var failedUserIds []int64
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ? AND is_failed = ?", courseIDs, true).
-				Distinct("user_id").
-				Pluck("user_id", &failedUserIds)
-
-			// Filter out failed users from participated users
-			failedMap := make(map[int64]bool)
-			for _, id := range failedUserIds {
-				failedMap[id] = true
-			}
-
-			for _, id := range participatedUserIds {
-				if !failedMap[id] {
-					resultUserIds = append(resultUserIds, id)
-				}
-			}
-			return resultUserIds, nil
-		}
-	}
-
-	// Case 3: Both filters are active
-	if isFilterNotParticipated && isFilterFailTheSubject {
-		if notParticipated {
-			// Users NOT participated - fail_the_subject is irrelevant
-			// Return participated users to be excluded
-			var participatedUserIds []int64
-			db.ReplicaDB.Table("user_courses").
-				Where("course_id IN ?", courseIDs).
-				Distinct("user_id").
-				Pluck("user_id", &participatedUserIds)
-			return participatedUserIds, nil
-		} else {
-			// Users participated
-			if failTheSubject {
-				// Users who failed
-				db.ReplicaDB.Table("user_courses").
-					Where("course_id IN ? AND is_failed = ?", courseIDs, true).
-					Distinct("user_id").
-					Pluck("user_id", &resultUserIds)
-				return resultUserIds, nil
-			} else {
-				// Users participated but NOT failed
-				var participatedUserIds []int64
-				db.ReplicaDB.Table("user_courses").
-					Where("course_id IN ?", courseIDs).
-					Distinct("user_id").
-					Pluck("user_id", &participatedUserIds)
-
-				var failedUserIds []int64
-				db.ReplicaDB.Table("user_courses").
-					Where("course_id IN ? AND is_failed = ?", courseIDs, true).
-					Distinct("user_id").
-					Pluck("user_id", &failedUserIds)
-
-				failedMap := make(map[int64]bool)
-				for _, id := range failedUserIds {
-					failedMap[id] = true
-				}
-
-				for _, id := range participatedUserIds {
-					if !failedMap[id] {
-						resultUserIds = append(resultUserIds, id)
-					}
-				}
-				return resultUserIds, nil
-			}
-		}
-	}
-
-	// No filter applied
-	return []int64{}, nil
-}
-

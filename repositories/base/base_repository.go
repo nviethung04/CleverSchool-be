@@ -1,10 +1,10 @@
 package base
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/redis"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/redis"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -198,12 +198,6 @@ func (r *BaseRepository[T]) FindAll() ([]T, int64, error) {
 	}
 	query = r.queryBuilder.ApplyFilters(query)
 
-	// Use DISTINCT to avoid counting duplicate rows from JOINs
-	useMeiliOrder := r.queryBuilder.searchValue != "" && r.meiliIndex != "" && config.LoadConfig().MeiliEnabled
-	if !useMeiliOrder {
-		query = query.Distinct()
-	}
-
 	if err := query.Count(&totalCount).Error; err != nil {
 		return nil, 0, err
 	}
@@ -234,10 +228,10 @@ func (r *BaseRepository[T]) FindAll() ([]T, int64, error) {
 
 	// Todo sort by meili
 	// Avoid DISTINCT when ordering by CASE (Meili ranking), otherwise Postgres complains
-	useMeiliOrder = r.queryBuilder.searchValue != "" && r.meiliIndex != "" && config.LoadConfig().MeiliEnabled
-	if !useMeiliOrder {
-		query = query.Distinct()
-	}
+	// useMeiliOrder := r.queryBuilder.searchValue != "" && r.meiliIndex != "" && config.LoadConfig().MeiliEnabled
+	// if !useMeiliOrder {
+	// 	query = query.Distinct()
+	// }
 
 	err := query.Find(&entities).Error
 
@@ -811,4 +805,3 @@ func (r *BaseRepository[T]) GetAdminSchoolId(ctx *gin.Context) int {
 
 	return 0
 }
-

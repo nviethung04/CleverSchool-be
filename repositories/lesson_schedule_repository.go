@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"strconv"
 	"strings"
 	"time"
@@ -27,12 +27,10 @@ func (r *lessonScheduleRepository) GetSchedulesByUser(userID int, filters map[st
 	query := db.ReplicaDB.
 		Joins("JOIN lessons ON lessons.id = lesson_schedules.lesson_id").
 		Joins("JOIN courses ON courses.id = lesson_schedules.course_id").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
 		Joins("JOIN user_courses ON user_courses.course_id = courses.id").
 		Where("user_courses.user_id = ?", userID).
 		Where("lessons.deleted_at IS NULL").
-		Where("courses.deleted_at IS NULL").
-		Where("chapters.program_id = courses.program_id")
+		Where("courses.deleted_at IS NULL")
 
 	if start, ok := filters["start_date"].(time.Time); ok {
 		query = query.Where("lesson_schedules.scheduled_date >= ?", start)
@@ -54,8 +52,6 @@ func (r *lessonScheduleRepository) GetSchedulesByUser(userID int, filters map[st
 		Preload("Lesson").
 		Preload("Course").
 		Preload("Lesson.Chapter").
-		Preload("Lesson.LessonPlans").
-		Preload("Lesson.LessonPlans.Author").
 		Find(&schedules).Error
 
 	return schedules, err
@@ -67,10 +63,8 @@ func (r *lessonScheduleRepository) GetSchedules(filters map[string]interface{}) 
 	query := db.MasterDB.
 		Joins("JOIN lessons ON lessons.id = lesson_schedules.lesson_id").
 		Joins("JOIN courses ON courses.id = lesson_schedules.course_id").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
 		Where("lessons.deleted_at IS NULL").
-		Where("courses.deleted_at IS NULL").
-		Where("chapters.program_id = courses.program_id")
+		Where("courses.deleted_at IS NULL")
 
 	if start, ok := filters["start_date"].(time.Time); ok {
 		query = query.Where("lesson_schedules.scheduled_date >= ?", start)
@@ -92,8 +86,7 @@ func (r *lessonScheduleRepository) GetSchedules(filters map[string]interface{}) 
 	}
 
 	if courseID, ok := filters["course_id"].(int64); ok && courseID > 0 {
-		query = query.
-			Where("lesson_schedules.course_id = ?", courseID)
+		query = query.Where("lesson_schedules.course_id= ?", courseID)
 	}
 
 	if idStr, ok := filters["lesson_ids"].(string); ok {
@@ -113,8 +106,6 @@ func (r *lessonScheduleRepository) GetSchedules(filters map[string]interface{}) 
 		Preload("Lesson").
 		Preload("Course").
 		Preload("Lesson.Chapter").
-		Preload("Lesson.LessonPlans").
-		Preload("Lesson.LessonPlans.Author").
 		Find(&schedules).Error
 
 	return schedules, err
@@ -206,4 +197,3 @@ func (r *lessonScheduleRepository) UpdateCourseIdByLesson(lessonId, chapterId, o
 
 	return nil
 }
-

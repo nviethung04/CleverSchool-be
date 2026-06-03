@@ -1,15 +1,15 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/table_manager"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/table_manager"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -32,7 +32,6 @@ type DashboardRepository interface {
 	GetLearningOverview(filter dto.FilterDashboardAdmin) (*dto.LearningOverviewDataItem, error)
 	GetScoreDistribution(filter dto.FilterDashboardAdmin) (*dto.ScoreDistributionOverview, error)
 	GetSystemUsage(filter dto.FilterDashboardAdmin) (*dto.SystemUsageOverview, error)
-	GetSystemUsageType(filter dto.FilterDashboardAdmin) (*dto.SystemUsageOverview, error)
 	GetQuestionBank(filter dto.FilterDashboardAdmin) (*dto.QuestionBankOverview, error)
 	GetRiskWarning(filter dto.FilterDashboardAdmin) (*dto.RiskAndWarning, error)
 	GetTeacherPerformance(filter dto.FilterDashboardAdmin) (*dto.TeacherPerformanceOverview, error)
@@ -80,37 +79,19 @@ func (r *dashboardRepository) GetSchool(filter dto.FilterDashboardAdmin) (int32,
 		totalQuery = totalQuery.Where("schools.id = ?", filter.SchoolId)
 	}
 
-	// === Count (chạy song song) ===
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
+	// === Count ===
+	if err := currentQuery.Count(&currentCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		setErr(currentQuery.Count(&currentCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(previousQuery.Count(&previousCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(totalQuery.Count(&totalCount).Error)
-	}()
-	wg.Wait()
-	if firstErr != nil {
-		return 0, 0, 0, firstErr
+
+	if err := previousQuery.Count(&previousCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
+
+	if err := totalQuery.Count(&totalCount).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
 	return int32(totalCount), int32(currentCount), int32(previousCount), nil
 }
 
@@ -124,7 +105,7 @@ func (r *dashboardRepository) GetUserRegister(filter dto.FilterDashboardAdmin) (
 		Where("users.created_at <= ?", filter.EndTime)
 
 	previousQuery := db.ReplicaDB.Model(&models.User{}).
-		Where("users.created_at <= ?", filter.EndPreviousTime)
+		Where("users.created_at >= ? AND users.created_at <= ?", filter.StartPreviousTime, filter.EndPreviousTime)
 
 	totalQuery := db.ReplicaDB.Model(&models.User{}).
 		Where("users.created_at <= ?", filter.EndTime)
@@ -189,37 +170,18 @@ func (r *dashboardRepository) GetUserRegister(filter dto.FilterDashboardAdmin) (
 		`, filter.SchoolId, filter.SchoolId)
 	}
 
-	// Count chạy song song
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
+	if err := currentQuery.Distinct("users.id").Count(&currentCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		setErr(currentQuery.Distinct("users.id").Count(&currentCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(previousQuery.Distinct("users.id").Count(&previousCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(totalQuery.Distinct("users.id").Count(&totalCount).Error)
-	}()
-	wg.Wait()
-	if firstErr != nil {
-		return 0, 0, 0, firstErr
+
+	if err := previousQuery.Distinct("users.id").Count(&previousCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
+
+	if err := totalQuery.Distinct("users.id").Count(&totalCount).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
 	return int32(totalCount), int32(currentCount), int32(previousCount), nil
 }
 
@@ -233,6 +195,7 @@ func (r *dashboardRepository) GetStudentRegister(filter dto.FilterDashboardAdmin
 		Where("urr.role_id = ?", models.StudentRoleId)
 
 	previousQuery := db.ReplicaDB.Model(&models.User{}).
+		// Where("users.created_at >= ? AND users.created_at <= ?", filter.StartPreviousTime, filter.EndPreviousTime).
 		Where("users.created_at <= ?", filter.EndPreviousTime).
 		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
 		Where("urr.role_id = ?", models.StudentRoleId)
@@ -285,37 +248,18 @@ func (r *dashboardRepository) GetStudentRegister(filter dto.FilterDashboardAdmin
 		totalQuery = totalQuery.Where("users.school_id = ?", filter.SchoolId)
 	}
 
-	// Count chạy song song
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
+	if err := currentQuery.Distinct("users.id").Count(&currentCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		setErr(currentQuery.Distinct("users.id").Count(&currentCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(previousQuery.Distinct("users.id").Count(&previousCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(totalQuery.Distinct("users.id").Count(&totalCount).Error)
-	}()
-	wg.Wait()
-	if firstErr != nil {
-		return 0, 0, 0, firstErr
+
+	if err := previousQuery.Distinct("users.id").Count(&previousCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
+
+	if err := totalQuery.Distinct("users.id").Count(&totalCount).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
 	return int32(totalCount), int32(currentCount), int32(previousCount), nil
 }
 
@@ -396,123 +340,88 @@ func (r *dashboardRepository) GetTeacherRegister(filter dto.FilterDashboardAdmin
 			Where("c.school_id = ?", filter.SchoolId)
 	}
 
-	// Count chạy song song
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
+	// === Thực thi ===
+	if err := currentQuery.Distinct("users.id").Count(&currentCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		setErr(currentQuery.Distinct("users.id").Count(&currentCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(previousQuery.Distinct("users.id").Count(&previousCount).Error)
-	}()
-	go func() {
-		defer wg.Done()
-		setErr(totalQuery.Distinct("users.id").Count(&totalCount).Error)
-	}()
-	wg.Wait()
-	if firstErr != nil {
-		return 0, 0, 0, firstErr
+
+	if err := previousQuery.Distinct("users.id").Count(&previousCount).Error; err != nil {
+		return 0, 0, 0, err
 	}
+
+	if err := totalQuery.Distinct("users.id").Count(&totalCount).Error; err != nil {
+		return 0, 0, 0, err
+	}
+
 	return int32(totalCount), int32(currentCount), int32(previousCount), nil
 }
 
 func (r *dashboardRepository) GetActivityUserIds(startTime, endTime time.Time, courseId, schoolId, programId int64) (models.ActivityIds, error) {
-	type monthTask struct {
-		monthStart     time.Time
-		monthEnd       time.Time
-		isCurrentMonth bool
-	}
-	var tasks []monthTask
+	var allUserIDs []int64
+	historyUseRepo := NewHistoryUseRepository()
+
 	current := startTime
-	now := time.Now()
 	for current.Before(endTime) || current.Equal(endTime) {
 		monthStart := time.Date(current.Year(), current.Month(), 1, 0, 0, 0, 0, current.Location())
 		monthEnd := monthStart.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
 		if monthEnd.After(endTime) {
 			monthEnd = endTime
 		}
-		isCurrentMonth := now.Year() == current.Year() && now.Month() == current.Month()
-		tasks = append(tasks, monthTask{monthStart, monthEnd, isCurrentMonth})
-		current = monthStart.AddDate(0, 1, 0)
-	}
 
-	var allUserIDs []int64
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
-	}
-	historyUseRepo := NewHistoryUseRepository()
-	wg := sync.WaitGroup{}
-	for _, task := range tasks {
-		wg.Add(1)
-		go func(monthStart, monthEnd time.Time, isCurrentMonth bool) {
-			defer wg.Done()
-			var userIDs []int64
-			if isCurrentMonth {
-				idsRes, err := historyUseRepo.ActivityIds(monthStart, monthEnd)
-				if err != nil {
-					setErr(err)
-					return
-				}
-				userIDs = idsRes.Ids
-				var historyUses []models.HistoryUse
-				if err := db.ReplicaDB.Where("type = ?", "month").Find(&historyUses).Error; err != nil {
-					config.Log.Error(err)
-					setErr(err)
-					return
-				}
-				for _, historyUse := range historyUses {
-					var activityIds models.ActivityIds
-					if err := json.Unmarshal(historyUse.ActivityIds, &activityIds); err != nil {
-						config.Log.Error(err)
-						setErr(err)
-						return
-					}
-					userIDs = append(userIDs, activityIds.Ids...)
-				}
-			} else {
-				var historyUse models.HistoryUse
-				if err := db.ReplicaDB.Where("date = ? AND type = ?", monthStart.Format("2006-01-02"), "month").First(&historyUse).Error; err != nil {
-					setErr(err)
-					return
-				}
+		var userIDs []int64
+		var activityIds models.ActivityIds
+
+		now := time.Now()
+		isCurrentMonth := now.Year() == current.Year() && now.Month() == current.Month()
+
+		if isCurrentMonth {
+			idsRes, err := historyUseRepo.ActivityIds(monthStart, monthEnd)
+			if err != nil {
+				return models.ActivityIds{}, err
+			}
+			userIDs = idsRes.Ids
+
+			var historyUses []models.HistoryUse
+			err = db.ReplicaDB.
+				Where("type = ?", "month").
+				Find(&historyUses).Error
+			if err != nil {
+				config.Log.Error(err)
+				return models.ActivityIds{}, err
+			}
+
+			for _, historyUse := range historyUses {
 				var activityIds models.ActivityIds
 				if err := json.Unmarshal(historyUse.ActivityIds, &activityIds); err != nil {
-					setErr(err)
-					return
+					config.Log.Error(err)
+					return models.ActivityIds{}, err
 				}
-				userIDs = activityIds.Ids
+
+				for _, id := range activityIds.Ids {
+					userIDs = append(userIDs, id)
+				}
 			}
-			mu.Lock()
-			allUserIDs = append(allUserIDs, userIDs...)
-			mu.Unlock()
-		}(task.monthStart, task.monthEnd, task.isCurrentMonth)
-	}
-	wg.Wait()
-	if firstErr != nil {
-		return models.ActivityIds{}, firstErr
+		} else {
+			var historyUse models.HistoryUse
+			err := db.ReplicaDB.
+				Where("date = ? AND type = ?", monthStart.Format("2006-01-02"), "month").
+				First(&historyUse).Error
+			if err != nil {
+				return models.ActivityIds{}, err
+			}
+			if err := json.Unmarshal(historyUse.ActivityIds, &activityIds); err != nil {
+				return models.ActivityIds{}, err
+			}
+
+			for _, id := range activityIds.Ids {
+				userIDs = append(userIDs, id)
+			}
+		}
+
+		allUserIDs = append(allUserIDs, userIDs...)
+
+		current = monthStart.AddDate(0, 1, 0)
 	}
 
 	unique := make(map[int64]struct{})
@@ -586,6 +495,14 @@ func (r *dashboardRepository) getUserOverviewFallback(filter dto.FilterDashboard
 		return nil, err
 	}
 
+	config.Log.Info("Fallback method results:",
+		"UserTotal", userTotal, "UserCurrent", userCurrent,
+		"StudentTotal", studentTotal, "StudentCurrent", studentCurrent,
+		"TeacherTotal", teacherTotal, "TeacherCurrent", teacherCurrent,
+		"ActivityTotal", activityTotal, "ActivityCurrent", activityCurrent,
+		"SchoolTotal", schoolTotal, "SchoolCurrent", schoolCurrent,
+	)
+
 	return &dto.UserOverview{
 		User: &dto.DashboardAdminItem{
 			Total:       userTotal,
@@ -616,62 +533,26 @@ func (r *dashboardRepository) getUserOverviewFallback(filter dto.FilterDashboard
 }
 
 func (r *dashboardRepository) GetActivity(filter dto.FilterDashboardAdmin) (int32, int32, int32, int32, error) {
-	var currentUserIds, previousIds, totalIds models.ActivityIds
-	var mu sync.Mutex
-	var firstErr error
-	setErr := func(e error) {
-		if e == nil {
-			return
-		}
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = e
-		}
-		mu.Unlock()
+	currentUserIds, err := r.GetActivityUserIds(filter.StartTime, filter.EndTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
+	if err != nil {
+		return 0, 0, 0, 0, err
 	}
-	wg := sync.WaitGroup{}
-	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		ids, err := r.GetActivityUserIds(filter.StartTime, filter.EndTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
-		if err != nil {
-			setErr(err)
-			return
-		}
-		mu.Lock()
-		currentUserIds = ids
-		mu.Unlock()
-	}()
-	go func() {
-		defer wg.Done()
-		ids, err := r.GetActivityUserIds(filter.StartPreviousTime, filter.EndPreviousTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
-		if err != nil {
-			setErr(err)
-			return
-		}
-		mu.Lock()
-		previousIds = ids
-		mu.Unlock()
-	}()
-	go func() {
-		defer wg.Done()
-		ids, err := r.GetActivityUserIds(filter.StartTime, filter.EndPreviousTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
-		if err != nil {
-			setErr(err)
-			return
-		}
-		mu.Lock()
-		totalIds = ids
-		mu.Unlock()
-	}()
-	wg.Wait()
-	if firstErr != nil {
-		return 0, 0, 0, 0, firstErr
+
+	previousIds, err := r.GetActivityUserIds(filter.StartPreviousTime, filter.EndPreviousTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
+	if err != nil {
+		return 0, 0, 0, 0, err
 	}
+
+	totalIds, err := r.GetActivityUserIds(filter.StartTime, filter.EndPreviousTime, filter.CourseId, filter.SchoolId, filter.ProgramId)
+	if err != nil {
+		return 0, 0, 0, 0, err
+	}
+
 	totalCount := int64(len(totalIds.Ids))
 	currentCount := int64(len(currentUserIds.Ids))
 	previousCount := int64(len(previousIds.Ids))
 	newCount := currentCount - previousCount
+
 	return int32(totalCount), int32(currentCount), int32(previousCount), int32(newCount), nil
 }
 
@@ -697,289 +578,242 @@ func (r *dashboardRepository) GetCourseOverview(filter dto.FilterDashboardAdmin)
 
 	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
 
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 
-	// === Program (phải chạy trước để có programId) ===
+	// === Program ===
 	var programId int64
-	programQuery := database.Model(&models.Program{})
+	programQuery := db.Model(&models.Program{}).
+		Joins("LEFT JOIN courses co ON co.program_id = programs.id")
 
 	if filter.CourseId > 0 {
-		programQuery = programQuery.
-			Joins("JOIN courses co ON co.program_id = programs.id").
-			Where("co.id = ?", filter.CourseId)
+		programQuery = programQuery.Where("co.id = ?", filter.CourseId)
 
-		database.Model(&models.Course{}).
+		db.Model(&models.Course{}).
 			Select("program_id").
 			Where("id = ?", filter.CourseId).
 			Scan(&programId)
 	} else if filter.ProgramId > 0 {
 		programId = filter.ProgramId
 		programQuery = programQuery.Where("programs.id = ?", filter.ProgramId)
-	} else if filter.SchoolId > 0 {
-		programQuery = programQuery.
-			Joins("JOIN courses co ON co.program_id = programs.id").
+	}
+	if filter.SchoolId > 0 {
+		programQuery = programQuery.Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+	if filterByDate {
+		programQuery = programQuery.Where("programs.created_at <= ?", filter.EndTime)
+		// programQuery = programQuery.Where("courses.created_at >= ? AND courses.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+	programQuery.Distinct("programs.id").Count(&programCount)
+
+	// === Lesson ===
+	lessonQuery := db.Model(&models.Lesson{}).
+		Joins("JOIN chapters AS c ON lessons.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id")
+
+	if programId > 0 {
+		lessonQuery = lessonQuery.Where("p.id = ?", programId)
+	}
+	if filter.SchoolId > 0 {
+		lessonQuery = lessonQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+	if filterByDate {
+		lessonQuery = lessonQuery.Where("lessons.created_at <= ?", filter.EndTime)
+		// lessonQuery = lessonQuery.Where("lessons.created_at >= ? AND lessons.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+	lessonQuery.Count(&lessonCount)
+
+	// === Lesson Plan ===
+	lessonPlanQuery := db.Table("lesson_plans AS lp")
+
+	if programId > 0 || filter.SchoolId > 0 {
+		lessonPlanQuery = lessonPlanQuery.
+			Joins("JOIN lesson_plan_ref_lessons AS lprl ON lp.id = lprl.lesson_plan_id").
+			Joins("JOIN lessons AS l ON lprl.lesson_id = l.id").
+			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+			Joins("JOIN programs p ON c.program_id = p.id")
+	}
+
+	if programId > 0 {
+		lessonPlanQuery = lessonPlanQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		lessonPlanQuery = lessonPlanQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
 			Joins("JOIN course_schools cs ON cs.course_id = co.id").
 			Where("cs.school_id = ?", filter.SchoolId)
 	}
 
 	if filterByDate {
-		programQuery = programQuery.Where("programs.created_at <= ?", filter.EndTime)
+		lessonPlanQuery = lessonPlanQuery.Where("lp.created_at <= ?", filter.EndTime)
+		// lessonPlanQuery = lessonPlanQuery.Where("lp.created_at >= ? AND lp.created_at <= ?", filter.StartTime, filter.EndTime)
 	}
-	programQuery.Distinct("programs.id").Count(&programCount)
 
-	// === Chạy song song các query chỉ phụ thuộc programId / filter ===
+	lessonPlanQuery.Where("lp.deleted_at IS NULL").
+		Distinct("lp.id").
+		Count(&lessonPlanCount)
+
+	// === Question ===
+	questionQuery := db.Model(&models.Question{})
+	if filterByDate {
+		questionQuery = questionQuery.Where("created_at <= ?", filter.EndTime)
+		// questionQuery = questionQuery.Where("created_at >= ? AND created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+	questionQuery.Count(&questionCount)
+
+	// === Homework ===
+	homeworkQuery := db.Table("homeworks AS h").
+		Joins("JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id").
+		Joins("JOIN lessons AS l ON l.id = hrl.lesson_id").
+		Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id")
+
+	if programId > 0 {
+		homeworkQuery = homeworkQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		homeworkQuery = homeworkQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		homeworkQuery = homeworkQuery.Where("h.created_at <= ?", filter.EndTime)
+		// homeworkQuery = homeworkQuery.Where("h.created_at >= ? AND h.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	homeworkQuery.Where("h.deleted_at IS NULL").
+		Select("COUNT(DISTINCT h.id)").
+		Count(&homeworkCount)
+
+	// === Exam ===
+	examQuery := db.Table("exams AS e").
+		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
+		Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
+		Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id")
+
+	if programId > 0 {
+		examQuery = examQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		examQuery = examQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		examQuery = examQuery.Where("e.created_at <= ?", filter.EndTime)
+		// examQuery = examQuery.Where("e.created_at >= ? AND e.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	examQuery.Where("e.deleted_at IS NULL").
+		Select("COUNT(DISTINCT e.id)").
+		Count(&examCount)
+
+	// === User Exam ===
+	userExamQuery := db.Table("exam_users AS eu").
+		Joins("JOIN exams AS e ON eu.exam_id = e.id").
+		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
+		Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
+		Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id").
+		Where("e.deleted_at IS NULL")
+
+	if programId > 0 {
+		userExamQuery = userExamQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		userExamQuery = userExamQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		userExamQuery = userExamQuery.Where("eu.created_at <= ?", filter.EndTime)
+		// userExamQuery = userExamQuery.Where("eu.created_at >= ? AND eu.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	subQuery := userExamQuery.Select("DISTINCT eu.user_id, eu.exam_id")
+
+	db.Table("(?) as sub", subQuery).Count(&userExamCount)
+
+	// === Submitted Homework ===
+	submittedHomeworkQuery := db.Model(&models.HomeworkUser{}).
+		Joins("JOIN homeworks AS h ON h.id = homework_users.homework_id").
+		Joins("JOIN homework_ref_lessons AS hrl ON hrl.homework_id = h.id").
+		Joins("JOIN lessons AS l ON l.id = hrl.lesson_id").
+		Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id")
+
+	if programId > 0 {
+		submittedHomeworkQuery = submittedHomeworkQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		submittedHomeworkQuery = submittedHomeworkQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		submittedHomeworkQuery = submittedHomeworkQuery.Where("homework_users.created_at <= ?", filter.EndTime)
+		// submittedHomeworkQuery = submittedHomeworkQuery.Where("homework_users.created_at >= ? AND homework_users.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	submittedHomeworkQuery.
+		Select("COUNT(DISTINCT homework_users.homework_id)").
+		Scan(&submittedHomeworkCount)
+
+	// === Submitted Exam ===
+	submittedExamQuery := db.Model(&models.ExamUser{}).
+		Joins("JOIN exams AS e ON e.id = exam_users.exam_id").
+		Joins("JOIN exam_ref_lessons AS erl ON erl.exam_id = e.id").
+		Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
+		Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+		Joins("JOIN programs p ON c.program_id = p.id")
+
+	if programId > 0 {
+		submittedExamQuery = submittedExamQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		submittedExamQuery = submittedExamQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		submittedExamQuery = submittedExamQuery.
+			Where("exam_users.created_at <= ?", filter.EndTime)
+		// submittedExamQuery = submittedExamQuery.
+		//   Where("exam_users.created_at >= ? AND exam_users.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	err := submittedExamQuery.
+		Select("COALESCE(COUNT(DISTINCT exam_users.exam_id), 0)").
+		Scan(&submittedExamCount).Error
+
+	if err != nil {
+		config.Log.Error("Error executing submitted exam query: ", err)
+	}
+
+	// === Cloned QuestionIDs ===
 	var questionIDs []QuestionID
-	var firstErr error
-	var mu sync.Mutex
-	wg := &sync.WaitGroup{}
 
-	// Lesson
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Model(&models.Lesson{}).
-			Joins("JOIN chapters AS c ON lessons.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("lessons.created_at <= ?", filter.EndTime)
-		}
-		err := q.Distinct("lessons.id").Count(&lessonCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Lesson Plan
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Table("lesson_plans AS lp")
-		if programId > 0 || filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN lesson_plan_ref_lessons AS lprl ON lp.id = lprl.lesson_plan_id").
-				Joins("JOIN lessons AS l ON lprl.lesson_id = l.id").
-				Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-				Joins("JOIN programs p ON c.program_id = p.id")
-		}
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("lp.created_at <= ?", filter.EndTime)
-		}
-		err := q.Where("lp.deleted_at IS NULL").Distinct("lp.id").Count(&lessonPlanCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Question
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Model(&models.Question{})
-		if filterByDate {
-			q = q.Where("created_at <= ?", filter.EndTime)
-		}
-		err := q.Count(&questionCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Homework
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Table("homeworks AS h").
-			Joins("JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id").
-			Joins("JOIN lessons AS l ON l.id = hrl.lesson_id").
-			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("h.created_at <= ?", filter.EndTime)
-		}
-		err := q.Where("h.deleted_at IS NULL").Select("COUNT(DISTINCT h.id)").Count(&homeworkCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Exam
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Table("exams AS e").
-			Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
-			Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
-			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("e.created_at <= ?", filter.EndTime)
-		}
-		err := q.Where("e.deleted_at IS NULL").Select("COUNT(DISTINCT e.id)").Count(&examCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// User Exam
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Table("exam_users AS eu").
-			Joins("JOIN exams AS e ON eu.exam_id = e.id").
-			Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
-			Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
-			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id").
-			Where("e.deleted_at IS NULL")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("eu.created_at <= ?", filter.EndTime)
-		}
-		subQuery := q.Select("DISTINCT eu.user_id, eu.exam_id")
-		err := database.Table("(?) as sub", subQuery).Count(&userExamCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Submitted Homework
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Model(&models.HomeworkUser{}).
-			Joins("JOIN homeworks AS h ON h.id = homework_users.homework_id").
-			Joins("JOIN homework_ref_lessons AS hrl ON hrl.homework_id = h.id").
-			Joins("JOIN lessons AS l ON l.id = hrl.lesson_id").
-			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("homework_users.created_at <= ?", filter.EndTime)
-		}
-		err := q.Select("COUNT(DISTINCT homework_users.homework_id)").Scan(&submittedHomeworkCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Submitted Exam
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Model(&models.ExamUser{}).
-			Joins("JOIN exams AS e ON e.id = exam_users.exam_id").
-			Joins("JOIN exam_ref_lessons AS erl ON erl.exam_id = e.id").
-			Joins("JOIN lessons AS l ON l.id = erl.lesson_id").
-			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-			Joins("JOIN programs p ON c.program_id = p.id")
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("exam_users.created_at <= ?", filter.EndTime)
-		}
-		err := q.Select("COALESCE(COUNT(DISTINCT exam_users.exam_id), 0)").Scan(&submittedExamCount).Error
-		if err != nil {
-			config.Log.Error("Error executing submitted exam query: ", err)
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	// Cloned QuestionIDs (raw SQL)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		queryClonedQuestion := `
+	queryClonedQuestion := `
 		SELECT DISTINCT (jsonb_array_elements(cq.questions)->>'id')::int AS id
 		FROM cloned_questions cq
 		LEFT JOIN homeworks hw
@@ -996,89 +830,101 @@ func (r *dashboardRepository) GetCourseOverview(filter dto.FilterDashboardAdmin)
 			ON c.id = l.chapter_id
 		LEFT JOIN programs p
 			ON p.id = c.program_id
-		`
-		var conditions []string
-		var args []interface{}
-		if filterByDate {
-			conditions = append(conditions, "cq.created_at <= ?")
-			args = append(args, filter.EndTime)
-		}
-		if programId > 0 {
-			conditions = append(conditions, "p.id = ?")
-			args = append(args, programId)
-		}
-		if filter.CourseId > 0 {
-			conditions = append(conditions, `
+	`
+
+	var conditions []string
+	var args []interface{}
+
+	if filterByDate {
+		conditions = append(conditions, "cq.created_at <= ?")
+		args = append(args, filter.EndTime)
+	}
+
+	if programId > 0 {
+		conditions = append(conditions, "p.id = ?")
+		args = append(args, programId)
+	}
+
+	if filter.CourseId > 0 {
+		conditions = append(conditions, `
 			EXISTS (
 				SELECT 1 FROM courses co
 				WHERE co.program_id = p.id AND co.id = ?
 			)
-			`)
-			args = append(args, filter.CourseId)
-		}
-		if filter.SchoolId > 0 {
-			conditions = append(conditions, `
+		`)
+		args = append(args, filter.CourseId)
+	}
+
+	if filter.SchoolId > 0 {
+		conditions = append(conditions, `
 			EXISTS (
 				SELECT 1 FROM course_schools cs
 				JOIN courses co ON co.id = cs.course_id
 				WHERE co.program_id = p.id AND cs.school_id = ?
 			)
-			`)
-			args = append(args, filter.SchoolId)
-		}
-		if len(conditions) > 0 {
-			queryClonedQuestion += " WHERE " + strings.Join(conditions, " AND ")
-		}
-		err := database.Raw(queryClonedQuestion, args...).Scan(&questionIDs).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
+		`)
+		args = append(args, filter.SchoolId)
+	}
 
-	// Completed Lesson Plan
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Table("lesson_plans AS lp").
-			Joins("JOIN lesson_plan_completes AS lpc ON lp.id = lpc.lesson_plan_id")
-		if programId > 0 || filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN lesson_plan_ref_lessons AS lprl ON lp.id = lprl.lesson_plan_id").
-				Joins("JOIN lessons AS l ON lprl.lesson_id = l.id").
-				Joins("JOIN chapters AS c ON l.chapter_id = c.id").
-				Joins("JOIN programs p ON c.program_id = p.id")
-		}
-		if programId > 0 {
-			q = q.Where("p.id = ?", programId)
-		}
-		if filter.SchoolId > 0 {
-			q = q.
-				Joins("JOIN courses co ON co.program_id = p.id").
-				Joins("JOIN course_schools cs ON cs.course_id = co.id").
-				Where("cs.school_id = ?", filter.SchoolId)
-		}
-		if filterByDate {
-			q = q.Where("lpc.completed_at <= ?", filter.EndTime)
-		}
-		err := q.Distinct("lp.id").Count(&completedLessonPlanCount).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
+	if len(conditions) > 0 {
+		queryClonedQuestion += " WHERE " + strings.Join(conditions, " AND ")
+	}
 
-	// Ungraded
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		ungradedQuery := `
+	db.Raw(queryClonedQuestion, args...).Scan(&questionIDs)
+
+	uniqueQuestionIDs := make([]int, 0)
+	seen := make(map[int]struct{})
+	for _, q := range questionIDs {
+		if _, ok := seen[q.ID]; !ok {
+			seen[q.ID] = struct{}{}
+			uniqueQuestionIDs = append(uniqueQuestionIDs, q.ID)
+		}
+	}
+
+	// === Question used ===
+	questionUsedQuery := db.Model(&models.Question{}).
+		Where("id IN (?)", uniqueQuestionIDs)
+	if filterByDate {
+		questionUsedQuery = questionUsedQuery.Where("created_at <= ?", filter.EndTime)
+		// questionUsedQuery = questionUsedQuery.Where("created_at >= ? AND created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+	questionUsedQuery.Count(&questionUsedCount)
+
+	// === Completed Lesson Plan ===
+	completedLessonPlanQuery := db.Table("lesson_plans AS lp").
+		Joins("JOIN lesson_plan_completes AS lpc ON lp.id = lpc.lesson_plan_id")
+
+	if programId > 0 || filter.SchoolId > 0 {
+		completedLessonPlanQuery = completedLessonPlanQuery.
+			Joins("JOIN lesson_plan_ref_lessons AS lprl ON lp.id = lprl.lesson_plan_id").
+			Joins("JOIN lessons AS l ON lprl.lesson_id = l.id").
+			Joins("JOIN chapters AS c ON l.chapter_id = c.id").
+			Joins("JOIN programs p ON c.program_id = p.id")
+	}
+
+	if programId > 0 {
+		completedLessonPlanQuery = completedLessonPlanQuery.Where("p.id = ?", programId)
+	}
+
+	if filter.SchoolId > 0 {
+		completedLessonPlanQuery = completedLessonPlanQuery.
+			Joins("JOIN courses co ON co.program_id = p.id").
+			Joins("JOIN course_schools cs ON cs.course_id = co.id").
+			Where("cs.school_id = ?", filter.SchoolId)
+	}
+
+	if filterByDate {
+		completedLessonPlanQuery = completedLessonPlanQuery.Where("lpc.completed_at <= ?", filter.EndTime)
+		// completedLessonPlanQuery = completedLessonPlanQuery.
+		//    Where("lpc.completed_at >= ? AND lpc.completed_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	completedLessonPlanQuery.
+		Distinct("lp.id").
+		Count(&completedLessonPlanCount)
+
+	// === Ungraded ===
+	ungradedQuery := `
 		SELECT COUNT(*) AS ungraded_exam_users
 		FROM (
 			SELECT DISTINCT eu.exam_id, eu.user_id
@@ -1094,57 +940,28 @@ func (r *dashboardRepository) GetCourseOverview(filter dto.FilterDashboardAdmin)
 				WHERE eqms.exam_id = eu.exam_id
 					AND eqms.user_id = eu.user_id
 					AND eqms.is_scored = FALSE
-		`
-		if programId > 0 {
-			ungradedQuery += " AND c.program_id = ?"
-		}
-		if filter.SchoolId > 0 {
-			ungradedQuery += " AND EXISTS (SELECT 1 FROM course_schools cs WHERE cs.course_id = co.id AND cs.school_id = ?)"
-		}
-		ungradedQuery += `
+	`
+
+	if programId > 0 {
+		ungradedQuery += " AND c.program_id = ?"
+	}
+	if filter.SchoolId > 0 {
+		ungradedQuery += " AND EXISTS (SELECT 1 FROM course_schools cs WHERE cs.course_id = co.id AND cs.school_id = ?)"
+	}
+
+	ungradedQuery += `
 			)
 		) AS ungraded_subquery
-		`
-		var err error
-		if programId > 0 && filter.SchoolId > 0 {
-			err = database.Raw(ungradedQuery, programId, filter.SchoolId).Scan(&unsubmittedUserExamCount).Error
-		} else if programId > 0 {
-			err = database.Raw(ungradedQuery, programId).Scan(&unsubmittedUserExamCount).Error
-		} else if filter.SchoolId > 0 {
-			err = database.Raw(ungradedQuery, filter.SchoolId).Scan(&unsubmittedUserExamCount).Error
-		} else {
-			err = database.Raw(ungradedQuery).Scan(&unsubmittedUserExamCount).Error
-		}
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
+	`
 
-	wg.Wait()
-	if firstErr != nil {
-		return nil, firstErr
-	}
-
-	// Dedupe questionIDs → uniqueQuestionIDs, rồi query question used (phụ thuộc kết quả cloned)
-	uniqueQuestionIDs := make([]int, 0)
-	seen := make(map[int]struct{})
-	for _, q := range questionIDs {
-		if _, ok := seen[q.ID]; !ok {
-			seen[q.ID] = struct{}{}
-			uniqueQuestionIDs = append(uniqueQuestionIDs, q.ID)
-		}
-	}
-
-	if len(uniqueQuestionIDs) > 0 {
-		questionUsedQuery := database.Model(&models.Question{}).Where("id IN (?)", uniqueQuestionIDs)
-		if filterByDate {
-			questionUsedQuery = questionUsedQuery.Where("created_at <= ?", filter.EndTime)
-		}
-		questionUsedQuery.Count(&questionUsedCount)
+	if programId > 0 && filter.SchoolId > 0 {
+		db.Raw(ungradedQuery, programId, filter.SchoolId).Scan(&unsubmittedUserExamCount)
+	} else if programId > 0 {
+		db.Raw(ungradedQuery, programId).Scan(&unsubmittedUserExamCount)
+	} else if filter.SchoolId > 0 {
+		db.Raw(ungradedQuery, filter.SchoolId).Scan(&unsubmittedUserExamCount)
+	} else {
+		db.Raw(ungradedQuery).Scan(&unsubmittedUserExamCount)
 	}
 
 	return &dto.CourseOverviewDataItem{
@@ -1164,418 +981,104 @@ func (r *dashboardRepository) GetCourseOverview(filter dto.FilterDashboardAdmin)
 }
 
 func (r *dashboardRepository) GetLearningOverview(filter dto.FilterDashboardAdmin) (*dto.LearningOverviewDataItem, error) {
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 
 	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
 
-	includeExam := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exam"
-	includeHomework := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "homework"
-	includeExercise := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exercise"
+	type ExamWithUser struct {
+		ExamID     int64            `json:"exam_id"`
+		ExamName   string           `json:"exam_name"`
+		ExamUserID int64            `json:"exam_user_id"`
+		UserID     int64            `json:"user_id"`
+		UserName   string           `json:"user_name"`
+		Ratio      float64          `json:"ratio"`
+		AvatarInfo models.MediaInfo `json:"avatar_info"`
+	}
 
-	var userIds []int64
-	hasFilter := filter.ProgramId > 0 || filter.CourseId > 0 || filter.SchoolId > 0 || filter.ClassId > 0 || filter.TeacherId > 0
+	type WeekScore struct {
+		WeekID     int64   `json:"week_id"`
+		WeekNumber int     `json:"week_number"`
+		AvgScore   float64 `json:"avg_score"`
+	}
 
-	// === Phase 1: chạy song song userIds (nếu hasFilter) và weeks ===
+	// === 1. Lấy tuần ===
 	var weeks []struct {
 		ID         int64
 		WeekNumber int
 	}
-	var firstErr error
-	var mu sync.Mutex
-	wg1 := &sync.WaitGroup{}
 
-	if hasFilter {
-		wg1.Add(1)
-		go func() {
-			defer wg1.Done()
-			userIdQuery := database.Table("users u")
-			needUserCourses := filter.ProgramId > 0 || filter.CourseId > 0 || filter.TeacherId > 0
-			if needUserCourses {
-				userIdQuery = userIdQuery.Joins("JOIN user_courses uc ON uc.user_id = u.id").
-					Joins("JOIN courses c ON c.id = uc.course_id")
-				if filter.CourseId > 0 {
-					userIdQuery = userIdQuery.Where("c.id = ?", filter.CourseId)
-				}
-				if filter.ProgramId > 0 {
-					userIdQuery = userIdQuery.Where("c.program_id = ?", filter.ProgramId)
-				}
-				if filter.TeacherId > 0 {
-					userIdQuery = userIdQuery.Where("uc.user_id = ?", filter.TeacherId)
-				}
-			}
-			if filter.SchoolId > 0 {
-				userIdQuery = userIdQuery.Where("u.school_id = ?", filter.SchoolId)
-			}
-			if filter.ClassId > 0 {
-				userIdQuery = userIdQuery.Joins("JOIN user_classes ucl ON ucl.user_id = u.id").
-					Where("ucl.class_id = ?", filter.ClassId)
-			}
-			err := userIdQuery.Distinct("u.id").Pluck("u.id", &userIds).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	weeksQuery := db.Table("weeks").
+		Select("id, week_number")
+
+	if filterByDate {
+		weeksQuery = weeksQuery.
+			Where("end_date >= ?", filter.StartTime).
+			Where("end_date <= ?", filter.EndTime).
+			Order("id ASC")
+	} else {
+		weeksQuery = weeksQuery.
+			Where("start_date <= NOW()").
+			Order("id DESC").
+			Limit(20)
 	}
 
-	wg1.Add(1)
-	go func() {
-		defer wg1.Done()
-		q := database.Table("weeks").Select("id, week_number")
-		if filterByDate {
-			q = q.Where("end_date >= ?", filter.StartTime).Where("end_date <= ?", filter.EndTime).Order("id ASC")
-		} else {
-			q = q.Where("start_date <= NOW()").Order("id DESC").Limit(20)
-		}
-		err := q.Scan(&weeks).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg1.Wait()
-	if firstErr != nil {
-		return nil, firstErr
+	if err := weeksQuery.Scan(&weeks).Error; err != nil {
+		return nil, err
 	}
 
-	// === Phase 2: build union SQL/args (dùng userIds, hasFilter) ===
-	buildWeekScoreQuery := func(userTable string) (string, []interface{}) {
-		var args []interface{}
-		whereClause := " WHERE w.start_date <= NOW()"
-		if filterByDate {
-			whereClause += " AND w.end_date >= ? AND w.end_date <= ?"
-			args = append(args, filter.StartTime, filter.EndTime)
-		}
-		if len(userIds) > 0 {
-			placeholders := strings.Repeat("?,", len(userIds))
-			placeholders = placeholders[:len(placeholders)-1]
-			whereClause += fmt.Sprintf(" AND %s.user_id IN (%s)", userTable, placeholders)
-			for _, id := range userIds {
-				args = append(args, id)
-			}
-		} else if hasFilter {
-			whereClause += " AND 1=0"
-		}
-		query := fmt.Sprintf(`
-			SELECT w.id AS week_id, COALESCE(AVG(%s.ratio), 0) AS avg_score
-			FROM weeks w
-			LEFT JOIN %s ON %s.created_at BETWEEN w.start_date AND w.end_date%s
-			GROUP BY w.id`,
-			userTable, userTable, userTable, whereClause)
-		return query, args
-	}
-
-	var unionParts []string
-	var unionArgs []interface{}
-	if includeExam {
-		examSQL, examArgs := buildWeekScoreQuery("exam_users")
-		unionParts = append(unionParts, examSQL)
-		unionArgs = append(unionArgs, examArgs...)
-	}
-	if includeHomework {
-		homeworkSQL, homeworkArgs := buildWeekScoreQuery("homework_users")
-		unionParts = append(unionParts, homeworkSQL)
-		unionArgs = append(unionArgs, homeworkArgs...)
-	}
-	if includeExercise {
-		exerciseSQL, exerciseArgs := buildWeekScoreQuery("exercise_users")
-		unionParts = append(unionParts, exerciseSQL)
-		unionArgs = append(unionArgs, exerciseArgs...)
-	}
-
-	buildTopQuery := func(tableName, assignmentTable, assignmentIdCol, assignmentNameCol, typeName string) (string, []interface{}) {
-		var args []interface{}
-		whereClause := " WHERE 1=1"
-		if filterByDate {
-			whereClause += fmt.Sprintf(" AND %s.created_at <= ?", tableName)
-			args = append(args, filter.EndTime)
-		}
-		if len(userIds) > 0 {
-			placeholders := strings.Repeat("?,", len(userIds))
-			placeholders = placeholders[:len(placeholders)-1]
-			whereClause += fmt.Sprintf(" AND %s.user_id IN (%s)", tableName, placeholders)
-			for _, id := range userIds {
-				args = append(args, id)
-			}
-		} else if hasFilter {
-			whereClause += " AND 1=0"
-		}
-		query := fmt.Sprintf(`
-			SELECT
-				%s.user_id,
-				users.name AS user_name,
-				users.avatar_info,
-				AVG(%s.ratio) AS avg_ratio,
-				%s.%s as assignment_id,
-				%s.id as user_record_id,
-				a.%s AS assignment_name,
-				'%s' AS type,
-				users.name AS student_name,
-				COALESCE(schools.name, '') AS school_name,
-				COALESCE(MIN(classes.name), '') AS class_name
-			FROM %s
-			JOIN users ON %s.user_id = users.id
-			LEFT JOIN %s a ON %s.%s = a.id
-			LEFT JOIN user_classes uc ON uc.user_id = users.id
-			LEFT JOIN schools ON schools.id = users.school_id
-			LEFT JOIN classes ON classes.id = uc.class_id%s
-			GROUP BY %s.user_id, users.name, users.avatar_info, %s.%s, %s.id, a.%s, users.name, schools.name, classes.name
-			HAVING AVG(%s.ratio) > 75`,
-			tableName, tableName, tableName, assignmentIdCol, tableName, assignmentNameCol, typeName,
-			tableName, tableName, assignmentTable, tableName, assignmentIdCol, whereClause,
-			tableName, tableName, assignmentIdCol, tableName, assignmentNameCol, tableName)
-		return query, args
-	}
-
-	var topHighestUnionParts []string
-	var topHighestArgs []interface{}
-	if includeExam {
-		q, a := buildTopQuery("exam_users", "exams", "exam_id", "name", "exam")
-		topHighestUnionParts = append(topHighestUnionParts, q)
-		topHighestArgs = append(topHighestArgs, a...)
-	}
-	if includeHomework {
-		q, a := buildTopQuery("homework_users", "homeworks", "homework_id", "name", "homework")
-		topHighestUnionParts = append(topHighestUnionParts, q)
-		topHighestArgs = append(topHighestArgs, a...)
-	}
-	if includeExercise {
-		q, a := buildTopQuery("exercise_users", "exercises", "exercise_id", "name", "exercise")
-		topHighestUnionParts = append(topHighestUnionParts, q)
-		topHighestArgs = append(topHighestArgs, a...)
-	}
-
-	buildTopLowestQuery := func(tableName, assignmentTable, assignmentIdCol, assignmentNameCol, typeName string) (string, []interface{}) {
-		var args []interface{}
-		whereClause := " WHERE 1=1"
-		if filterByDate {
-			whereClause += fmt.Sprintf(" AND %s.created_at <= ?", tableName)
-			args = append(args, filter.EndTime)
-		}
-		if len(userIds) > 0 {
-			placeholders := strings.Repeat("?,", len(userIds))
-			placeholders = placeholders[:len(placeholders)-1]
-			whereClause += fmt.Sprintf(" AND %s.user_id IN (%s)", tableName, placeholders)
-			for _, id := range userIds {
-				args = append(args, id)
-			}
-		} else if hasFilter {
-			whereClause += " AND 1=0"
-		}
-		query := fmt.Sprintf(`
-			SELECT
-				%s.user_id,
-				users.name AS user_name,
-				users.avatar_info,
-				AVG(%s.ratio) AS avg_ratio,
-				%s.%s as assignment_id,
-				%s.id as user_record_id,
-				a.%s AS assignment_name,
-				'%s' AS type,
-				users.name AS student_name,
-				COALESCE(schools.name, '') AS school_name,
-				COALESCE(MIN(classes.name), '') AS class_name
-			FROM %s
-			JOIN users ON %s.user_id = users.id
-			LEFT JOIN %s a ON %s.%s = a.id
-			LEFT JOIN user_classes uc ON uc.user_id = users.id
-			LEFT JOIN schools ON schools.id = users.school_id
-			LEFT JOIN classes ON classes.id = uc.class_id%s
-			GROUP BY %s.user_id, users.name, users.avatar_info, %s.%s, %s.id, a.%s, users.name, schools.name, classes.name
-			HAVING AVG(%s.ratio) < 25`,
-			tableName, tableName, tableName, assignmentIdCol, tableName, assignmentNameCol, typeName,
-			tableName, tableName, assignmentTable, tableName, assignmentIdCol, whereClause,
-			tableName, tableName, assignmentIdCol, tableName, assignmentNameCol, tableName)
-		return query, args
-	}
-
-	var topLowestUnionParts []string
-	var topLowestArgs []interface{}
-	if includeExam {
-		q, a := buildTopLowestQuery("exam_users", "exams", "exam_id", "name", "exam")
-		topLowestUnionParts = append(topLowestUnionParts, q)
-		topLowestArgs = append(topLowestArgs, a...)
-	}
-	if includeHomework {
-		q, a := buildTopLowestQuery("homework_users", "homeworks", "homework_id", "name", "homework")
-		topLowestUnionParts = append(topLowestUnionParts, q)
-		topLowestArgs = append(topLowestArgs, a...)
-	}
-	if includeExercise {
-		q, a := buildTopLowestQuery("exercise_users", "exercises", "exercise_id", "name", "exercise")
-		topLowestUnionParts = append(topLowestUnionParts, q)
-		topLowestArgs = append(topLowestArgs, a...)
-	}
-
-	buildAvgQuery := func(tableName string) (string, []interface{}) {
-		var args []interface{}
-		whereClause := " WHERE 1=1"
-		if filterByDate {
-			whereClause += fmt.Sprintf(" AND %s.created_at <= ?", tableName)
-			args = append(args, filter.EndTime)
-		}
-		if len(userIds) > 0 {
-			placeholders := strings.Repeat("?,", len(userIds))
-			placeholders = placeholders[:len(placeholders)-1]
-			whereClause += fmt.Sprintf(" AND %s.user_id IN (%s)", tableName, placeholders)
-			for _, id := range userIds {
-				args = append(args, id)
-			}
-		} else if hasFilter {
-			whereClause += " AND 1=0"
-		}
-		query := fmt.Sprintf(`SELECT %s.user_id, %s.ratio FROM %s%s`, tableName, tableName, tableName, whereClause)
-		return query, args
-	}
-
-	var avgUnionParts []string
-	var avgArgs []interface{}
-	if includeExam {
-		q, a := buildAvgQuery("exam_users")
-		avgUnionParts = append(avgUnionParts, q)
-		avgArgs = append(avgArgs, a...)
-	}
-	if includeHomework {
-		q, a := buildAvgQuery("homework_users")
-		avgUnionParts = append(avgUnionParts, q)
-		avgArgs = append(avgArgs, a...)
-	}
-	if includeExercise {
-		q, a := buildAvgQuery("exercise_users")
-		avgUnionParts = append(avgUnionParts, q)
-		avgArgs = append(avgArgs, a...)
-	}
-
-	// === Phase 3: chạy song song 5 query (weekScores, topHighest, topLowest, averageScore, scoreCounts) ===
-	type TopStudent struct {
-		UserId         int64
-		UserName       string
-		Avatar         models.MediaInfo
-		AvgRatio       float64
-		AssignmentId   int64
-		UserRecordId   int64
-		StudentName    string
-		AssignmentName string
-		Type           string
-		SchoolName     string
-		ClassName      string
-	}
-
+	// === 2. Query avg score ===
 	var weekScores []struct {
 		WeekID   int64
 		AvgScore float64
 	}
-	var topHighestStudents []TopStudent
-	var topLowestStudents []TopStudent
-	var averageScore struct {
-		TotalAvgRatio  float64
-		TotalUserCount int64
-	}
-	var scoreCounts struct {
-		HighRatioCount int64
-		LowRatioCount  int64
-		TotalCount     int64
-	}
 
-	firstErr = nil
-	wg3 := &sync.WaitGroup{}
+	selectClause := `
+		w.id AS week_id,
+		COALESCE(SUM(eu.ratio), 0) / NULLIF(COUNT(eu.id), 0) AS avg_score
+	`
+	weekQuery := db.Table("weeks w").
+		Select(selectClause).
+		Joins(`LEFT JOIN exam_users eu ON eu.created_at BETWEEN w.start_date AND w.end_date`).
+		Joins(`LEFT JOIN exams e ON eu.exam_id = e.id`).
+		Joins(`LEFT JOIN exam_ref_lessons erl ON erl.exam_id = e.id`).
+		Joins(`LEFT JOIN lessons l ON erl.lesson_id = l.id`).
+		Joins(`LEFT JOIN chapters c ON l.chapter_id = c.id`).
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`)
 
-	if len(unionParts) > 0 {
-		wg3.Add(1)
-		finalSQL := `SELECT week_id, AVG(avg_score) AS avg_score FROM (` + strings.Join(unionParts, " UNION ALL ") + `) AS combined GROUP BY week_id ORDER BY week_id DESC LIMIT 20`
-		go func() {
-			defer wg3.Done()
-			err := database.Raw(finalSQL, unionArgs...).Scan(&weekScores).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	if filter.CourseId > 0 {
+		weekQuery = weekQuery.Where("co.id = ?", filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		weekQuery = weekQuery.Where("c.program_id = ?", filter.ProgramId)
 	}
 
-	if len(topHighestUnionParts) > 0 {
-		wg3.Add(1)
-		finalTopHighestSQL := strings.Join(topHighestUnionParts, " UNION ALL ") + " ORDER BY avg_ratio DESC LIMIT 10"
-		go func() {
-			defer wg3.Done()
-			err := database.Raw(finalTopHighestSQL, topHighestArgs...).Scan(&topHighestStudents).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	if filter.SchoolId > 0 {
+		weekQuery = weekQuery.Joins(
+			`JOIN course_schools cs ON cs.course_id = co.id AND cs.school_id = ?`, filter.SchoolId,
+		)
 	}
 
-	if len(topLowestUnionParts) > 0 {
-		wg3.Add(1)
-		finalTopLowestSQL := strings.Join(topLowestUnionParts, " UNION ALL ") + " ORDER BY avg_ratio ASC LIMIT 10"
-		go func() {
-			defer wg3.Done()
-			err := database.Raw(finalTopLowestSQL, topLowestArgs...).Scan(&topLowestStudents).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	if filter.ClassId > 0 {
+		weekQuery = weekQuery.
+			Joins(`JOIN users u ON eu.user_id = u.id`).
+			Joins(`JOIN user_classes uc ON uc.user_id = u.id AND uc.class_id = ?`, filter.ClassId)
 	}
 
-	if len(avgUnionParts) > 0 {
-		wg3.Add(1)
-		finalAvgSQL := fmt.Sprintf(`
-			SELECT COALESCE(AVG(ratio), 0) AS total_avg_ratio, COUNT(DISTINCT user_id) AS total_user_count
-			FROM (%s) AS combined`, strings.Join(avgUnionParts, " UNION ALL "))
-		go func() {
-			defer wg3.Done()
-			err := database.Raw(finalAvgSQL, avgArgs...).Scan(&averageScore).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-
-		wg3.Add(1)
-		finalCountSQL := fmt.Sprintf(`
-			SELECT SUM(CASE WHEN ratio >= 75 THEN 1 ELSE 0 END) AS high_ratio_count,
-				SUM(CASE WHEN ratio < 25 THEN 1 ELSE 0 END) AS low_ratio_count, COUNT(*) AS total_count
-			FROM (%s) AS combined`, strings.Join(avgUnionParts, " UNION ALL "))
-		go func() {
-			defer wg3.Done()
-			err := database.Raw(finalCountSQL, avgArgs...).Scan(&scoreCounts).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	if filter.TeacherId > 0 {
+		weekQuery = weekQuery.
+			Joins(`JOIN user_courses uc2 ON uc2.course_id = co.id AND uc2.user_id = ?`, filter.TeacherId)
 	}
 
-	wg3.Wait()
-	if firstErr != nil {
-		return nil, firstErr
+	if err := weekQuery.
+		Where("w.start_date <= NOW()").
+		Group("w.id").
+		Order("w.id DESC").
+		Limit(20).
+		Scan(&weekScores).Error; err != nil {
+		return nil, err
 	}
 
-	// === Map tuần + build DTO ===
+	// === 3. Map đủ 20 tuần ===
 	scoreMap := make(map[int64]float64)
 	for _, ws := range weekScores {
 		scoreMap[ws.WeekID] = ws.AvgScore
@@ -1600,36 +1103,265 @@ func (r *dashboardRepository) GetLearningOverview(filter dto.FilterDashboardAdmi
 		})
 	}
 
-	topHighest := make([]dto.StudentScore, 0, len(topHighestStudents))
-	for _, student := range topHighestStudents {
+	type TopStudent struct {
+		UserId      int64
+		UserName    string
+		Avatar      models.MediaInfo
+		AvgRatio    float64
+		ExamId      int64
+		ExamUserId  int64
+		StudentName string
+		ExamName    string
+		SchoolName  string
+		ClassName   string
+	}
+
+	// === 4. Top Highest ===
+	var topHighestExam []TopStudent
+
+	topHighestQuery := db.Model(&models.ExamUser{}).
+		Select(`
+			exam_users.user_id,
+			users.name AS user_name,
+			users.avatar_info,
+			AVG(exam_users.ratio) AS avg_ratio,
+			exam_users.exam_id as exam_id,
+			exam_users.id as exam_user_id,
+			e.name AS exam_name,
+			users.name AS student_name,
+			COALESCE(schools.name, '') AS school_name,
+			COALESCE(MIN(classes.name), '') AS class_name
+		`).
+		Joins("JOIN users ON exam_users.user_id = users.id").
+		Joins("JOIN exams e ON exam_users.exam_id = e.id").
+		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
+		Joins("JOIN lessons l ON erl.lesson_id = l.id").
+		Joins("JOIN chapters c ON l.chapter_id = c.id").
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`).
+		Joins(`LEFT JOIN user_classes uc ON uc.user_id = users.id`).
+		Joins(`LEFT JOIN schools ON schools.id = users.school_id`).
+		Joins(`LEFT JOIN classes ON classes.id = uc.class_id`)
+
+	if filterByDate {
+		topHighestQuery = topHighestQuery.Where("exam_users.created_at <= ?", filter.EndTime)
+		// topHighestQuery = topHighestQuery.Where("exam_users.created_at >= ? AND exam_users.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	if filter.CourseId > 0 {
+		topHighestQuery = topHighestQuery.Where("co.id = ?", filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		topHighestQuery = topHighestQuery.Where("c.program_id = ?", filter.ProgramId)
+	}
+
+	if filter.SchoolId > 0 {
+		topHighestQuery = topHighestQuery.Where("schools.id = ?", filter.SchoolId)
+	}
+
+	if filter.ClassId > 0 {
+		topHighestQuery = topHighestQuery.Where("uc.class_id = ?", filter.ClassId)
+	}
+
+	if filter.TeacherId > 0 {
+		topHighestQuery = topHighestQuery.Joins(`JOIN user_courses uc2 ON uc2.course_id = co.id AND uc2.user_id = ?`, filter.TeacherId)
+	}
+
+	err := topHighestQuery.Group("exam_users.user_id, users.name, users.avatar_info, exam_users.exam_id, exam_users.id, e.name, users.name, schools.name, classes.name").
+		Having("AVG(exam_users.ratio) > ?", 75).
+		Order("avg_ratio DESC").
+		Limit(10).
+		Scan(&topHighestExam).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	topHighest := make([]dto.StudentScore, 0, len(topHighestExam))
+	for _, student := range topHighestExam {
 		topHighest = append(topHighest, dto.StudentScore{
 			Id:         student.UserId,
-			TypeId:     student.AssignmentId,
-			TypeUserId: student.UserRecordId,
+			ExamId:     student.ExamId,
+			ExamUserId: student.ExamUserId,
 			Name:       student.UserName,
-			TypeName:   student.AssignmentName,
+			ExamName:   student.ExamName,
 			Score:      float32(student.AvgRatio),
-			Type:       student.Type,
 			AvatarInfo: student.Avatar,
 			ClassName:  student.ClassName,
 			SchoolName: student.SchoolName,
 		})
 	}
 
-	topLowest := make([]dto.StudentScore, 0, len(topLowestStudents))
-	for _, student := range topLowestStudents {
+	// === 5. Top Lowest ===
+	var topLowestExam []TopStudent
+
+	topLowestQuery := db.Model(&models.ExamUser{}).
+		Select(`
+			exam_users.user_id,
+			users.name AS user_name,
+			users.avatar_info,
+			AVG(exam_users.ratio) AS avg_ratio,
+			exam_users.exam_id as exam_id,
+			exam_users.id as exam_user_id,
+			e.name AS exam_name,
+			users.name AS student_name,
+			COALESCE(schools.name, '') AS school_name,
+			COALESCE(MIN(classes.name), '') AS class_name
+		`).
+		Joins("JOIN users ON exam_users.user_id = users.id").
+		Joins("JOIN exams e ON exam_users.exam_id = e.id").
+		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
+		Joins("JOIN lessons l ON erl.lesson_id = l.id").
+		Joins("JOIN chapters c ON l.chapter_id = c.id").
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`).
+		Joins(`LEFT JOIN user_classes uc ON uc.user_id = users.id`).
+		Joins(`LEFT JOIN schools ON schools.id = users.school_id`).
+		Joins(`LEFT JOIN classes ON classes.id = uc.class_id`)
+
+	if filterByDate {
+		topLowestQuery = topLowestQuery.Where("exam_users.created_at <= ?", filter.EndTime)
+		// topLowestQuery = topLowestQuery.Where("exam_users.created_at >= ? AND exam_users.created_at <= ?", filter.StartTime, filter.EndTime)
+	}
+
+	if filter.CourseId > 0 {
+		topLowestQuery = topLowestQuery.Where("co.id = ?", filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		topLowestQuery = topLowestQuery.Where("c.program_id = ?", filter.ProgramId)
+	}
+
+	if filter.SchoolId > 0 {
+		topLowestQuery = topLowestQuery.Where("schools.id = ?", filter.SchoolId)
+	}
+
+	if filter.ClassId > 0 {
+		topLowestQuery = topLowestQuery.Where("uc.class_id = ?", filter.ClassId)
+	}
+
+	if filter.TeacherId > 0 {
+		topLowestQuery = topLowestQuery.Joins(`JOIN user_courses uc2 ON uc2.course_id = co.id AND uc2.user_id = ?`, filter.TeacherId)
+	}
+
+	err = topLowestQuery.Group("exam_users.user_id, users.name, users.avatar_info, exam_users.exam_id, exam_users.id, e.name, users.name, schools.name, classes.name").
+		Having("AVG(exam_users.ratio) < ?", 25).
+		Order("avg_ratio ASC").
+		Limit(10).
+		Scan(&topLowestExam).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	topLowest := make([]dto.StudentScore, 0, len(topLowestExam))
+
+	for _, student := range topLowestExam {
 		topLowest = append(topLowest, dto.StudentScore{
 			Id:         student.UserId,
-			TypeId:     student.AssignmentId,
-			TypeUserId: student.UserRecordId,
+			ExamId:     student.ExamId,
+			ExamUserId: student.ExamUserId,
 			Name:       student.UserName,
-			TypeName:   student.AssignmentName,
+			ExamName:   student.ExamName,
 			Score:      float32(student.AvgRatio),
-			Type:       student.Type,
 			AvatarInfo: student.Avatar,
 			ClassName:  student.ClassName,
 			SchoolName: student.SchoolName,
 		})
+	}
+
+	var averageScore struct {
+		TotalAvgRatio  float64
+		TotalUserCount int64
+	}
+
+	avgRatioQuery := db.Table("exam_users eu").
+		Select(`
+            COALESCE(AVG(eu.ratio), 0) AS total_avg_ratio,
+            COUNT(DISTINCT eu.user_id) AS total_user_count
+        `).
+		Joins(`LEFT JOIN users u ON eu.user_id = u.id`).
+		Joins(`JOIN exams e ON eu.exam_id = e.id`).
+		Joins(`JOIN exam_ref_lessons erl ON erl.exam_id = e.id`).
+		Joins(`LEFT JOIN lessons l ON erl.lesson_id = l.id`).
+		Joins(`LEFT JOIN chapters c ON l.chapter_id = c.id`).
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`).
+		Joins(`LEFT JOIN user_classes uc ON uc.user_id = u.id`).
+		Joins(`LEFT JOIN schools ON schools.id = u.school_id`)
+
+	if filterByDate {
+		avgRatioQuery = avgRatioQuery.Where("eu.created_at <= ?", filter.EndTime)
+	}
+
+	if filter.CourseId > 0 {
+		avgRatioQuery = avgRatioQuery.Where("co.id = ?", filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		avgRatioQuery = avgRatioQuery.Where("c.program_id = ?", filter.ProgramId)
+	}
+
+	if filter.SchoolId > 0 {
+		avgRatioQuery = avgRatioQuery.Where("u.school_id = ?", filter.SchoolId)
+	}
+
+	if filter.ClassId > 0 {
+		avgRatioQuery = avgRatioQuery.Where("uc.class_id = ?", filter.ClassId)
+	}
+
+	if filter.TeacherId > 0 {
+		avgRatioQuery = avgRatioQuery.Joins(`JOIN user_courses uc2 ON uc2.course_id = co.id AND uc2.user_id = ?`, filter.TeacherId)
+	}
+
+	if err := avgRatioQuery.Scan(&averageScore).Error; err != nil {
+		return nil, err
+	}
+
+	var scoreCounts struct {
+		HighRatioCount int64
+		LowRatioCount  int64
+		TotalCount     int64
+	}
+
+	subQuery := db.Table("exam_users eu").
+		Select("eu.id AS exam_user_id, eu.ratio AS avg_ratio").
+		Joins(`JOIN exams e ON eu.exam_id = e.id`).
+		Joins(`JOIN exam_ref_lessons erl ON erl.exam_id = e.id`).
+		Joins(`LEFT JOIN users ON eu.user_id = users.id`).
+		Joins(`LEFT JOIN lessons l ON erl.lesson_id = l.id`).
+		Joins(`LEFT JOIN chapters c ON l.chapter_id = c.id`).
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`).
+		Joins(`LEFT JOIN user_classes uc ON uc.user_id = users.id`).
+		Joins(`LEFT JOIN schools ON schools.id = users.school_id`)
+
+	if filterByDate {
+		subQuery = subQuery.Where("eu.created_at <= ?", filter.EndTime)
+	}
+
+	if filter.CourseId > 0 {
+		subQuery = subQuery.Where("co.id = ?", filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		subQuery = subQuery.Where("c.program_id = ?", filter.ProgramId)
+	}
+
+	if filter.SchoolId > 0 {
+		subQuery = subQuery.Where("schools.id = ?", filter.SchoolId)
+	}
+
+	if filter.ClassId > 0 {
+		subQuery = subQuery.Where("uc.class_id = ?", filter.ClassId)
+	}
+
+	if filter.TeacherId > 0 {
+		subQuery = subQuery.Joins(`JOIN user_courses uc2 ON uc2.course_id = co.id AND uc2.user_id = ?`, filter.TeacherId)
+	}
+
+	ratioCountQuery := db.Table("(?) AS sub", subQuery).
+		Select(`
+			SUM(CASE WHEN sub.avg_ratio >= 75 THEN 1 ELSE 0 END) AS high_ratio_count,
+			SUM(CASE WHEN sub.avg_ratio < 25 THEN 1 ELSE 0 END) AS low_ratio_count,
+			COUNT(*) AS total_count
+		`)
+
+	if err := ratioCountQuery.Scan(&scoreCounts).Error; err != nil {
+		return nil, err
 	}
 
 	totalAverageScore := float32(0)
@@ -1666,87 +1398,24 @@ func (r *dashboardRepository) GetLearningOverview(filter dto.FilterDashboardAdmi
 }
 
 func (r *dashboardRepository) GetScoreDistribution(filter dto.FilterDashboardAdmin) (*dto.ScoreDistributionOverview, error) {
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 
-	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
-
-	includeExam := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exam"
-	includeHomework := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "homework"
-	includeExercise := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exercise"
-
-	var userIds []int64
-	hasFilter := filter.ProgramId > 0 || filter.CourseId > 0 || filter.SchoolId > 0 || filter.ClassId > 0 || filter.TeacherId > 0
-
+	// === STEP 1: Lấy danh sách khối ===
 	type Grade struct {
 		ID     int64
 		Number int64
 	}
+
 	var grades []Grade
-
-	// === Phase 1: chạy song song userIds (nếu hasFilter) và grades ===
-	var firstErr error
-	var mu sync.Mutex
-	wg := &sync.WaitGroup{}
-
-	if hasFilter {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			userIdQuery := database.Table("users u")
-			needUserCourses := filter.ProgramId > 0 || filter.CourseId > 0 || filter.TeacherId > 0
-			if needUserCourses {
-				userIdQuery = userIdQuery.Joins("JOIN user_courses uc ON uc.user_id = u.id").
-					Joins("JOIN courses c ON c.id = uc.course_id")
-				if filter.CourseId > 0 {
-					userIdQuery = userIdQuery.Where("c.id = ?", filter.CourseId)
-				}
-				if filter.ProgramId > 0 {
-					userIdQuery = userIdQuery.Where("c.program_id = ?", filter.ProgramId)
-				}
-				if filter.TeacherId > 0 {
-					userIdQuery = userIdQuery.Where("uc.user_id = ?", filter.TeacherId)
-				}
-			}
-			if filter.SchoolId > 0 {
-				userIdQuery = userIdQuery.Where("u.school_id = ?", filter.SchoolId)
-			}
-			if filter.ClassId > 0 {
-				userIdQuery = userIdQuery.Joins("JOIN user_classes ucl ON ucl.user_id = u.id").
-					Where("ucl.class_id = ?", filter.ClassId)
-			}
-			err := userIdQuery.Distinct("u.id").Pluck("u.id", &userIds).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
+	err := db.Model(&models.Grade{}).
+		Select("id, number").
+		Order("number").
+		Find(&grades).Error
+	if err != nil {
+		return nil, err
 	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Model(&models.Grade{}).
-			Select("id, number").
-			Order("number").
-			Find(&grades).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Wait()
-	if firstErr != nil {
-		return nil, firstErr
-	}
-
-	// === Phase 2: build union và chạy query phân phối điểm ===
+	// === STEP 2: Lấy phân phối điểm GROUP BY bin + grade_id ===
 	type BinResult struct {
 		Bin     int64
 		Count   int64
@@ -1754,69 +1423,51 @@ func (r *dashboardRepository) GetScoreDistribution(filter dto.FilterDashboardAdm
 	}
 
 	var results []BinResult
-	buildScoreDistQuery := func(userTable string) (string, []interface{}) {
-		var args []interface{}
-		whereClause := " WHERE 1=1"
-		if filterByDate {
-			whereClause += fmt.Sprintf(" AND %s.created_at <= ?", userTable)
-			args = append(args, filter.EndTime)
-		}
-		if len(userIds) > 0 {
-			placeholders := strings.Repeat("?,", len(userIds))
-			placeholders = placeholders[:len(placeholders)-1]
-			whereClause += fmt.Sprintf(" AND %s.user_id IN (%s)", userTable, placeholders)
-			for _, id := range userIds {
-				args = append(args, id)
-			}
-		} else if hasFilter {
-			whereClause += " AND 1=0"
-		}
-		query := fmt.Sprintf(`
-			SELECT 
-				FLOOR(%s.ratio / 10) * 10 AS bin, 
-				cl.grade_id,
-				COUNT(DISTINCT %s.user_id) AS count
-			FROM %s
-			JOIN users u ON %s.user_id = u.id
-			JOIN user_classes uc ON uc.user_id = u.id
-			JOIN classes cl ON uc.class_id = cl.id
-			%s
-			GROUP BY bin, cl.grade_id`,
-			userTable, userTable, userTable, userTable, whereClause)
-		return query, args
+
+	query := db.Table("exam_users AS eu").
+		Select(`FLOOR(eu.ratio / 10) * 10 AS bin, cl.grade_id, COUNT(*) AS count`).
+		Joins(`JOIN exams e ON eu.exam_id = e.id`).
+		Joins(`JOIN exam_ref_lessons erl ON erl.exam_id = e.id`).
+		Joins(`JOIN lessons l ON erl.lesson_id = l.id`).
+		Joins(`JOIN chapters c ON l.chapter_id = c.id`).
+		Joins(`JOIN users u ON eu.user_id = u.id`).
+		Joins(`JOIN user_classes uc ON uc.user_id = u.id`).
+		Joins(`JOIN classes cl ON uc.class_id = cl.id`).
+		Joins(`LEFT JOIN courses co ON co.program_id = c.program_id`)
+
+	// === Filters ===
+	if filter.CourseId > 0 {
+		query = query.Where(`co.id = ?`, filter.CourseId)
+	}
+	if filter.ProgramId > 0 {
+		query = query.Where(`c.program_id = ?`, filter.ProgramId)
+	}
+	if filter.SchoolId > 0 {
+		query = query.Where("u.school_id = ?", filter.SchoolId)
+	}
+	if filter.ClassId > 0 {
+		query = query.Joins(`JOIN user_classes uc2 ON uc2.user_id = u.id AND uc2.class_id = ?`, filter.ClassId)
+	}
+	if filter.TeacherId > 0 {
+		query = query.Joins(`JOIN user_courses uc3 ON uc3.course_id = co.id AND uc3.user_id = ?`, filter.TeacherId)
 	}
 
-	var unionParts []string
-	var unionArgs []interface{}
-	if includeExam {
-		q, a := buildScoreDistQuery("exam_users")
-		unionParts = append(unionParts, q)
-		unionArgs = append(unionArgs, a...)
-	}
-	if includeHomework {
-		q, a := buildScoreDistQuery("homework_users")
-		unionParts = append(unionParts, q)
-		unionArgs = append(unionArgs, a...)
-	}
-	if includeExercise {
-		q, a := buildScoreDistQuery("exercise_users")
-		unionParts = append(unionParts, q)
-		unionArgs = append(unionArgs, a...)
+	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
+	if filterByDate {
+		query = query.Where(`eu.created_at <= ?`, filter.EndTime)
+		// query = query.Where(`eu.created_at >= ? AND eu.created_at <= ?`, filter.StartTime, filter.EndTime)
 	}
 
-	if len(unionParts) > 0 {
-		finalSQL := fmt.Sprintf(`
-			SELECT bin, grade_id, SUM(count) AS count
-			FROM (%s) AS combined
-			GROUP BY bin, grade_id
-			ORDER BY grade_id, bin`, strings.Join(unionParts, " UNION ALL "))
+	err = query.
+		Group(`bin, cl.grade_id`).
+		Order(`cl.grade_id, bin`).
+		Scan(&results).Error
 
-		if err := database.Raw(finalSQL, unionArgs...).Scan(&results).Error; err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
-	// === Map bin theo grade và build items ===
+	// === STEP 3: Map bin theo grade ===
 	resultMap := make(map[int64]map[int64]int64)
 	for _, r := range results {
 		if _, ok := resultMap[r.GradeID]; !ok {
@@ -1825,33 +1476,42 @@ func (r *dashboardRepository) GetScoreDistribution(filter dto.FilterDashboardAdm
 		resultMap[r.GradeID][r.Bin] = r.Count
 	}
 
+	// === STEP 4: Build items theo khối ===
 	min := int64(0)
 	max := int64(100)
 	step := int64(10)
+
 	var items []dto.ScoreDistributionItem
+	itemNumber := 1
 
 	for _, g := range grades {
 		bins := resultMap[g.ID]
+
 		scores := []float32{}
 		counts := []float32{}
+
 		for b := min; b <= max; b += step {
 			scores = append(scores, float32(b))
 			counts = append(counts, float32(bins[b]))
 		}
+
 		items = append(items, dto.ScoreDistributionItem{
 			Number: int32(g.Number),
 			Scores: scores,
 			Counts: counts,
 		})
+
+		itemNumber++
 	}
 
+	// === Trả về ===
 	return &dto.ScoreDistributionOverview{
 		Items: items,
 	}, nil
 }
 
 func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*dto.SystemUsageOverview, error) {
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 
 	historyRepo := NewHistoryUseRepository()
 
@@ -1866,38 +1526,50 @@ func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*
 		Duration  float64
 	}
 
+	var weeklyResults []WeeklyUsageResult
+
+	// Lấy danh sách bảng cần query theo tháng
 	tableNames := table_manager.GetTableNamesForDateRange("activity_logs", filter.StartTime, filter.EndTime)
 
-	// Phase 1: một vòng lặp — kiểm tra exists một lần mỗi bảng, build cả weekly và device union
 	var unionQueries []string
 	var args []interface{}
-	var deviceUnionQueries []string
-	var deviceArgs []interface{}
-
 	for _, tableName := range tableNames {
+		// Kiểm tra bảng có tồn tại không
 		var exists bool
-		if err := database.Raw(`
-			SELECT EXISTS (
-				SELECT FROM information_schema.tables
-				WHERE table_schema = 'public' AND table_name = ?
-			)`, tableName).Scan(&exists).Error; err != nil || !exists {
+		err := db.Raw(`
+				SELECT EXISTS (
+					SELECT FROM information_schema.tables
+					WHERE table_schema = 'public'
+					AND table_name = ?
+				)
+			`, tableName).Scan(&exists).Error
+
+		if err != nil || !exists {
 			continue
 		}
 
-		// Weekly subquery
+		// Tạo subquery cho từng bảng tháng
 		subQuery := fmt.Sprintf(`
-			SELECT
-				CONCAT(EXTRACT('week' FROM al.created_at)::INT, '/', EXTRACT('isoyear' FROM al.created_at)::INT) AS week_label,
-				COUNT(DISTINCT FLOOR(EXTRACT(EPOCH FROM al.created_at) / 300)) * 5 AS duration
-			FROM %s al
-		`, tableName)
-		joinClause := " JOIN users ON users.id = al.user_id"
+				SELECT
+					CONCAT(EXTRACT('week' FROM al.created_at)::INT, '/', EXTRACT('isoyear' FROM al.created_at)::INT) AS week_label,
+					COUNT(DISTINCT FLOOR(EXTRACT(EPOCH FROM al.created_at) / 300)) * 5 AS duration
+				FROM %s al
+			`, tableName)
+
+		// Thêm JOIN clauses
+		joinClause := ""
 		whereClause := "WHERE al.created_at >= ? AND al.created_at <= ?"
-		queryArgs := []interface{}{filter.StartTime, filter.EndTime}
+		var queryArgs []interface{}
+		queryArgs = append(queryArgs, filter.StartTime, filter.EndTime)
+
+		baseJoin := " JOIN users ON users.id = al.user_id"
+		joinClause = baseJoin
+
 		if filter.SchoolId > 0 {
 			whereClause += " AND users.school_id = ?"
 			queryArgs = append(queryArgs, filter.SchoolId)
 		}
+
 		if filter.CourseId > 0 || filter.ProgramId > 0 {
 			joinClause += " JOIN user_courses ON user_courses.user_id = al.user_id"
 			if filter.CourseId > 0 {
@@ -1910,6 +1582,7 @@ func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*
 				queryArgs = append(queryArgs, filter.ProgramId)
 			}
 		}
+
 		if filter.RoleId > 0 {
 			if !strings.Contains(joinClause, "JOIN user_ref_roles") {
 				joinClause += " JOIN user_ref_roles urr ON urr.user_id = users.id"
@@ -1917,161 +1590,151 @@ func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*
 			whereClause += " AND urr.role_id = ?"
 			queryArgs = append(queryArgs, filter.RoleId)
 		}
-		subQuery += joinClause + " " + whereClause + " GROUP BY week_label"
-		unionQueries = append(unionQueries, subQuery)
+
 		args = append(args, queryArgs...)
 
-		// Device subquery
-		deviceSubQuery := fmt.Sprintf(`
-			SELECT DISTINCT ON (al.user_id) al.user_id, al.device
-			FROM %s al
-		`, tableName)
-		deviceJoin := " JOIN users u ON u.id = al.user_id"
-		deviceWhere := "WHERE al.device IS NOT NULL AND al.created_at >= ? AND al.created_at <= ?"
-		if filter.SchoolId > 0 {
-			deviceWhere += fmt.Sprintf(" AND u.school_id = %d", filter.SchoolId)
-		}
-		if filter.CourseId > 0 || filter.ProgramId > 0 {
-			deviceJoin += " JOIN user_courses uc ON uc.user_id = al.user_id"
-			if filter.CourseId > 0 {
-				deviceWhere += fmt.Sprintf(" AND uc.course_id = %d", filter.CourseId)
-			}
-			if filter.ProgramId > 0 {
-				deviceJoin += " JOIN courses co ON co.id = uc.course_id"
-				deviceWhere += fmt.Sprintf(" AND co.program_id = %d", filter.ProgramId)
-			}
-		}
-		if filter.RoleId > 0 {
-			if !strings.Contains(deviceJoin, "JOIN user_ref_roles") {
-				deviceJoin += " JOIN user_ref_roles urr ON urr.user_id = u.id"
-			}
-			deviceWhere += fmt.Sprintf(" AND urr.role_id = %d", filter.RoleId)
-		}
-		deviceSubQuery += deviceJoin + " " + deviceWhere + " ORDER BY al.user_id, al.created_at DESC"
-		deviceUnionQueries = append(deviceUnionQueries, deviceSubQuery)
-		deviceArgs = append(deviceArgs, filter.StartTime, filter.EndTime)
+		subQuery += joinClause + " " + whereClause + " GROUP BY week_label"
+		unionQueries = append(unionQueries, subQuery)
 	}
-
-	// Phase 2: chạy song song weeks, weeklyResults, deviceResults, averageUsed
-	var weeklyResults []WeeklyUsageResult
-	var weeks []models.Week
-	var deviceResults []DeviceUsageResult
-	var averageUsed models.AverageUsed
-
-	var firstErr error
-	var mu sync.Mutex
-	wg := &sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Raw(`
-			SELECT week_number, start_date, end_date, year
-			FROM weeks
-			WHERE start_date >= ? AND end_date <= ? AND start_date < NOW()
-			ORDER BY year, week_number
-		`, filter.StartTime.AddDate(0, 0, -4), filter.EndTime.AddDate(0, 0, 4)).Scan(&weeks).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
 
 	if len(unionQueries) > 0 {
-		wg.Add(1)
+		// Gộp tất cả subqueries bằng UNION ALL và tính tổng
 		mainQuery := fmt.Sprintf(`
-			SELECT week_label, SUM(duration) as duration
-			FROM (%s) AS combined
-			GROUP BY week_label
-			ORDER BY week_label ASC
-		`, strings.Join(unionQueries, " UNION ALL "))
-		go func() {
-			defer wg.Done()
-			err := database.Raw(mainQuery, args...).Scan(&weeklyResults).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-	}
+				SELECT week_label, SUM(duration) as duration
+				FROM (
+					%s
+				) AS combined
+				GROUP BY week_label
+				ORDER BY week_label ASC
+			`, strings.Join(unionQueries, " UNION ALL "))
 
-	if len(deviceUnionQueries) > 0 {
-		wg.Add(1)
-		deviceMainQuery := fmt.Sprintf(`
-			SELECT t.device AS device, COUNT(*) AS count,
-				COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () AS percent
-			FROM (
-				SELECT DISTINCT ON (user_id) user_id, device
-				FROM (%s) AS all_devices
-				ORDER BY user_id, device
-			) AS t
-			GROUP BY t.device
-		`, strings.Join(deviceUnionQueries, " UNION ALL "))
-		go func() {
-			defer wg.Done()
-			err := database.Raw(deviceMainQuery, deviceArgs...).Scan(&deviceResults).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-	}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		avg, err := historyRepo.AverageUsed(filter.StartTime, filter.EndTime, filter.SchoolId, filter.CourseId, filter.ProgramId, filter.RoleId)
+		err := db.Raw(mainQuery, args...).Scan(&weeklyResults).Error
 		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-			return
+			return nil, err
 		}
-		averageUsed = avg
-	}()
-
-	wg.Wait()
-	if firstErr != nil {
-		return nil, firstErr
 	}
 
-	// Phase 3: build usageMap, weeklyUsages, deviceUsages
+	var weeks []models.Week
+
+	err := db.Raw(`
+			SELECT week_number, start_date, end_date, year
+			FROM weeks
+			WHERE
+				start_date >= ?
+				AND end_date <= ?
+				AND start_date < NOW()
+			ORDER BY year, week_number
+		`,
+		filter.StartTime.AddDate(0, 0, -4),
+		filter.EndTime.AddDate(0, 0, 4),
+	).Scan(&weeks).Error
+
+	if err != nil {
+		return nil, err
+	}
+
 	usageMap := make(map[string]float64)
 	for _, r := range weeklyResults {
 		usageMap[r.WeekLabel] = r.Duration
 	}
 
-	beginAt, _ := time.Parse("2006-01-02", "2025-09-08")
-	today := time.Now()
 	weeklyUsages := make([]dto.WeeklyUsage, 0, len(weeks))
 	for _, w := range weeks {
-		startDate := w.StartDate
-		endDate := w.EndDate
-		if startDate.Before(beginAt) {
+		weekLabel := fmt.Sprintf("%d/%d", w.WeekNumber, w.Year)
+
+		duration := float32(usageMap[weekLabel])
+
+		weeklyUsages = append(weeklyUsages, dto.WeeklyUsage{
+			Week:     weekLabel,
+			Duration: duration,
+		})
+	}
+
+	// === Thiết bị từ logs ===
+	var deviceResults []DeviceUsageResult
+
+	// Tạo UNION query cho device từ các bảng theo tháng
+	var deviceUnionQueries []string
+	var deviceArgs []interface{}
+
+	for _, tableName := range tableNames {
+		// Kiểm tra bảng có tồn tại không
+		var exists bool
+		err := db.Raw(`
+				SELECT EXISTS (
+					SELECT FROM information_schema.tables
+					WHERE table_schema = 'public'
+					AND table_name = ?
+				)
+			`, tableName).Scan(&exists).Error
+
+		if err != nil || !exists {
 			continue
 		}
-		diff := startDate.Sub(beginAt)
-		weekNumber := int(diff.Hours()/(24*7)) + 1
-		weekLabel := fmt.Sprintf("%d/%d", w.WeekNumber, w.Year)
-		duration := float32(usageMap[weekLabel])
-		isCurrent := (today.Equal(startDate) || today.After(startDate)) &&
-			(today.Equal(endDate) || today.Before(endDate.Add(24*time.Hour)))
-		weeklyUsages = append(weeklyUsages, dto.WeeklyUsage{
-			Week:      int32(weekNumber),
-			Duration:  duration,
-			IsCurrent: isCurrent,
-		})
+
+		// Tạo subquery để lấy device của user từ mỗi bảng tháng
+		subQuery := fmt.Sprintf(`
+				SELECT DISTINCT ON (al.user_id)
+					al.user_id,
+					al.device
+				FROM %s al
+			`, tableName)
+
+		// Thêm JOIN clauses
+		joinClause := ""
+		whereClause := "WHERE al.device IS NOT NULL AND al.created_at >= ? AND al.created_at <= ?"
+
+		baseJoin := " JOIN users u ON u.id = al.user_id"
+		joinClause = baseJoin
+
+		if filter.SchoolId > 0 {
+			whereClause += fmt.Sprintf(" AND u.school_id = %d", filter.SchoolId)
+		}
+
+		if filter.CourseId > 0 || filter.ProgramId > 0 {
+			joinClause += " JOIN user_courses uc ON uc.user_id = al.user_id"
+			if filter.CourseId > 0 {
+				whereClause += fmt.Sprintf(" AND uc.course_id = %d", filter.CourseId)
+			}
+			if filter.ProgramId > 0 {
+				joinClause += " JOIN courses co ON co.id = uc.course_id"
+				whereClause += fmt.Sprintf(" AND co.program_id = %d", filter.ProgramId)
+			}
+		}
+
+		if filter.RoleId > 0 {
+			if !strings.Contains(joinClause, "JOIN user_ref_roles") {
+				joinClause += " JOIN user_ref_roles urr ON urr.user_id = u.id"
+			}
+			whereClause += fmt.Sprintf(" AND urr.role_id = %d", filter.RoleId)
+		}
+
+		subQuery += joinClause + " " + whereClause + " ORDER BY al.user_id, al.created_at DESC"
+		deviceUnionQueries = append(deviceUnionQueries, subQuery)
+		deviceArgs = append(deviceArgs, filter.StartTime, filter.EndTime)
+	}
+
+	if len(deviceUnionQueries) > 0 {
+		// Gộp kết quả từ tất cả các bảng tháng và tính phần trăm
+		deviceMainQuery := fmt.Sprintf(`
+				SELECT
+					t.device AS device,
+					COUNT(*) AS count,
+					COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () AS percent
+				FROM (
+					SELECT DISTINCT ON (user_id) user_id, device
+					FROM (
+						%s
+					) AS all_devices
+					ORDER BY user_id, device
+				) AS t
+				GROUP BY t.device
+			`, strings.Join(deviceUnionQueries, " UNION ALL "))
+
+		err = db.Raw(deviceMainQuery, deviceArgs...).Scan(&deviceResults).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	deviceMap := make(map[string]dto.DeviceUsage)
@@ -2082,15 +1745,22 @@ func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*
 			Percent: float32(d.Percent),
 		}
 	}
+
 	devices := []string{"Desktop", "Mobile", "Tablet"}
 	deviceUsages := make([]dto.DeviceUsage, 0, len(devices))
 	for _, device := range devices {
 		if usage, ok := deviceMap[device]; ok {
 			deviceUsages = append(deviceUsages, usage)
 		} else {
-			deviceUsages = append(deviceUsages, dto.DeviceUsage{Name: device, Count: 0, Percent: 0})
+			deviceUsages = append(deviceUsages, dto.DeviceUsage{
+				Name:    device,
+				Count:   0,
+				Percent: 0,
+			})
 		}
 	}
+
+	averageUsed, _ := historyRepo.AverageUsed(filter.StartTime, filter.EndTime, filter.SchoolId, filter.CourseId, filter.ProgramId, filter.RoleId)
 
 	return &dto.SystemUsageOverview{
 		WeeklyUsages: weeklyUsages,
@@ -2099,461 +1769,32 @@ func (r *dashboardRepository) GetSystemUsage(filter dto.FilterDashboardAdmin) (*
 	}, nil
 }
 
-func (r *dashboardRepository) GetSystemUsageType(filter dto.FilterDashboardAdmin) (*dto.SystemUsageOverview, error) {
-	database := db.ReplicaDB
-
-	// Step 1: Find courses based on filter
-	courseQuery := database.Table("courses c").
-		Select("DISTINCT c.id").
-		Where("c.deleted_at IS NULL")
-	if filter.SchoolId > 0 {
-		courseQuery = courseQuery.
-			Joins("JOIN course_schools cs ON cs.course_id = c.id").
-			Where("cs.school_id = ?", filter.SchoolId)
-	}
-	if filter.ProgramId > 0 {
-		courseQuery = courseQuery.Where("c.program_id = ?", filter.ProgramId)
-	}
-	if filter.CourseId > 0 {
-		courseQuery = courseQuery.Where("c.id = ?", filter.CourseId)
-	}
-
-	var courseIds []int64
-	if err := courseQuery.Pluck("id", &courseIds).Error; err != nil {
-		return nil, err
-	}
-	if len(courseIds) == 0 {
-		return &dto.SystemUsageOverview{CompleteCount: 0, CompletedRate: 0}, nil
-	}
-
-	includeExam := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exam"
-	includeHomework := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "homework"
-	includeExercise := filter.ObjectType == "" || filter.ObjectType == "all" || filter.ObjectType == "exercise"
-
-	type Assignment struct {
-		AssignmentID int64
-		CourseID     int64
-		Type         string
-	}
-
-	// Step 2: Chạy song song 3 query assignments (exam, homework, exercise)
-	var examAssignments, homeworkAssignments, exerciseAssignments []Assignment
-	var firstErr error
-	var mu sync.Mutex
-	wgAssign := &sync.WaitGroup{}
-
-	if includeExam {
-		wgAssign.Add(1)
-		go func() {
-			defer wgAssign.Done()
-			var out []Assignment
-			q := database.Table("exam_ref_lessons erl").
-				Select("DISTINCT erl.exam_id as assignment_id, erl.course_id, 'exam' as type").
-				Joins("JOIN lesson_schedules ls ON ls.lesson_id = erl.lesson_id AND ls.course_id = erl.course_id").
-				Where("erl.course_id IN ?", courseIds).
-				Where("erl.assigned_at IS NOT NULL")
-			if !filter.StartTime.IsZero() && !filter.EndTime.IsZero() {
-				q = q.Where("ls.scheduled_date >= ? AND ls.scheduled_date <= ?", filter.StartTime, filter.EndTime)
-			}
-			err := q.Scan(&out).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-				return
-			}
-			examAssignments = out
-		}()
-	}
-	if includeHomework {
-		wgAssign.Add(1)
-		go func() {
-			defer wgAssign.Done()
-			var out []Assignment
-			q := database.Table("homework_ref_lessons hrl").
-				Select("DISTINCT hrl.homework_id as assignment_id, hrl.course_id, 'homework' as type").
-				Joins("JOIN lesson_schedules ls ON ls.lesson_id = hrl.lesson_id AND ls.course_id = hrl.course_id").
-				Where("hrl.course_id IN ?", courseIds).
-				Where("hrl.assigned_at IS NOT NULL")
-			if !filter.StartTime.IsZero() && !filter.EndTime.IsZero() {
-				q = q.Where("ls.scheduled_date >= ? AND ls.scheduled_date <= ?", filter.StartTime, filter.EndTime)
-			}
-			err := q.Scan(&out).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-				return
-			}
-			homeworkAssignments = out
-		}()
-	}
-	if includeExercise {
-		wgAssign.Add(1)
-		go func() {
-			defer wgAssign.Done()
-			var out []Assignment
-			q := database.Table("exercise_ref_lessons exrl").
-				Select("DISTINCT exrl.exercise_id as assignment_id, exrl.course_id, 'exercise' as type").
-				Joins("JOIN lesson_schedules ls ON ls.lesson_id = exrl.lesson_id AND ls.course_id = exrl.course_id").
-				Where("exrl.course_id IN ?", courseIds).
-				Where("exrl.assigned_at IS NOT NULL")
-			if !filter.StartTime.IsZero() && !filter.EndTime.IsZero() {
-				q = q.Where("ls.scheduled_date >= ? AND ls.scheduled_date <= ?", filter.StartTime, filter.EndTime)
-			}
-			err := q.Scan(&out).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-				return
-			}
-			exerciseAssignments = out
-		}()
-	}
-
-	wgAssign.Wait()
-	if firstErr != nil {
-		return nil, firstErr
-	}
-
-	allAssignments := make([]Assignment, 0, len(examAssignments)+len(homeworkAssignments)+len(exerciseAssignments))
-	allAssignments = append(allAssignments, examAssignments...)
-	allAssignments = append(allAssignments, homeworkAssignments...)
-	allAssignments = append(allAssignments, exerciseAssignments...)
-
-	if len(allAssignments) == 0 {
-		return &dto.SystemUsageOverview{CompleteCount: 0, CompletedRate: 0}, nil
-	}
-
-	coursesWithAssignments := make(map[int64]bool)
-	for _, a := range allAssignments {
-		coursesWithAssignments[a.CourseID] = true
-	}
-	filteredCourseIds := make([]int64, 0, len(courseIds))
-	for _, courseID := range courseIds {
-		if coursesWithAssignments[courseID] {
-			filteredCourseIds = append(filteredCourseIds, courseID)
-		}
-	}
-	if len(filteredCourseIds) == 0 {
-		return &dto.SystemUsageOverview{CompleteCount: 0, CompletedRate: 0}, nil
-	}
-
-	assignmentsByCourse := make(map[int64][]Assignment)
-	var examIDs, homeworkIDs, exerciseIDs []int64
-	for _, a := range allAssignments {
-		assignmentsByCourse[a.CourseID] = append(assignmentsByCourse[a.CourseID], a)
-		switch a.Type {
-		case "exam":
-			examIDs = append(examIDs, a.AssignmentID)
-		case "homework":
-			homeworkIDs = append(homeworkIDs, a.AssignmentID)
-		case "exercise":
-			exerciseIDs = append(exerciseIDs, a.AssignmentID)
-		}
-	}
-
-	type StudentCourse struct {
-		UserID   int64
-		CourseID int64
-	}
-	type CompletionRecord struct {
-		UserID       int64
-		AssignmentID int64
-		Type         string
-	}
-
-	// Step 3: Chạy song song studentCourses + 3 completion queries
-	var studentCourses []StudentCourse
-	var examCompletions []struct {
-		UserID int64
-		ExamID int64
-	}
-	var homeworkCompletions []struct {
-		UserID     int64
-		HomeworkID int64
-	}
-	var exerciseCompletions []struct {
-		UserID     int64
-		ExerciseID int64
-	}
-
-	firstErr = nil
-	wgData := &sync.WaitGroup{}
-
-	wgData.Add(1)
-	go func() {
-		defer wgData.Done()
-		err := database.Table("user_courses uc").
-			Select("DISTINCT uc.user_id, uc.course_id").
-			Joins("JOIN users u ON u.id = uc.user_id").
-			Joins("JOIN user_ref_roles ur ON ur.user_id = u.id").
-			Where("ur.role_id = ?", models.StudentRoleId).
-			Where("u.deleted_at IS NULL").
-			Where("uc.course_id IN ?", filteredCourseIds).
-			Scan(&studentCourses).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	if includeExam && len(examIDs) > 0 {
-		wgData.Add(1)
-		go func() {
-			defer wgData.Done()
-			err := database.Table("exam_users").
-				Select("DISTINCT user_id, exam_id").
-				Where("exam_id IN ?", examIDs).
-				Scan(&examCompletions).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-	}
-	if includeHomework && len(homeworkIDs) > 0 {
-		wgData.Add(1)
-		go func() {
-			defer wgData.Done()
-			err := database.Table("homework_users").
-				Select("DISTINCT user_id, homework_id").
-				Where("homework_id IN ?", homeworkIDs).
-				Scan(&homeworkCompletions).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-	}
-	if includeExercise && len(exerciseIDs) > 0 {
-		wgData.Add(1)
-		go func() {
-			defer wgData.Done()
-			err := database.Table("exercise_users").
-				Select("DISTINCT user_id, exercise_id").
-				Where("exercise_id IN ?", exerciseIDs).
-				Scan(&exerciseCompletions).Error
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = err
-				}
-				mu.Unlock()
-			}
-		}()
-	}
-
-	wgData.Wait()
-	if firstErr != nil {
-		return nil, firstErr
-	}
-
-	if len(studentCourses) == 0 {
-		return &dto.SystemUsageOverview{CompleteCount: 0, CompletedRate: 0}, nil
-	}
-
-	studentCoursesMap := make(map[int64][]int64)
-	uniqueStudents := make(map[int64]bool)
-	for _, sc := range studentCourses {
-		studentCoursesMap[sc.UserID] = append(studentCoursesMap[sc.UserID], sc.CourseID)
-		uniqueStudents[sc.UserID] = true
-	}
-
-	allCompletions := make([]CompletionRecord, 0,
-		len(examCompletions)+len(homeworkCompletions)+len(exerciseCompletions))
-	for _, ec := range examCompletions {
-		allCompletions = append(allCompletions, CompletionRecord{UserID: ec.UserID, AssignmentID: ec.ExamID, Type: "exam"})
-	}
-	for _, hc := range homeworkCompletions {
-		allCompletions = append(allCompletions, CompletionRecord{UserID: hc.UserID, AssignmentID: hc.HomeworkID, Type: "homework"})
-	}
-	for _, exc := range exerciseCompletions {
-		allCompletions = append(allCompletions, CompletionRecord{UserID: exc.UserID, AssignmentID: exc.ExerciseID, Type: "exercise"})
-	}
-
-	completionMap := make(map[int64]map[string]bool)
-	for _, comp := range allCompletions {
-		if completionMap[comp.UserID] == nil {
-			completionMap[comp.UserID] = make(map[string]bool)
-		}
-		completionMap[comp.UserID][comp.Type+":"+fmt.Sprintf("%d", comp.AssignmentID)] = true
-	}
-
-	var completeCount int64
-	for userID := range uniqueStudents {
-		requiredAssignments := make(map[string]bool)
-		for _, courseID := range studentCoursesMap[userID] {
-			for _, a := range assignmentsByCourse[courseID] {
-				requiredAssignments[a.Type+":"+fmt.Sprintf("%d", a.AssignmentID)] = true
-			}
-		}
-		if len(requiredAssignments) == 0 {
-			continue
-		}
-		completed := completionMap[userID]
-		for requiredKey := range requiredAssignments {
-			if completed[requiredKey] {
-				completeCount++
-				break
-			}
-		}
-	}
-
-	totalUniqueStudents := int64(len(uniqueStudents))
-	var completeRate float32
-	if totalUniqueStudents > 0 {
-		completeRate = float32(completeCount) / float32(totalUniqueStudents) * 100
-	}
-
-	return &dto.SystemUsageOverview{
-		CompleteCount: int32(completeCount),
-		CompletedRate: completeRate,
-	}, nil
-}
-
 func (r *dashboardRepository) GetQuestionBank(filter dto.FilterDashboardAdmin) (*dto.QuestionBankOverview, error) {
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
 
 	var totalQuestions int64
+	if err := db.Model(&models.Question{}).Count(&totalQuestions).Error; err != nil {
+		return nil, err
+	}
+
+	// Query tổng theo loại
 	var typeResults []struct {
 		QuestionType string
 		Total        int32
 	}
-	var allAttributes []struct {
-		ID       int64
-		ParentID *int64
-		Name     string
+
+	questionQuery := db.
+		Model(&models.Question{}).
+		Select("question_type, COUNT(*) as total")
+
+	if filterByDate {
+		questionQuery = questionQuery.Where(`created_at <= ?`, filter.EndTime)
+		// questionQuery = questionQuery.Where(`created_at >= ? AND created_at <= ?`, filter.StartTime, filter.EndTime)
 	}
-	var countResults []struct {
-		AttributeID int64
-		Count       int32
-	}
-	var withAudio, withImage int64
 
-	var firstErr error
-	var mu sync.Mutex
-	wg := &sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Model(&models.Question{}).Count(&totalQuestions).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		q := database.Model(&models.Question{}).Select("question_type, COUNT(*) as total")
-		if filterByDate {
-			q = q.Where(`created_at <= ?`, filter.EndTime)
-		}
-		err := q.Group("question_type").Scan(&typeResults).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Table("question_attributes").Select("id, parent_id, name").Find(&allAttributes).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		countQuery := `
-			SELECT qa.id AS attribute_id, COUNT(q.id) AS count
-			FROM question_attributes qa
-			INNER JOIN question_ref_attributes qra ON qra.question_attribute_id = qa.id
-			INNER JOIN questions q ON q.id = qra.question_id AND q.deleted_at IS NULL
-			WHERE qa.parent_id IS NOT NULL
-		`
-		var args []interface{}
-		if filterByDate {
-			countQuery += ` AND q.created_at <= ?`
-			args = append(args, filter.EndTime)
-		}
-		countQuery += ` GROUP BY qa.id`
-		err := database.Raw(countQuery, args...).Scan(&countResults).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Model(&models.Question{}).
-			Where(`file_info->>'path' IS NOT NULL AND kind = ?`, "audio").
-			Count(&withAudio).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Model(&models.Question{}).
-			Where(`file_info->>'path' IS NOT NULL AND kind = ?`, "image").
-			Count(&withImage).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Wait()
-	if firstErr != nil {
-		return nil, firstErr
+	if err := questionQuery.Group("question_type").Scan(&typeResults).Error; err != nil {
+		return nil, err
 	}
 
 	var types []dto.QuestionTypeItem
@@ -2566,21 +1807,71 @@ func (r *dashboardRepository) GetQuestionBank(filter dto.FilterDashboardAdmin) (
 		})
 	}
 
+	// Lấy toàn bộ question_attributes
+	var allAttributes []struct {
+		ID       int64
+		ParentID *int64
+		Name     string
+	}
+
+	if err := db.
+		Table("question_attributes").
+		Select("id, parent_id, name").
+		Find(&allAttributes).Error; err != nil {
+		return nil, err
+	}
+
+	// Đếm số question gắn attribute
+	var countResults []struct {
+		AttributeID int64
+		Count       int32
+	}
+
+	countQuery := `
+		SELECT qa.id AS attribute_id, COUNT(q.id) AS count
+		FROM question_attributes qa
+		INNER JOIN question_ref_attributes qra ON qra.question_attribute_id = qa.id
+		INNER JOIN questions q ON q.id = qra.question_id AND q.deleted_at IS NULL
+		WHERE qa.parent_id IS NOT NULL
+	`
+
+	var args []interface{}
+	if filterByDate {
+		countQuery += ` AND q.created_at <= ?`
+		args = append(args, filter.EndTime)
+		// countQuery += ` AND q.created_at >= ? AND q.created_at <= ?`
+		// args = append(args, filter.StartTime, filter.EndTime)
+	}
+
+	countQuery += ` GROUP BY qa.id`
+
+	if err := db.Raw(countQuery, args...).Scan(&countResults).Error; err != nil {
+		return nil, err
+	}
+
+	// Map count vào
 	countMap := make(map[int64]int32)
 	for _, row := range countResults {
 		countMap[row.AttributeID] = row.Count
 	}
 
+	// Tạo cây kết quả
 	rootMap := map[int64]dto.QuestionAttributeItem{}
 	childMap := map[int64][]dto.QuestionDistributionItem{}
+
 	for _, attr := range allAttributes {
 		count := countMap[attr.ID]
 		percent := float32(count) * 100 / float32(totalQuestions)
+
 		if attr.ParentID == nil {
-			rootMap[attr.ID] = dto.QuestionAttributeItem{Name: attr.Name}
+			rootMap[attr.ID] = dto.QuestionAttributeItem{
+				Name: attr.Name,
+			}
 		} else {
 			childMap[*attr.ParentID] = append(childMap[*attr.ParentID], dto.QuestionDistributionItem{
-				Name: attr.Name, Count: count, Percent: percent,
+				Name:    attr.Name,
+				Count:   count,
+				Percent: percent,
 			})
 		}
 	}
@@ -2591,16 +1882,29 @@ func (r *dashboardRepository) GetQuestionBank(filter dto.FilterDashboardAdmin) (
 		attributes = append(attributes, root)
 	}
 
+	// Media usage
+	var withAudio, withImage int64
+
+	db.Model(&models.Question{}).
+		Where(`file_info->>'path' IS NOT NULL AND kind = ?`, "audio").
+		Count(&withAudio)
+
+	db.Model(&models.Question{}).
+		Where(`file_info->>'path' IS NOT NULL AND kind = ?`, "image").
+		Count(&withImage)
+
 	mediaUsage := dto.MediaUsage{
 		TotalQuestions: int32(totalQuestions),
 		WithAudio:      int32(withAudio),
 		WithImage:      int32(withImage),
 	}
+
 	if totalQuestions > 0 {
 		mediaUsage.AudioPercent = float32(withAudio) * 100 / float32(totalQuestions)
 		mediaUsage.ImagePercent = float32(withImage) * 100 / float32(totalQuestions)
 	}
 
+	// Final result
 	return &dto.QuestionBankOverview{
 		Types:      types,
 		Attributes: attributes,
@@ -2609,7 +1913,7 @@ func (r *dashboardRepository) GetQuestionBank(filter dto.FilterDashboardAdmin) (
 }
 
 func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*dto.RiskAndWarning, error) {
-	database := db.ReplicaDB
+	db := db.ReplicaDB
 
 	var (
 		inactiveStudents    []dto.InactiveStudent
@@ -2617,6 +1921,7 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 		decliningStudents   []dto.DecliningStudent
 	)
 
+	// ====== Date condition ======
 	var dateCondition string
 	var dateArgs []interface{}
 	if !filter.StartTime.IsZero() && !filter.EndTime.IsZero() {
@@ -2624,8 +1929,10 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 		dateArgs = append(dateArgs, filter.StartTime, filter.EndTime)
 	}
 
+	// Inactive Students
 	whereInactive := "urr.role_id = ? AND u.deleted_at IS NULL"
 	joinCourse := ""
+
 	if filter.SchoolId > 0 {
 		whereInactive += fmt.Sprintf(" AND u.school_id = %d", filter.SchoolId)
 	}
@@ -2638,7 +1945,12 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 	}
 
 	inactiveSQL := fmt.Sprintf(`
-		SELECT u.id, u.name, u.avatar_info, c.name AS class, u.last_login_at AS last_login,
+		SELECT
+			u.id,
+			u.name,
+			u.avatar_info,
+			c.name AS class,
+			u.last_login_at AS last_login,
 			DATE_PART('day', NOW() - COALESCE(u.last_login_at, u.created_at)) AS absent_days
 		FROM users u
 		LEFT JOIN user_classes uc ON uc.user_id = u.id
@@ -2648,9 +1960,15 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 		WHERE %s
 		GROUP BY u.id, u.name, u.avatar_info, c.name, u.created_at, u.last_login_at
 		HAVING DATE_PART('day', NOW() - COALESCE(u.last_login_at, u.created_at)) >= 7
-		ORDER BY absent_days DESC LIMIT 20
+		ORDER BY absent_days DESC
+		LIMIT 20
 	`, joinCourse, whereInactive)
 
+	if err := db.Raw(inactiveSQL, models.StudentRoleId).Scan(&inactiveStudents).Error; err != nil {
+		return nil, err
+	}
+
+	// Declining Students
 	whereDeclining := "1=1"
 	joinCourseDeclining := ""
 	if filter.SchoolId > 0 {
@@ -2665,7 +1983,10 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 
 	decliningSQL := fmt.Sprintf(`
 		WITH scored AS (
-			SELECT eu.user_id, eu.id, eu.ratio,
+			SELECT
+				eu.user_id,
+				eu.id,
+				eu.ratio,
 				LAG(eu.ratio) OVER (PARTITION BY eu.user_id ORDER BY eu.created_at) AS prev_ratio
 			FROM exam_users eu
 			JOIN users u ON u.id = eu.user_id
@@ -2674,23 +1995,39 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 			WHERE %s %s
 		),
 		filtered AS (
-			SELECT user_id FROM scored
+			SELECT user_id
+			FROM scored
 			GROUP BY user_id
 			HAVING COUNT(*) >= 3 AND BOOL_AND(prev_ratio IS NULL OR ratio <= prev_ratio)
 		)
-		SELECT u.id, u.name, u.avatar_info, c.name AS class,
-			json_agg(json_build_object('id', eu.id, 'score', eu.ratio) ORDER BY eu.created_at) AS score
+		SELECT
+			u.id,
+			u.name,
+			u.avatar_info,
+			c.name AS class,
+			json_agg(
+				json_build_object('id', eu.id, 'score', eu.ratio)
+				ORDER BY eu.created_at
+			) AS score
 		FROM users u
 		JOIN exam_users eu ON eu.user_id = u.id
 		JOIN user_ref_roles urr ON urr.user_id = u.id
 		LEFT JOIN user_classes uc2 ON uc2.user_id = u.id
 		LEFT JOIN classes c ON c.id = uc2.class_id
-		WHERE u.id IN (SELECT user_id FROM filtered) AND urr.role_id = ? AND u.deleted_at IS NULL
-		GROUP BY u.id, u.name, u.avatar_info, c.name ORDER BY u.id LIMIT 20
+		WHERE u.id IN (SELECT user_id FROM filtered)
+			AND urr.role_id = ?
+			AND u.deleted_at IS NULL
+		GROUP BY u.id, u.name, u.avatar_info, c.name
+		ORDER BY u.id
+		LIMIT 20
 	`, joinCourseDeclining, whereDeclining, dateCondition)
 
-	decliningArgs := append(append([]interface{}{}, dateArgs...), models.StudentRoleId)
+	decliningArgs := append(dateArgs, models.StudentRoleId)
+	if err := db.Raw(decliningSQL, decliningArgs...).Scan(&decliningStudents).Error; err != nil {
+		return nil, err
+	}
 
+	// Slow Grading Teachers
 	whereSlow := "r.id = ? AND ut.deleted_at IS NULL"
 	if filter.SchoolId > 0 {
 		whereSlow += fmt.Sprintf(" AND ut.school_id = %d", filter.SchoolId)
@@ -2707,7 +2044,10 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 
 	slowGradingSQL := fmt.Sprintf(`
 		WITH submissions AS (
-			SELECT eu.exam_id, eu.user_id AS student_id, uct.user_id AS teacher_id
+			SELECT
+				eu.exam_id,
+				eu.user_id AS student_id,
+				uct.user_id AS teacher_id
 			FROM exam_users eu
 			JOIN exams e ON e.id = eu.exam_id
 			JOIN exam_ref_lessons erl ON erl.exam_id = e.id
@@ -2721,12 +2061,18 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 			WHERE %s %s
 		),
 		grading AS (
-			SELECT eq.exam_id, eq.user_id AS student_id,
-				MIN(eq.created_at) AS submitted_at, MIN(eq.scoring_at) AS first_scored_at
+			SELECT
+				eq.exam_id,
+				eq.user_id AS student_id,
+				MIN(eq.created_at) AS submitted_at,
+				MIN(eq.scoring_at) AS first_scored_at
 			FROM exam_question_user_manual_scoring eq
 			GROUP BY eq.exam_id, eq.user_id
 		)
-		SELECT s.teacher_id, ut.name AS teacher_name, ut.avatar_info,
+		SELECT
+			s.teacher_id,
+			ut.name AS teacher_name,
+			ut.avatar_info,
 			COUNT(DISTINCT s.exam_id || '-' || s.student_id) AS total_submissions,
 			COUNT(DISTINCT CASE WHEN g.first_scored_at IS NOT NULL THEN s.exam_id || '-' || s.student_id END) AS graded_submissions,
 			ROUND(EXTRACT(EPOCH FROM AVG(COALESCE(g.first_scored_at, NOW()) - g.submitted_at)) / 3600, 2) AS avg_wait_hours
@@ -2734,57 +2080,13 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 		JOIN grading g ON s.exam_id = g.exam_id AND s.student_id = g.student_id
 		JOIN users ut ON ut.id = s.teacher_id
 		GROUP BY s.teacher_id, ut.name, ut.avatar_info
-		ORDER BY avg_wait_hours DESC LIMIT 20
+		ORDER BY avg_wait_hours DESC
+		LIMIT 20
 	`, whereSlow, dateCondition)
 
-	slowGradingArgs := append(append([]interface{}{}, models.TeacherRoleId), dateArgs...)
-
-	var firstErr error
-	var mu sync.Mutex
-	wg := &sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Raw(inactiveSQL, models.StudentRoleId).Scan(&inactiveStudents).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Raw(decliningSQL, decliningArgs...).Scan(&decliningStudents).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		err := database.Raw(slowGradingSQL, slowGradingArgs...).Scan(&slowGradingTeachers).Error
-		if err != nil {
-			mu.Lock()
-			if firstErr == nil {
-				firstErr = err
-			}
-			mu.Unlock()
-		}
-	}()
-
-	wg.Wait()
-	if firstErr != nil {
-		return nil, firstErr
+	slowGradingArgs := append([]interface{}{models.TeacherRoleId}, dateArgs...)
+	if err := db.Raw(slowGradingSQL, slowGradingArgs...).Scan(&slowGradingTeachers).Error; err != nil {
+		return nil, err
 	}
 
 	return &dto.RiskAndWarning{
@@ -2794,14 +2096,370 @@ func (r *dashboardRepository) GetRiskWarning(filter dto.FilterDashboardAdmin) (*
 	}, nil
 }
 
+func (r *dashboardRepository) GetTeacherPerformance(filter dto.FilterDashboardAdmin) (*dto.TeacherPerformanceOverview, error) {
+	db := db.ReplicaDB
+	filterByDate := filter.Month != 0 || filter.Year != 0 || filter.Quarter != 0
+
+	// Determine which types to include
+	includeExam := filter.GradingType == "" || filter.GradingType == "all" || filter.GradingType == "exam"
+	includeHomework := filter.GradingType == "" || filter.GradingType == "all" || filter.GradingType == "homework"
+	includeExercise := filter.GradingType == "" || filter.GradingType == "all" || filter.GradingType == "exercise"
+
+	var (
+		weeklyMarkingRates       []dto.WeeklyMarkingRate
+		weeklyMarkings           []dto.WeeklyMarking
+		ungradedSubmissions      []dto.UngradedSubmission
+		totalSubmissions         int32
+		totalUngradedSubmissions int32
+	)
+
+	// --- Weekly marking ---
+	var weekArgs []interface{}
+	var unionParts []string
+
+	whereClause := ""
+	if filterByDate {
+		whereClause = " AND w.end_date >= ? AND w.end_date <= ?"
+	} else {
+		whereClause = " AND w.end_date <= NOW()"
+	}
+
+	// Exam weekly marking
+	if includeExam {
+		examWeekSQL := `
+			SELECT
+				w.id,
+				w.week_number,
+				w.start_date,
+				w.end_date,
+				COUNT(DISTINCT eu.id) AS assigned_count,
+				COUNT(DISTINCT CASE
+					WHEN equms.scoring_by IS NOT NULL THEN equms.exam_id || '-' || equms.user_id
+				END) AS marked_count
+			FROM weeks w
+			LEFT JOIN exam_users eu
+				ON eu.created_at >= w.start_date AND eu.created_at < w.end_date + INTERVAL '1 day'
+			LEFT JOIN exam_question_user_manual_scoring equms
+				ON equms.created_at >= w.start_date AND equms.created_at < w.end_date + INTERVAL '1 day'
+				AND equms.exam_id = eu.exam_id AND equms.user_id = eu.user_id
+			WHERE 1=1` + whereClause + `
+			GROUP BY w.id, w.week_number, w.start_date, w.end_date`
+		unionParts = append(unionParts, examWeekSQL)
+		if filterByDate {
+			weekArgs = append(weekArgs, filter.StartTime, filter.EndTime)
+		}
+	}
+
+	// Homework weekly marking
+	if includeHomework {
+		homeworkWeekSQL := `
+			SELECT
+				w.id,
+				w.week_number,
+				w.start_date,
+				w.end_date,
+				COUNT(DISTINCT hu.id) AS assigned_count,
+				COUNT(DISTINCT CASE
+					WHEN hqums.scoring_by IS NOT NULL THEN hqums.homework_id || '-' || hqums.user_id
+				END) AS marked_count
+			FROM weeks w
+			LEFT JOIN homework_users hu
+				ON hu.created_at >= w.start_date AND hu.created_at < w.end_date + INTERVAL '1 day'
+			LEFT JOIN homework_question_user_manual_scoring hqums
+				ON hqums.created_at >= w.start_date AND hqums.created_at < w.end_date + INTERVAL '1 day'
+				AND hqums.homework_id = hu.homework_id AND hqums.user_id = hu.user_id
+			WHERE 1=1` + whereClause + `
+			GROUP BY w.id, w.week_number, w.start_date, w.end_date`
+		unionParts = append(unionParts, homeworkWeekSQL)
+		if filterByDate {
+			weekArgs = append(weekArgs, filter.StartTime, filter.EndTime)
+		}
+	}
+
+	// Exercise weekly marking
+	if includeExercise {
+		exerciseWeekSQL := `
+			SELECT
+				w.id,
+				w.week_number,
+				w.start_date,
+				w.end_date,
+				COUNT(DISTINCT eu.id) AS assigned_count,
+				COUNT(DISTINCT CASE
+					WHEN equms.scoring_by IS NOT NULL THEN equms.exercise_id || '-' || equms.user_id
+				END) AS marked_count
+			FROM weeks w
+			LEFT JOIN exercise_users eu
+				ON eu.created_at >= w.start_date AND eu.created_at < w.end_date + INTERVAL '1 day'
+			LEFT JOIN exercise_question_user_manual_scoring equms
+				ON equms.created_at >= w.start_date AND equms.created_at < w.end_date + INTERVAL '1 day'
+				AND equms.exercise_id = eu.exercise_id AND equms.user_id = eu.user_id
+			WHERE 1=1` + whereClause + `
+			GROUP BY w.id, w.week_number, w.start_date, w.end_date`
+		unionParts = append(unionParts, exerciseWeekSQL)
+		if filterByDate {
+			weekArgs = append(weekArgs, filter.StartTime, filter.EndTime)
+		}
+	}
+
+	if len(unionParts) == 0 {
+		// No types selected
+		weeklyMarkings = []dto.WeeklyMarking{}
+	} else {
+		// Combine all parts with UNION ALL and aggregate
+		weekSQL := `
+			SELECT
+				id,
+				week_number,
+				start_date,
+				end_date,
+				SUM(assigned_count)::bigint AS assigned_count,
+				SUM(marked_count)::bigint AS marked_count
+			FROM (
+		` + strings.Join(unionParts, " UNION ALL ") + `
+			) AS combined
+			GROUP BY id, week_number, start_date, end_date
+			ORDER BY start_date DESC`
+
+		if err := db.Raw(weekSQL, weekArgs...).Scan(&weeklyMarkings).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// --- Ungraded submissions ---
+	// Build ungraded submissions query with UNION ALL for all types
+	var ungradedUnionParts []string
+	var ungradedArgs []interface{}
+
+	if includeExam {
+		examDateFilter := ""
+		if filterByDate {
+			examDateFilter = " AND eq.created_at >= ? AND eq.created_at <= ?"
+			ungradedArgs = append(ungradedArgs, filter.StartTime, filter.EndTime)
+		}
+		examSQL := `WITH ungraded_exam AS (
+				SELECT eq.exam_id AS id_value, 'exam' AS type_value, eq.user_id AS student_id,
+					eq.question_id, eq.created_at
+				FROM exam_question_user_manual_scoring eq
+				WHERE eq.scoring_by IS NULL
+					AND NOT EXISTS (SELECT 1 FROM exam_question_user_manual_scoring eq2
+						WHERE eq2.exam_id = eq.exam_id AND eq2.question_id = eq.question_id
+						AND eq2.user_id = eq.user_id AND eq2.scoring_by IS NOT NULL)` + examDateFilter + `
+			), agg_exam AS (
+				SELECT id_value, type_value, student_id, ARRAY_AGG(question_id) AS question_ids,
+					COUNT(*) AS question_count, MIN(created_at) AS submitted_at
+				FROM ungraded_exam GROUP BY id_value, type_value, student_id
+			), exam_course AS (
+				SELECT e.id AS exam_id, e.name AS exam_name, l.id AS lesson_id,
+					c.id AS chapter_id, c.program_id
+				FROM exams e
+				JOIN exam_ref_lessons erl ON erl.exam_id = e.id
+				JOIN lessons l ON l.id = erl.lesson_id
+				JOIN chapters c ON c.id = l.chapter_id
+			)
+			SELECT 'exam' AS type, u.id AS teacher_id, u.name AS teacher_name,
+				s.id AS student_id, s.name AS student_name, a.id_value AS id,
+				ec.exam_name AS name, a.question_ids, a.question_count, a.submitted_at
+			FROM agg_exam a
+			JOIN exam_course ec ON a.id_value = ec.exam_id
+			JOIN courses co ON co.program_id = ec.program_id
+			JOIN user_courses uc ON uc.course_id = co.id AND uc.main_teacher = TRUE
+			JOIN users u ON u.id = uc.user_id
+			JOIN user_ref_roles urr ON urr.user_id = u.id
+			JOIN roles r ON r.id = urr.role_id
+			JOIN users s ON s.id = a.student_id
+			WHERE r.id = ?`
+		ungradedUnionParts = append(ungradedUnionParts, examSQL)
+		ungradedArgs = append(ungradedArgs, models.TeacherRoleId)
+	}
+
+	if includeHomework {
+		homeworkDateFilter := ""
+		if filterByDate {
+			homeworkDateFilter = " AND hq.created_at >= ? AND hq.created_at <= ?"
+			ungradedArgs = append(ungradedArgs, filter.StartTime, filter.EndTime)
+		}
+		homeworkSQL := `WITH ungraded_homework AS (
+				SELECT hq.homework_id AS id_value, 'homework' AS type_value, hq.user_id AS student_id,
+					hq.question_id, hq.created_at
+				FROM homework_question_user_manual_scoring hq
+				WHERE hq.scoring_by IS NULL
+					AND NOT EXISTS (SELECT 1 FROM homework_question_user_manual_scoring hq2
+						WHERE hq2.homework_id = hq.homework_id AND hq2.question_id = hq.question_id
+						AND hq2.user_id = hq.user_id AND hq2.scoring_by IS NOT NULL)` + homeworkDateFilter + `
+			), agg_homework AS (
+				SELECT id_value, type_value, student_id, ARRAY_AGG(question_id) AS question_ids,
+					COUNT(*) AS question_count, MIN(created_at) AS submitted_at
+				FROM ungraded_homework GROUP BY id_value, type_value, student_id
+			), homework_course AS (
+				SELECT h.id AS homework_id, h.name AS homework_name, l.id AS lesson_id,
+					c.id AS chapter_id, c.program_id
+				FROM homeworks h
+				JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id
+				JOIN lessons l ON l.id = hrl.lesson_id
+				JOIN chapters c ON c.id = l.chapter_id
+			)
+			SELECT 'homework' AS type, u.id AS teacher_id, u.name AS teacher_name,
+				s.id AS student_id, s.name AS student_name, a.id_value AS id,
+				hc.homework_name AS name, a.question_ids, a.question_count, a.submitted_at
+			FROM agg_homework a
+			JOIN homework_course hc ON a.id_value = hc.homework_id
+			JOIN courses co ON co.program_id = hc.program_id
+			JOIN user_courses uc ON uc.course_id = co.id AND uc.main_teacher = TRUE
+			JOIN users u ON u.id = uc.user_id
+			JOIN user_ref_roles urr ON urr.user_id = u.id
+			JOIN roles r ON r.id = urr.role_id
+			JOIN users s ON s.id = a.student_id
+			WHERE r.id = ?`
+		ungradedUnionParts = append(ungradedUnionParts, homeworkSQL)
+		ungradedArgs = append(ungradedArgs, models.TeacherRoleId)
+	}
+
+	if includeExercise {
+		exerciseDateFilter := ""
+		if filterByDate {
+			exerciseDateFilter = " AND eq.created_at >= ? AND eq.created_at <= ?"
+			ungradedArgs = append(ungradedArgs, filter.StartTime, filter.EndTime)
+		}
+		exerciseSQL := `WITH ungraded_exercise AS (
+				SELECT eq.exercise_id AS id_value, 'exercise' AS type_value, eq.user_id AS student_id,
+					eq.question_id, eq.created_at
+				FROM exercise_question_user_manual_scoring eq
+				WHERE eq.scoring_by IS NULL
+					AND NOT EXISTS (SELECT 1 FROM exercise_question_user_manual_scoring eq2
+						WHERE eq2.exercise_id = eq.exercise_id AND eq2.question_id = eq.question_id
+						AND eq2.user_id = eq.user_id AND eq2.scoring_by IS NOT NULL)` + exerciseDateFilter + `
+			), agg_exercise AS (
+				SELECT id_value, type_value, student_id, ARRAY_AGG(question_id) AS question_ids,
+					COUNT(*) AS question_count, MIN(created_at) AS submitted_at
+				FROM ungraded_exercise GROUP BY id_value, type_value, student_id
+			), exercise_course AS (
+				SELECT e.id AS exercise_id, e.name AS exercise_name, l.id AS lesson_id,
+					c.id AS chapter_id, c.program_id
+				FROM exercises e
+				JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id
+				JOIN lessons l ON l.id = erl.lesson_id
+				JOIN chapters c ON c.id = l.chapter_id
+			)
+			SELECT 'exercise' AS type, u.id AS teacher_id, u.name AS teacher_name,
+				s.id AS student_id, s.name AS student_name, a.id_value AS id,
+				ec.exercise_name AS name, a.question_ids, a.question_count, a.submitted_at
+			FROM agg_exercise a
+			JOIN exercise_course ec ON a.id_value = ec.exercise_id
+			JOIN courses co ON co.program_id = ec.program_id
+			JOIN user_courses uc ON uc.course_id = co.id AND uc.main_teacher = TRUE
+			JOIN users u ON u.id = uc.user_id
+			JOIN user_ref_roles urr ON urr.user_id = u.id
+			JOIN roles r ON r.id = urr.role_id
+			JOIN users s ON s.id = a.student_id
+			WHERE r.id = ?`
+		ungradedUnionParts = append(ungradedUnionParts, exerciseSQL)
+		ungradedArgs = append(ungradedArgs, models.TeacherRoleId)
+	}
+
+	if len(ungradedUnionParts) == 0 {
+		ungradedSubmissions = []dto.UngradedSubmission{}
+	} else {
+		// Wrap each CTE query in a subquery for UNION ALL compatibility
+		wrappedParts := make([]string, len(ungradedUnionParts))
+		for i, part := range ungradedUnionParts {
+			wrappedParts[i] = "SELECT * FROM (" + part + ") AS subquery_" + strconv.Itoa(i)
+		}
+		ungradedSQL := strings.Join(wrappedParts, " UNION ALL ") + " ORDER BY teacher_id, type, id, student_id"
+		if err := db.Raw(ungradedSQL, ungradedArgs...).Scan(&ungradedSubmissions).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// --- Merge weekly ---
+	beginAt, _ := time.Parse("2006-01-02", "2025-09-08")
+	for _, week := range weeklyMarkings {
+		ungradedSubmissionByWeeks := []dto.UngradedSubmission{}
+		startDate, _ := time.Parse(time.RFC3339, week.StartDate)
+		endDate, _ := time.Parse(time.RFC3339, week.EndDate)
+
+		if startDate.Before(beginAt) {
+			continue
+		}
+
+		markingPercent := float32(100)
+		if week.AssignedCount > 0 {
+			markingPercent = float32(week.AssignedCount - week.MarkedCount) * 100 / float32(week.AssignedCount)
+		}
+
+		// Use map to track unique submissions by Type and Id
+		seenMap := make(map[string]dto.UngradedSubmission)
+		for _, u := range ungradedSubmissions {
+			submittedAt, _ := time.Parse(time.RFC3339, u.SubmittedAt)
+			if submittedAt.After(startDate) && submittedAt.Before(endDate.AddDate(0, 0, 1)) {
+				// Create unique key from Type and Id
+				uniqueKey := fmt.Sprintf("%s_%d", u.Type, u.Id)
+				// Only add if not already seen
+				if _, exists := seenMap[uniqueKey]; !exists {
+					seenMap[uniqueKey] = u
+				}
+			}
+		}
+		// Convert map values to slice
+		for _, u := range seenMap {
+			ungradedSubmissionByWeeks = append(ungradedSubmissionByWeeks, u)
+		}
+
+		diff := startDate.Sub(beginAt)
+		weekNumber := int(diff.Hours() / (24 * 7))
+		if weekNumber < 0 {
+			weekNumber = 0
+		}
+		weekNumber++
+
+		totalSubmissions += week.AssignedCount
+		totalUngradedSubmissions += int32(len(ungradedSubmissionByWeeks))
+
+		weeklyMarkingRates = append(weeklyMarkingRates, dto.WeeklyMarkingRate{
+			Id:                  week.Id,
+			WeekNumber:          strconv.Itoa(weekNumber),
+			MarkedCount:         week.AssignedCount - week.MarkedCount,
+			AssignedCount:       week.AssignedCount,
+			MarkingPercent:      markingPercent,
+			UngradedSubmissions: ungradedSubmissionByWeeks,
+		})
+	}
+
+	gradedSubmissions := totalSubmissions - totalUngradedSubmissions
+
+	if gradedSubmissions < 0 {
+		gradedSubmissions = 0
+	}
+
+	ungradedPercent := float32(0)
+	if totalSubmissions > 0 {
+		ungradedPercent = float32(totalUngradedSubmissions) * 100 / float32(totalSubmissions)
+	}
+
+	gradingSummary := dto.GradingSummary{
+		TotalSubmissions:    totalSubmissions,
+		GradedSubmissions:   gradedSubmissions,
+		UngradedSubmissions: totalUngradedSubmissions,
+		UngradedPercent:     ungradedPercent,
+	}
+
+	return &dto.TeacherPerformanceOverview{
+		GradingSummary:     gradingSummary,
+		WeeklyMarkingRates: weeklyMarkingRates,
+	}, nil
+}
+
 func (r *dashboardRepository) GetUserOverview(filter dto.FilterDashboardAdmin) (*dto.UserOverview, error) {
+	// Use single SQL function to get most data at once
 	var result models.DashboardOverviewResult
 
+	// Convert to UTC for database
 	endTimeUTC := filter.EndTime.UTC()
 	startPreviousTimeUTC := filter.StartPreviousTime.UTC()
 	endPreviousTimeUTC := filter.EndPreviousTime.UTC()
 	startTimeUTC := filter.StartTime.UTC()
 
+	// Use raw SQL with string interpolation instead of prepared statement
 	query := fmt.Sprintf(`
 		SELECT * FROM get_dashboard_overview(
 			'%s'::timestamp,
@@ -2825,39 +2483,25 @@ func (r *dashboardRepository) GetUserOverview(filter dto.FilterDashboardAdmin) (
 		filter.SchoolId,
 	)
 
-	var overviewErr error
-	var activityTotal, activityCurrent, activityNew int32
-	var activityErr error
+	err := db.MasterDB.Raw(query).Scan(&result).Error
 
-	wg := &sync.WaitGroup{}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		overviewErr = db.MasterDB.Raw(query).Scan(&result).Error
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		activityTotal, activityCurrent, _, activityNew, activityErr = r.GetActivity(filter)
-	}()
-
-	wg.Wait()
-
-	if overviewErr != nil {
-		config.Log.Error("Error calling get_dashboard_overview:", overviewErr)
+	if err != nil {
+		config.Log.Error("Error calling get_dashboard_overview:", err)
+		// Fallback to individual methods if SQL function fails
 		config.Log.Info("Falling back to individual methods...")
 		return r.getUserOverviewFallback(filter)
 	}
 
+	// If all values are 0, try fallback method
 	if result.SchoolTotalCount == 0 && result.UserTotalCount == 0 && result.StudentTotalCount == 0 && result.TeacherTotalCount == 0 {
 		config.Log.Info("SQL function returned all zeros, trying fallback method...")
 		return r.getUserOverviewFallback(filter)
 	}
 
-	if activityErr != nil {
-		return nil, activityErr
+	// Get activity data separately using the existing method
+	activityTotal, activityCurrent, _, activityNew, err := r.GetActivity(filter)
+	if err != nil {
+		return nil, err
 	}
 
 	return &dto.UserOverview{
@@ -2895,4 +2539,3 @@ func (r *dashboardRepository) Percent(count, all int64) float32 {
 	}
 	return float32(count) * 100 / float32(all)
 }
-

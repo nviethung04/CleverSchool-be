@@ -1,6 +1,6 @@
 package dto
 
-import "be-cleverschool/models"
+import "be-lms/models"
 
 type DashboardExamRanking struct {
 	StudentID    int64            `json:"student_id"`

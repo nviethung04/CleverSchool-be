@@ -1,16 +1,15 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/redis"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -83,7 +82,7 @@ func (s *authService) Login(c *gin.Context, username, password string) (*prot.Us
 
 		roleId = int(u.Roles[0].ID)
 
-		if !isTester && (roleId == models.StudentRoleId || roleId == models.TeacherRoleId) || roleId == models.AdminRoleId {
+		if (!isTester && (roleId == models.StudentRoleId || roleId == models.TeacherRoleId) || roleId == models.AdminRoleId) {
 			err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 			if err == nil {
 				hasUser = true
@@ -127,7 +126,7 @@ func (s *authService) Login(c *gin.Context, username, password string) (*prot.Us
 	}
 
 	// Tạo JWT token
-	token, err := utils.GenerateToken(int(user.ID), tempRoleId, user.SchoolID, roleName, roleIds, roleNames, roleType, user.MemberType)
+	token, err := utils.GenerateToken(int(user.ID), tempRoleId, user.SchoolID, roleName, roleIds, roleNames, roleType)
 	if err != nil {
 		return nil, false, errors.New(i18n.Localize("messages.failed_to_generate_token")), "messages.failed_to_generate_token"
 	}
@@ -150,11 +149,11 @@ func (s *authService) Login(c *gin.Context, username, password string) (*prot.Us
 	_ = redis.SaveUserToken(c, int(user.ID), token, ip, userAgent, expires)
 
 	resp := &prot.UserLoginResponse{
-		Token:     token,
-		RoleId:    int32(tempRoleId),
-		RoleName:  roleName,
-		Type:      roleType,
-		RoleIds:   roleIdsInt32,
+		Token:    token,
+		RoleId:   int32(tempRoleId),
+		RoleName: roleName,
+		Type:     roleType,
+		RoleIds:  roleIdsInt32,
 		RoleNames: roleNames,
 	}
 
@@ -250,11 +249,8 @@ func (s *authService) ListSessions(c *gin.Context) ([]redis.SessionInfo, error, 
 
 func (s *authService) Register(c *gin.Context, req *prot.RegisterRequest) (*models.User, error, string) {
 	var userName string
-	var password string
 
-	if req.Username != "" {
-		userName = req.Username
-	} else if req.Email != "" {
+	if req.Email != "" {
 		userName = req.Email
 	} else if req.PhoneNumber != "" {
 		userName = req.PhoneNumber
@@ -264,13 +260,7 @@ func (s *authService) Register(c *gin.Context, req *prot.RegisterRequest) (*mode
 		return nil, err, "messages.account_already_exists"
 	}
 
-	if req.Password != "" {
-		password = req.Password
-	} else {
-		password = userName
-	}
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userName), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err, "messages.error_generate_from_password"
 	}
@@ -280,19 +270,13 @@ func (s *authService) Register(c *gin.Context, req *prot.RegisterRequest) (*mode
 		roleID = models.StudentRoleId
 	}
 
-	memberType := models.MemberTypeInternal
-	if req.MemberType == models.MemberTypeExternal {
-		memberType = models.MemberTypeExternal
-	}
-
 	user := models.User{
 		Name:        req.FullName,
 		Username:    userName,
 		Email:       req.Email,
 		Password:    string(hashedPassword),
 		PhoneNumber: req.PhoneNumber,
-		Status:      memberType == models.MemberTypeExternal,
-		MemberType:  memberType,
+		Status:      false,
 	}
 
 	return s.repo.CreateUser(user, int64(roleID))
@@ -356,7 +340,7 @@ func (s *authService) ForgotPassword(c *gin.Context, req *prot.ForgotPasswordReq
 		return &prot.ForgotPasswordResponse{
 			Success: false,
 			Message: i18n.Localize("messages.email_not_found"),
-		}, fmt.Errorf(i18n.Localize("messages.email_not_found")), "messages.email_not_found"
+		}, nil, "messages.email_not_found"
 	}
 
 	// Check if there has been a recent password reset request (within 10 minutes)
@@ -368,7 +352,7 @@ func (s *authService) ForgotPassword(c *gin.Context, req *prot.ForgotPasswordReq
 				return &prot.ForgotPasswordResponse{
 					Success: false,
 					Message: i18n.Localize("messages.reset_password_too_frequent"),
-				}, fmt.Errorf(i18n.Localize("messages.reset_password_too_frequent")), "messages.reset_password_too_frequent"
+				}, nil, "messages.reset_password_too_frequent"
 			}
 		}
 	}
@@ -390,7 +374,7 @@ func (s *authService) ForgotPassword(c *gin.Context, req *prot.ForgotPasswordReq
 		return &prot.ForgotPasswordResponse{
 			Success: false,
 			Message: i18n.Localize("messages.reset_password_failed"),
-		}, fmt.Errorf(i18n.Localize("messages.reset_password_failed")), "messages.reset_password_failed"
+		}, nil, "messages.reset_password_failed"
 	}
 
 	// send email
@@ -400,7 +384,7 @@ func (s *authService) ForgotPassword(c *gin.Context, req *prot.ForgotPasswordReq
 		return &prot.ForgotPasswordResponse{
 			Success: false,
 			Message: i18n.Localize("messages.email_send_failed"),
-		}, fmt.Errorf(i18n.Localize("messages.email_send_failed")), "messages.email_send_failed"
+		}, nil, "messages.email_send_failed"
 	}
 
 	return &prot.ForgotPasswordResponse{
@@ -481,9 +465,6 @@ func (s *authService) AcceptRole(c *gin.Context, id int) (*prot.UserLoginRespons
 	roleIDs, _ := roleIDsVal.([]int)
 	roleNames, _ := roleNamesVal.([]string)
 
-	memberType, _ := c.Get("memberType")
-	memberTypeStr, _ := memberType.(string)
-
 	valid := false
 	for _, rid := range roleIDs {
 		if rid == id {
@@ -506,7 +487,7 @@ func (s *authService) AcceptRole(c *gin.Context, id int) (*prot.UserLoginRespons
 
 	oldToken := c.GetHeader("Token")
 
-	token, err := utils.GenerateToken(userID, id, schoolID, roleName, roleIDs, roleNames, roleType, memberTypeStr)
+	token, err := utils.GenerateToken(userID, id, schoolID, roleName, roleIDs, roleNames, roleType)
 	if err != nil {
 		return nil, false, errors.New(i18n.Localize("messages.failed_to_generate_token")), "messages.failed_to_generate_token"
 	}
@@ -530,11 +511,11 @@ func (s *authService) AcceptRole(c *gin.Context, id int) (*prot.UserLoginRespons
 
 	// Trả về response
 	response := &prot.UserLoginResponse{
-		Token:     token,
-		RoleId:    int32(id),
-		RoleName:  roleName,
-		Type:      roleType,
-		RoleIds:   roleIdsInt32,
+		Token:    token,
+		RoleId:   int32(id),
+		RoleName: roleName,
+		Type:     roleType,
+		RoleIds:  roleIdsInt32,
 		RoleNames: roleNames,
 	}
 
@@ -547,9 +528,9 @@ func (s *authService) AcceptRole(c *gin.Context, id int) (*prot.UserLoginRespons
 	return response, true, nil, ""
 }
 
+
 func (s *authService) generateResetToken() string {
 	bytes := make([]byte, 32)
 	rand.Read(bytes)
 	return hex.EncodeToString(bytes)
 }
-

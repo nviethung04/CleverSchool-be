@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -21,23 +21,18 @@ type SaveScoreFillInBlankService interface {
 }
 
 type saveScoreFillInBlankService struct {
-	repo                        repositories.SaveScoreFillInBlankRepository
-	correctRepo                 repositories.SaveCorrectHomeworkRepository
-	clonedQuestionService       ClonedQuestionService
-	homeworkUserQuestionService HomeworkUserQuestionService
+	repo                  repositories.SaveScoreFillInBlankRepository
+	correctRepo           repositories.SaveCorrectHomeworkRepository
+	clonedQuestionService ClonedQuestionService
 }
 
 func NewSaveScoreFillInBlankService(repo repositories.SaveScoreFillInBlankRepository, clonedQuestionService ClonedQuestionService) SaveScoreFillInBlankService {
-	// Tạo repository cho homework user question service (dùng chung cho nhiều dạng câu hỏi)
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
 	return &saveScoreFillInBlankService{
-		repo:                        repo,
-		correctRepo:                 repositories.NewSaveCorrectHomeworkRepository(),
-		clonedQuestionService:       clonedQuestionService,
-		homeworkUserQuestionService: NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService),
+		repo:                  repo,
+		correctRepo:           repositories.NewSaveCorrectHomeworkRepository(),
+		clonedQuestionService: clonedQuestionService,
 	}
 }
-
 
 func (s *saveScoreFillInBlankService) SaveScoreFillInBlankExam(req *prot.SaveScoreFillInBlankRequest, userID int64) (*prot.SaveScoreResponseFillInBlank, error) {
 	if req.ExamId == 0 || len(req.Answers) == 0 {
@@ -219,32 +214,14 @@ func (s *saveScoreFillInBlankService) SaveScoreFillInBlankHomework(req *prot.Sav
 		return nil, err
 	}
 
-	// Nếu không cần lưu (đã có câu trả lời đúng hết), query từ DB để lấy star, ratio_score, weight, number_time_sent
+	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại
 	if !needSave {
-		var star, numberTimeSent int
-		var ratioScore, weight float64
-		
-		// Query bản ghi có is_all_correct = true để lấy star, ratio_score, weight, number_time_sent
-		if req.HomeworkId != 0 {
-			existingRecord, err := s.homeworkUserQuestionService.GetHomeworkUserQuestionByCorrect(req.HomeworkId, userID, req.QuestionId, req.LessonId)
-			if err == nil && existingRecord != nil {
-				star = existingRecord.Star
-				ratioScore = existingRecord.RatioScore
-				weight = existingRecord.Weight
-				numberTimeSent = existingRecord.NumberTimeSent
-			}
-		}
-		
 		tx.Commit()
 		return &prot.SaveScoreResponseFillInBlank{
-			QuestionId:      req.QuestionId,
-			TotalScore:      utils.RoundTo2Decimal(totalScore),
-			Answers:         answerResults,
-			IsAllCorrect:    correctCount == numAnswers,
-			Star:            int32(star),
-			RatioScore:      ratioScore,
-			Weight:          weight,
-			NumberTimeSent:  int32(numberTimeSent),
+			QuestionId:   req.QuestionId,
+			TotalScore:   utils.RoundTo2Decimal(totalScore),
+			Answers:      answerResults,
+			IsAllCorrect: correctCount == numAnswers,
 		}, nil
 	}
 
@@ -274,22 +251,8 @@ func (s *saveScoreFillInBlankService) SaveScoreFillInBlankHomework(req *prot.Sav
 		})
 	}
 
-	isAllCorrect := correctCount == numAnswers
-
-	// Lưu vào homework_user_questions và lấy star, ratioScore, weight, numberTimeSent
-	var star, numberTimeSent int
-	var ratioScore, weight float64
-	if req.HomeworkId != 0 {
-		var err error
-		star, ratioScore, weight, numberTimeSent, err = s.homeworkUserQuestionService.SaveHomeworkUserQuestion(req.HomeworkId, userID, req.QuestionId, req.LessonId, isAllCorrect, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
-
 	// Upsert trạng thái hoàn thành nếu đúng hết
-	if isAllCorrect {
+	if correctCount == numAnswers {
 		err := s.correctRepo.UpsertHomeworkUserOnCorrect(req.HomeworkId, req.LessonId, userID, req.QuestionId, "fill_in_blank")
 		if err != nil {
 			tx.Rollback()
@@ -304,14 +267,10 @@ func (s *saveScoreFillInBlankService) SaveScoreFillInBlankHomework(req *prot.Sav
 	tx.Commit()
 
 	return &prot.SaveScoreResponseFillInBlank{
-		QuestionId:      req.QuestionId,
-		TotalScore:      utils.RoundTo2Decimal(totalScore),
-		Answers:         answerResults,
-		IsAllCorrect:    isAllCorrect,
-		Star:            int32(star),
-		RatioScore:      ratioScore,
-		Weight:          weight,
-		NumberTimeSent:  int32(numberTimeSent),
+		QuestionId:   req.QuestionId,
+		TotalScore:   utils.RoundTo2Decimal(totalScore),
+		Answers:      answerResults,
+		IsAllCorrect: correctCount == numAnswers,
 	}, nil
 }
 
@@ -390,4 +349,3 @@ func (s *saveScoreFillInBlankService) SaveScoreFillInBlankExercise(req *prot.Sav
 	tx.Commit()
 	return &prot.SaveScoreResponseFillInBlank{QuestionId: req.QuestionId, TotalScore: utils.RoundTo2Decimal(totalScore), Answers: answerResults, IsAllCorrect: correctCount == numAnswers}, nil
 }
-

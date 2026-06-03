@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/resources"
 
-	"be-cleverschool/utils"
+	"be-lms/utils"
 
 	"strconv"
 
@@ -59,26 +59,13 @@ func (s *lessonPlanService) GetByID(c *gin.Context, id int) (*prot.LessonPlan, e
 	if err != nil {
 		return nil, err
 	}
-
-	resource := resources.NewLessonPlanResource()
-	return resource.FormatLessonPlan(lp), nil
+	return modelToProtoLessonPlan(lp), nil
 }
 
 func (s *lessonPlanService) Create(c *gin.Context, req *prot.LessonPlanRequest) (*models.LessonPlan, error) {
 	coverImageUrl := utils.StripDomain(req.CoverImage, models.Storage)
 	mediaRepo := repositories.NewMediaRepository()
 	imageInfo := mediaRepo.GetMediaInfo(coverImageUrl, models.Storage)
-
-	userId := utils.GetCurrentUserId(c)
-
-	var authorId int64
-	if req.AuthorId > 0 {
-		authorId = int64(req.AuthorId)
-	} else if req.Author != nil && req.Author.Id != 0 {
-		authorId = req.Author.Id
-	} else {
-		authorId = int64(userId)
-	}
 
 	lp := &models.LessonPlan{
 		Name:           req.Name,
@@ -87,42 +74,27 @@ func (s *lessonPlanService) Create(c *gin.Context, req *prot.LessonPlanRequest) 
 		Status:         int(req.Status),
 		SortPosition:   int(req.SortPosition),
 		TotalTime:      int(req.TotalTime),
-		CreatedBy:      int64(userId),
-		AuthorId:       authorId,
+		CreatedBy:      1,
 	}
 
 	err := s.repo.Create(lp, int(req.LessonId))
 	if err != nil {
 		return nil, err
 	}
-
-	s.StoreLessons(lp.ID, req.Lessons)
-
-	new, _ := s.repo.GetByID(int(lp.ID), c)
-	return new, nil
+	return lp, nil
 }
 
 func (s *lessonPlanService) Update(c *gin.Context, req *prot.LessonPlanRequest) (*models.LessonPlan, error) {
 	lessonPlanResource := resources.NewLessonPlanResource()
 	lessonPlan := lessonPlanResource.FormatModelLessonPlan(req)
 
-	userId := utils.GetCurrentUserId(c)
-
-	if req.AuthorId > 0 {
-		lessonPlan.AuthorId = req.AuthorId
-	} else if req.Author != nil && req.Author.Id > 0 {
-		lessonPlan.AuthorId = req.Author.Id
-	} else {
-		lessonPlan.AuthorId = int64(userId)
-	}
-
 	err := s.repo.Update(lessonPlan)
 	if err != nil {
 		return nil, err
 	}
 
+	userId := utils.GetCurrentUserId(c)
 	s.repo.Complete(int(req.Id), int64(userId), req.IsComplete)
-	s.StoreLessons(req.Id, req.Lessons)
 
 	update, _ := s.repo.GetByID(int(req.Id), c)
 
@@ -170,19 +142,31 @@ func (s *lessonPlanService) Complete(c *gin.Context, id int, req *prot.LessonPla
 	return s.repo.Complete(id, int64(userId), req.IsComplete)
 }
 
+func modelToProtoLessonPlan(lp *models.LessonPlan) *prot.LessonPlan {
+	var isComplete bool
+	var completeAt int64
+
+	if lp.Complete != nil {
+		isComplete = true
+		completeAt = lp.Complete.CompletedAt.Unix()
+	}
+
+	return &prot.LessonPlan{
+		Id:           int64(lp.ID),
+		Name:         lp.Name,
+		Description:  lp.Description,
+		CoverImage:   utils.StaticURL(lp.CoverImageInfo.Path, models.Storage),
+		Status:       int32(lp.Status),
+		SortPosition: int32(lp.SortPosition),
+		TotalTime:    int64(lp.TotalTime),
+		Views:        int32(lp.Views),
+		CreatedAt:    lp.CreatedAt.Unix(),
+		UpdatedAt:    lp.UpdatedAt.Unix(),
+		IsComplete:   isComplete,
+		CompleteAt:   completeAt,
+	}
+}
+
 func (s *lessonPlanService) CompleteByIds(c *gin.Context, ids []int) ([]models.LessonPlanComplete, error) {
 	return s.repo.CompleteByIds(ids)
 }
-
-func (s *lessonPlanService) StoreLessons(id int64, lessons []*prot.LessonPlanLessonInfo) error {
-	var lessonIds []int64
-
-	for _, lesson := range lessons {
-		lessonIds = append(lessonIds, lesson.Id)
-	}
-
-	s.repo.UpdateLessons(id, lessonIds)
-
-	return nil
-}
-

@@ -21,20 +21,6 @@
       "status": {
         "type": "boolean"
       },
-      "medias": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            }
-          }
-        }
-      },
       "created_at": {
         "type": "string",
         "format": "date-time"
@@ -59,20 +45,6 @@
       },
       "content": {
         "type": "string"
-      },
-      "medias": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            }
-          }
-        }
       }
     }
   },
@@ -734,13 +706,6 @@
       "reset_all": {
         "type": "boolean",
         "description": "Reset toàn bộ hay không"
-      },
-      "sort_question_ids": {
-        "type": "array",
-        "items": {
-          "type": "integer"
-        },
-        "description": "Danh sách ID câu hỏi để sắp xếp"
       }
     }
   }

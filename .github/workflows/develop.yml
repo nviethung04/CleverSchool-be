@@ -1,119 +1,96 @@
-name: Auto Deploy BE to VPS (develop)
+name: Build and Deploy (develop)
 
 on:
   push:
     branches:
       - develop
 
-concurrency:
-  group: be-deploy-develop
-  cancel-in-progress: true
+env:
+  HARBOR_REGISTRY: ${{ secrets.HARBOR_REGISTRY }}
+  HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+  HARBOR_PASSWORD: ${{ secrets.HARBOR_PASSWORD }}
+  HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
+  HARBOR_REPOSITORY: ${{ secrets.HARBOR_REPOSITORY }}
+  DEPLOY_REPO: Enspire-Digital/be-lms-enspire-deploy
+  DEPLOY_REPO_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
+  KUSTOMIZE_PATH: src/develop
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build-and-push:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Harbor registry
+        uses: docker/login-action@v3
         with:
-          go-version: "1.24"
-          cache: true
+          registry: ${{ env.HARBOR_REGISTRY }}
+          username: ${{ env.HARBOR_USERNAME }}
+          password: ${{ env.HARBOR_PASSWORD }}
 
-      - name: Build Linux binary
-        run: |
-          go mod download
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o myapp .
-
-      - name: Package release bundle
-        id: bundle
+      - name: Set image variables
+        id: vars
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
-          RELEASE_DIR="release-$SHORT_SHA"
-          mkdir -p "$RELEASE_DIR"
-          cp myapp "$RELEASE_DIR/"
-          cp docker-compose.yml "$RELEASE_DIR/"
-          cp -R templates power_point i18n "$RELEASE_DIR/"
-          tar -czf "cleverschool-be-$SHORT_SHA.tar.gz" -C "$RELEASE_DIR" .
-          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
-          echo "bundle=cleverschool-be-$SHORT_SHA.tar.gz" >> "$GITHUB_OUTPUT"
+          IMAGE=${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${HARBOR_REPOSITORY}
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
-      - name: Upload bundle to VPS
-        uses: appleboy/scp-action@v0.1.7
+      - name: Build and push image
+        uses: docker/build-push-action@v6
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          source: ${{ steps.bundle.outputs.bundle }}
-          target: ${{ secrets.VPS_APP_DIR }}
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }}
+            ${{ steps.vars.outputs.IMAGE }}:develop
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.repository }}
 
-      - name: Deploy on VPS
-        uses: appleboy/ssh-action@v1.0.3
+  update-deploy-repo:
+    runs-on: self-hosted
+    needs: build-and-push
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout deploy repo
+        uses: actions/checkout@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script_stop: true
-          script: |
-            set -e
-            SHORT_SHA=${{ steps.bundle.outputs.short_sha }}
-            APP_DIR="${{ secrets.VPS_APP_DIR }}"
-            RELEASE_DIR="$APP_DIR/releases/$SHORT_SHA"
-            BUNDLE="$APP_DIR/cleverschool-be-$SHORT_SHA.tar.gz"
+          repository: ${{ env.DEPLOY_REPO }}
+          token: ${{ env.DEPLOY_REPO_TOKEN }}
+          path: deploy-repo
+          ref: main
 
-            if [ ! -f "$APP_DIR/.env" ]; then
-              echo "Missing $APP_DIR/.env"
-              exit 1
-            fi
+      - name: Compute image ref
+        id: vars
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          IMAGE=${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${HARBOR_REPOSITORY}
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_OUTPUT
 
-            mkdir -p "$APP_DIR/releases"
-            rm -rf "$RELEASE_DIR"
-            mkdir -p "$RELEASE_DIR"
-            tar -xzf "$BUNDLE" -C "$RELEASE_DIR"
-            rm -f "$BUNDLE"
-            ln -sfn "$RELEASE_DIR" "$APP_DIR/current"
+      - name: Set up kustomize
+        uses: imranismail/setup-kustomize@v2
 
-            cd "$APP_DIR/current"
-            docker compose -p cleverschool-develop --env-file "$APP_DIR/.env" up -d postgres redis
-
-            until docker compose -p cleverschool-develop --env-file "$APP_DIR/.env" exec -T postgres pg_isready -U "${DB_MASTER_USER:-admin}" -d "${DB_MASTER_NAME:-clever_school}" >/dev/null 2>&1; do
-              echo "Waiting for postgres..."
-              sleep 3
-            done
-
-            set -a
-            . "$APP_DIR/.env"
-            set +a
-            "$APP_DIR/current/myapp" migrate
-
-            if [ ! -f /etc/systemd/system/cleverschool-be.service ]; then
-              printf '%s\n' \
-                '[Unit]' \
-                'Description=CleverSchool BE (develop)' \
-                'After=network-online.target docker.service' \
-                'Wants=network-online.target' \
-                '' \
-                '[Service]' \
-                'Type=simple' \
-                'User=root' \
-                "WorkingDirectory=$APP_DIR/current" \
-                "EnvironmentFile=$APP_DIR/.env" \
-                "ExecStart=$APP_DIR/current/myapp" \
-                'Restart=always' \
-                'RestartSec=5' \
-                '' \
-                '[Install]' \
-                'WantedBy=multi-user.target' \
-                >/etc/systemd/system/cleverschool-be.service
-            fi
-
-            systemctl daemon-reload
-            systemctl enable cleverschool-be.service
-            systemctl restart cleverschool-be.service
-            systemctl --no-pager --full status cleverschool-be.service || true
-
-
+      - name: Update kustomize image tag
+        working-directory: deploy-repo/${{ env.KUSTOMIZE_PATH }}
+        run: |
+          kustomize edit set image ${{ steps.vars.outputs.IMAGE }}=${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: update image to ${{ steps.vars.outputs.IMAGE }}:${{ steps.vars.outputs.SHORT_SHA }} (develop)"
+            git push origin HEAD:main
+          fi

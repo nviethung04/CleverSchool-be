@@ -1,7 +1,7 @@
 package command
 
 import (
-	"be-cleverschool/database/db"
+	"be-lms/database/db"
 	"fmt"
 	"net/http"
 	"strings"
@@ -172,4 +172,3 @@ func (cmd *UpdateHomeworkLessonIdsCommand) updateChunk(table string, homeworkIDs
 
 	return int(result.RowsAffected), nil
 }
-

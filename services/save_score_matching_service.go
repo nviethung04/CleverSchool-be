@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -20,19 +20,16 @@ type SaveScoreMatchingService interface {
 }
 
 type saveScoreMatchingService struct {
-	repo                        repositories.SaveScoreMatchingRepository
-	correctRepo                 repositories.SaveCorrectHomeworkRepository
-	clonedQuestionService       ClonedQuestionService
-	homeworkUserQuestionService HomeworkUserQuestionService
+	repo                  repositories.SaveScoreMatchingRepository
+	correctRepo           repositories.SaveCorrectHomeworkRepository
+	clonedQuestionService ClonedQuestionService
 }
 
 func NewSaveScoreMatchingService(repo repositories.SaveScoreMatchingRepository, clonedQuestionService ClonedQuestionService) SaveScoreMatchingService {
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
 	return &saveScoreMatchingService{
-		repo:                        repo,
-		correctRepo:                 repositories.NewSaveCorrectHomeworkRepository(),
-		clonedQuestionService:       clonedQuestionService,
-		homeworkUserQuestionService: NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService),
+		repo:                  repo,
+		correctRepo:           repositories.NewSaveCorrectHomeworkRepository(),
+		clonedQuestionService: clonedQuestionService,
 	}
 }
 
@@ -267,42 +264,14 @@ func (s *saveScoreMatchingService) SaveScoreMatchingHomework(req *prot.SaveScore
 		})
 	}
 
-	isAllCorrect := correctCount == numMatches
-
-	// Lưu vào homework_user_questions và lấy star, ratioScore, weight, numberTimeSent
-	var star, numberTimeSent int
-	var ratioScore, weight float64
-	if req.HomeworkId != 0 {
-		var err error
-		star, ratioScore, weight, numberTimeSent, err = s.homeworkUserQuestionService.SaveHomeworkUserQuestion(req.HomeworkId, userID, req.QuestionId, req.LessonId, isAllCorrect, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
-
-	// Nếu không cần lưu (đã có câu trả lời đúng hết), query từ DB để lấy star, ratio_score, weight, number_time_sent
+	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại
 	if !needSave {
-		if req.HomeworkId != 0 {
-			existingRecord, err := s.homeworkUserQuestionService.GetHomeworkUserQuestionByCorrect(req.HomeworkId, userID, req.QuestionId, req.LessonId)
-			if err == nil && existingRecord != nil {
-				star = existingRecord.Star
-				ratioScore = existingRecord.RatioScore
-				weight = existingRecord.Weight
-				numberTimeSent = existingRecord.NumberTimeSent
-			}
-		}
-
 		tx.Commit()
 		return &prot.SaveScoreResponseMatching{
-			QuestionId:      req.QuestionId,
-			TotalScore:      utils.RoundTo2Decimal(totalScore),
-			Matches:         matchResults,
-			IsAllCorrect:    correctCount == numMatches,
-			Star:            int32(star),
-			RatioScore:      ratioScore,
-			Weight:          weight,
-			NumberTimeSent:  int32(numberTimeSent),
+			QuestionId:   req.QuestionId,
+			TotalScore:   utils.RoundTo2Decimal(totalScore),
+			Matches:      matchResults,
+			IsAllCorrect: correctCount == numMatches,
 		}, nil
 	}
 
@@ -322,14 +291,10 @@ func (s *saveScoreMatchingService) SaveScoreMatchingHomework(req *prot.SaveScore
 	tx.Commit()
 
 	return &prot.SaveScoreResponseMatching{
-		QuestionId:      req.QuestionId,
-		TotalScore:      utils.RoundTo2Decimal(totalScore),
-		Matches:         matchResults,
-		IsAllCorrect:    correctCount == numMatches,
-		Star:            int32(star),
-		RatioScore:      ratioScore,
-		Weight:          weight,
-		NumberTimeSent:  int32(numberTimeSent),
+		QuestionId:   req.QuestionId,
+		TotalScore:   utils.RoundTo2Decimal(totalScore),
+		Matches:      matchResults,
+		IsAllCorrect: correctCount == numMatches,
 	}, nil
 }
 
@@ -470,4 +435,3 @@ func (s *saveScoreMatchingService) SaveScoreMatchingExercise(req *prot.SaveScore
 		IsAllCorrect: correctCount == numMatches,
 	}, nil
 }
-

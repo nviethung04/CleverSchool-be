@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
 	"time"
 )
 
@@ -46,21 +46,6 @@ func (r *ClassResourceImpl) FormatClass(class *models.Class) *prot.ClassResponse
 		grade = gradeResource.FormatGrade(class.Grade)
 	}
 
-	var faculty *prot.Faculty
-	facultyResource := NewFacultyResource()
-	if class.Faculty != nil {
-		faculty = facultyResource.FormatFaculty(class.Faculty)
-	}
-
-	var classMainId int64
-	var classMainName string
-	if class.ClassMain != nil {
-		classMainId = class.ClassMain.ID
-		classMainName = class.ClassMain.Name
-	} else if class.ClassMainId > 0 {
-		classMainId = class.ClassMainId
-	}
-
 	return &prot.ClassResponse{
 		Id:              class.ID,
 		SchoolId:        class.SchoolId,
@@ -74,13 +59,9 @@ func (r *ClassResourceImpl) FormatClass(class *models.Class) *prot.ClassResponse
 			Phone: class.TeacherInfo.Phone,
 			Email: class.TeacherInfo.Email,
 		},
-		FacultyId:      class.FacultyId,
-		Grade:          grade,
-		Faculty:        faculty,
-		ClassMainId:    classMainId,
-		ClassMainName:  classMainName,
-		CreatedAt:      class.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:      class.UpdatedAt.Format("2006-01-02 15:04:05"),
+		Grade:     grade,
+		CreatedAt: class.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: class.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 
@@ -129,7 +110,6 @@ func (r *ClassResourceImpl) FormatModelClass(class *prot.ClassRequest) *models.C
 		ID:          class.Id,
 		SchoolId:    class.SchoolId,
 		GradeId:     class.GradeId,
-		FacultyId:   class.FacultyId,
 		Name:        class.Name,
 		Status:      class.Status,
 		MaxStudents: class.MaxStudents,
@@ -244,4 +224,3 @@ func (r *ClassResourceImpl) MapCoursesToDTOCourses(cousers []models.Course) []dt
 
 	return currentCousers
 }
-

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/admin/prot";
+option go_package = "be-lms/admin/prot";
 
 import "answer.proto";
 import "source_question.proto";
@@ -142,9 +142,4 @@ message CreateQuestionRelationRequest {
   bool is_reset = 10;
   bool reset_all = 11;
   bool clear_self_scoring_questions = 12;
-  repeated int64 sort_question_ids = 13;
-  map<string, int32> questions_order = 14;
-  map<string, int32> source_questions_order = 15;
 }
-
-//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative question.proto

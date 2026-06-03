@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 )
 
 type ContestResultRepository interface {
@@ -71,51 +71,12 @@ func (r *contestResultRepository) GetContestRoundAnswersByStudent(contestRoundId
 }
 
 func (r *contestResultRepository) GetContestRoundResults(contestRoundId int64) (interface{}, error) {
-	// Get all results for a contest round với query tối ưu
-	var results []struct {
-		ID                 int64   `json:"id"`
-		ContestRoundID     int64   `json:"contest_round_id"`
-		UserID             int64   `json:"user_id"`
-		Score              float64 `json:"score"`
-		Ratio              float64 `json:"ratio"`
-		Time               int64   `json:"time"`
-		HasManualScoring   bool    `json:"has_manual_scoring"`
-		CreatedAt          string  `json:"created_at"`
-		
-		// User info
-		UserName           string  `json:"user_name"`
-		UserCode           string  `json:"user_code"`
-		UserPhone          string  `json:"user_phone"`
-		UserEmail          string  `json:"user_email"`
-		
-		// School info
-		SchoolName         string  `json:"school_name"`
-		
-		// Address info
-		ProvinceName       string  `json:"province_name"`
-		
-		// Contest info
-		ContestRoundName   string  `json:"contest_round_name"`
-		ContestName        string  `json:"contest_name"`
-	}
+	// Get all results for a contest round
+	var results []models.ContestRoundUser
 
 	err := db.ReplicaDB.
-		Table("contest_round_users cru").
-		Select(`cru.id, cru.contest_round_id, cru.user_id, cru.score, cru.ratio, cru.time, 
-			cru.has_manual_scoring, cru.created_at,
-			u.name as user_name, u.code as user_code, u.phone_number as user_phone, u.email as user_email,
-			s.name as school_name,
-			COALESCE(p.name, '') as province_name,
-			cr.name as contest_round_name,
-			c.name as contest_name`).
-		Joins("JOIN users u ON u.id = cru.user_id AND u.deleted_at IS NULL").
-		Joins("LEFT JOIN schools s ON s.id = u.school_id AND s.deleted_at IS NULL").
-		Joins("LEFT JOIN wards w ON w.code = s.ward_code").
-		Joins("LEFT JOIN provinces p ON p.code = w.province_code").
-		Joins("JOIN contest_rounds cr ON cr.id = cru.contest_round_id AND cr.deleted_at IS NULL").
-		Joins("JOIN contests c ON c.id = cr.contest_id AND c.deleted_at IS NULL").
-		Where("cru.contest_round_id = ?", contestRoundId).
-		Order("cru.score DESC, cru.time ASC").
+		Where("contest_round_id = ?", contestRoundId).
+		Order("score DESC, time ASC").
 		Find(&results).Error
 
 	return results, err
@@ -124,23 +85,19 @@ func (r *contestResultRepository) GetContestRoundResults(contestRoundId int64) (
 func (r *contestResultRepository) GetContestRoundLeaderboard(contestRoundId int64) (interface{}, error) {
 	// Get leaderboard for a contest round
 	var leaderboard []struct {
-		Rank       int     `json:"rank"`
-		UserID     int64   `json:"user_id"`
-		UserName   string  `json:"user_name"`
-		UserCode   string  `json:"user_code"`
-		SchoolName string  `json:"school_name"`
-		Score      float64 `json:"score"`
-		Ratio      float64 `json:"ratio"`
-		Time       int64   `json:"time"`
+		UserID   int64   `json:"user_id"`
+		UserName string  `json:"user_name"`
+		Score    float64 `json:"score"`
+		Ratio    float64 `json:"ratio"`
+		Time     int64   `json:"time"`
+		Rank     int     `json:"rank"`
 	}
 
 	err := db.ReplicaDB.
 		Table("contest_round_users cru").
-		Select(`cru.user_id, u.name as user_name, u.code as user_code, 
-			COALESCE(s.name, '') as school_name, cru.score, cru.ratio, cru.time`).
-		Joins("JOIN users u ON u.id = cru.user_id AND u.deleted_at IS NULL").
-		Joins("LEFT JOIN schools s ON s.id = u.school_id AND s.deleted_at IS NULL").
-		Where("cru.contest_round_id = ?", contestRoundId).
+		Select("cru.user_id, u.name as user_name, cru.score, cru.ratio, cru.time").
+		Joins("JOIN users u ON u.id = cru.user_id").
+		Where("cru.contest_round_id = ? AND u.deleted_at IS NULL", contestRoundId).
 		Order("cru.score DESC, cru.time ASC").
 		Find(&leaderboard).Error
 
@@ -151,4 +108,3 @@ func (r *contestResultRepository) GetContestRoundLeaderboard(contestRoundId int6
 
 	return leaderboard, err
 }
-

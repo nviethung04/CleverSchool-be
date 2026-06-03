@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"be-cleverschool/middleware"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
+	"be-lms/middleware"
+	"be-lms/redis"
+	"be-lms/repositories"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +11,6 @@ import (
 
 func RouteAuth(router *gin.Engine) {
 	api := router.Group("/api")
-	api.Use(middleware.TimeoutWithSkip(30*time.Second, []string{}))
 	authController := NewAuthController()
 
 	authRepo := repositories.NewAuthRepository()
@@ -30,4 +29,3 @@ func RouteAuth(router *gin.Engine) {
 	api.PUT("/change-password", middleware.AuthMiddleware(authRepo), authController.ChangePassword)
 	api.PUT("/accept-roles/:role", middleware.AuthMiddleware(authRepo), authController.AcceptRole)
 }
-

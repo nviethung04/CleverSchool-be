@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 	"strconv"
 
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -90,16 +90,6 @@ func (ctl *HomeworkController) AssignedLesson(c *gin.Context) {
 	}
 
 	utils.Respond(c, lessons, err, "")
-}
-
-func (ctl *HomeworkController) StudentsDoing(c *gin.Context) {
-	result, err := ctl.svc.GetStudentsDoing(c)
-	if err != nil {
-		utils.Respond(c, nil, err, err.Error())
-		return
-	}
-
-	utils.Respond(c, result, nil, "")
 }
 
 // GetByID override để xử lý permission denied cho học sinh

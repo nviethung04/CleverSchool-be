@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 	"strconv"
 
@@ -44,16 +44,6 @@ func (ctl *HomeworkStudentController) GetHomeworkStudents(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	var questionFiles []*prot.HomeworkFile
-
-	for _, qf := range info.FileInfos {
-		questionFiles = append(questionFiles, &prot.HomeworkFile{
-			Type: qf.Type,
-			Url:  utils.StaticURL(qf.Disk, models.Storage),
-		})
-	}
-
 	resp := &prot.HomeworkStudentsResponse{
 		HomeworkInfo: &prot.HomeworkStudentsResponse_HomeworkInfo{
 			Name:           info.Name,
@@ -62,8 +52,6 @@ func (ctl *HomeworkStudentController) GetHomeworkStudents(c *gin.Context) {
 			CoverImage:     utils.StaticURL(info.CoverImage, models.Storage),
 			IsAssigned:     info.IsAssigned,
 			TotalQuestions: info.TotalQuestions,
-			QuestionForm: info.QuestionForm,
-			QuestionFiles: questionFiles,
 			CreatedAt:      info.CreatedAt.Unix(),
 		},
 		Students: []*prot.HomeworkStudentInfo{},
@@ -79,9 +67,7 @@ func (ctl *HomeworkStudentController) GetHomeworkStudents(c *gin.Context) {
 			UpdatedAt:               s.UpdatedAt.Unix(),
 			ManualQuestionsCount:    s.ManualQuestionsCount,
 			CourseId:                s.CourseID,
-			IsSubmitted:             s.IsSubmitted,
 		})
 	}
 	utils.Respond(c, resp, err, "")
 }
-

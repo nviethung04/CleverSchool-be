@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 
-	"be-cleverschool/models"
+	"be-lms/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,5 +64,4 @@ func (s *dashboardContestRankingService) GetContestRanking(c *gin.Context, req *
 		CurrentRanking: currentRanking, // Thêm current_ranking vào response
 	}, nil
 }
-
 

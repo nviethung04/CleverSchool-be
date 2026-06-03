@@ -23,9 +23,6 @@
       },
       "description": {
         "type": "string"
-      },
-      "book_url": {
-        "type": "string"
       }
     }
   },
@@ -160,10 +157,6 @@
       "copy_schedule_message": {
         "type": "string",
         "description": "Thông báo kết quả copy lịch học"
-      },
-      "eligible_for_final_exam": {
-        "type": "boolean",
-        "description": "Có được thi cuối kỳ không"
       }
     }
   },
@@ -272,10 +265,6 @@
       "copy_schedule_message": {
         "type": "string",
         "description": "Thông báo kết quả copy lịch học"
-      },
-      "eligible_for_final_exam": {
-        "type": "boolean",
-        "description": "Có được thi cuối kỳ không"
       }
     }
   },
@@ -399,9 +388,6 @@
             },
             "main_teacher": {
               "type": "boolean"
-            },
-            "is_failed": {
-              "type": "boolean"
             }
           }
         }
@@ -428,9 +414,6 @@
             },
             "username": {
               "type": "string"
-            },
-            "is_failed": {
-              "type": "boolean"
             }
           }
         }

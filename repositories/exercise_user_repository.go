@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"errors"
 	"fmt"
 	"time"
@@ -251,4 +251,3 @@ func (r *exerciseUserRepository) UpdateOrCreate(exerciseUser *models.ExerciseUse
 
 	return nil
 }
-

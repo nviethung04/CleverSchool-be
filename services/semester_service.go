@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -80,7 +80,7 @@ func (s *semesterService) GetByID(c *gin.Context, id int) (*prot.Semester, error
 func (s *semesterService) Create(c *gin.Context, req *prot.SemesterRequest) (*models.Semester, error) {
 	semesterResource := resources.NewSemesterResource()
 
-	if req.PreviousSemesterId != 0 {
+    if req.PreviousSemesterId != 0 {
 		beginDate := s.GetEarliestStartDateFromPrevious(int(req.PreviousSemesterId), map[int]bool{})
 		if beginDate != nil {
 			req.BeginDate = beginDate.Format("2006-01-02")
@@ -96,11 +96,6 @@ func (s *semesterService) Create(c *gin.Context, req *prot.SemesterRequest) (*mo
 			return nil, err
 		}
 		semester.StartDate = startWeek.StartDate
-
-		if req.BeginDate == "" {
-			parsedBegin, _ := time.Parse("2006-01-02", startWeek.StartDate.Format("2006-01-02"))
-			semester.BeginDate = parsedBegin
-		}
 	}
 
 	if req.EndWeekId != 0 {
@@ -147,11 +142,6 @@ func (s *semesterService) Update(c *gin.Context, req *prot.SemesterRequest) (*mo
 			return nil, err
 		}
 		semester.StartDate = startWeek.StartDate
-
-		if req.BeginDate == "" {
-			parsedBegin, _ := time.Parse("2006-01-02", startWeek.StartDate.Format("2006-01-02"))
-			semester.BeginDate = parsedBegin
-		}
 	}
 
 	if req.EndWeekId != 0 {
@@ -243,44 +233,20 @@ func (s *semesterService) ApplyFilter(c *gin.Context, filter map[string]interfac
 }
 
 func (s *semesterService) StoreHolidays(c *gin.Context, id int64, req *prot.SemesterRequest) error {
-	holidayResource := resources.NewHolidayResource()
-
-	if err := s.repo.DeleteOldHolidays(id, nil); err != nil {
-		return err
-	}
-
-	parseDate := func(s string) time.Time {
-		if s == "" {
-			return time.Time{}
-		}
-		if t, err := time.Parse("2006-01-02", s); err == nil {
-			return t
-		}
-		if t, err := time.Parse(time.RFC3339, s); err == nil {
-			return t
-		}
-		return time.Time{}
-	}
+	holidayIds := make([]int64, 0, len(req.Holidays))
 
 	for _, value := range req.Holidays {
-		holidayModel := holidayResource.ProtToModel(value)
-		holidayModel.StartDate = parseDate(value.StartDate)
-		holidayModel.EndDate = parseDate(value.EndDate)
-
-		createdHoliday, err := s.repo.UpdateOrCreate(*holidayModel)
-		if err != nil {
-			return err
-		}
-
-		ref := models.SemesterRefHoliday{
+		holiday := models.SemesterRefHoliday{
 			SemesterId: id,
-			HolidayId:  createdHoliday.ID,
+			HolidayId:    value.Id,
 		}
-		if err := s.repo.UpdateOrCreateHoliday(ref); err != nil {
-			return err
-		}
+
+		s.repo.UpdateOrCreateHoliday(holiday)
+
+		holidayIds = append(holidayIds, value.Id)
 	}
+
+	s.repo.DeleteOldHolidays(id, holidayIds)
 
 	return nil
 }
-

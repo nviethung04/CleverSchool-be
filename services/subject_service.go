@@ -1,12 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
-	"mime/multipart"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +17,6 @@ type SubjectService interface {
 	Update(c *gin.Context, req *prot.SubjectRequest) (*models.Subject, error)
 	Delete(c *gin.Context, id int) error
 	Restore(c *gin.Context, id int) (*models.Subject, error)
-	Export(c *gin.Context) (string, error)
-	Import(c *gin.Context, fileHeader *multipart.FileHeader) error
 }
 
 type subjectService struct {
@@ -31,7 +28,7 @@ func NewSubjectService(repo repositories.SubjectRepository) SubjectService {
 }
 
 func (s *subjectService) GetAll(c *gin.Context) ([]models.Subject, int64, error) {
-	allowedFilters := []string{"status", "faculty_id"}
+	allowedFilters := []string{"status"}
 	filter, page, perPage, keyword, sort, err := utils.ParsePaginationParams(c, allowedFilters)
 	if err != nil {
 		return nil, 0, err
@@ -42,11 +39,6 @@ func (s *subjectService) GetAll(c *gin.Context) ([]models.Subject, int64, error)
 	s.repo.SetLimit(perPage)
 	s.repo.SetPage(page)
 	s.repo.SetSort(sort)
-	s.repo.SetPreload([]string{
-		"Faculty",
-		"TrainingLevels",
-	})
-	s.repo.SetContext(c)
 
 	subjects, rows, err := s.repo.FindAll()
 	if err != nil {
@@ -57,11 +49,6 @@ func (s *subjectService) GetAll(c *gin.Context) ([]models.Subject, int64, error)
 }
 
 func (s *subjectService) GetByID(c *gin.Context, id int) (*prot.Subject, error) {
-	s.repo.SetContext(c)
-	s.repo.SetPreload([]string{
-		"Faculty",
-		"TrainingLevels",
-	})
 	subject, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, err
@@ -84,13 +71,7 @@ func (s *subjectService) Create(c *gin.Context, req *prot.SubjectRequest) (*mode
 		return nil, err
 	}
 
-	s.StoreTrainingLevels(c, subject.ID, req.TrainingLevels)
-
 	id := int(subject.ID)
-	s.repo.SetPreload([]string{
-		"Faculty",
-		"TrainingLevels",
-	})
 	newSubject, _ := s.repo.FindNewByID(id)
 
 	return newSubject, nil
@@ -107,13 +88,7 @@ func (s *subjectService) Update(c *gin.Context, req *prot.SubjectRequest) (*mode
 		return nil, err
 	}
 
-	s.StoreTrainingLevels(c, subject.ID, req.TrainingLevels)
-
 	id := int(subject.ID)
-	s.repo.SetPreload([]string{
-		"Faculty",
-		"TrainingLevels",
-	})
 	updateSubject, _ := s.repo.FindNewByID(id)
 
 	return updateSubject, nil
@@ -138,16 +113,3 @@ func (s *subjectService) Restore(c *gin.Context, id int) (*models.Subject, error
 
 	return subject, nil
 }
-
-func (s *subjectService) StoreTrainingLevels(c *gin.Context, id int64, trainingLevels []*prot.TrainingLevel) error {
-	var trainingLevelIds []int64
-
-	for _, trainingLevel := range trainingLevels {
-		trainingLevelIds = append(trainingLevelIds, trainingLevel.Id)
-	}
-
-	s.repo.UpdateTrainingLevels(id, trainingLevelIds)
-
-	return nil
-}
-

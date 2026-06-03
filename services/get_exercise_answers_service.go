@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	_ "be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	_ "be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"context"
 	"encoding/json"
 	"strconv"
@@ -747,4 +747,3 @@ func (s *getExerciseAnswersService) GetExerciseAnswers(ctx context.Context, req 
 		Overview:  overview,
 	}, nil
 }
-

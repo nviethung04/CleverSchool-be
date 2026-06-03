@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/i18n"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/services"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"os"
@@ -262,4 +262,3 @@ func (s *MediaController) Files(c *gin.Context) {
 	data, err := s.service.Files(c, folderId)
 	utils.Respond(c, data, err, "")
 }
-

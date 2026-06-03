@@ -69,7 +69,7 @@
                                     },
                                     "object_url": {
                                         "type": "string",
-                                        "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
+                                        "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext"
                                     },
                                     "key": {
                                         "type": "string",
@@ -128,7 +128,7 @@
                             },
                             "url": {
                                 "type": "string",
-                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext",
+                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext",
                                 "description": "URL truy cập file"
                             },
                             "size": {
@@ -165,14 +165,6 @@
                             "success": {
                                 "type": "boolean",
                                 "example": true
-                            },
-                            "final_url": {
-                                "type": "string",
-                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
-                            },
-                            "job_id": {
-                                "type": "string",
-                                "example": "1234567890"
                             },
                             "message": {
                                 "type": "string",
@@ -225,7 +217,7 @@
                             },
                             "url": {
                                 "type": "string",
-                                "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext.zip",
+                                "example": "https://cdn-dev.xlms.vn/public/test_extract/test_ext.zip",
                                 "description": "URL truy cập file"
                             },
                             "size": {
@@ -281,88 +273,6 @@
                                     "base_key": {
                                         "type": "string",
                                         "example": "public/test_extract/test_ext"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "500": {
-                    "description": "Lỗi server"
-                }
-            }
-        }
-    },
-    "/api/upload/progress": {
-        "get": {
-            "description": "API lấy progress của extraction job",
-            "tags": [
-                "Upload"
-            ],
-            "security": [
-                {
-                    "ApiKeyAuth": []
-                }
-            ],
-            "parameters": [
-                {
-                    "in": "query",
-                    "name": "job_id",
-                    "description": "ID của job",
-                    "required": true,
-                    "type": "string",
-                    "example": "1234567890"
-                }
-            ],
-            "summary": "Lấy progress của extraction job",
-            "responses": {
-                "200": {
-                    "description": "Thành công",
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "success": {
-                                "type": "boolean",
-                                "example": true
-                            },
-                            "data": {
-                                "type": "object",
-                                "properties": {
-                                    "job_id": {
-                                        "type": "string",
-                                        "example": "1234567890"
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "example": "completed"
-                                    },
-                                    "progress": {
-                                        "type": "integer",
-                                        "example": 100
-                                    },
-                                    "message": {
-                                        "type": "string",
-                                        "example": "Extraction completed"
-                                    },
-                                    "error": {
-                                        "type": "string",
-                                        "example": "Extraction failed"
-                                    },
-                                    "final_url": {
-                                        "type": "string",
-                                        "example": "https://cdn-dev.xClever School.vn/public/test_extract/test_ext"
-                                    },
-                                    "started_at": {
-                                        "type": "string",
-                                        "example": "2021-01-01T00:00:00Z"
-                                    },
-                                    "updated_at": {
-                                        "type": "string",
-                                        "example": "2021-01-01T00:00:00Z"
-                                    },
-                                    "completed_at": {
-                                        "type": "string",
-                                        "example": "2021-01-01T00:00:00Z"
                                     }
                                 }
                             }

@@ -11,7 +11,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Install buf
-RUN curl -sSL "https://cdn-dev.xClever School.vn/buf/buf-Linux-x86_64" --retry 5 --retry-delay 5 -o ./buf && \
+RUN curl -sSL "https://cdn-dev.xlms.vn/buf/buf-Linux-x86_64" --retry 5 --retry-delay 5 -o ./buf && \
     chmod +x ./buf
 
 # Copy buf config files

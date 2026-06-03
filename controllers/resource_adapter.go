@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
 )
 
 // Topic
@@ -211,23 +211,6 @@ func (adapter *LessonResourceAdapter) FormatItem(item *models.Lesson) *prot.Less
 	return adapter.resource.FormatLesson(item)
 }
 
-// AssessmentCriteriaGroup
-type AssessmentCriteriaGroupResourceAdapter struct {
-	resource resources.AssessmentCriteriaGroupResource
-}
-
-func NewAssessmentCriteriaGroupResourceAdapter(resource resources.AssessmentCriteriaGroupResource) *AssessmentCriteriaGroupResourceAdapter {
-	return &AssessmentCriteriaGroupResourceAdapter{resource: resource}
-}
-
-func (adapter *AssessmentCriteriaGroupResourceAdapter) FormatItems(items []*models.AssessmentCriteriaGroup) []*prot.AssessmentCriteriaGroup {
-	return adapter.resource.FormatGroups(items)
-}
-
-func (adapter *AssessmentCriteriaGroupResourceAdapter) FormatItem(item *models.AssessmentCriteriaGroup) *prot.AssessmentCriteriaGroup {
-	return adapter.resource.FormatGroup(item)
-}
-
 // School
 type SchoolResourceAdapter struct {
 	resource resources.SchoolResource
@@ -362,57 +345,6 @@ func (adapter *HomeworkResourceAdapter) FormatItems(items []*models.Homework) []
 
 func (adapter *HomeworkResourceAdapter) FormatItem(item *models.Homework) *prot.Homework {
 	return adapter.resource.FormatHomework(item)
-}
-
-// Assessment
-type AssessmentResourceAdapter struct {
-	resource resources.AssessmentResource
-}
-
-func NewAssessmentResourceAdapter(resource resources.AssessmentResource) *AssessmentResourceAdapter {
-	return &AssessmentResourceAdapter{resource: resource}
-}
-
-func (adapter *AssessmentResourceAdapter) FormatItems(items []*models.Assessment) []*prot.Assessment {
-	return adapter.resource.FormatAssessments(items)
-}
-
-func (adapter *AssessmentResourceAdapter) FormatItem(item *models.Assessment) *prot.Assessment {
-	return adapter.resource.FormatAssessment(item)
-}
-
-// AssessmentCriterion
-type AssessmentCriterionResourceAdapter struct {
-	resource resources.AssessmentCriterionResource
-}
-
-func NewAssessmentCriterionResourceAdapter(resource resources.AssessmentCriterionResource) *AssessmentCriterionResourceAdapter {
-	return &AssessmentCriterionResourceAdapter{resource: resource}
-}
-
-func (adapter *AssessmentCriterionResourceAdapter) FormatItems(items []*models.AssessmentCriterion) []*prot.AssessmentCriterion {
-	return adapter.resource.FormatAssessmentCriteria(items)
-}
-
-func (adapter *AssessmentCriterionResourceAdapter) FormatItem(item *models.AssessmentCriterion) *prot.AssessmentCriterion {
-	return adapter.resource.FormatAssessmentCriterion(item)
-}
-
-// AssessmentSubcriterion
-type AssessmentSubcriterionResourceAdapter struct {
-	resource resources.AssessmentSubcriterionResource
-}
-
-func NewAssessmentSubcriterionResourceAdapter(resource resources.AssessmentSubcriterionResource) *AssessmentSubcriterionResourceAdapter {
-	return &AssessmentSubcriterionResourceAdapter{resource: resource}
-}
-
-func (adapter *AssessmentSubcriterionResourceAdapter) FormatItems(items []*models.AssessmentSubcriterion) []*prot.AssessmentSubcriterion {
-	return adapter.resource.FormatAssessmentSubcriteria(items)
-}
-
-func (adapter *AssessmentSubcriterionResourceAdapter) FormatItem(item *models.AssessmentSubcriterion) *prot.AssessmentSubcriterion {
-	return adapter.resource.FormatAssessmentSubcriterion(item)
 }
 
 // Feedback
@@ -584,140 +516,3 @@ func (adapter *ProgramResourceAdapter) FormatItems(items []*models.Program) []*p
 func (adapter *ProgramResourceAdapter) FormatItem(item *models.Program) *prot.Program {
 	return adapter.resource.FormatProgram(item)
 }
-
-// Setting
-type SettingResourceAdapter struct {
-	resource resources.SettingResource
-}
-
-func NewSettingResourceAdapter(resource resources.SettingResource) *SettingResourceAdapter {
-	return &SettingResourceAdapter{resource: resource}
-}
-
-func (adapter *SettingResourceAdapter) FormatItems(items []*models.Setting) []*prot.Setting {
-	return adapter.resource.FormatSettings(items)
-}
-
-func (adapter *SettingResourceAdapter) FormatItem(item *models.Setting) *prot.Setting {
-	return adapter.resource.FormatSetting(item)
-}
-
-// Notice
-type NoticeResourceAdapter struct {
-	resource resources.NoticeResource
-}
-
-func NewNoticeResourceAdapter(resource resources.NoticeResource) *NoticeResourceAdapter {
-	return &NoticeResourceAdapter{resource: resource}
-}
-
-func (adapter *NoticeResourceAdapter) FormatItems(items []*models.Notice) []*prot.Notice {
-	return adapter.resource.FormatNotices(items)
-}
-
-func (adapter *NoticeResourceAdapter) FormatItem(item *models.Notice) *prot.Notice {
-	return adapter.resource.FormatNotice(item)
-}
-
-// Faculty
-type FacultyResourceAdapter struct {
-	resource resources.FacultyResource
-}
-
-func NewFacultyResourceAdapter(resource resources.FacultyResource) *FacultyResourceAdapter {
-	return &FacultyResourceAdapter{resource: resource}
-}
-
-func (adapter *FacultyResourceAdapter) FormatItems(items []*models.Faculty) []*prot.Faculty {
-	return adapter.resource.FormatFaculties(items)
-}
-
-func (adapter *FacultyResourceAdapter) FormatItem(item *models.Faculty) *prot.Faculty {
-	return adapter.resource.FormatFaculty(item)
-}
-
-// StudyReportCriteria
-type StudyReportCriteriaResourceAdapter struct {
-	resource resources.StudyReportCriteriaResource
-}
-
-func NewStudyReportCriteriaResourceAdapter(resource resources.StudyReportCriteriaResource) *StudyReportCriteriaResourceAdapter {
-	return &StudyReportCriteriaResourceAdapter{resource: resource}
-}
-
-func (adapter *StudyReportCriteriaResourceAdapter) FormatItems(items []*models.StudyReportCriteria) []*prot.StudyReportCriteria {
-	return adapter.resource.FormatStudyReportCriterias(items)
-}
-
-func (adapter *StudyReportCriteriaResourceAdapter) FormatItem(item *models.StudyReportCriteria) *prot.StudyReportCriteria {
-	return adapter.resource.FormatStudyReportCriteria(item)
-}
-
-// StudyReport
-type StudyReportResourceAdapter struct {
-	resource resources.StudyReportResource
-}
-
-func NewStudyReportResourceAdapter(resource resources.StudyReportResource) *StudyReportResourceAdapter {
-	return &StudyReportResourceAdapter{resource: resource}
-}
-
-func (adapter *StudyReportResourceAdapter) FormatItems(items []*models.StudyReport) []*prot.StudyReport {
-	return adapter.resource.FormatStudyReports(items)
-}
-
-func (adapter *StudyReportResourceAdapter) FormatItem(item *models.StudyReport) *prot.StudyReport {
-	return adapter.resource.FormatStudyReport(item)
-}
-
-// Heading
-type HeadingResourceAdapter struct {
-	resource resources.HeadingResource
-}
-
-func NewHeadingResourceAdapter(resource resources.HeadingResource) *HeadingResourceAdapter {
-	return &HeadingResourceAdapter{resource: resource}
-}
-
-func (adapter *HeadingResourceAdapter) FormatItem(item *models.Heading) *prot.Heading {
-	return adapter.resource.FormatHeading(item)
-}
-
-func (adapter *HeadingResourceAdapter) FormatItems(items []*models.Heading) []*prot.Heading {
-	return adapter.resource.FormatHeadings(items)
-}
-
-// TrainingLevel
-type TrainingLevelResourceAdapter struct {
-	resource resources.TrainingLevelResource
-}
-
-func NewTrainingLevelResourceAdapter(resource resources.TrainingLevelResource) *TrainingLevelResourceAdapter {
-	return &TrainingLevelResourceAdapter{resource: resource}
-}
-
-func (adapter *TrainingLevelResourceAdapter) FormatItem(item *models.TrainingLevel) *prot.TrainingLevel {
-	return adapter.resource.FormatTrainingLevel(item)
-}
-
-func (adapter *TrainingLevelResourceAdapter) FormatItems(items []*models.TrainingLevel) []*prot.TrainingLevel {
-	return adapter.resource.FormatTrainingLevels(items)
-}
-
-// TeachingPlan
-type TeachingPlanResourceAdapter struct {
-	resource resources.TeachingPlanResource
-}
-
-func NewTeachingPlanResourceAdapter(resource resources.TeachingPlanResource) *TeachingPlanResourceAdapter {
-	return &TeachingPlanResourceAdapter{resource: resource}
-}
-
-func (adapter *TeachingPlanResourceAdapter) FormatItem(item *models.TeachingPlan) *prot.TeachingPlan {
-	return adapter.resource.FormatTeachingPlan(item)
-}
-
-func (adapter *TeachingPlanResourceAdapter) FormatItems(items []*models.TeachingPlan) []*prot.TeachingPlan {
-	return adapter.resource.FormatTeachingPlans(items)
-}
-

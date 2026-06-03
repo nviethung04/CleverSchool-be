@@ -37,12 +37,6 @@
                 },
                 {
                     "in": "query",
-                    "name": "faculty_id",
-                    "description": "Lấy theo ID khoa",
-                    "required": false
-                },
-                {
-                    "in": "query",
                     "name": "keyword",
                     "description": "Tìm kiếm từ khoá",
                     "required": false

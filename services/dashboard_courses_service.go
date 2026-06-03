@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/repositories"
+	"be-lms/dto"
+	"be-lms/repositories"
 )
 
 type DashboardCoursesService interface {
@@ -21,6 +21,5 @@ func NewDashboardCoursesService(dashboardCoursesRepo repositories.DashboardCours
 
 // GetDashboardCourses lấy danh sách dashboard courses với điều kiện cố định
 func (s *dashboardCoursesService) GetDashboardCourses(schoolID int64, selectedStartDate, selectedEndDate string) ([]dto.DashboardCoursesResponse, error) {
-	return s.dashboardCoursesRepo.GetDashboardCourses(schoolID, 0, 0, selectedStartDate, selectedEndDate)
+	return s.dashboardCoursesRepo.GetDashboardCourses(schoolID, selectedStartDate, selectedEndDate)
 }
-

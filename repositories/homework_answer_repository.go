@@ -1,12 +1,12 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"time"
+    "be-lms/database/db"
+    "be-lms/models"
+    "encoding/json"
+    "database/sql"
+    "time"
+    "fmt"
 )
 
 type ManualAnswer struct {
@@ -30,11 +30,6 @@ type HomeworkAnswerOverview struct {
 	QuestionsCompleted      int64
 	LastQuestionIDCompleted int64
 	ManualQuestionsCount    int32
-	HomeworkQuestionForm    string
-	HomeworkFiles           models.MediaInfos
-	IsSubmitted             bool
-	IsScored                bool
-	Rate                    string
 }
 
 type HomeworkAnswerRepository interface {
@@ -43,7 +38,6 @@ type HomeworkAnswerRepository interface {
 	GetManualAnswers(homeworkID, userID int64) ([]ManualAnswer, error)
     GetHomeworkRatio(homeworkID, userID int64) (float64, error)
     GetLatestHomeworkComment(homeworkID, userID int64) (string, error)
-	GetSubmitFiles(homeworkID, userID int64) (models.MediaInfos, error)
 }
 
 type homeworkAnswerRepository struct {
@@ -68,8 +62,6 @@ func (r *homeworkAnswerRepository) GetHomeworkAnswerOverview(homeworkID, userID 
 	overview.HomeworkDescription = hw.Description
 	overview.HomeworkStatus = int32(hw.Status)
 	overview.HomeworkCoverImage = hw.CoverImageInfo.Path // trả về string gốc
-	overview.HomeworkQuestionForm = hw.QuestionForm
-	overview.HomeworkFiles = hw.FileInfos
 	// Lấy số câu hỏi từ cloned_questions
 	var raw struct{ Questions json.RawMessage }
 	if err := db.MasterDB.Table("cloned_questions").Select("questions").Where("assignment_id = ? AND assignment_type = ?", homeworkID, "homework").First(&raw).Error; err == nil {
@@ -84,12 +76,8 @@ func (r *homeworkAnswerRepository) GetHomeworkAnswerOverview(homeworkID, userID 
 		Joins("INNER JOIN homeworks ON homeworks.id = homework_users.homework_id").
 		Where("homework_users.homework_id = ? AND homework_users.user_id = ? AND homeworks.deleted_at IS NULL", homeworkID, userID).
 		First(&hwUser)
-
 	overview.QuestionsCompleted = hwUser.QuestionsCompleted
 	overview.LastQuestionIDCompleted = hwUser.LastQuestionIDCompleted
-	overview.IsSubmitted = hwUser.ID > 0
-	overview.IsScored = hwUser.StatusScoring == 2
-	overview.Rate = hwUser.Rate
 
 	// Lấy số câu hỏi manual đã làm
 	var manualCount int64
@@ -152,7 +140,7 @@ func (r *homeworkAnswerRepository) GetManualAnswers(homeworkID, userID int64) ([
 			} else {
 				continue // Skip if id is not string or float64
 			}
-
+			
 			// Convert type to string safely
 			var questionType string
 			if qType, ok := q["type"].(string); ok {
@@ -162,7 +150,7 @@ func (r *homeworkAnswerRepository) GetManualAnswers(homeworkID, userID int64) ([
 			} else {
 				continue // Skip if type is not string or float64
 			}
-
+			
 			if (questionType == "speaking" || questionType == "writing") && questionID == a.QuestionID {
 				content, _ := json.Marshal(q["content"])
 				var path *string
@@ -224,15 +212,3 @@ func (r *homeworkAnswerRepository) GetLatestHomeworkComment(homeworkID, userID i
     }
     return content, nil
 }
-
-func (r *homeworkAnswerRepository) GetSubmitFiles(homeworkID, userID int64) (models.MediaInfos, error) {
-	var homeworkUser models.HomeworkUser
-
-	db.ReplicaDB.
-		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
-		First(&homeworkUser)
-
-	return homeworkUser.FileInfos, nil
-
-}
-

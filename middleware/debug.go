@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"be-cleverschool/config"
+	"be-lms/config"
 	"bytes"
 	"io"
 	"runtime/debug"
@@ -29,7 +29,7 @@ func CustomRecovery() gin.HandlerFunc {
 					line = strings.TrimSpace(line)
 					if line != "" {
 						// Highlight các dòng quan trọng
-						if strings.Contains(line, "be-Clever School") {
+						if strings.Contains(line, "be-lms") {
 							config.Log.Errorf("%d: %s", i+1, line)
 						} else {
 							config.Log.Errorf("%d: %s", i+1, line)
@@ -78,7 +78,7 @@ func SafeGo(fn func()) {
 				for i, line := range stackLines {
 					line = strings.TrimSpace(line)
 					if line != "" {
-						if strings.Contains(line, "be-Clever School") {
+						if strings.Contains(line, "be-lms") {
 							config.Log.Errorf("   %d: 🔥 %s", i+1, line)
 						} else {
 							config.Log.Errorf("   %d: %s", i+1, line)
@@ -93,4 +93,3 @@ func SafeGo(fn func()) {
 		fn()
 	}()
 }
-

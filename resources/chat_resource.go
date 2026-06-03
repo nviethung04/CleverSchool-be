@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-lms/dto"
+	"be-lms/prot"
 )
 
 type ChatResource interface {
@@ -30,16 +30,6 @@ func (r *ChatResourceImpl) FormatChat(chat *dto.ChatMessageResponse) *prot.ChatM
 			Username: chat.User.Username,
 			FullName: chat.User.FullName,
 			Avatar:   chat.User.Avatar,
-		}
-	}
-
-	var recipient *prot.ChatUserResponse
-	if chat.Recipient != nil {
-		recipient = &prot.ChatUserResponse{
-			Id:       chat.Recipient.ID,
-			Username: chat.Recipient.Username,
-			FullName: chat.Recipient.FullName,
-			Avatar:   chat.Recipient.Avatar,
 		}
 	}
 
@@ -73,16 +63,16 @@ func (r *ChatResourceImpl) FormatChat(chat *dto.ChatMessageResponse) *prot.ChatM
 	medias := make([]*prot.ChatMediaResponse, 0, len(chat.Medias))
 	for _, m := range chat.Medias {
 		medias = append(medias, &prot.ChatMediaResponse{
-			Id:            m.ID,
-			FileName:      m.FileName,
-			FilePath:      m.FilePath,
-			FullPath:      m.FullPath,
-			FileType:      m.FileType,
-			FileSize:      m.FileSize,
+			Id:           m.ID,
+			FileName:     m.FileName,
+			FilePath:     m.FilePath,
+			FullPath:     m.FullPath,
+			FileType:     m.FileType,
+			FileSize:     m.FileSize,
 			FileExtension: m.FileExtension,
-			DiskName:      m.DiskName,
-			StaticUrl:     m.StaticURL,
-			SortOrder:     int32(m.SortOrder),
+			DiskName:     m.DiskName,
+			StaticUrl:    m.StaticURL,
+			SortOrder:    int32(m.SortOrder),
 		})
 	}
 
@@ -100,34 +90,22 @@ func (r *ChatResourceImpl) FormatChat(chat *dto.ChatMessageResponse) *prot.ChatM
 		replyToMessageId = 0
 	}
 
-	var recipientId uint64
-	if chat.RecipientID != nil {
-		recipientId = *chat.RecipientID
-	}
-
-	var content string
-	if chat.Content != nil {
-		content = *chat.Content
-	}
-
 	return &prot.ChatMessageResponse{
-		Id:               chat.ID,
-		CourseId:         chat.CourseID,
-		UserId:           chat.UserID,
-		RecipientId:      recipientId,
-		Content:          content,
-		MessageType:      chat.MessageType,
-		IsPinned:         chat.IsPinned,
-		IsEdited:         chat.IsEdited,
+		Id:              chat.ID,
+		CourseId:        chat.CourseID,
+		UserId:          chat.UserID,
+		Content:         *chat.Content,
+		MessageType:     chat.MessageType,
+		IsPinned:        chat.IsPinned,
+		IsEdited:        chat.IsEdited,
 		ReplyToMessageId: replyToMessageId,
-		EditedAt:         editedAt,
-		CreatedAt:        chat.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:        chat.UpdatedAt.Format("2006-01-02 15:04:05"),
-		User:             &user,
-		Recipient:        recipient,
-		ReplyToMessage:   replyTo,
-		Files:            files,
-		Medias:           medias,
+		EditedAt:        editedAt,
+		CreatedAt:       chat.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:       chat.UpdatedAt.Format("2006-01-02 15:04:05"),
+		User:            &user,
+		ReplyToMessage:  replyTo,
+		Files:          files,
+		Medias:         medias,
 	}
 }
 
@@ -147,14 +125,14 @@ func (r *ChatResourceImpl) FormatChatMedia(media *dto.UploadedMediaResponse) *pr
 	}
 
 	return &prot.UploadedMediaResponse{
-		Id:            media.ID,
-		FileName:      media.FileName,
-		FilePath:      media.FilePath,
-		FileType:      media.FileType,
-		FileSize:      media.FileSize,
-		FileExtension: media.FileExtension,
-		DiskName:      media.DiskName,
-		StaticUrl:     media.StaticURL,
+		Id:              media.ID,
+		FileName:        media.FileName,
+		FilePath:          media.FilePath,
+		FileType:         media.FileType,
+		FileSize:     media.FileSize,
+		FileExtension:        media.FileExtension,
+		DiskName:        media.DiskName,
+		StaticUrl:        media.StaticURL,
 	}
 }
 
@@ -167,4 +145,3 @@ func (r *ChatResourceImpl) FormatChatMedias(medias []dto.UploadedMediaResponse) 
 	}
 	return result
 }
-

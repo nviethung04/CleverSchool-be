@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,4 +28,3 @@ func (ctl *DashboardTeacherExamUnscoredController) DashboardTeacherExamUnscored(
 	resp, err := ctl.svc.GetUnscoredExams(c, &req)
 	utils.Respond(c, resp, err, "")
 }
-

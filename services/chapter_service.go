@@ -1,14 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
-	"errors"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -80,21 +77,13 @@ func (s *chapterService) Create(c *gin.Context, req *prot.ChapterRequest) (*mode
 	}
 	chapter.SortPosition = sortPosition
 
-	err := s.Validate(chapter)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = s.repo.Create(chapter); err != nil {
+	if err := s.repo.Create(chapter); err != nil {
 		return nil, err
 	}
 
 	id := int(chapter.ID)
 
-	err = s.StoreLessons(c, int64(id), req, chapter)
-	if err != nil {
-		config.Log.Error(err)
-	}
+	s.StoreLessons(c, int64(id), req)
 
 	s.repo.SetPreload([]string{
 		"Lessons",
@@ -120,21 +109,13 @@ func (s *chapterService) Update(c *gin.Context, req *prot.ChapterRequest) (*mode
 	}
 	chapter.SortPosition = sortPosition
 
-	err := s.Validate(chapter)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = s.repo.Update(chapter); err != nil {
+	if err := s.repo.Update(chapter); err != nil {
 		return nil, err
 	}
 
 	id := int(chapter.ID)
 
-	err = s.StoreLessons(c, int64(id), req, chapter)
-	if err != nil {
-		config.Log.Error(err)
-	}
+	s.StoreLessons(c, int64(id), req)
 
 	s.repo.SetPreload([]string{
 		"Lessons",
@@ -168,13 +149,8 @@ func (s *chapterService) SortLessons(c *gin.Context, id int, req *prot.ChapterLe
 	return nil
 }
 
-func (s *chapterService) StoreLessons(c *gin.Context, id int64, req *prot.ChapterRequest, chapter *models.Chapter) error {
+func (s *chapterService) StoreLessons(c *gin.Context, id int64, req *prot.ChapterRequest) error {
 	var lessonIds []int64
-	var isVtg = config.LoadConfig().IsVtg
-
-	if isVtg && chapter.Time == 5 {
-		return s.repo.UpdateLessonVtg(chapter)
-	}
 
 	for index, lesson := range req.Lessons {
 		lessonRepo := repositories.NewLessonRepository()
@@ -184,8 +160,8 @@ func (s *chapterService) StoreLessons(c *gin.Context, id int64, req *prot.Chapte
 			lessonIds = append(lessonIds, int64(lesson.Id))
 		} else {
 			lessonModel := models.Lesson{
-				Title:        lesson.Title,
-				ChapterID:    id,
+				Title:       lesson.Title,
+				ChapterID: id,
 				SortPosition: index,
 			}
 
@@ -206,37 +182,13 @@ func (s *chapterService) StoreLessons(c *gin.Context, id int64, req *prot.Chapte
 func (cs *chapterService) RespondDetail(c *gin.Context, chapter *models.Chapter) (*prot.Chapter, error) {
 	lessonRepo := repositories.NewLessonRepository()
 	lessonService := NewLessonService(lessonRepo)
-	hideLessonIds := lessonService.HideLessonIds(c)
-	studyingLessonIds := lessonService.StudyingLessonIds(c, 0, chapter.ID)
 	completeLessonIds := lessonService.CompletionLessonIds(c, 0, chapter.ID)
 
 	chapterResource := resources.NewChapterResource()
 	if impl, ok := chapterResource.(*resources.ChapterResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 	}
 	formattedChapter := chapterResource.FormatChapterDetail(chapter)
 
 	return formattedChapter, nil
 }
-
-func (cs *chapterService) Validate(chapter *models.Chapter) error {
-	var isVtg = config.LoadConfig().IsVtg
-
-	if !isVtg {
-		return nil
-	}
-
-	if chapter.Time < 0 || chapter.Time%5 != 0 {
-		return errors.New(i18n.Localize("messages.chapter_time_invalid"))
-	}
-
-	isValid := cs.repo.ValidTime(chapter.ProgramId, chapter.ID, chapter.Time)
-
-	if !isValid {
-		return errors.New(i18n.Localize("messages.chapter_time_overlap"))
-	}
-	return nil
-}
-

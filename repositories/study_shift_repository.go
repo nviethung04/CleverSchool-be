@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/models"
+	"be-lms/repositories/base"
 )
 
 type StudyShiftRepository interface {
@@ -18,4 +18,3 @@ func NewStudyShiftRepository() StudyShiftRepository {
 		BaseRepository: base.NewBaseRepository[models.StudyShift](),
 	}
 }
-

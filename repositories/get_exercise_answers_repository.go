@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	_ "be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
+	_ "be-lms/models"
 	"encoding/json"
 	"fmt"
 
@@ -327,4 +327,3 @@ func (r *getExerciseAnswersRepository) GetExerciseComment(exerciseID, userID int
     err := db.ReplicaDB.Table("exercise_comments").Select("content").Where("exercises_id = ? AND student_id = ?", exerciseID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
     return content, err
 }
-

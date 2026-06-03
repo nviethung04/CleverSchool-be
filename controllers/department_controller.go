@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
 )
 
 type DepartmentController struct {
@@ -33,4 +33,3 @@ func NewDepartmentController(service services.DepartmentService) *DepartmentCont
 		GenericController: genericController,
 	}
 }
-

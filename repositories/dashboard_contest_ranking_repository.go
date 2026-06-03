@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/requests"
 	"sort"
 	"strings"
 )
@@ -336,4 +336,3 @@ func (r *dashboardContestRankingRepository) GetContestScoreChart(req *requests.D
 
 	return sortedDistributions, nil
 }
-

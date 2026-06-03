@@ -37,18 +37,6 @@
           }
         }
       },
-      "heading": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          }
-        }
-      },
       "course": {
         "type": "object",
         "properties": {
@@ -197,24 +185,6 @@
             },
             "is_complete": {
               "type": "boolean"
-            },
-            "is_active": {
-              "type": "boolean"
-            },
-            "author": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "avatar": {
-                  "type": "string"
-                }
-              }
             }
           }
         }
@@ -237,45 +207,6 @@
           },
           "phone_number": {
             "type": "string"
-          }
-        }
-      },
-      "teaching_plan": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "file_url": {
-            "type": "string"
-          },
-          "file_type": {
-            "type": "string"
-          },
-          "approved": {
-            "type": "object",
-            "properties": {
-              "approved_by": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "approved_at": {
-                "type": "string"
-              },
-              "approved_note": {
-                "type": "string"
-              },
-              "status": {
-                "type": "boolean"
-              }
-            }
           }
         }
       },
@@ -323,18 +254,6 @@
             "type": "string"
           },
           "object_title": {
-            "type": "string"
-          }
-        }
-      },
-      "heading": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
             "type": "string"
           }
         }
@@ -517,21 +436,6 @@
             },
             "object_title": {
               "type": "string"
-            },
-            "author": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "avatar": {
-                  "type": "string"
-                }
-              }
             }
           }
         }
@@ -609,45 +513,6 @@
           }
         }
       },
-      "teaching_plan": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "file_url": {
-            "type": "string"
-          },
-          "file_type": {
-            "type": "string"
-          },
-          "approved": {
-            "type": "object",
-            "properties": {
-              "approved_by": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "approved_at": {
-                "type": "string"
-              },
-              "approved_note": {
-                "type": "string"
-              },
-              "status": {
-                "type": "boolean"
-              }
-            }
-          }
-        }
-      },
       "created_at": {
         "type": "string",
         "format": "date-time"
@@ -677,10 +542,6 @@
       "object_title": {
         "type": "string"
       },
-      "program_id": {
-        "type": "integer",
-        "format": "int64"
-      },
       "chapter": {
         "type": "object",
         "properties": {
@@ -692,18 +553,6 @@
             "type": "string"
           },
           "object_title": {
-            "type": "string"
-          }
-        }
-      },
-      "heading": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
             "type": "string"
           }
         }
@@ -817,21 +666,6 @@
             },
             "total_time": {
               "type": "string"
-            },
-            "author": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "avatar": {
-                  "type": "string"
-                }
-              }
             }
           }
         }
@@ -847,45 +681,6 @@
             "week_id": {
               "type": "integer",
               "format": "int64"
-            }
-          }
-        }
-      },
-      "teaching_plan": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "file_url": {
-            "type": "string"
-          },
-          "file_type": {
-            "type": "string"
-          },
-          "approved": {
-            "type": "object",
-            "properties": {
-              "approved_by": {
-                "type": "integer",
-                "format": "int64"
-              },
-              "approved_at": {
-                "type": "string"
-              },
-              "approved_note": {
-                "type": "string"
-              },
-              "status": {
-                "type": "boolean"
-              }
             }
           }
         }
@@ -1116,37 +911,6 @@
       "id",
       "student_id",
       "is_complete"
-    ]
-  },
-  "prot.LessonStudying": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "string",
-        "example": "76",
-        "description": "ID bản ghi lesson"
-      },
-      "student_id": {
-        "type": "string",
-        "example": "246",
-        "description": "ID học sinh"
-      },
-      "is_studying": {
-        "type": "boolean",
-        "example": true,
-        "description": "Trạng thái bắt đầu bài học"
-      },
-      "studying_at": {
-        "type": "string",
-        "format": "date",
-        "example": "2025-07-21",
-        "description": "Ngày bắt đầu bài học"
-      }
-    },
-    "required": [
-      "id",
-      "student_id",
-      "is_studying"
     ]
   },
   "prot.AssignedLesson": {

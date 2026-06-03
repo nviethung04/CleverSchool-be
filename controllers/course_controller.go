@@ -1,17 +1,12 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
-	"errors"
-	"fmt"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -59,37 +54,37 @@ func NewCourseController(service services.CourseService) *CourseController {
 func (cc *CourseController) GetUsers(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		utils.Respond(c, nil, err,  "messages.id_invalid", 400)
 		return
 	}
 
-	users, failedUserIds, err := cc.service.GetUsers(c, int64(id))
-	cc.respondWithUsers(c, users, int64(id), failedUserIds, err)
+	users, err := cc.service.GetUsers(c, int64(id))
+	cc.respondWithUsers(c, users, int64(id), err)
 }
 
 func (cc *CourseController) StoreUsers(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		utils.Respond(c, nil, err,  "messages.id_invalid", 400)
 		return
 	}
 
-	users, failedUserIds, err := cc.service.StoreUsers(c, int64(id))
-	cc.respondWithUsers(c, users, int64(id), failedUserIds, err)
+	users, err := cc.service.StoreUsers(c, int64(id))
+	cc.respondWithUsers(c, users, int64(id), err)
 }
 
 func (cc *CourseController) AddUsers(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		utils.Respond(c, nil, err,  "messages.id_invalid", 400)
 		return
 	}
 
-	students, failedUserIds, err := cc.service.AddUsers(c, int64(id))
-	cc.respondWithUsers(c, students, int64(id), failedUserIds, err)
+	students, err := cc.service.AddUsers(c, int64(id))
+	cc.respondWithUsers(c, students, int64(id), err)
 }
 
-func (cc *CourseController) respondWithUsers(c *gin.Context, users []models.User, courseId int64, failedUserIds []int64, err error) {
+func (cc *CourseController) respondWithUsers(c *gin.Context, users []models.User, courseId int64, err error) {
 	if err != nil {
 		utils.Respond(c, nil, err, "")
 		return
@@ -103,7 +98,6 @@ func (cc *CourseController) respondWithUsers(c *gin.Context, users []models.User
 	userResource := resources.NewUserResource()
 	if impl, ok := userResource.(*resources.UserResourceImpl); ok {
 		impl.CourseId = courseId
-		impl.FailedUserIds = failedUserIds
 	}
 	formattedUsers := userResource.FormatUsers(ptrs)
 
@@ -118,7 +112,7 @@ func (cc *CourseController) respondWithUsers(c *gin.Context, users []models.User
 func (cc *CourseController) GetScore(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		utils.Respond(c, nil, err,  "messages.id_invalid", 400)
 		return
 	}
 
@@ -157,11 +151,6 @@ func (cc *CourseController) RespondList(c *gin.Context, items []models.Course, t
 	courseResource := resources.NewCourseResource()
 	var coursesResponse []*prot.Course
 
-	userId := utils.GetCurrentUserId(c)
-	if impl, ok := courseResource.(*resources.CourseResourceImpl); ok {
-		impl.NotEligibleForFinalExamIds = cc.service.NotEligibleForFinalExamIds(c, 0, int64(userId))
-	}
-
 	if byUserParam := c.Query("by_user"); byUserParam != "" {
 		coursesResponse = courseResource.FormatDetailCourses(coursePtrs)
 	} else {
@@ -179,8 +168,6 @@ func (cc *CourseController) RespondList(c *gin.Context, items []models.Course, t
 func (cc *CourseController) RespondDetail(c *gin.Context, course *models.Course) {
 	lessonRepo := repositories.NewLessonRepository()
 	lessonService := services.NewLessonService(lessonRepo)
-	hideLessonIds := lessonService.HideLessonIds(c)
-	studyingLessonIds := lessonService.StudyingLessonIds(c, course.ID, 0)
 	completeLessonIds := lessonService.CompletionLessonIds(c, course.ID, 0)
 
 	lessonSchedules, _ := lessonRepo.GetLessonSchedulesByCourse(course.ID)
@@ -189,119 +176,15 @@ func (cc *CourseController) RespondDetail(c *gin.Context, course *models.Course)
 		return &prot.CourseRequest{}
 	})
 
-	copyScheduleResponse := cc.service.CopySchedule(course.ID, req.ParentCourseId, course.ProgramId)
-	userId := utils.GetCurrentUserId(c)
+	copyScheduleResponse := cc.service.CopySchedule(course.ID, req.TargetCourseId, course.ProgramId)
 
 	courseResource := resources.NewCourseResource()
 	if impl, ok := courseResource.(*resources.CourseResourceImpl); ok {
-		impl.HideLessonIds = hideLessonIds
-		impl.StudyingLessonIds = studyingLessonIds
 		impl.CompleteLessonIds = completeLessonIds
 		impl.LessonSchedules = lessonSchedules
 		impl.CopyScheduleResponse = copyScheduleResponse
-		impl.NotEligibleForFinalExamIds = cc.service.NotEligibleForFinalExamIds(c, course.ID, int64(userId))
 	}
 	formattedCourse := courseResource.FormatCourseDetail(course)
 
 	utils.Respond(c, formattedCourse, nil, "")
 }
-
-func (fc *CourseController) Export(c *gin.Context) {
-	cCp := c.Copy()
-	resultChan := make(chan *dto.MyExportResult)
-
-	go func() {
-		url, err := fc.service.Export(cCp)
-		resultChan <- &dto.MyExportResult{Url: url, Err: err}
-	}()
-
-	res := <-resultChan
-	utils.Respond(c, &prot.Export{Url: res.Url}, res.Err, "")
-}
-
-func (cc *CourseController) ListCoursesFamily(c *gin.Context) {
-	programIdStr := c.Query("program_id")
-	if programIdStr == "" {
-		utils.Respond(c, nil, errors.New("program_id is required"), "messages.program_id_required", 400)
-		return
-	}
-
-	programId, err := strconv.ParseInt(programIdStr, 10, 64)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.program_id_invalid", 400)
-		return
-	}
-
-	result, err := cc.service.GetCoursesFamilyByProgramId(programId)
-	if err != nil {
-		utils.Respond(c, nil, err, "", 500)
-		return
-	}
-
-	utils.Respond(c, result, nil, "")
-}
-
-func (fc *CourseController) Import(c *gin.Context) {
-	file, err := c.FormFile("file")
-	if err != nil {
-		utils.Respond(c, nil, fmt.Errorf("file is required"), "file is required", 400)
-		return
-	}
-
-	cCp := c.Copy()
-	go func() {
-		err := fc.service.Import(cCp, file)
-		if err != nil {
-			config.Log.Error("Course import failed", "error", err)
-		} else {
-			config.Log.Info("Course import finished successfully")
-		}
-	}()
-
-	utils.Respond(c, &prot.Import{Message: i18n.Localize("messages.import_complete")}, nil, "")
-}
-
-func (fc *CourseController) ExportUsers(c *gin.Context) {
-	cCp := c.Copy()
-	resultChan := make(chan *dto.MyExportResult)
-	courseId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
-		return
-	}
-
-	go func() {
-		url, err := fc.service.ExportUsers(cCp, courseId)
-		resultChan <- &dto.MyExportResult{Url: url, Err: err}
-	}()
-
-	res := <-resultChan
-	utils.Respond(c, &prot.Export{Url: res.Url}, res.Err, "")
-}
-
-func (fc *CourseController) ImportUsers(c *gin.Context) {
-	courseId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.id_invalid", 400)
-		return
-	}
-
-	file, err := c.FormFile("file")
-	if err != nil {
-		utils.Respond(c, nil, fmt.Errorf("file is required"), "file is required", 400)
-		return
-	}
-
-	cCp := c.Copy()
-	go func() {
-		err := fc.service.ImportUsers(cCp, courseId, file)
-		if err != nil {
-			config.Log.Error("Course users import failed", "error", err)
-		} else {
-			config.Log.Info("Course users import finished successfully")
-		}
-	}()
-
-	utils.Respond(c, &prot.Import{Message: i18n.Localize("messages.import_complete")}, nil, "")
-}
-

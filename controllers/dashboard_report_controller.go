@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/repositories"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -49,4 +49,3 @@ func (c *DashboardReportController) GetDashboardReport(ctx *gin.Context) {
 	// Convert protobuf response to JSON for utils.Respond
 	utils.Respond(ctx, report, nil, "")
 }
-

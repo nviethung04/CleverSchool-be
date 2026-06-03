@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
+	"be-lms/config"
+	"be-lms/i18n"
+	"be-lms/prot"
 	"bytes"
 	"fmt"
 	"strings"
@@ -34,7 +34,6 @@ func (s *dashboardService) Export(c *gin.Context) (string, error) {
 	riskAndWarning := s.cache.GetCachedRiskWarning(c)
 	questionBank := s.cache.GetCachedQuestionBank(c)
 	systemUsageOverview := s.cache.GetCachedSystemUsage(c)
-	teacherPerformance := s.cache.GetCachedTeacherPerformance(c)
 
 	f := excelize.NewFile()
 
@@ -83,10 +82,6 @@ func (s *dashboardService) Export(c *gin.Context) (string, error) {
 	questionBankSheet := "Question Bank"
 	f.NewSheet(questionBankSheet)
 	s.SetSheetQuestionBank(f, questionBankSheet, questionBank, headerStyle)
-
-	unmarkedExercisesSheet := "Not graded homework"
-	f.NewSheet(unmarkedExercisesSheet)
-	s.SetSheetUnmarkedHomeworks(f, unmarkedExercisesSheet, teacherPerformance, headerStyle)
 
 	// ===== Save file to S3 =====
 	filename := fmt.Sprintf("dashboard_%d.xlsx", time.Now().Unix())
@@ -216,9 +211,9 @@ func (s *dashboardService) SetSheetOverviewLearning(f *excelize.File, sheetName 
 	// Data
 	for _, u := range learning.TopHighest {
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), u.Id)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), u.TypeId)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), u.ExamId)
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), u.StudentName)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), u.TypeName)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), u.ExamName)
 		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), u.Score)
 		row++
 	}
@@ -241,9 +236,9 @@ func (s *dashboardService) SetSheetOverviewLearning(f *excelize.File, sheetName 
 	// Data
 	for _, u := range learning.TopLowest {
 		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), u.Id)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), u.TypeId)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), u.ExamId)
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), u.StudentName)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), u.TypeName)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), u.ExamName)
 		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), u.Score)
 		row++
 	}
@@ -429,55 +424,10 @@ func (s *dashboardService) SetSheetSystemUsageOverview(f *excelize.File, sheetNa
 	return nil
 }
 
-func (s *dashboardService) SetSheetUnmarkedHomeworks(f *excelize.File, sheetName string, teacherPerformance *prot.TeacherPerformanceOverview, headerStyle int) error {
-	unmarkedHomeworks := []map[string]interface{}{}
-
-	for _, week := range teacherPerformance.WeeklySubmitRates {
-		weekLabel := week.WeekLabel
-
-		for _, homework := range week.NotGradedHomeworks {
-			submittedDate := ""
-			if homework.SubmittedAt != "" {
-				if parsed, err := time.Parse("2006-01-02 15:04", homework.SubmittedAt); err == nil {
-					submittedDate = parsed.Format("2006-01-02")
-				} else {
-					submittedDate = homework.SubmittedAt
-				}
-			}
-
-			unmarkedHomeworks = append(unmarkedHomeworks, map[string]interface{}{
-				"week":         weekLabel,
-				"course_id":    homework.CourseId,
-				"course":       homework.CourseName,
-				"lesson":       homework.LessonName,
-				"exercise":     homework.NotGradedName,
-				"submitted_at": submittedDate,
-				"teacher_name": homework.TeacherName,
-				"student_name": homework.StudentName,
-			})
-		}
+// max helper
+func max(a, b int) int {
+	if a > b {
+		return a
 	}
-
-	headers := []string{"Week", "Course ID", "Course", "Lesson", "Homework", "Submitted at", "Teacher name", "Student name"}
-	for i, h := range headers {
-		cell := fmt.Sprintf("%s1", string('A'+i))
-		f.SetCellValue(sheetName, cell, h)
-		f.SetCellStyle(sheetName, cell, cell, headerStyle)
-	}
-
-	row := 2
-	for _, hw := range unmarkedHomeworks {
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", row), hw["week"])
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", row), hw["course_id"])
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", row), hw["course"])
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", row), hw["lesson"])
-		f.SetCellValue(sheetName, fmt.Sprintf("E%d", row), hw["exercise"])
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", row), hw["submitted_at"])
-		f.SetCellValue(sheetName, fmt.Sprintf("G%d", row), hw["teacher_name"])
-		f.SetCellValue(sheetName, fmt.Sprintf("H%d", row), hw["student_name"])
-		row++
-	}
-
-	return nil
+	return b
 }
-

@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-lms/models"
+	"be-lms/prot"
 )
 
 type WeekResource interface {
@@ -42,4 +42,3 @@ func (r *WeekResourceImpl) FormatWeeks(weeks []*models.Week) []*prot.Week {
 	}
 	return result
 }
-

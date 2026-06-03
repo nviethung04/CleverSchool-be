@@ -1,9 +1,6 @@
 package dto
 
-import (
-	"encoding/json"
-	"time"
-)
+import "time"
 
 type DashboardTeacherHomeworkScored struct {
 	UserID             int64     `json:"user_id"`
@@ -12,7 +9,6 @@ type DashboardTeacherHomeworkScored struct {
 	LessonID           int64     `json:"lesson_id"`
 	StudentName        string    `json:"student_name"`
 	CourseName         string    `json:"course_name"`
-	ObjectTitle        string    `json:"object_title"`
 	SubjectName        string    `json:"subject_name"`
 	HomeworkName       string    `json:"homework_name"`
 	LessonTitle        string    `json:"lesson_title"`
@@ -22,6 +18,4 @@ type DashboardTeacherHomeworkScored struct {
 	UnscoredQuestions  int       `json:"unscored_questions"`
 	HasComment         bool      `json:"has_comment"`
 	CommentContent     string    `json:"comment_content"`
-	Graders            []DashboardTeacherHomeworkGrader `json:"graders" gorm:"-"`
-	GradersJSON        json.RawMessage                  `json:"-" gorm:"column:graders_json"`
 }

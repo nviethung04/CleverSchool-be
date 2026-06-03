@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"errors"
 	"fmt"
 	"time"
@@ -30,9 +30,6 @@ type HomeworkUserRepository interface {
 	GetManualScoringByHomework(homeworkID, userID int64) (map[int64]float64, error)
 	GetAnswerCountByTable(table string, homeworkID, userID int64) (map[int64]int, error)
 	UpdateHomeworkUserRatio(homeworkID, userID int64, ratio float64) error
-	UpdateHomeworkUserExp(homeworkID, userID int64, exp float64) error
-	UpdateHomeworkUserStar(homeworkID, userID int64, star int64) error
-	UpdateHomeworkUserHasManualScoring(homeworkID, userID int64, hasManualScoring bool) error
 	GetQuestionsCompleted(homeworkID, userID int64) (int64, error)
 	UpdateOrCreate(homeworkUser *models.HomeworkUser) error
 }
@@ -47,7 +44,7 @@ func NewHomeworkUserRepository() HomeworkUserRepository {
 
 func (r *homeworkUserRepository) GetByHomeworkAndUser(homeworkID, userID int64) (*models.HomeworkUser, error) {
 	var homeworkUser models.HomeworkUser
-	err := db.MasterDB.Where("homework_id = ? AND user_id = ?", homeworkID, userID).First(&homeworkUser).Error
+	err := db.ReplicaDB.Where("homework_id = ? AND user_id = ?", homeworkID, userID).First(&homeworkUser).Error
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +53,7 @@ func (r *homeworkUserRepository) GetByHomeworkAndUser(homeworkID, userID int64) 
 
 func (r *homeworkUserRepository) GetByHomeworkUserAndLesson(homeworkID, userID, lessonID int64) (*models.HomeworkUser, error) {
 	var homeworkUser models.HomeworkUser
-	err := db.MasterDB.Where("homework_id = ? AND user_id = ? AND lesson_id = ?", homeworkID, userID, lessonID).First(&homeworkUser).Error
+	err := db.ReplicaDB.Where("homework_id = ? AND user_id = ? AND lesson_id = ?", homeworkID, userID, lessonID).First(&homeworkUser).Error
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +99,7 @@ func (r *homeworkUserRepository) SaveHomeworkUser(homeworkUser *models.HomeworkU
 
 func (r *homeworkUserRepository) SumScoreFillInBlank(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_fill_in_blanks").
+	err := db.ReplicaDB.Table("homework_question_user_fill_in_blanks").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -111,7 +108,7 @@ func (r *homeworkUserRepository) SumScoreFillInBlank(homeworkID, userID int64) (
 
 func (r *homeworkUserRepository) SumScoreGroup(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_groups").
+	err := db.ReplicaDB.Table("homework_question_user_groups").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -120,7 +117,7 @@ func (r *homeworkUserRepository) SumScoreGroup(homeworkID, userID int64) (float6
 
 func (r *homeworkUserRepository) SumScoreLabeling(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_labelings").
+	err := db.ReplicaDB.Table("homework_question_user_labelings").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -129,7 +126,7 @@ func (r *homeworkUserRepository) SumScoreLabeling(homeworkID, userID int64) (flo
 
 func (r *homeworkUserRepository) SumScoreManual(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_manual_scoring").
+	err := db.ReplicaDB.Table("homework_question_user_manual_scoring").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -138,7 +135,7 @@ func (r *homeworkUserRepository) SumScoreManual(homeworkID, userID int64) (float
 
 func (r *homeworkUserRepository) SumScoreMatching(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_matchings").
+	err := db.ReplicaDB.Table("homework_question_user_matchings").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -147,7 +144,7 @@ func (r *homeworkUserRepository) SumScoreMatching(homeworkID, userID int64) (flo
 
 func (r *homeworkUserRepository) SumScorePosition(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_user_positions").
+	err := db.ReplicaDB.Table("homework_question_user_positions").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -156,7 +153,7 @@ func (r *homeworkUserRepository) SumScorePosition(homeworkID, userID int64) (flo
 
 func (r *homeworkUserRepository) SumScoreUser(homeworkID, userID int64) (float64, error) {
 	var sum float64
-	err := db.MasterDB.Table("homework_question_users").
+	err := db.ReplicaDB.Table("homework_question_users").
 		Select("COALESCE(SUM(score),0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&sum).Error
@@ -178,7 +175,8 @@ func (r *homeworkUserRepository) UpdateHomeworkUserScore(homeworkID, userID int6
 		return dbConn.Table("homework_users").
 			Where("id = ?", homeworkUserID).
 			Updates(map[string]interface{}{
-				"score": score,
+				"score":      score,
+				"updated_at": now,
 			}).Error
 	} else {
 		return dbConn.Table("homework_users").
@@ -230,10 +228,12 @@ func (r *homeworkUserRepository) UpdateHomeworkUserStatusScoring(homeworkID, use
 	}
 
 	// Cập nhật status_scoring
+	now := time.Now().UTC()
 	return db.MasterDB.Table("homework_users").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Updates(map[string]interface{}{
 			"status_scoring": statusScoring,
+			"updated_at":     now,
 		}).Error
 }
 
@@ -241,7 +241,7 @@ func (r *homeworkUserRepository) UpdateHomeworkUserStatusScoring(homeworkID, use
 
 func (r *homeworkUserRepository) GetCorrectCountByTable(table string, homeworkID, userID int64) (map[int64]int, error) {
 	result := make(map[int64]int)
-	rows, err := db.MasterDB.Table(table).
+	rows, err := db.ReplicaDB.Table(table).
 		Select("question_id, COUNT(*)").
 		Where("homework_id = ? AND user_id = ? AND is_correct = true", homeworkID, userID).
 		Group("question_id").
@@ -262,7 +262,7 @@ func (r *homeworkUserRepository) GetCorrectCountByTable(table string, homeworkID
 
 func (r *homeworkUserRepository) GetAnswerCountByTable(table string, homeworkID, userID int64) (map[int64]int, error) {
 	result := make(map[int64]int)
-	rows, err := db.MasterDB.Table(table).
+	rows, err := db.ReplicaDB.Table(table).
 		Select("question_id, COUNT(*)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Group("question_id").
@@ -283,7 +283,7 @@ func (r *homeworkUserRepository) GetAnswerCountByTable(table string, homeworkID,
 
 func (r *homeworkUserRepository) GetManualScoringByHomework(homeworkID, userID int64) (map[int64]float64, error) {
 	result := make(map[int64]float64)
-	rows, err := db.MasterDB.Table("homework_question_user_manual_scoring").
+	rows, err := db.ReplicaDB.Table("homework_question_user_manual_scoring").
 		Select("question_id, score").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Rows()
@@ -316,7 +316,8 @@ func (r *homeworkUserRepository) UpdateHomeworkUserRatio(homeworkID, userID int6
 		return dbConn.Table("homework_users").
 			Where("id = ?", homeworkUserID).
 			Updates(map[string]interface{}{
-				"ratio": ratio,
+				"ratio":      ratio,
+				"updated_at": now,
 			}).Error
 	} else {
 		return dbConn.Table("homework_users").
@@ -332,97 +333,11 @@ func (r *homeworkUserRepository) UpdateHomeworkUserRatio(homeworkID, userID int6
 
 func (r *homeworkUserRepository) GetQuestionsCompleted(homeworkID, userID int64) (int64, error) {
 	var completed int64
-	err := db.MasterDB.Table("homework_users").
+	err := db.ReplicaDB.Table("homework_users").
 		Select("COALESCE(questions_completed,0)").
 		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
 		Scan(&completed).Error
 	return completed, err
-}
-
-func (r *homeworkUserRepository) UpdateHomeworkUserExp(homeworkID, userID int64, exp float64) error {
-	dbConn := db.MasterDB
-	var homeworkUserID int64
-	err := dbConn.Table("homework_users").
-		Select("id").
-		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
-		Scan(&homeworkUserID).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return err
-	}
-	now := time.Now().UTC()
-	if homeworkUserID > 0 {
-		// Dùng UpdateColumn để không tự động cập nhật updated_at
-		return dbConn.Table("homework_users").
-			Where("id = ?", homeworkUserID).
-			UpdateColumn("exp", exp).Error
-	} else {
-		return dbConn.Table("homework_users").
-			Create(map[string]interface{}{
-				"homework_id": homeworkID,
-				"user_id":     userID,
-				"exp":         exp,
-				"created_at":  now,
-				"updated_at":  now,
-			}).Error
-	}
-}
-
-func (r *homeworkUserRepository) UpdateHomeworkUserStar(homeworkID, userID int64, star int64) error {
-	dbConn := db.MasterDB
-	var homeworkUserID int64
-	err := dbConn.Table("homework_users").
-		Select("id").
-		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
-		Scan(&homeworkUserID).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return err
-	}
-	now := time.Now().UTC()
-	if homeworkUserID > 0 {
-		// Dùng UpdateColumn để không tự động cập nhật updated_at
-		return dbConn.Table("homework_users").
-			Where("id = ?", homeworkUserID).
-			UpdateColumn("star", star).Error
-	} else {
-		return dbConn.Table("homework_users").
-			Create(map[string]interface{}{
-				"homework_id": homeworkID,
-				"user_id":     userID,
-				"star":        star,
-				"created_at":  now,
-				"updated_at":  now,
-			}).Error
-	}
-}
-
-func (r *homeworkUserRepository) UpdateHomeworkUserHasManualScoring(homeworkID, userID int64, hasManualScoring bool) error {
-	dbConn := db.MasterDB
-	var homeworkUserID int64
-	err := dbConn.Table("homework_users").
-		Select("id").
-		Where("homework_id = ? AND user_id = ?", homeworkID, userID).
-		Scan(&homeworkUserID).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return err
-	}
-	now := time.Now().UTC()
-	if homeworkUserID > 0 {
-		return dbConn.Table("homework_users").
-			Where("id = ?", homeworkUserID).
-			Updates(map[string]interface{}{
-				"has_manual_scoring": hasManualScoring,
-				"updated_at":         now,
-			}).Error
-	} else {
-		return dbConn.Table("homework_users").
-			Create(map[string]interface{}{
-				"homework_id":        homeworkID,
-				"user_id":            userID,
-				"has_manual_scoring": hasManualScoring,
-				"created_at":         now,
-				"updated_at":         now,
-			}).Error
-	}
 }
 
 func (r *homeworkUserRepository) UpdateOrCreate(homeworkUser *models.HomeworkUser) error {
@@ -431,7 +346,7 @@ func (r *homeworkUserRepository) UpdateOrCreate(homeworkUser *models.HomeworkUse
 	}
 
 	var existing models.HomeworkUser
-	err := db.MasterDB.
+	err := db.ReplicaDB.
 		Where("homework_id = ? AND lesson_id = ? AND user_id = ?",
 			homeworkUser.HomeworkID, homeworkUser.LessonID, homeworkUser.UserID).
 		First(&existing).Error
@@ -463,4 +378,3 @@ func (r *homeworkUserRepository) UpdateOrCreate(homeworkUser *models.HomeworkUse
 
 	return nil
 }
-

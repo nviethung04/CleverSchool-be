@@ -1,11 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -34,8 +33,7 @@ func NewWarningService(activityLogRepo repositories.MonthlyActivityLogRepository
 
 // API 1: Chỉ đếm số lượng (nhanh)
 func (s *warningService) GetActiveUsersCount(minutes int) (*prot.ActiveUsersCountResponse, error) {
-	// Default: không filter (0 = không filter)
-	count, err := s.activityLogRepo.GetActiveUsersCount(minutes, 0, 0, 0)
+	count, err := s.activityLogRepo.GetActiveUsersCount(minutes)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +47,7 @@ func (s *warningService) GetActiveUsersCount(minutes int) (*prot.ActiveUsersCoun
 
 // API 1b: Đếm số lượng theo khoảng thời gian cụ thể
 func (s *warningService) GetActiveUsersCountByTimeRange(startTime, endTime time.Time) (*prot.ActiveUsersCountResponse, error) {
-	// Default: không filter (0 = không filter)
-	count, err := s.activityLogRepo.GetActiveUsersCountByTimeRange(startTime, endTime, 0, 0, 0)
+	count, err := s.activityLogRepo.GetActiveUsersCountByTimeRange(startTime, endTime)
 	if err != nil {
 		return nil, err
 	}
@@ -278,28 +275,9 @@ func (s *warningService) GetFailedLoginsWithPaging(req *requests.GetFailedLoginR
 
 // API 2b: Lấy danh sách active users với phân trang theo khoảng thời gian cụ thể
 func (s *warningService) GetActiveUsersWithPagingByTimeRange(startTime, endTime time.Time, page, limit int, c *gin.Context) (*prot.ActiveUsersListResponse, error) {
-	// Lấy filter từ query params nếu có
-	var schoolID, courseID, programID int64
-	if c != nil {
-		if schoolIDStr := c.Query("school_id"); schoolIDStr != "" {
-			if id, err := strconv.ParseInt(schoolIDStr, 10, 64); err == nil {
-				schoolID = id
-			}
-		}
-		if courseIDStr := c.Query("course_id"); courseIDStr != "" {
-			if id, err := strconv.ParseInt(courseIDStr, 10, 64); err == nil {
-				courseID = id
-			}
-		}
-		if programIDStr := c.Query("program_id"); programIDStr != "" {
-			if id, err := strconv.ParseInt(programIDStr, 10, 64); err == nil {
-				programID = id
-			}
-		}
-	}
-
+	// Create a temporary request for compatibility with existing repo method
 	// Get active users by time range
-	activeUserIDs, total, err := s.activityLogRepo.GetActiveUsersByTimeRange(startTime, endTime, page, limit, schoolID, courseID, programID)
+	activeUserIDs, total, err := s.activityLogRepo.GetActiveUsersByTimeRange(startTime, endTime, page, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -414,4 +392,3 @@ func (s *warningService) GetFailedLoginsWithPagingByTimeRange(startTime, endTime
 		Timestamp:         time.Now().Format("2006-01-02 15:04:05"),
 	}, nil
 }
-

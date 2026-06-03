@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
 )
 
 type ExerciseCommentService interface {
@@ -30,6 +30,5 @@ func (s *exerciseCommentService) CreateExerciseComment(exerciseID, studentID, te
     }
     return &prot.ExamCommentResponse{Success: true, Message: "Comment saved successfully"}
 }
-
 
 

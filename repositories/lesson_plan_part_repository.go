@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/requests"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,6 @@ import (
 type LessonPlanPartRepository interface {
 	GetAllWithPaging(req *requests.GetLessonPlanPartRequest, c *gin.Context) ([]models.LessonPlanPart, int64, error)
 	GetByID(id int64, c *gin.Context) (*models.LessonPlanPart, error)
-	GetByLessonPlanID(lessonPlanID int64) ([]models.LessonPlanPart, error)
 	Create(part *models.LessonPlanPart) error
 	Update(part *models.LessonPlanPart) error
 	Delete(id int64, userID int64) error
@@ -66,16 +65,6 @@ func (r *lessonPlanPartRepository) GetByID(id int64, c *gin.Context) (*models.Le
 		return nil, err
 	}
 	return &part, nil
-}
-
-func (r *lessonPlanPartRepository) GetByLessonPlanID(lessonPlanID int64) ([]models.LessonPlanPart, error) {
-	var parts []models.LessonPlanPart
-	err := db.ReplicaDB.
-		Where("lesson_plan_id = ?", lessonPlanID).
-		Order("sort_position ASC").
-		Order("id ASC").
-		Find(&parts).Error
-	return parts, err
 }
 
 func (r *lessonPlanPartRepository) Create(part *models.LessonPlanPart) error {
@@ -147,4 +136,3 @@ func (r *lessonPlanPartRepository) Delete(id int64, deletedBy int64) error {
 	}
 	return db.MasterDB.Delete(&model).Error
 }
-

@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"fmt"
 	"mime/multipart"
 	"strconv"
@@ -98,7 +98,6 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 	var (
 		currentQuestionId int64
 		currentAnswers    []models.AnswerPosition
-		currentFileInfos  models.MediaInfos
 	)
 
 	importCount := 0
@@ -110,25 +109,12 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip answer parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 10) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			// persist immediately so we don't lose data if the file has no more question rows
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		// New question
 		if row[2] != "" {
 			// Save first answer
 			if currentQuestionId != 0 && len(currentAnswers) > 0 {
 				ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerPosition](currentAnswers)
 				repositories.DeleteOldAnswers[models.AnswerPosition](currentQuestionId, ids)
-			}
-
-			// Save file infos for previous question
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
 			}
 
 			qID, _ := strconv.ParseInt(row[0], 10, 64)
@@ -148,12 +134,6 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -162,7 +142,6 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     questionType,
 				TimeLimitSeconds: timeLimit,
@@ -181,10 +160,6 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 
 			currentQuestionId = id
 			currentAnswers = nil
-			// ensure file infos are initialized for this question id (in case UpdateOrCreate skips zero-values)
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
 
 			importCount++
 		}
@@ -248,51 +223,11 @@ func (s *questionService) UpdateOrCreateAnswerPositionQuestions(rows [][]string,
 		ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerPosition](currentAnswers)
 		repositories.DeleteOldAnswers[models.AnswerPosition](currentQuestionId, ids)
 	}
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
-	}
 
 	config.Log.Info("Count import questions:", importCount)
 	config.Log.Info("Import question, UpdateOrCreateAnswerPositionQuestions done")
 
 	return nil
-}
-
-// isMediaOnlyRow detects the exported "extra media rows" which only contain Kind + File url.
-// We also require answerIdCol to be empty to avoid misclassifying normal answer rows.
-func isMediaOnlyRow(row []string, kindCol, urlCol, answerIdCol int) bool {
-	if len(row) <= urlCol {
-		return false
-	}
-	kind := ""
-	if len(row) > kindCol {
-		kind = row[kindCol]
-	}
-	url := row[urlCol]
-	answerID := ""
-	if len(row) > answerIdCol {
-		answerID = row[answerIdCol]
-	}
-	return (kind != "" || url != "") && answerID == ""
-}
-
-func (s *questionService) parseMediaDetail(row []string, kindCol, urlCol int) models.MediaDetail {
-	kind := "text"
-	if len(row) > kindCol && row[kindCol] != "" {
-		kind = row[kindCol]
-	}
-	fileUrl := ""
-	if len(row) > urlCol && row[urlCol] != "" {
-		fileUrl = utils.StripDomain(row[urlCol], models.Storage)
-	}
-	mediaRepo := repositories.NewMediaRepository()
-	fileInfo := mediaRepo.GetMediaInfo(fileUrl, models.Storage)
-	return models.MediaDetail{
-		Id:   fileInfo.Id,
-		Disk: fileInfo.Disk,
-		Path: fileInfo.Path,
-		Type: kind,
-	}
 }
 
 func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibutes []models.QuestionAttribute) error {
@@ -303,7 +238,6 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 	var (
 		currentQuestionId int64
 		currentAnswers    []models.Answer
-		currentFileInfos  models.MediaInfos
 	)
 
 	importCount := 0
@@ -315,23 +249,12 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip answer parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 10) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		// New question
 		if row[2] != "" {
 			// Save first answer
 			if currentQuestionId != 0 && len(currentAnswers) > 0 {
 				ids, _ := repositories.UpdateOrCreateAnswers[models.Answer](currentAnswers)
 				repositories.DeleteOldAnswers[models.Answer](currentQuestionId, ids)
-			}
-
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
 			}
 
 			qID, _ := strconv.ParseInt(row[0], 10, 64)
@@ -351,12 +274,6 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -365,7 +282,6 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     models.QuestionTypeMultipleChoice,
 				TimeLimitSeconds: timeLimit,
@@ -384,9 +300,6 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 
 			currentQuestionId = id
 			currentAnswers = nil
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
 
 			importCount++
 		}
@@ -442,9 +355,6 @@ func (s *questionService) UpdateOrCreateAnswerQuestions(rows [][]string, attibut
 		ids, _ := repositories.UpdateOrCreateAnswers[models.Answer](currentAnswers)
 		repositories.DeleteOldAnswers[models.Answer](currentQuestionId, ids)
 	}
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
-	}
 
 	config.Log.Info("Count import questions:", importCount)
 	config.Log.Info("Import question, UpdateOrCreateAnswerQuestions done")
@@ -460,7 +370,6 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 	var (
 		currentQuestionId int64
 		currentAnswers    []models.AnswerMatching
-		currentFileInfos  models.MediaInfos
 	)
 
 	importCount := 0
@@ -472,23 +381,12 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip answer parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 10) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		// New question
 		if row[2] != "" {
 			// Save first answer
 			if currentQuestionId != 0 && len(currentAnswers) > 0 {
 				ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerMatching](currentAnswers)
 				repositories.DeleteOldAnswers[models.AnswerMatching](currentQuestionId, ids)
-			}
-
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
 			}
 
 			qID, _ := strconv.ParseInt(row[0], 10, 64)
@@ -508,12 +406,6 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -522,7 +414,6 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     models.QuestionTypeMatching,
 				TimeLimitSeconds: timeLimit,
@@ -541,9 +432,6 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 
 			currentQuestionId = id
 			currentAnswers = nil
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
 			importCount++
 		}
 
@@ -626,9 +514,6 @@ func (s *questionService) UpdateOrCreateAnswerMatchingQuestions(rows [][]string,
 		ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerMatching](currentAnswers)
 		repositories.DeleteOldAnswers[models.AnswerMatching](currentQuestionId, ids)
 	}
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
-	}
 
 	config.Log.Info("Count import questions:", importCount)
 	config.Log.Info("Import question, UpdateOrCreateAnswerMatchingQuestions done")
@@ -644,7 +529,6 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 	var (
 		currentQuestionId int64
 		currentAnswers    []models.AnswerCoordinates
-		currentFileInfos  models.MediaInfos
 	)
 
 	importCount := 0
@@ -656,23 +540,12 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip answer parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 10) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		// New question
 		if row[2] != "" {
 			// Save first answer
 			if currentQuestionId != 0 && len(currentAnswers) > 0 {
 				ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerCoordinates](currentAnswers)
 				repositories.DeleteOldAnswers[models.AnswerCoordinates](currentQuestionId, ids)
-			}
-
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
 			}
 
 			qID, _ := strconv.ParseInt(row[0], 10, 64)
@@ -692,12 +565,6 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -706,7 +573,6 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     models.QuestionTypeLabeling,
 				TimeLimitSeconds: timeLimit,
@@ -725,9 +591,6 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 
 			currentQuestionId = id
 			currentAnswers = nil
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
 			importCount++
 		}
 
@@ -770,9 +633,6 @@ func (s *questionService) UpdateOrCreateAnswerLabelingQuestions(rows [][]string,
 		ids, _ := repositories.UpdateOrCreateAnswers[models.AnswerCoordinates](currentAnswers)
 		repositories.DeleteOldAnswers[models.AnswerCoordinates](currentQuestionId, ids)
 	}
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
-	}
 
 	config.Log.Info("Count import questions:", importCount)
 	config.Log.Info("Import question, UpdateOrCreateAnswerLabelingQuestions done")
@@ -789,7 +649,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 		currentQuestionId int64
 		currentAnswers    []models.AnswerGroup
 		mappingGroup      = make(map[string]int64)
-		currentFileInfos  models.MediaInfos
 	)
 
 	importCount := 0
@@ -801,13 +660,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 10) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		if row[2] != "" {
 			if currentQuestionId != 0 && len(currentAnswers) > 0 {
 				ids, err := repositories.UpdateOrCreateAnswers[models.AnswerGroup](currentAnswers)
@@ -816,10 +668,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 				} else {
 					return err
 				}
-			}
-
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
 			}
 
 			mappingGroup = make(map[string]int64)
@@ -860,12 +708,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -874,7 +716,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     models.QuestionTypeCategory,
 				TimeLimitSeconds: timeLimit,
@@ -893,9 +734,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 
 			currentQuestionId = id
 			currentAnswers = nil
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
 			importCount++
 		}
 
@@ -982,9 +820,6 @@ func (s *questionService) UpdateOrCreateAnswerCategoryQuestions(rows [][]string,
 			return err
 		}
 	}
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
-	}
 
 	config.Log.Info("Count import questions:", importCount)
 	config.Log.Info("Import question, UpdateOrCreateAnswerCategoryQuestions done")
@@ -998,10 +833,6 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 	}
 
 	importCount := 0
-	var (
-		currentQuestionId int64
-		currentFileInfos  models.MediaInfos
-	)
 
 	for i, row := range rows {
 		if i == 0 || len(row) < 8 {
@@ -1010,19 +841,7 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 			continue
 		}
 
-		// Media-only row (Kind + File url only): append to currentFileInfos and skip parsing
-		if row[2] == "" && isMediaOnlyRow(row, 5, 6, 0) && currentQuestionId != 0 {
-			currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			continue
-		}
-
 		if row[2] != "" {
-			// Save file infos for previous question
-			if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
-
 			qID, err1 := strconv.ParseInt(row[0], 10, 64)
 			if err1 != nil {
 				qID = 0
@@ -1054,12 +873,6 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 				kind = "text"
 			}
 
-			// Init file infos for this question (include first media)
-			currentFileInfos = models.MediaInfos{}
-			if row[5] != "" || row[6] != "" {
-				currentFileInfos = append(currentFileInfos, s.parseMediaDetail(row, 5, 6))
-			}
-
 			question := models.Question{
 				ID:               qID,
 				SourceQuestionId: sourceID,
@@ -1068,7 +881,6 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 				Content:          row[4],
 				Kind:             kind,
 				FileInfo:         fileInfo,
-				FileInfos:        currentFileInfos,
 				Point:            point,
 				QuestionType:     questionType,
 				TimeLimitSeconds: timeLimit,
@@ -1083,18 +895,8 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 
 			s.SaveAttributes(id, row, attibutes, 8)
 
-			currentQuestionId = id
-			if len(currentFileInfos) > 0 {
-				_ = s.repo.UpdateFileInfos(currentQuestionId, currentFileInfos)
-			}
-
 			importCount++
 		}
-	}
-
-	// save last current
-	if currentQuestionId != 0 && len(currentFileInfos) > 0 {
-		_ = s.repo.Update(&models.Question{ID: currentQuestionId, FileInfos: currentFileInfos})
 	}
 
 	config.Log.Info("Count import questions:", importCount)
@@ -1102,4 +904,3 @@ func (s *questionService) UpdateOrCreateWritingAndSpeakingQuestions(rows [][]str
 
 	return nil
 }
-

@@ -1,16 +1,16 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -258,6 +258,5 @@ func UpdateExerciseTotalQuestions(exerciseID int64) error {
     if err != nil { return err }
     return db.MasterDB.Model(&models.Exercise{}).Where("id = ?", exerciseID).Update("total_questions", int32(totalQuestions)).Error
 }
-
 
 

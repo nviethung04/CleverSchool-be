@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
 	"errors"
 	"fmt"
 	"time"
@@ -680,4 +680,3 @@ func (s *FlashcardService) ResumeFlashcardSession(userID, sessionID int64) (map[
 
 	return result, nil
 }
-

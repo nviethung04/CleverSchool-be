@@ -2,7 +2,7 @@
 -- Date: 2025-01-08
 
 -- Remove lesson_id from exercise_users
-ALTER TABLE IF EXISTS exercise_users DROP COLUMN IF EXISTS lesson_id;
+ALTER TABLE exercise_users DROP COLUMN IF EXISTS lesson_id;
 
 -- Remove lesson_id from exercise_questions
 ALTER TABLE exercise_questions DROP COLUMN IF EXISTS lesson_id;
@@ -30,4 +30,3 @@ ALTER TABLE exercise_question_user_fill_in_blanks DROP COLUMN IF EXISTS lesson_i
 
 -- Remove lesson_id from exercise_comments
 ALTER TABLE exercise_comments DROP COLUMN IF EXISTS lesson_id;
-

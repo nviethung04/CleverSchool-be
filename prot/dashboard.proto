@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message DashboardAdminItem {
     int32 total = 1;
@@ -51,7 +51,6 @@ message UserOverview {
     DashboardAdminItem teacher = 3;
     DashboardAdminItem activity = 4;
     DashboardAdminItem school = 5;
-    DashboardAdminItem user_online = 6;
 }
 
 message CourseOverviewItem {
@@ -106,15 +105,14 @@ message GemsByWeek {
 
 message StudentScore {
     int64 id = 1;
-    int64 type_id = 2;
-    int64 type_user_id = 3;
+    int64 exam_id = 2;
+    int64 exam_user_id = 3;
     string student_name = 4;
-    string type_name = 5;
+    string exam_name = 5;
     float score = 6;
     string avatar = 7;
     string class_name = 8;
     string school_name = 9;
-    string type = 10;
 }
 
 message OverviewLearning {
@@ -162,7 +160,6 @@ message WeeklyUsage {
     string week_label = 1;
     string average_duration = 2;
     int32 average_duration_minute = 3;
-    bool is_current = 4;
 }
 
 message DeviceUsage {
@@ -172,90 +169,15 @@ message DeviceUsage {
 }
 
 message GradingSummary {
-    int32 total_exercise = 1;
-    int32 total_assigned = 2;
-    int32 total_submissions = 3;
-    int32 graded_submissions = 4;
-    int32 ungraded_submissions = 5;
-    float ungraded_percent = 6;
+    int32 total_submissions = 1;
+    int32 graded_submissions = 2;
+    int32 ungraded_submissions = 3;
+    float ungraded_percent = 4;
 }
 
 message TeacherPerformanceOverview {
     GradingSummary grading_summary = 1;
     repeated WeeklyMarkingRate weekly_marking_rates = 2;
-    repeated WeeklyAssignAssignmentRate weekly_assign_assignment_rates = 3;
-    repeated WeeklySubmitRate weekly_submit_rates = 4;
-    repeated WeeklyPerformanceOverviewRate weekly_performance_overview_rates = 5;
-}
-
-message WeeklyAssignAssignmentRate {
-    int64 id = 1;
-    string week_label = 2;
-    int32 total = 3;
-    int32 assign_assignment = 4;
-    repeated NotAssignAssignment not_assign_assignment_exams = 5;
-    repeated NotAssignAssignment not_assign_assignment_homeworks = 6;
-    repeated NotAssignAssignment not_assign_assignment_exercises = 7;
-}
-
-message WeeklySubmitRate {
-    int64 id = 1;
-    string week_label = 2;
-    int32 total = 3;
-    int32 not_graded = 4;
-    repeated NotGraded not_graded_exams = 5;
-    repeated NotGraded not_graded_homeworks = 6;
-    repeated NotGraded not_graded_exercises = 7;
-}
-
-message WeeklyPerformanceOverviewRate {
-    int64 id = 1;
-    string week_label = 2;
-    float assign_assignment_percent = 3;
-    float submit_percent = 4;
-    float not_graded_percent = 5;
-    int32 total_required = 6;  // Tổng số bài cần làm
-    int32 total_submitted = 7;  // Tổng số đã làm
-    repeated NotSubmittedExam not_submitted_exams = 8;  // Danh sách exam chưa làm (nhóm theo submitted_id)
-    repeated NotSubmittedGrouped not_submitted_homeworks = 9;  // Danh sách homework chưa làm (nhóm theo submitted_id)
-    repeated NotSubmittedGrouped not_submitted_exercises = 10;  // Danh sách exercise chưa làm (nhóm theo submitted_id)
-}
-
-message NotSubmittedExam {
-    int64 submitted_id = 1;  // exam_id
-    string name = 2;  // exam_name
-    repeated int64 user_ids = 3;  // Danh sách user_id chưa làm bài này
-}
-
-message NotSubmittedGrouped {
-    int64 submitted_id = 1;  // homework_id hoặc exercise_id
-    string name = 2;  // homework_name hoặc exercise_name
-    string submitted_type = 3;  // "homework" hoặc "exercise"
-    repeated int64 student_ids = 4;  // Danh sách student_id chưa làm bài này
-}
-
-message NotGraded {
-    int64 teacher_id = 1;
-	int64 not_graded_id = 2;
-	int64 student_id = 3;
-	string teacher_name = 4;
-	string student_name = 5;
-	string not_graded_name = 6;
-	repeated int64 question_ids = 7;
-	int32 question_count = 8;
-	string submitted_at = 9;
-	int64 course_id = 10;
-	string course_name = 11;
-	string lesson_name = 12;
-}
-
-message NotAssignAssignment {
-    int64 teacher_id = 1;
-	int64 assign_assignment_id = 2;
-	string teacher_name = 3;
-	string assign_assignment_name = 4;
-	repeated int64 question_ids = 5;
-	int32 question_count = 6;
 }
 
 message UngradedSubmission {
@@ -435,4 +357,3 @@ message DashboardTeacherResponse {
     DashboardExercises exercise = 6;
     DashboardStudents student = 7;
 }
-

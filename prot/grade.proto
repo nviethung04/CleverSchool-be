@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message Grade {
   int64 id = 1;
@@ -39,4 +39,3 @@ message GradesResponse {
   repeated Grade grades = 1;
   uint64 total_count = 2;
 }
-

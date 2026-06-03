@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/models"
+	"be-lms/repositories/base"
 )
 
 type HolidayRepository interface {
@@ -18,4 +18,3 @@ func NewHolidayRepository() HolidayRepository {
 		BaseRepository: base.NewBaseRepository[models.Holiday](),
 	}
 }
-

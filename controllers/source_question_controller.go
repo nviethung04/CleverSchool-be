@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
+	"fmt"
 	"net/http"
-	"slices"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -44,36 +45,18 @@ func (sc *SourceQuestionController) GetAll(c *gin.Context) {
 	utils.Respond(c, list, err, "")
 }
 
-// SourceQuestionDetailResponse response GET detail source question (kèm danh sách questions như API detail question)
-type SourceQuestionDetailResponse struct {
-	SourceQuestion *prot.SourceQuestion `json:"source_question"`
-	Questions      []*prot.Question    `json:"questions"`
-}
-
 func (sc *SourceQuestionController) GetByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	sourceQuestion, questions, err := sc.service.GetByID(c, id)
+	sourceQuestion, err := sc.service.GetByID(c, id)
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.data_existed", http.StatusNotFound)
+		utils.Respond(c, nil, err,  "messages.data_existed", http.StatusNotFound)
 		return
 	}
 
 	sourceQuestionResource := resources.NewSourceQuestionResource()
 	formattedSourceQuestion := sourceQuestionResource.FormatSourceQuestion(sourceQuestion)
 
-	questionResource := resources.NewQuestionResource()
-	formattedQuestions := make([]*prot.Question, 0, len(questions))
-	for _, q := range questions {
-		if f := questionResource.FormatQuestion(q); f != nil {
-			formattedQuestions = append(formattedQuestions, f)
-		}
-	}
-
-	resp := &SourceQuestionDetailResponse{
-		SourceQuestion: formattedSourceQuestion,
-		Questions:      formattedQuestions,
-	}
-	utils.Respond(c, resp, nil, "")
+	utils.Respond(c, formattedSourceQuestion, err, "")
 }
 
 func (sc *SourceQuestionController) Create(c *gin.Context) {
@@ -84,14 +67,6 @@ func (sc *SourceQuestionController) Create(c *gin.Context) {
 	if err != nil {
 		utils.Respond(c, nil, err, message)
 		return
-	}
-
-	if !slices.Contains(models.Skills, req.Skill) {
-		req.Skill = models.SkillDefault
-	}
-
-	if !slices.Contains(models.Levels, req.Level) {
-		req.Level = models.LevelDefault
 	}
 
 	sourceQuestion, err := sc.service.Create(c, req)
@@ -117,14 +92,6 @@ func (sc *SourceQuestionController) Update(c *gin.Context) {
 		return
 	}
 
-	if !slices.Contains(models.Skills, req.Skill) {
-		req.Skill = models.SkillDefault
-	}
-
-	if !slices.Contains(models.Levels, req.Level) {
-		req.Level = models.LevelDefault
-	}
-
 	req.Id = int64(id)
 
 	sourceQuestion, err := sc.service.Update(c, req)
@@ -138,6 +105,8 @@ func (sc *SourceQuestionController) Update(c *gin.Context) {
 	formattedSourceQuestion := sourceQuestionResource.FormatSourceQuestion(sourceQuestion)
 
 	utils.Respond(c, formattedSourceQuestion, err, "")
+
+	utils.Respond(c, nil, fmt.Errorf(i18n.Localize("messages.no_record_update")), "messages.no_record_update")
 }
 
 func (sc *SourceQuestionController) Delete(c *gin.Context) {
@@ -167,4 +136,3 @@ func (sc *SourceQuestionController) Restore(c *gin.Context) {
 
 	utils.Respond(c, formattedSourceQuestion, nil, "")
 }
-

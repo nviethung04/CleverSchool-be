@@ -1,20 +1,19 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"errors"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type ClassRepository interface {
 	base.BaseRepositoryInterface[models.Class]
-	GetUsers(classId int64, roleId int64) ([]models.User, []int64, error)
+	GetUsers(classId int64, roleId int64) ([]models.User, error)
 	ReplaceUserClass(classId int64, userIds []int64, roleId int64) error
 	AddUserClass(classId int64, userIds []int64, roleId int64) error
 
@@ -29,15 +28,12 @@ type classRepository struct {
 }
 
 func NewClassRepository() ClassRepository {
-	repo := &classRepository{
+	return &classRepository{
 		BaseRepository: base.NewBaseRepository[models.Class](),
 	}
-
-	repo.BaseRepository.SetBeforeQueryHook(repo)
-	return repo
 }
 
-func (r *classRepository) GetUsers(classId int64, roleId int64) ([]models.User, []int64, error) {
+func (r *classRepository) GetUsers(classId int64, roleId int64) ([]models.User, error) {
 	var users []models.User
 
 	query := db.MasterDB.
@@ -51,11 +47,10 @@ func (r *classRepository) GetUsers(classId int64, roleId int64) ([]models.User, 
 	}
 
 	if err := query.Find(&users).Error; err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	// Classes don't have is_failed field, return empty slice
-	return users, []int64{}, nil
+	return users, nil
 }
 
 func (r *classRepository) ReplaceUserClass(classId int64, userIds []int64, roleId int64) error {
@@ -298,7 +293,6 @@ func (r *classRepository) CreateOrUpdateClass(class *models.Class) (int64, error
 
 	if err == nil {
 		existing.Name = class.Name
-		existing.FacultyId = class.FacultyId
 		existing.SchoolId = class.SchoolId
 		existing.GradeId = class.GradeId
 		existing.MaxStudents = class.MaxStudents
@@ -317,14 +311,3 @@ func (r *classRepository) CreateOrUpdateClass(class *models.Class) (int64, error
 
 	return 0, err
 }
-
-func (r *classRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {
-	schoolId := r.GetAdminSchoolId(ctx)
-
-	if schoolId > 0 {
-		query = query.Where("school_id = ?", schoolId)
-	}
-
-	return query
-}
-

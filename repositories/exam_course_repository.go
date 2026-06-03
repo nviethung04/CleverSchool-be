@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 )
 
 type ExamCourseExam struct {
@@ -138,4 +138,3 @@ func (r *examCourseRepository) GetExamCourseDetail(courseID int64, isAssigned *b
 	}
 	return result, nil
 }
-

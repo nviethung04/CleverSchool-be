@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message DashboardTeacherInfo {
   int64 id = 1;
@@ -21,27 +21,24 @@ message DashboardReportCourse {
   int64 total_teachers = 8;
   string teacher_ids = 9;
   repeated DashboardTeacherInfo teacher_infos = 10;
-  int64 active_teachers = 11;
-  int64 active_students = 12;
-  int64 students_completed_homework = 13;
-  int64 total_homeworks = 17;      // Tổng số homework trong khoảng thời gian (start_date - end_date)
-  int64 assigned_homeworks = 18;   // Số homework đã giao trong khoảng thời gian (start_date - end_date)
-  int64 students_completed_all_homeworks = 19;  // Số học sinh đã hoàn thành tất cả homework được giao
-  int64 students_doing_homeworks = 20;         // Số học sinh đang làm homework
-  int64 students_not_started_any_homework = 21; // Số học sinh chưa làm homework nào
-  int64 student_active_not_started_any_homework = 22; // Số học sinh active nhưng chưa làm homework nào
-  int64 homework_over_50_percent_student_complete = 23; // Số lượng homework có trên 50% học sinh active hoàn thành
+  int64 active_teachers_from_sep8 = 11;
+  int64 active_students_from_sep15 = 12;
+  int64 students_completed_homework_from_sep15 = 13;
+  int64 students_completed_homework_selected_week = 14;
+  int64 active_students_selected_week = 15;
+  int64 active_teachers_selected_week = 16;
+  int64 total_homeworks = 17;      // Tổng số homework từ 15/9/2025 đến hiện tại
+  int64 assigned_homeworks = 18;   // Số homework đã giao từ 15/9/2025 đến hiện tại
+  int64 completed_homeworks = 19;  // Số homework đã hoàn thành từ 15/9/2025 đến hiện tại
 }
 
 message DashboardCoursesRequest {
   int64 school_id = 1; // optional filter by school_id
-  int64 teacher_id = 7; // optional filter by teacher_id (checks in teacher_ids column)
-  int64 course_id = 8; // optional filter by course_id
   string search = 2; // optional search by course_name or school_name
   int32 page = 3; // page number (default: 1)
   int32 limit = 4; // items per page (default: 10)
-  string start_date = 5; // start date (format: YYYY-MM-DD)
-  string end_date = 6; // end date (format: YYYY-MM-DD)
+  string start_date = 5; // selected week start date (format: YYYY-MM-DD)
+  string end_date = 6; // selected week end date (format: YYYY-MM-DD)
 }
 
 message DashboardCoursesResponse {
@@ -52,47 +49,4 @@ message DashboardCoursesResponse {
   int32 total_pages = 5;
 }
 
-// Dashboard Course Students
-message DashboardCourseStudentsRequest {
-  int64 course_id = 1;
-  string start_date = 2; // Format: YYYY-MM-DD
-  string end_date = 3;   // Format: YYYY-MM-DD
-}
-
-message DashboardCourseStudentHomework {
-  int64 id = 1;
-  string name = 2;
-  bool is_completed = 3; // Trạng thái hoàn thành
-  bool is_completed_late = 4;
-}
-
-message DashboardCourseStudent {
-  int64 id = 1;
-  string name = 2;
-  bool is_active = 3; // Trạng thái active (true/false)
-  repeated DashboardCourseStudentHomework homeworks = 4; // Danh sách homework
-}
-
-message DashboardCourseStudentsResponse {
-  repeated DashboardCourseStudent students = 1;
-}
-
-message DashboardCourseHomework {
-  int64 id = 1;
-  string name = 2;
-  int64 assigned_at = 3;
-  bool is_assigned_late = 4;
-}
-
-message DashboardCourseHomeworksRequest {
-  int64 course_id = 1;
-  string start_date = 2;
-  string end_date = 3;
-}
-
-message DashboardCourseHomeworksResponse {
-  repeated DashboardCourseHomework homeworks = 1;
-}
-
 //protoc --go_out=. --go_opt=paths=source_relative prot/dashboard_courses.proto
-

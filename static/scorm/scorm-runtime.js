@@ -22,8 +22,8 @@
 
     // SCORM 1.2 API Implementation
     var SCORM12_API = {
-        Clever SchoolInitialize: function(param) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolInitialize called with:', param);
+        LMSInitialize: function(param) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSInitialize called with:', param);
             
             if (SCORM_RUNTIME.initialized) {
                 return "false";
@@ -59,7 +59,7 @@
                 'cmi.core.success_status': 'unknown',
                 'cmi.core.max_time_allowed': 'unknown',
                 'cmi.core.time_limit_action': 'unknown',
-                'cmi.core.data_from_Clever School': '',
+                'cmi.core.data_from_lms': '',
                 'cmi.core.mastery_score': 'unknown',
                 'cmi.core.launch_data': '',
                 'cmi.core.lesson_mode': 'normal',
@@ -75,7 +75,7 @@
                 'cmi.core.success_status': 'unknown',
                 'cmi.core.max_time_allowed': 'unknown',
                 'cmi.core.time_limit_action': 'unknown',
-                'cmi.core.data_from_Clever School': '',
+                'cmi.core.data_from_lms': '',
                 'cmi.core.mastery_score': 'unknown',
                 'cmi.core.launch_data': ''
             };
@@ -83,8 +83,8 @@
             return "true";
         },
 
-        Clever SchoolFinish: function(param) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolFinish called with:', param);
+        LMSFinish: function(param) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSFinish called with:', param);
             
             if (!SCORM_RUNTIME.initialized) {
                 return "false";
@@ -92,17 +92,17 @@
             
             // Commit any pending data
             if (SCORM_RUNTIME.commitPending) {
-                this.Clever SchoolCommit("");
+                this.LMSCommit("");
             }
             
             // Terminate the session
-            this.Clever SchoolTerminate("");
+            this.LMSTerminate("");
             
             return "true";
         },
 
-        Clever SchoolGetValue: function(element) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolGetValue called for:', element);
+        LMSGetValue: function(element) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSGetValue called for:', element);
             
             if (!SCORM_RUNTIME.initialized) {
                 return "";
@@ -117,8 +117,8 @@
             return getFromServer(element);
         },
 
-        Clever SchoolSetValue: function(element, value) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolSetValue called for:', element, 'with value:', value);
+        LMSSetValue: function(element, value) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSSetValue called for:', element, 'with value:', value);
             
             if (!SCORM_RUNTIME.initialized) {
                 return "false";
@@ -139,8 +139,8 @@
             return "true";
         },
 
-        Clever SchoolCommit: function(param) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolCommit called with:', param);
+        LMSCommit: function(param) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSCommit called with:', param);
             
             if (!SCORM_RUNTIME.initialized) {
                 return "false";
@@ -153,11 +153,11 @@
             return "true";
         },
 
-        Clever SchoolGetLastError: function() {
+        LMSGetLastError: function() {
             return SCORM_RUNTIME.lastError || "0";
         },
 
-        Clever SchoolGetErrorString: function(errorCode) {
+        LMSGetErrorString: function(errorCode) {
             var errorMessages = {
                 "0": "No error",
                 "101": "General exception",
@@ -268,12 +268,12 @@
             return errorMessages[errorCode] || "Unknown error";
         },
 
-        Clever SchoolGetDiagnostic: function(errorCode) {
-            return this.Clever SchoolGetErrorString(errorCode);
+        LMSGetDiagnostic: function(errorCode) {
+            return this.LMSGetErrorString(errorCode);
         },
 
-        Clever SchoolTerminate: function(param) {
-            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: Clever SchoolTerminate called with:', param);
+        LMSTerminate: function(param) {
+            if (SCORM_RUNTIME.debug) console.log('SCORM 1.2: LMSTerminate called with:', param);
             
             if (!SCORM_RUNTIME.initialized) {
                 return "false";
@@ -281,7 +281,7 @@
             
             // Commit any pending data
             if (SCORM_RUNTIME.commitPending) {
-                this.Clever SchoolCommit("");
+                this.LMSCommit("");
             }
             
             // Terminate session on server
@@ -330,7 +330,7 @@
                 'cmi.completion_threshold': 'unknown',
                 'cmi.max_time_allowed': 'unknown',
                 'cmi.time_limit_action': 'unknown',
-                'cmi.data_from_Clever School': '',
+                'cmi.data_from_lms': '',
                 'cmi.mastery_score': 'unknown',
                 'cmi.launch_data': '',
                 'cmi.learner_preference.audio_level': 'unknown',
@@ -434,7 +434,7 @@
         },
 
         GetErrorString: function(errorCode) {
-            return SCORM12_API.Clever SchoolGetErrorString(errorCode);
+            return SCORM12_API.LMSGetErrorString(errorCode);
         },
 
         GetDiagnostic: function(errorCode) {

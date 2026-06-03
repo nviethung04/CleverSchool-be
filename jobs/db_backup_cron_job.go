@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
+	"be-lms/config"
 	"bytes"
 	"context"
 	"database/sql"
@@ -298,13 +298,6 @@ func exportDatabaseDirectly(host, port, user, password, dbname, filePath string)
 
 	// Export each table's data
 	for _, table := range tables {
-		// Only keep activity_logs partition table for current month/year, skip older months
-		if shouldSkipActivityLogsTable(table, time.Now()) {
-			config.Log.Infof("Skipping table data (not current month): %s", table)
-			file.WriteString(fmt.Sprintf("\n-- Skipped table %s (not current month)\n", table))
-			continue
-		}
-
 		config.Log.Infof("Exporting table data: %s", table)
 		file.WriteString(fmt.Sprintf("\n-- Data for table %s\n", table))
 
@@ -367,25 +360,6 @@ func exportDatabaseDirectly(host, port, user, password, dbname, filePath string)
 
 	config.Log.Info("Direct data-only export completed")
 	return nil
-}
-
-// shouldSkipActivityLogsTable returns true if the given table is an activity_logs_MM_YYYY
-// partition table but not for the provided time's month/year.
-func shouldSkipActivityLogsTable(fullyQualifiedTable string, now time.Time) bool {
-	const prefix = "public.activity_logs_"
-	if !strings.HasPrefix(fullyQualifiedTable, prefix) {
-		return false
-	}
-
-	suffix := strings.TrimPrefix(fullyQualifiedTable, prefix) // expected: "MM_YYYY"
-	parts := strings.Split(suffix, "_")
-	if len(parts) != 2 {
-		// If naming doesn't match expected pattern, don't skip (safer default).
-		return false
-	}
-
-	expected := fmt.Sprintf("%02d_%04d", int(now.Month()), now.Year())
-	return suffix != expected
 }
 
 func uploadBackupToS3(localPath string, fileName string) error {
@@ -464,4 +438,3 @@ func extractDomainName(rawURL string) string {
 
 	return strings.ReplaceAll(host, "-", "_")
 }
-

@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/i18n"
+	"be-lms/prot"
+	"be-lms/redis"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"net/http"
@@ -25,7 +25,7 @@ func NewAuthController(service services.AuthService) *AuthController {
 }
 
 func (ac *AuthController) Login(c *gin.Context) {
-	input, err, message := utils.GetBody[*prot.LoginRequest](c, func() *prot.LoginRequest { return &prot.LoginRequest{} })
+    input, err, message := utils.GetBody[*prot.LoginRequest](c, func() *prot.LoginRequest { return &prot.LoginRequest{} })
 
 	if err != nil {
 		config.Log.Error("error: ", err)
@@ -206,4 +206,3 @@ func (ac *AuthController) AcceptRole(c *gin.Context) {
 
 	utils.Respond(c, nil, err, message)
 }
-

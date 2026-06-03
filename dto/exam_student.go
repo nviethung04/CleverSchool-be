@@ -36,7 +36,6 @@ type GetExamByStudentExamDTO struct {
 	Deadline     int64   `json:"deadline"`
 	IsSubmitted  bool    `json:"is_submitted"`
 	UnscoredCount int32  `json:"unscored_count"`
-	Type         string  `json:"type"`
 }
 
 type GetExamByStudentHomeworkDTO struct {
@@ -48,8 +47,6 @@ type GetExamByStudentHomeworkDTO struct {
 	QuestionCompleted      int32  `json:"question_completed"`
 	CoverImage             string `json:"cover_image"`
 	LastQuestionIDCompleted int64 `json:"last_question_id_completed"`
-	QuestionForm           string `json:"question_form"`
-	IsSubmitted            bool   `json:"is_submitted"`
 }
 
 type GetExamByStudentExerciseDTO struct {
@@ -96,5 +93,4 @@ type GetExamByStudentExamQuery struct {
 	Description string
 	CoverImage  string
 	Deadline    int64
-	Type        string
-}
+} 

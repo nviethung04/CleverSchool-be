@@ -1,12 +1,13 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
+	"be-lms/requests"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 	"time"
 
@@ -24,7 +25,6 @@ type LessonPlanRepository interface {
 	DeleteLessonPlansLesson(lessonPlanID, lessonID int) error
 	Complete(id int, userID int64, status bool) error
 	CompleteByIds(ids []int) ([]models.LessonPlanComplete, error)
-	UpdateLessons(id int64, lessonIds []int64) error
 }
 
 type lessonPlanRepository struct{}
@@ -81,9 +81,7 @@ func (r *lessonPlanRepository) GetAllWithPaging(req *requests.GetLessonPlanReque
 		query = query.Limit(req.Limit).Offset((req.Page - 1) * req.Limit)
 	}
 
-	query = query.Preload("Complete").
-		Preload("Author").
-		Preload("Lessons")
+	query = query.Preload("Complete")
 
 	err := query.Order("sort_position ASC").Find(&lessonPlans).Error
 	if err != nil {
@@ -94,16 +92,9 @@ func (r *lessonPlanRepository) GetAllWithPaging(req *requests.GetLessonPlanReque
 
 func (r *lessonPlanRepository) GetByID(id int, c *gin.Context) (*models.LessonPlan, error) {
 	var lessonPlan models.LessonPlan
-	query := db.MasterDB.Model(&models.LessonPlan{})
+	query := db.ReplicaDB.Model(&models.LessonPlan{})
 
-	err := query.Preload("Complete").
-		Preload("Author").
-		Preload("Lessons").
-		Preload("Lessons.Chapter").
-		Preload("Lessons.Chapter.Program").
-		Preload("Lessons.Chapter.Program.Subjects").
-		Preload("Lessons.Chapter.Program.Subjects.Faculty").
-		First(&lessonPlan, id).Error
+	err := query.Preload("Complete").First(&lessonPlan, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +154,6 @@ func (r *lessonPlanRepository) Update(lp *models.LessonPlan) error {
 		updates["updated_by"] = lp.UpdatedBy
 	}
 
-	if lp.AuthorId != 0 {
-		updates["author_id"] = lp.AuthorId
-	}
-
 	updates["updated_at"] = time.Now()
 
 	return db.MasterDB.Omit("course_id", "clone_info").Model(&models.LessonPlan{}).Where("id = ?", lp.ID).Updates(updates).Error
@@ -195,10 +182,6 @@ func (r *lessonPlanRepository) SyncUpdate(lp *models.LessonPlan) error {
 	}
 	if lp.UpdatedBy != 0 {
 		updates["updated_by"] = lp.UpdatedBy
-	}
-
-	if lp.AuthorId != 0 {
-		updates["author_id"] = lp.AuthorId
 	}
 
 	updates["clone_info"] = lp.CloneInfo
@@ -230,23 +213,25 @@ func (r *lessonPlanRepository) DeleteLessonPlansLesson(lessonPlanID, lessonID in
 }
 
 func (r *lessonPlanRepository) AfterFindById(id int, entity *models.LessonPlan) error {
-	lessonPlanID := entity.ID
-
-	go func(id int64) {
+	// ✅ Async add views
+	go func(e *models.LessonPlan) {
 		defer func() {
 			if rec := recover(); rec != nil {
 				fmt.Println("panic in async view update:", rec)
 			}
 		}()
 
-		// Atomic update: views = views + 1
-		if err := db.MasterDB.
-			Table("lesson_plans").
-			Where("id = ?", id).
-			UpdateColumn("views", gorm.Expr("views + 1")).Error; err != nil {
-			fmt.Println("async update views error:", err)
+		val := reflect.ValueOf(e).Elem()
+		field := val.FieldByName("Views")
+
+		if field.IsValid() && field.Kind() == reflect.Int {
+			newViews := field.Int() + 1
+
+			if err := db.MasterDB.Model(e).Update("views", newViews).Error; err != nil {
+				fmt.Println("async update views error:", err)
+			}
 		}
-	}(lessonPlanID)
+	}(entity)
 
 	return nil
 }
@@ -315,39 +300,3 @@ func (r *lessonPlanRepository) CompleteByIds(ids []int) ([]models.LessonPlanComp
 
 	return completes, nil
 }
-
-func (r *lessonPlanRepository) UpdateLessons(id int64, lessonIds []int64) error {
-	if id <= 0 {
-		return nil
-	}
-
-	if err := db.MasterDB.
-		Where("lesson_plan_id = ?", id).
-		Delete(&models.LessonPlanRefLesson{}).Error; err != nil {
-		return err
-	}
-
-	if len(lessonIds) == 0 {
-		return nil
-	}
-
-	refs := make([]models.LessonPlanRefLesson, 0, len(lessonIds))
-	for _, lessonId := range lessonIds {
-		if lessonId <= 0 {
-			continue
-		}
-		refs = append(refs, models.LessonPlanRefLesson{
-			LessonId:     lessonId,
-			LessonPlanId: id,
-		})
-	}
-
-	if len(refs) > 0 {
-		if err := db.MasterDB.Create(&refs).Error; err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-

@@ -26,12 +26,6 @@
       "object_title": {
         "type": "string"
       },
-      "time": {
-        "type": "integer"
-      },
-      "target": {
-        "type": "string"
-      },
       "created_at": {
         "type": "string",
         "format": "date-time"
@@ -72,19 +66,7 @@
           "$ref": "#/definitions/prot.LessonInfo"
         }
       },
-      "headings": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/prot.HeadingInfo"
-        }
-      },
       "object_title": {
-        "type": "string"
-      },
-      "time": {
-        "type": "integer"
-      },
-      "target": {
         "type": "string"
       },
       "created_at": {
@@ -124,12 +106,6 @@
         }
       },
       "object_title": {
-        "type": "string"
-      },
-      "time": {
-        "type": "integer"
-      },
-      "target": {
         "type": "string"
       },
       "created_at": {
@@ -183,24 +159,6 @@
       },
       "object_title": {
         "type": "string"
-      }
-    }
-  },
-  "prot.HeadingInfo": {
-    "type": "object",
-    "properties": {
-      "id": {
-        "type": "integer",
-        "format": "int64"
-      },
-      "name": {
-        "type": "string"
-      },
-      "lessons": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/prot.LessonInfo"
-        }
       }
     }
   },

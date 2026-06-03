@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
+	"be-lms/config"
+	"be-lms/database/db"
 	"context"
 	"fmt"
 	"time"
@@ -60,4 +60,3 @@ func (r *RateLimiter) IsLimited(ip string) (bool, error) {
 
 	return false, nil
 }
-

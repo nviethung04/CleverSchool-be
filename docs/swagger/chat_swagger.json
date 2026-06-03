@@ -1,0 +1,105 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Chat API Documentation",
+        "description": "API documentation cho hệ thống chat real-time với Redis Pub/Sub và Server-Sent Events",
+        "version": "1.0.0",
+        "contact": {
+            "name": "LMS Development Team",
+            "email": "dev@lms.com"
+        }
+    },
+    "host": "localhost:3001",
+    "basePath": "/",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Token",
+            "description": "JWT Token để authentication. Format: Bearer {token}"
+        }
+    },
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json",
+        "text/event-stream"
+    ],
+    "tags": [
+        {
+            "name": "Chat SSE",
+            "description": "Server-Sent Events endpoints cho real-time chat"
+        },
+        {
+            "name": "Chat Messages",
+            "description": "Quản lý tin nhắn chat"
+        },
+        {
+            "name": "Chat Replies",
+            "description": "Quản lý replies cho tin nhắn"
+        },
+        {
+            "name": "Chat Reactions",
+            "description": "Quản lý reactions cho tin nhắn"
+        },
+        {
+            "name": "Chat Management",
+            "description": "Quản lý và monitoring chat system"
+        },
+        {
+            "name": "File Upload",
+            "description": "Upload files cho chat"
+        }
+    ],
+    "parameters": {
+        "AcceptHeader": {
+            "type": "string",
+            "description": "Accept header",
+            "name": "Accept",
+            "in": "header",
+            "default": "application/json"
+        },
+        "CourseIdPath": {
+            "type": "integer",
+            "description": "Course ID",
+            "name": "id",
+            "in": "path",
+            "required": true
+        },
+        "MessageIdPath": {
+            "type": "integer",
+            "description": "Message ID",
+            "name": "message_id",
+            "in": "path",
+            "required": true
+        },
+        "UserIdPath": {
+            "type": "integer",
+            "description": "User ID",
+            "name": "user_id",
+            "in": "path",
+            "required": true
+        },
+        "PageQuery": {
+            "type": "integer",
+            "description": "Số trang (mặc định: 1)",
+            "name": "page",
+            "in": "query",
+            "default": 1
+        },
+        "LimitQuery": {
+            "type": "integer",
+            "description": "Số lượng items mỗi trang (mặc định: 20, tối đa: 100)",
+            "name": "limit",
+            "in": "query",
+            "default": 20
+        }
+    },
+    "paths": {},
+    "definitions": {}
+}

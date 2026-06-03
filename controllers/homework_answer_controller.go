@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 	"strconv"
 
@@ -25,16 +25,6 @@ func (ctl *HomeworkAnswerController) GetStudentHomeworkAnswer(c *gin.Context) {
 		return
 	}
 
-	lessonIDStr := c.Query("lesson_id")
-	var lessonID int64
-	if lessonIDStr != "" {
-		lessonID, err = strconv.ParseInt(lessonIDStr, 10, 64)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lesson_id"})
-			return
-		}
-	}
-
 	tokenStr := c.GetHeader("Token")
 	userID, err := utils.GetUserID(tokenStr)
 	if err != nil {
@@ -42,7 +32,7 @@ func (ctl *HomeworkAnswerController) GetStudentHomeworkAnswer(c *gin.Context) {
 		return
 	}
 
-	resp, err := ctl.service.GetHomeworkAnswerProto(homeworkID, userID, lessonID)
+	resp, err := ctl.service.GetHomeworkAnswerProto(homeworkID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -53,7 +43,6 @@ func (ctl *HomeworkAnswerController) GetStudentHomeworkAnswer(c *gin.Context) {
 func (ctl *HomeworkAnswerController) GetTeacherHomeworkAnswer(c *gin.Context) {
 	homeworkIDStr := c.Query("homework_id")
 	userIDStr := c.Query("user_id")
-	lessonIDStr := c.Query("lesson_id")
 	homeworkID, err := strconv.ParseInt(homeworkIDStr, 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid homework_id"})
@@ -64,15 +53,7 @@ func (ctl *HomeworkAnswerController) GetTeacherHomeworkAnswer(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user_id"})
 		return
 	}
-	var lessonID int64
-	if lessonIDStr != "" {
-		lessonID, err = strconv.ParseInt(lessonIDStr, 10, 64)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid lesson_id"})
-			return
-		}
-	}
-	resp, err := ctl.service.GetHomeworkAnswerProto(homeworkID, userID, lessonID)
+	resp, err := ctl.service.GetHomeworkAnswerProto(homeworkID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -86,4 +67,3 @@ func stringPtrToString(s *string) string {
 	}
 	return *s
 }
-

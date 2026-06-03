@@ -10,7 +10,6 @@ type ChatMessage struct {
 	ID               uint64          `gorm:"primaryKey" json:"id"`
 	CourseID         uint64          `gorm:"not null" json:"course_id"`
 	UserID           uint64          `gorm:"not null" json:"user_id"`
-	RecipientID      *uint64         `json:"recipient_id"` // NULL = group message, có giá trị = private message
 	Content          *string         `json:"content"`
 	MessageType      string          `gorm:"default:text" json:"message_type"`
 	IsPinned         bool            `gorm:"default:false" json:"is_pinned"`
@@ -24,12 +23,12 @@ type ChatMessage struct {
 	// Relations
 	Course         Course                `gorm:"foreignKey:CourseID" json:"course,omitempty"`
 	User           User                  `gorm:"foreignKey:UserID" json:"user,omitempty"`
-	Recipient      *User                 `gorm:"foreignKey:RecipientID" json:"recipient,omitempty"`
 	ReplyToMessage *ChatMessage          `gorm:"foreignKey:ReplyToMessageID" json:"reply_to_message,omitempty"`
 	Replies        []ChatMessage         `gorm:"foreignKey:ReplyToMessageID" json:"replies,omitempty"`
-	Medias        []Media            `gorm:"many2many:message_medias;foreignKey:ID;joinForeignKey:MessageID;References:ID;joinReferences:MediaID" json:"medias,omitempty"`
-	MessageMedias []MessageMedia     `gorm:"foreignKey:MessageID" json:"message_medias,omitempty"`
-	Reads         []ChatMessageRead  `gorm:"foreignKey:MessageID" json:"reads,omitempty"`
+	Medias         []Media               `gorm:"many2many:message_medias;foreignKey:ID;joinForeignKey:MessageID;References:ID;joinReferences:MediaID" json:"medias,omitempty"`
+	MessageMedias  []MessageMedia        `gorm:"foreignKey:MessageID" json:"message_medias,omitempty"`
+	Reads          []ChatMessageRead     `gorm:"foreignKey:MessageID" json:"reads,omitempty"`
+	Reactions      []ChatMessageReaction `gorm:"foreignKey:MessageID" json:"reactions,omitempty"`
 }
 
 type ChatMessageRead struct {

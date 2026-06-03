@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -100,4 +100,3 @@ func (ctl *LessonPlanController) RespondList(c *gin.Context, items []models.Less
 
 	utils.Respond(c, response, err, "")
 }
-

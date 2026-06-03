@@ -190,9 +190,9 @@
             
             // Set attempt ID if provided
             if (SCORM_WRAPPER.attemptId) {
-                SCORM_WRAPPER.api.Clever SchoolInitialize(SCORM_WRAPPER.attemptId);
+                SCORM_WRAPPER.api.LMSInitialize(SCORM_WRAPPER.attemptId);
             } else {
-                SCORM_WRAPPER.api.Clever SchoolInitialize();
+                SCORM_WRAPPER.api.LMSInitialize();
             }
             
             // Start timer
@@ -266,7 +266,7 @@
         // Commit data to server
         function commitData() {
             if (SCORM_WRAPPER.api) {
-                const result = SCORM_WRAPPER.api.Clever SchoolCommit("");
+                const result = SCORM_WRAPPER.api.LMSCommit("");
                 logDebug('Data committed', { result: result });
                 updateStatus('Data committed');
             }
@@ -275,7 +275,7 @@
         // Terminate session
         function terminateSession() {
             if (SCORM_WRAPPER.api) {
-                const result = SCORM_WRAPPER.api.Clever SchoolTerminate("");
+                const result = SCORM_WRAPPER.api.LMSTerminate("");
                 logDebug('Session terminated', { result: result });
                 updateStatus('Session terminated');
                 
@@ -344,8 +344,8 @@
 
         // Handle window beforeunload
         window.addEventListener('beforeunload', function(e) {
-            if (SCORM_WRAPPER.api && SCORM_WRAPPER.api.Clever SchoolTerminate) {
-                SCORM_WRAPPER.api.Clever SchoolTerminate("");
+            if (SCORM_WRAPPER.api && SCORM_WRAPPER.api.LMSTerminate) {
+                SCORM_WRAPPER.api.LMSTerminate("");
             }
         });
 

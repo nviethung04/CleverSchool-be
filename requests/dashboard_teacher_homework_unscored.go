@@ -9,5 +9,4 @@ type DashboardTeacherHomeworkUnscoredListRequest struct {
 	CourseID    int64             `json:"course_id" form:"course_id"`
 	HomeworkID  int64             `json:"homework_id" form:"homework_id"`
 	UserID      int64             `json:"user_id" form:"user_id"`
-	StudentName string            `json:"student_name" form:"student_name"`
 }

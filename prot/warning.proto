@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 // Active users count
 message ActiveUsersCountResponse {
@@ -60,4 +60,3 @@ message FailedLoginsListResponse {
   string time_range = 6;
   string timestamp = 7;
 }
-

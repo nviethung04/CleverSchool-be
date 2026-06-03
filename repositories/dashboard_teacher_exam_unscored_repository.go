@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/requests"
 )
 
 type DashboardTeacherExamUnscoredRepository interface {
@@ -19,22 +19,6 @@ func NewDashboardTeacherExamUnscoredRepository() DashboardTeacherExamUnscoredRep
 func (r *dashboardTeacherExamUnscoredRepository) GetUnscoredExams(userID int64, onlyUserCourses bool, req *requests.DashboardTeacherExamUnscoredListRequest) ([]dto.DashboardTeacherExamUnscored, int64, error) {
 	var exams []dto.DashboardTeacherExamUnscored
 	var totalCount int64
-
-	// Nếu không truyền course_id, lấy danh sách course_id của user từ bảng user_courses
-	var userCourseIDs []int64
-	if req.CourseID == 0 && userID > 0 {
-		if err := db.ReplicaDB.Table("user_courses").
-			Select("course_id").
-			Where("user_id = ?", userID).
-			Scan(&userCourseIDs).Error; err != nil {
-			return nil, 0, err
-		}
-
-		// Nếu user không có khóa nào thì trả về rỗng luôn
-		if len(userCourseIDs) == 0 {
-			return []dto.DashboardTeacherExamUnscored{}, 0, nil
-		}
-	}
 
 	query := db.ReplicaDB.Table("exam_users eu").
 		Select(`
@@ -77,9 +61,6 @@ func (r *dashboardTeacherExamUnscoredRepository) GetUnscoredExams(userID int64, 
 	// Filter by course_id
 	if req.CourseID > 0 {
 		query = query.Where("erl.course_id = ?", req.CourseID)
-	} else if len(userCourseIDs) > 0 {
-		// Không truyền course_id: lọc theo danh sách course_id của user
-		query = query.Where("erl.course_id IN (?)", userCourseIDs)
 	}
 
 	// Filter by exam_id
@@ -118,4 +99,3 @@ func (r *dashboardTeacherExamUnscoredRepository) GetUnscoredExams(userID int64, 
 	err := query.Find(&exams).Error
 	return exams, totalCount, err
 }
-

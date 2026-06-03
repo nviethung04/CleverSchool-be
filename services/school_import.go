@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -72,4 +72,3 @@ func (s *schoolService) Import(c *gin.Context, fileHeader *multipart.FileHeader)
 
 	return nil
 }
-

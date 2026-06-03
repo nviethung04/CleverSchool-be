@@ -1,11 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
-	"errors"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/requests"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +14,6 @@ type ExerciseRepository interface {
     GetAll() ([]models.Exercise, error)
     GetAllWithPaging(req *requests.GetExerciseRequest, c *gin.Context) ([]models.Exercise, int64, error)
     GetByID(id int64, c *gin.Context) (*models.Exercise, error)
-	IsRandomQuestion(id int64) (bool, error)
     Create(exercise *models.Exercise) error
     Update(exercise *models.Exercise) error
     Delete(id int64, deletedBy int64) error
@@ -24,7 +21,6 @@ type ExerciseRepository interface {
     GetTotalQuestionsMap(exerciseIDs []int64) (map[int64]int32, error)
     Assigned(ref models.ExerciseRefLesson) error
     AssignedLesson(id int64) (*models.Exercise, error)
-    UpdateEvaluate(userId, exerciseId int64, score float64) error
 }
 
 type exerciseRepository struct{}
@@ -98,18 +94,6 @@ func (r *exerciseRepository) GetByID(id int64, c *gin.Context) (*models.Exercise
         return nil, err
     }
     return &exercise, nil
-}
-
-func (r *exerciseRepository) IsRandomQuestion(id int64) (bool, error) {
-	var isRandom bool
-	err := db.ReplicaDB.Table("exercises").
-		Select("is_random_question").
-		Where("id = ? AND deleted_at IS NULL", id).
-		Scan(&isRandom).Error
-	if err != nil {
-		return false, err
-	}
-	return isRandom, nil
 }
 
 func (r *exerciseRepository) Create(exercise *models.Exercise) error {
@@ -218,21 +202,3 @@ func (r *exerciseRepository) AssignedLesson(id int64) (*models.Exercise, error) 
 	}
 	return &exercise, nil
 }
-
-func (r *exerciseRepository) UpdateEvaluate(userId, exerciseId int64, score float64) error {
-    result := db.MasterDB.Table("exercise_users").
-        Where("user_id = ? AND exercise_id = ?", userId, exerciseId).
-        Update("ratio", score)
-
-    if result.Error != nil {
-		config.Log.Errorf("Error updating evaluate: %v", result.Error)
-        return result.Error
-    }
-
-    if result.RowsAffected == 0 {
-		return errors.New("exercise user not found")
-    }
-
-    return nil
-}
-

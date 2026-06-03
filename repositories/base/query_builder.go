@@ -13,7 +13,7 @@ import (
 type QueryBuilder[T any] struct {
 	filter       map[string]interface{}
 	preload      []string
-	omit         []string
+	omit      []string
 	sort         map[string]string
 	limit        int
 	page         int
@@ -30,7 +30,7 @@ func NewQueryBuilder[T any]() *QueryBuilder[T] {
 	return &QueryBuilder[T]{
 		filter:  make(map[string]interface{}),
 		preload: []string{},
-		omit:    []string{},
+		omit: 	 []string{},
 		sort:    make(map[string]string),
 		limit:   1000,
 		page:    1,
@@ -317,156 +317,14 @@ func (qb *QueryBuilder[T]) ApplyFilters(query *gorm.DB) *gorm.DB {
 		query = qb.ApplySearch(query)
 	}
 
-	// Get table name for the model
-	var model T
-	stmt := &gorm.Statement{DB: query}
-	var tableName string
-	if err := stmt.Parse(&model); err == nil {
-		tableName = stmt.Schema.Table
-	}
-
 	for key, value := range qb.filter {
 		if strings.Contains(key, ".") {
-			// Check if this is a table-qualified column name (e.g., "users.status")
-			parts := strings.SplitN(key, ".", 2)
-			firstPart := parts[0]
-
-			// If the first part matches the table name, treat it as a table-qualified column
-			if firstPart == tableName {
-				// This is a table-qualified column name, not a relation filter
-				columnName := parts[1]
-				lowerKey := strings.ToLower(key)
-
-				if strVal, ok := value.(string); ok {
-					found := false
-
-					// Check BETWEEN
-					if strings.HasPrefix(strVal, "between:") {
-						vals := strings.Split(strings.TrimPrefix(strVal, "between:"), ",")
-						if len(vals) == 2 {
-							start := strings.TrimSpace(vals[0])
-							end := strings.TrimSpace(vals[1])
-							if start != "" && end != "" {
-								query = query.Where(fmt.Sprintf("%s BETWEEN ? AND ?", lowerKey), start, end)
-								found = true
-							}
-						}
-					}
-
-					// Check operators
-					if !found {
-						operators := []string{">=:", "<=:", "!=:", ">:", "<:", "==:"}
-						for _, op := range operators {
-							if strings.HasPrefix(strVal, op) {
-								val := strings.TrimPrefix(strVal, op)
-								val = strings.TrimSpace(val)
-
-								if val != "" {
-									if val == "NULL" {
-										if op == "!=:" {
-											query = query.Where(fmt.Sprintf("%s IS NOT NULL", lowerKey))
-										} else if op == "==:" {
-											query = query.Where(fmt.Sprintf("%s IS NULL", lowerKey))
-										}
-									} else {
-										if strings.Contains(strings.ToLower(columnName), "_id") && val == "0" {
-											query = query.Where(fmt.Sprintf("(%s = ? OR %s IS NULL)", lowerKey, lowerKey), val)
-										} else {
-											query = query.Where(fmt.Sprintf("%s %s ?", lowerKey, strings.TrimSuffix(op, ":")), val)
-										}
-									}
-									found = true
-									break
-								}
-							}
-						}
-					}
-
-					// Check NOT IN
-					if !found && strings.HasPrefix(strVal, "not_in:") {
-						rawIds := strings.Split(strings.TrimPrefix(strVal, "not_in:"), ",")
-						var ids []interface{}
-						for _, idStr := range rawIds {
-							idStr = strings.TrimSpace(idStr)
-							if idStr != "" {
-								ids = append(ids, idStr)
-							}
-						}
-						if len(ids) > 0 {
-							query = query.Where(lowerKey+" NOT IN ?", ids)
-						}
-						found = true
-					}
-
-					// Check IN
-					if !found && strings.HasPrefix(strVal, "in:") {
-						rawIds := strings.Split(strings.TrimPrefix(strVal, "in:"), ",")
-						var ids []interface{}
-						for _, idStr := range rawIds {
-							idStr = strings.TrimSpace(idStr)
-							if idStr != "" {
-								ids = append(ids, idStr)
-							}
-						}
-						query = query.Where(lowerKey+" IN ?", ids)
-						found = true
-					}
-
-					// Default =
-					if !found {
-						query = query.Where(lowerKey+" = ?", strVal)
-					}
-				} else {
-					query = query.Where(lowerKey+" = ?", value)
-				}
-				continue
-			}
-
 			// filter by releation table
-			relation := firstPart
+			parts := strings.SplitN(key, ".", 2)
+			relation := parts[0]
 
 			if strVal, ok := value.(string); ok {
-				// Check if this is IN clause with relation format: "in:1,2,3:user_classes:users:classes:user_id:class_id:id:id"
-				if strings.HasPrefix(strVal, "in:") && strings.Count(strVal, ":") >= 7 {
-					// Split by ":" to extract parts after "in:"
-					allParts := strings.SplitN(strVal, ":", 9)
-					if len(allParts) == 9 {
-						// allParts[0] = "in"
-						// allParts[1] = "1,2,3" (the IN values)
-						// allParts[2-8] = relation info
-						inValues := allParts[1]
-						relationRefTable := allParts[2]
-						currentTable := allParts[3]
-						relationTable := allParts[4]
-						currentRefKey := allParts[5]
-						relationRefKey := allParts[6]
-						currentKey := allParts[7]
-						relationKey := allParts[8]
-
-						// Parse IN values
-						rawIds := strings.Split(inValues, ",")
-						var ids []interface{}
-						for _, idStr := range rawIds {
-							idStr = strings.TrimSpace(idStr)
-							if idStr != "" {
-								ids = append(ids, idStr)
-							}
-						}
-
-						if len(ids) > 0 {
-							joinOn := fmt.Sprintf("%s.%s = %s.%s", relationRefTable, currentRefKey, currentTable, currentKey)
-							whereClause := fmt.Sprintf("%s.%s IN ?", relationRefTable, relationRefKey)
-							relationWhere := fmt.Sprintf("%s.%s IN ?", relationTable, relationKey)
-
-							query = query.
-								Joins("JOIN "+relationRefTable+" ON "+joinOn).
-								Where(whereClause, ids).
-								Preload(relation, func(db *gorm.DB) *gorm.DB {
-									return db.Where(relationWhere, ids)
-								})
-						}
-					}
-				} else if strings.Count(strVal, ":") == 7 {
+				if strings.Count(strVal, ":") == 7 {
 					// Example "1:user_courses:users:courses:user_id:course_id:id:id", Relation Courses
 					valueParts := strings.SplitN(strVal, ":", 8)
 
@@ -520,17 +378,6 @@ func (qb *QueryBuilder[T]) ApplyFilters(query *gorm.DB) *gorm.DB {
 								return db.Where(preloadWhere, filterValue)
 							})
 					}
-				} else if strings.HasPrefix(strVal, "in:") {
-					rawIds := strings.Split(strings.TrimPrefix(strVal, "in:"), ",")
-					var ids []interface{}
-					for _, idStr := range rawIds {
-						idStr = strings.TrimSpace(idStr)
-						if idStr != "" {
-							ids = append(ids, idStr)
-						}
-					}
-
-					query = query.Where(key+" IN ?", ids)
 				}
 			} else {
 				// todo skip filter
@@ -588,26 +435,8 @@ func (qb *QueryBuilder[T]) ApplyFilters(query *gorm.DB) *gorm.DB {
 					}
 				}
 
-				// Check NOT IN
-				// Example "not_in:1,2,3"
-				if !found && strings.HasPrefix(strVal, "not_in:") {
-					rawIds := strings.Split(strings.TrimPrefix(strVal, "not_in:"), ",")
-					var ids []interface{}
-					for _, idStr := range rawIds {
-						idStr = strings.TrimSpace(idStr)
-						if idStr != "" {
-							ids = append(ids, idStr)
-						}
-					}
-
-					if len(ids) > 0 {
-						query = query.Where(lowerKey+" NOT IN ?", ids)
-					}
-					found = true
-				}
-
 				// Check IN
-				// Example "in:1,2,3"
+				// Example "between:2006-01-02,2006-01-03"
 				if !found && strings.HasPrefix(strVal, "in:") {
 					rawIds := strings.Split(strings.TrimPrefix(strVal, "in:"), ",")
 					var ids []interface{}
@@ -617,7 +446,6 @@ func (qb *QueryBuilder[T]) ApplyFilters(query *gorm.DB) *gorm.DB {
 							ids = append(ids, idStr)
 						}
 					}
-
 					query = query.Where(lowerKey+" IN ?", ids)
 					found = true
 				}

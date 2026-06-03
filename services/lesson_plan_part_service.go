@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/resources"
 
-	"be-cleverschool/utils"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -119,4 +119,3 @@ func modelToProtoLessonPlanPart(part *models.LessonPlanPart) *prot.LessonPlanPar
 		IsProgram: isProgram,
 	}
 }
-

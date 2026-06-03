@@ -35,7 +35,6 @@ type Config struct {
 	BasicAuthUsername string
 	BasicAuthPassword string
 	AppUrl            string
-	AppConfigUrl      string
 	H5PUrl            string
 
 	// API Configuration
@@ -47,10 +46,6 @@ type Config struct {
 
 	// Internal API Configuration
 	InternalAPIKey string
-
-	PublicCourseIds []int64
-
-	IsVtg bool
 }
 
 func LoadConfig() Config {
@@ -96,7 +91,7 @@ func LoadConfig() Config {
 
 	masterPassword := os.Getenv("MASTER_PASSWORD")
 	if masterPassword == "" {
-		masterPassword = "super@Clever School@80a"
+		masterPassword = "super@enspire@80a"
 	}
 
 	discordWebhookUrl := os.Getenv("DISCORD_WEBHOOK_URL")
@@ -108,20 +103,6 @@ func LoadConfig() Config {
 	internalAPIKey := os.Getenv("INTERNAL_API_KEY")
 	if internalAPIKey == "" {
 		internalAPIKey = "internal-api-key-2025"
-	}
-
-	publicCourseIdsStr := os.Getenv("PUBLIC_COURSE_IDS")
-	var publicCourseIds []int64
-
-	if publicCourseIdsStr != "" {
-		ids := strings.Split(publicCourseIdsStr, ",")
-
-		for _, id := range ids {
-			i, err := strconv.ParseInt(id, 10, 64)
-			if err == nil {
-				publicCourseIds = append(publicCourseIds, i)
-			}
-		}
 	}
 
 	return Config{
@@ -146,7 +127,6 @@ func LoadConfig() Config {
 		BasicAuthUsername: basicAuthUsername,
 		BasicAuthPassword: basicAuthPassword,
 		AppUrl:            os.Getenv("APP_FULL_URL"),
-		AppConfigUrl:      os.Getenv("APP_CONFIG_URL"),
 
 		DBName:    dbName,
 		APIDomain: apiDomain,
@@ -155,9 +135,6 @@ func LoadConfig() Config {
 		MasterPassword: masterPassword,
 		DiscordHookUrl: discordWebhookUrl,
 		InternalAPIKey: internalAPIKey,
-
-		PublicCourseIds: publicCourseIds,
-		IsVtg:           os.Getenv("IS_VTG") == "true",
 	}
 }
 

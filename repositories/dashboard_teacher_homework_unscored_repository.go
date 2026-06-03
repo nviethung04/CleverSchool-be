@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/requests"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/requests"
 	"fmt"
 )
 
@@ -21,36 +21,17 @@ func (r *dashboardTeacherHomeworkUnscoredRepository) GetUnscoredHomeworks(userID
 	var homeworks []dto.DashboardTeacherHomeworkUnscored
 	var totalCount int64
 
-	// Nếu không truyền course_id, lấy danh sách course_id của user từ bảng user_courses
-	var userCourseIDs []int64
-	if req.CourseID == 0 && userID > 0 {
-		if err := db.ReplicaDB.Table("user_courses").
-			Select("course_id").
-			Where("user_id = ?", userID).
-			Scan(&userCourseIDs).Error; err != nil {
-			return nil, 0, err
-		}
-
-		// Nếu user không có khóa nào thì trả về rỗng luôn
-		if len(userCourseIDs) == 0 {
-			return []dto.DashboardTeacherHomeworkUnscored{}, 0, nil
-		}
-	}
-
 	// Bước 1: Lấy danh sách homework_users cơ bản
 	query := db.ReplicaDB.Table("homework_users hu").
 		Select(`
 			DISTINCT ON (hu.lesson_id, hu.homework_id, hu.user_id)
-			hu.user_id,
-			hu.homework_id,
-			hu.lesson_id,
+			hu.user_id, hu.homework_id, hu.lesson_id,
 			hrl.course_id,
 			u.name as student_name,
 			h.name as homework_name,
 			l.title as lesson_title,
 			c.name as course_name,
-			c.object_title as object_title,
-			hu.updated_at as submitted_at,
+			hu.created_at as submitted_at,
 			hu.ratio,
 			h.total_questions,
 			CASE 
@@ -60,30 +41,14 @@ func (r *dashboardTeacherHomeworkUnscoredRepository) GetUnscoredHomeworks(userID
 			COALESCE(hc.content, '') as comment_content
 		`).
 		Joins("JOIN users u ON hu.user_id = u.id").
-		Joins("JOIN user_ref_roles urr ON urr.user_id = u.id").
-		Joins("JOIN homeworks h ON hu.homework_id = h.id").
-		Joins("JOIN homework_ref_lessons hrl ON hrl.homework_id = hu.homework_id AND hrl.lesson_id = hu.lesson_id").
-		Joins("JOIN lessons l ON l.id = hu.lesson_id").
-		Joins("JOIN courses c ON c.id = hrl.course_id").
-		Joins("JOIN lesson_schedules ls ON ls.course_id = hrl.course_id AND ls.lesson_id = hrl.lesson_id").
-		Joins("JOIN weeks w ON w.id = ls.week_id").
-		Joins("JOIN user_courses student_courses ON student_courses.user_id = hu.user_id AND student_courses.course_id = hrl.course_id").
+		Joins("LEFT JOIN homeworks h ON hu.homework_id = h.id").
+		Joins("LEFT JOIN homework_ref_lessons hrl ON hrl.homework_id = hu.homework_id AND hrl.lesson_id = hu.lesson_id").
+		Joins("LEFT JOIN lessons l ON l.id = hu.lesson_id").
+		Joins("LEFT JOIN courses c ON c.id = hrl.course_id").
 		Joins("LEFT JOIN homework_comments hc ON hc.homework_id = hu.homework_id AND hc.student_id = hu.user_id AND hc.deleted_at IS NULL").
 		Where("hu.status_scoring = ?", 1).
 		Where("h.deleted_at IS NULL").
-		Where("u.deleted_at IS NULL").
-		Where("urr.role_id = ?", 3)
-
-	// Filter theo course_id
-	if req.CourseID > 0 {
-		query = query.
-			Where("student_courses.course_id = ?", req.CourseID).
-			Where("hrl.course_id = ?", req.CourseID)
-	} else if len(userCourseIDs) > 0 {
-		query = query.
-			Where("student_courses.course_id IN (?)", userCourseIDs).
-			Where("hrl.course_id IN (?)", userCourseIDs)
-	}
+		Where("u.deleted_at IS NULL")
 
 	// Apply filters directly on homework_users table
 	if req.HomeworkID > 0 {
@@ -92,20 +57,24 @@ func (r *dashboardTeacherHomeworkUnscoredRepository) GetUnscoredHomeworks(userID
 	if req.UserID > 0 {
 		query = query.Where("hu.user_id = ?", req.UserID)
 	}
-	if req.StudentName != "" {
-		query = query.Where("unaccent(u.name) ILIKE unaccent(?)", "%"+req.StudentName+"%")
+	if req.CourseID > 0 {
+		query = query.Where("hrl.course_id = ?", req.CourseID)
 	}
-	if req.StartDate > 0 && req.EndDate > 0 {
-		query = query.Where("hu.updated_at BETWEEN to_timestamp(?) AND to_timestamp(?)", req.StartDate, req.EndDate)
-	} else if req.StartDate > 0 {
-		query = query.Where("hu.updated_at >= to_timestamp(?)", req.StartDate)
-	} else if req.EndDate > 0 {
-		query = query.Where("hu.updated_at <= to_timestamp(?)", req.EndDate)
-	}
+
 	// Nếu chỉ lấy homework cùng khóa (role_id = 2 hoặc 3)
 	if onlyUserCourses && userID > 0 {
-		query = query.Joins("JOIN user_courses teacher_courses ON teacher_courses.course_id = hrl.course_id").
-			Where("teacher_courses.user_id = ?", userID)
+		query = query.Joins("LEFT JOIN user_courses ON hrl.course_id = user_courses.course_id").
+			Where("user_courses.user_id = ?", userID)
+	}
+
+	// Filter by start_date and end_date (only date part, not time)
+	if req.StartDate > 0 && req.EndDate > 0 {
+		// Lọc homework trong khoảng thời gian từ start_date đến end_date
+		query = query.Where("DATE(hu.created_at) >= DATE(to_timestamp(?)) AND DATE(hu.created_at) <= DATE(to_timestamp(?))", req.StartDate, req.EndDate)
+	} else if req.StartDate > 0 {
+		query = query.Where("DATE(hu.created_at) >= DATE(to_timestamp(?))", req.StartDate)
+	} else if req.EndDate > 0 {
+		query = query.Where("DATE(hu.created_at) <= DATE(to_timestamp(?))", req.EndDate)
 	}
 
 	// Count total
@@ -180,6 +149,6 @@ func (r *dashboardTeacherHomeworkUnscoredRepository) GetUnscoredHomeworks(userID
 		}
 	}
 
+
 	return homeworks, totalCount, nil
 }
-

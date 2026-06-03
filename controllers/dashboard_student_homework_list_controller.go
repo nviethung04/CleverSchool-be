@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,4 +32,3 @@ func (ctl *DashboardStudentHomeworkListController) GetStudentHomeworkList(c *gin
     stats, err := ctl.service.GetStudentHomeworkList(userID, req.CourseID, req.StartDate, req.EndDate, req.Limit, req.Page)
     utils.Respond(c, stats, err, "")
 }
-

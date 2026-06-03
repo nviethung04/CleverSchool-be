@@ -270,8 +270,8 @@
                 const api = createSCORMAPI(currentConfig.version);
                 
                 // Initialize
-                const initResult = api.Clever SchoolInitialize ? 
-                    api.Clever SchoolInitialize(currentConfig.attemptId) : 
+                const initResult = api.LMSInitialize ? 
+                    api.LMSInitialize(currentConfig.attemptId) : 
                     api.Initialize(currentConfig.attemptId);
                 
                 log(`SCORM ${currentConfig.version} initialized: ${initResult}`);
@@ -319,19 +319,19 @@
                 
                 // Initialize if not already
                 if (!window.SCORM_RUNTIME || !window.SCORM_RUNTIME.initialized) {
-                    api.Clever SchoolInitialize('demo_attempt_001');
+                    api.LMSInitialize('demo_attempt_001');
                 }
                 
                 // Set value
-                const setResult = api.Clever SchoolSetValue(element, value);
+                const setResult = api.LMSSetValue(element, value);
                 log(`SCORM 1.2 SetValue(${element}, ${value}): ${setResult}`);
                 
                 // Get value
-                const getResult = api.Clever SchoolGetValue(element);
+                const getResult = api.LMSGetValue(element);
                 log(`SCORM 1.2 GetValue(${element}): ${getResult}`);
                 
                 // Commit
-                const commitResult = api.Clever SchoolCommit('');
+                const commitResult = api.LMSCommit('');
                 log(`SCORM 1.2 Commit: ${commitResult}`);
                 
                 showResult('success', `SCORM 1.2 API test completed successfully!\nElement: ${element}\nValue: ${value}\nSet Result: ${setResult}\nGet Result: ${getResult}\nCommit Result: ${commitResult}`);

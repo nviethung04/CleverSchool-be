@@ -9,7 +9,6 @@ type DashboardTeacherHomeworkUnscored struct {
 	LessonID           int64     `json:"lesson_id"`
 	StudentName        string    `json:"student_name"`
 	CourseName         string    `json:"course_name"`
-	ObjectTitle        string    `json:"object_title"`
 	SubjectName        string    `json:"subject_name"`
 	HomeworkName       string    `json:"homework_name"`
 	LessonTitle        string    `json:"lesson_title"`

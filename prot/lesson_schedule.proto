@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "week.proto";
 import "study_shift.proto";
-import "lesson_plan.proto";
 
 message LessonSchedule {
   int64 id = 1;
@@ -23,19 +22,10 @@ message LessonSchedule {
   StudyShift shift = 10;
 }
 
-message LessonPlanBySchedule {
-  int64 id = 1;
-  string name = 2;
-  string description = 3;
-  bool is_active = 4;
-  LessonPlanAuthor author = 5;
-}
-
 message LessonBySchedule {
   int64 id = 1;
   string title = 2;
   string description = 3;
-  repeated LessonPlanBySchedule lesson_plans = 4;
 }
 
 message CourseBySchedule {
@@ -117,18 +107,3 @@ message LessonSchedulesInfoRequest {
   repeated ScheduleByWeek weeks = 2;
   repeated ScheduleBySemester semesters = 3;
 }
-
-message LessonScheduleSyncRequest {
-  int64 course_id = 1;
-}
-
-message LessonScheduleSyncResponse {
-  bool success = 1;
-  string message = 2;
-  int64 source_course_id = 3;
-  repeated int64 synced_course_ids = 4;
-  repeated int64 failed_course_ids = 5;
-  int32 synced_count = 6;
-  int32 failed_count = 7;
-}
-

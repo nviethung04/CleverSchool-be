@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"be-cleverschool/middleware"
+	"be-lms/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,4 +70,3 @@ func contains(slice []string, item string) bool {
 	}
 	return false
 }
-

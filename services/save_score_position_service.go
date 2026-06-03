@@ -1,14 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	_ "be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	_ "be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	_ "be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	_ "be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	_ "math"
@@ -23,20 +23,16 @@ type SaveScorePositionService interface {
 }
 
 type saveScorePositionService struct {
-	repo                        repositories.SaveScorePositionRepository
-	correctRepo                 repositories.SaveCorrectHomeworkRepository
-	clonedQuestionService       ClonedQuestionService
-	homeworkUserQuestionService HomeworkUserQuestionService
+	repo                  repositories.SaveScorePositionRepository
+	correctRepo           repositories.SaveCorrectHomeworkRepository
+	clonedQuestionService ClonedQuestionService
 }
 
 func NewSaveScorePositionService(repo repositories.SaveScorePositionRepository, clonedQuestionService ClonedQuestionService) SaveScorePositionService {
-	// Tạo repository cho homework user question service (dùng chung cho nhiều dạng câu hỏi)
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
 	return &saveScorePositionService{
-		repo:                        repo,
-		correctRepo:                 repositories.NewSaveCorrectHomeworkRepository(),
-		clonedQuestionService:       clonedQuestionService,
-		homeworkUserQuestionService: NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService),
+		repo:                  repo,
+		correctRepo:           repositories.NewSaveCorrectHomeworkRepository(),
+		clonedQuestionService: clonedQuestionService,
 	}
 }
 
@@ -221,48 +217,19 @@ func (s *saveScorePositionService) SaveScorePositionHomework(req *prot.SaveScore
 		return nil, err
 	}
 
-	isAllCorrect := correctCount == numAnswers
-
-	// Lưu vào homework_user_questions và lấy star, ratioScore, weight, numberTimeSent
-	var star, numberTimeSent int
-	var ratioScore, weight float64
-	if req.HomeworkId != 0 {
-		var err error
-		star, ratioScore, weight, numberTimeSent, err = s.homeworkUserQuestionService.SaveHomeworkUserQuestion(req.HomeworkId, userID, req.QuestionId, req.LessonId, isAllCorrect, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
-
-	// Nếu không cần lưu (đã có câu trả lời đúng hết), query từ DB để lấy star, ratio_score, weight, number_time_sent
+	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại
 	if !needSave {
-		// Query bản ghi có is_all_correct = true để lấy star, ratio_score, weight, number_time_sent
-		if req.HomeworkId != 0 {
-			existingRecord, err := s.homeworkUserQuestionService.GetHomeworkUserQuestionByCorrect(req.HomeworkId, userID, req.QuestionId, req.LessonId)
-			if err == nil && existingRecord != nil {
-				star = existingRecord.Star
-				ratioScore = existingRecord.RatioScore
-				weight = existingRecord.Weight
-				numberTimeSent = existingRecord.NumberTimeSent
-			}
-		}
-		
 		tx.Commit()
 		return &prot.SaveScoreResponsePosition{
-			QuestionId:      req.QuestionId,
-			TotalScore:      utils.RoundTo2Decimal(totalScore),
-			Answers:         answerResults,
-			IsAllCorrect:    isAllCorrect,
-			Star:            int32(star),
-			RatioScore:      ratioScore,
-			Weight:          weight,
-			NumberTimeSent:  int32(numberTimeSent),
+			QuestionId:   req.QuestionId,
+			TotalScore:   utils.RoundTo2Decimal(totalScore),
+			Answers:      answerResults,
+			IsAllCorrect: correctCount == numAnswers,
 		}, nil
 	}
 
 	// Upsert trạng thái hoàn thành nếu đúng hết
-	if isAllCorrect {
+	if correctCount == numAnswers {
 		err := s.correctRepo.UpsertHomeworkUserOnCorrect(req.HomeworkId, req.LessonId, userID, req.QuestionId, "position")
 		if err != nil {
 			tx.Rollback()
@@ -277,14 +244,10 @@ func (s *saveScorePositionService) SaveScorePositionHomework(req *prot.SaveScore
 	}
 	tx.Commit()
 	return &prot.SaveScoreResponsePosition{
-		QuestionId:      req.QuestionId,
-		TotalScore:      utils.RoundTo2Decimal(totalScore),
-		Answers:         answerResults,
-		IsAllCorrect:    isAllCorrect,
-		Star:            int32(star),
-		RatioScore:      ratioScore,
-		Weight:          weight,
-		NumberTimeSent:  int32(numberTimeSent),
+		QuestionId:   req.QuestionId,
+		TotalScore:   utils.RoundTo2Decimal(totalScore),
+		Answers:      answerResults,
+		IsAllCorrect: correctCount == numAnswers,
 	}, nil
 }
 
@@ -342,4 +305,3 @@ func (s *saveScorePositionService) SaveScorePositionExercise(req *prot.SaveScore
 	}
 	return &prot.SaveScoreResponsePosition{QuestionId: req.QuestionId, TotalScore: utils.RoundTo2Decimal(totalScore), Answers: answerResults, IsAllCorrect: correctCount == numAnswers}, nil
 }
-

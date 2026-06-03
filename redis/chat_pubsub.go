@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"be-cleverschool/database/db"
+	"be-lms/database/db"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -66,15 +66,6 @@ func (c *ChatPubSub) GetCourseChannel(courseID uint64) string {
 // GetUserChannel returns the Redis channel name for a user (for notifications)
 func (c *ChatPubSub) GetUserChannel(userID uint64) string {
 	return fmt.Sprintf("chat:user:%d", userID)
-}
-
-// GetPrivateMessageChannel returns the Redis channel name for private messages between two users in a course
-func (c *ChatPubSub) GetPrivateMessageChannel(courseID, userID1, userID2 uint64) string {
-	// Sort user IDs to ensure consistent channel name regardless of sender/recipient order
-	if userID1 > userID2 {
-		userID1, userID2 = userID2, userID1
-	}
-	return fmt.Sprintf("chat:private:course:%d:users:%d:%d", courseID, userID1, userID2)
 }
 
 // PublishNewMessage publishes a new message event
@@ -174,24 +165,6 @@ func (c *ChatPubSub) PublishUserNotification(userID uint64, notificationData int
 	return c.publishToUser(userID, message)
 }
 
-// PublishPrivateMessage publishes a private message event between two users in a course
-func (c *ChatPubSub) PublishPrivateMessage(courseID, messageID, senderID, recipientID uint64, messageData interface{}) error {
-	message := ChatPubSubMessage{
-		Type:      "private_message",
-		CourseID:  courseID,
-		MessageID: messageID,
-		UserID:    senderID,
-		Data: map[string]interface{}{
-			"message":      messageData,
-			"recipient_id": recipientID,
-		},
-		Timestamp: time.Now(),
-	}
-
-	channel := c.GetPrivateMessageChannel(courseID, senderID, recipientID)
-	return c.publish(channel, message)
-}
-
 // publishToCourse publishes a message to a course channel
 func (c *ChatPubSub) publishToCourse(courseID uint64, message ChatPubSubMessage) error {
 	channel := c.GetCourseChannel(courseID)
@@ -273,74 +246,6 @@ func (c *ChatPubSub) subscribe(channel string) (<-chan *ChatPubSubMessage, func(
 	}
 
 	log.Printf("Subscribed to channel: %s", channel)
-	return messageChan, cleanup, nil
-}
-
-// SubscribeToPrivateMessages subscribes to private messages between two users in a course
-func (c *ChatPubSub) SubscribeToPrivateMessages(courseID, userID1, userID2 uint64) (<-chan *ChatPubSubMessage, func(), error) {
-	channel := c.GetPrivateMessageChannel(courseID, userID1, userID2)
-	return c.subscribe(channel)
-}
-
-func (c *ChatPubSub) SubscribeToAllPrivateMessages(courseID, userID uint64) (<-chan *ChatPubSubMessage, func(), error) {
-	pattern1 := fmt.Sprintf("chat:private:course:%d:users:%d:*", courseID, userID)
-	pattern2 := fmt.Sprintf("chat:private:course:%d:users:*:%d", courseID, userID)
-
-	pubsub := c.client.PSubscribe(c.ctx, pattern1, pattern2)
-
-	_, err := pubsub.Receive(c.ctx)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to subscribe to private message patterns: %w", err)
-	}
-
-	messageChan := make(chan *ChatPubSubMessage, 100)
-
-	go func() {
-		defer close(messageChan)
-		defer pubsub.Close()
-
-		ch := pubsub.Channel()
-		for msg := range ch {
-			var chatMessage ChatPubSubMessage
-			if err := json.Unmarshal([]byte(msg.Payload), &chatMessage); err != nil {
-				log.Printf("Failed to unmarshal message from channel %s: %v", msg.Channel, err)
-				continue
-			}
-
-			if chatMessage.Data != nil {
-				if chatMsgMap, ok := chatMessage.Data.(map[string]interface{}); ok {
-					if recipientID, exists := chatMsgMap["recipient_id"]; exists {
-						var rid uint64
-						switch v := recipientID.(type) {
-						case uint64:
-							rid = v
-						case float64:
-							rid = uint64(v)
-						case int:
-							rid = uint64(v)
-						}
-						if rid != userID {
-							continue
-						}
-					}
-				}
-			}
-
-			select {
-			case messageChan <- &chatMessage:
-			case <-c.ctx.Done():
-				return
-			default:
-				log.Printf("Message buffer full, dropping message from channel %s", msg.Channel)
-			}
-		}
-	}()
-
-	cleanup := func() {
-		pubsub.Close()
-	}
-
-	log.Printf("Subscribed to all private messages for user %d in course %d", userID, courseID)
 	return messageChan, cleanup, nil
 }
 
@@ -427,4 +332,3 @@ func GetChatPubSub() *ChatPubSub {
 	}
 	return chatPubSub
 }
-

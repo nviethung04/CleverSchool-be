@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
 )
 
 type DegreeController struct {
@@ -33,4 +33,3 @@ func NewDegreeController(service services.DegreeService) *DegreeController {
 		GenericController: genericController,
 	}
 }
-

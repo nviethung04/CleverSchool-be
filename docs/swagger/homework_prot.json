@@ -154,55 +154,5 @@
         }
       }
     }
-  },
-  "prot.HomeworkStudentsDoingItem": {
-    "type": "object",
-    "properties": {
-      "user_id": {
-        "type": "integer",
-        "format": "int64"
-      },
-      "username": {
-        "type": "string"
-      },
-      "name": {
-        "type": "string"
-      },
-      "school_name": {
-        "type": "string"
-      },
-      "homework_id": {
-        "type": "integer",
-        "format": "int64"
-      },
-      "submitted_at": {
-        "type": "integer",
-        "format": "int64",
-        "description": "Unix timestamp của lần nộp gần nhất"
-      }
-    }
-  },
-  "prot.HomeworkStudentsDoingResponse": {
-    "type": "object",
-    "properties": {
-      "students": {
-        "type": "array",
-        "items": {
-          "$ref": "#/definitions/prot.HomeworkStudentsDoingItem"
-        }
-      },
-      "total": {
-        "type": "integer",
-        "format": "int64"
-      },
-      "page": {
-        "type": "integer",
-        "format": "int32"
-      },
-      "limit": {
-        "type": "integer",
-        "format": "int32"
-      }
-    }
   }
 }

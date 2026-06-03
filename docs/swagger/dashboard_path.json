@@ -67,8 +67,8 @@
         },
         {
           "in": "query",
-          "name": "object_type",
-          "description": "Lọc loại bài (exam, homework, exercise)",
+          "name": "grading_type",
+          "description": "Lọc chấm bài theo loại id (exam, homework, exercise)",
           "required": false
         },
         {
@@ -188,8 +188,8 @@
         },
         {
           "in": "query",
-          "name": "object_type",
-          "description": "Lọc loại bài (exam, homework, exercise)",
+          "name": "grading_type",
+          "description": "Lọc chấm bài theo loại id (exam, homework, exercise)",
           "required": false
         },
         {

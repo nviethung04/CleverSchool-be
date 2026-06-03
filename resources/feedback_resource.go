@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/utils"
 )
 
 type FeedbackResource interface {
@@ -53,4 +53,3 @@ func (r *FeedbackResourceImpl) FormatFeedbacks(feedbacks []*dto.FeedbackResponse
 	}
 	return result
 }
-

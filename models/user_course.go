@@ -10,5 +10,4 @@ type UserCourse struct {
 	IsCurrent   bool      `json:"is_current"`
 	Course      *Course   `gorm:"foreignKey:CourseId"`
 	MainTeacher bool      `json:"main_teacher"`
-	IsFailed    bool      `json:"is_failed"`
 }

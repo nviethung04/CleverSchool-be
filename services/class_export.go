@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"bytes"
 	"fmt"
 	"time"
@@ -15,8 +15,6 @@ import (
 func (s *classService) Export(c *gin.Context) (string, error) {
 	schoolRepo := repositories.NewSchoolRepository()
 	gradeRepo := repositories.NewGradeRepository()
-	facultyRepo := repositories.NewFacultyRepository()
-	isVtg := config.LoadConfig().IsVtg
 
 	allowedFilters := []string{"status", "school_id"}
 
@@ -25,12 +23,10 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 		return "", err
 	}
 
-	s.repo.SetContext(c)
 	s.repo.SetSearch(keyword, []string{"name", "id"})
 	s.repo.SetFilter(filter)
 	s.repo.SetSort(sort)
 
-	schoolRepo.SetContext(c)
 	schools, err := schoolRepo.GetAll()
 	if err != nil {
 		return "", err
@@ -42,12 +38,6 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 	}
 
 	classes, err := s.repo.GetAll()
-	if err != nil {
-		return "", err
-	}
-
-	facultyRepo.SetContext(c)
-	faculties, err := facultyRepo.GetAll()
 	if err != nil {
 		return "", err
 	}
@@ -119,22 +109,11 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 	classSheet := "Classes"
 	f.SetSheetName("Sheet1", classSheet)
 
-	classHeaders := []string{}
-
-	if isVtg {
-		classHeaders = []string{
-			"ID", "Faculty Id", "Grade Id",
-			"Name", "Max student", "Teacher - Name",
-			"Teacher - Phone", "Teacher - Email", "Status",
-		}
-	} else {
-		classHeaders = []string{
-			"ID", "School Id", "Grade Id",
-			"Name", "Max student", "Teacher - Name",
-			"Teacher - Phone", "Teacher - Email", "Status",
-		}
+	classHeaders := []string{
+		"ID", "School Id", "Grade Id",
+		"Name", "Max student", "Teacher - Name",
+		"Teacher - Phone", "Teacher - Email", "Status",
 	}
-
 	for i, h := range classHeaders {
 		col := string('A' + i)
 		cell := fmt.Sprintf("%s1", col)
@@ -144,13 +123,7 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 	for idx, c := range classes {
 		row := idx + 2
 		f.SetCellValue(classSheet, fmt.Sprintf("A%d", row), c.ID)
-
-		if isVtg {
-			f.SetCellValue(classSheet, fmt.Sprintf("B%d", row), c.FacultyId)
-		} else {
-			f.SetCellValue(classSheet, fmt.Sprintf("B%d", row), c.SchoolId)
-		}
-
+		f.SetCellValue(classSheet, fmt.Sprintf("B%d", row), c.SchoolId)
 		f.SetCellValue(classSheet, fmt.Sprintf("C%d", row), c.GradeId)
 		f.SetCellValue(classSheet, fmt.Sprintf("D%d", row), c.Name)
 		f.SetCellValue(classSheet, fmt.Sprintf("E%d", row), c.MaxStudents)
@@ -172,63 +145,31 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 		}
 	}
 
-	if isVtg {
-		// ===== Sheet: Faculties =====
-		facultySheet := "Faculties"
-		f.NewSheet(facultySheet)
+	// ===== Sheet: Schools =====
+	schoolSheet := "Schools"
+	f.NewSheet(schoolSheet)
 
-		facultyHeaders := []string{"ID", "Name", "Code"}
-		for i, h := range facultyHeaders {
-			col := string('A' + i)
-			cell := fmt.Sprintf("%s1", col)
-			f.SetCellValue(facultySheet, cell, h)
-			f.SetCellStyle(facultySheet, cell, cell, headerStyle)
-		}
-		for idx, faculty := range faculties {
-			row := idx + 2
-			f.SetCellValue(facultySheet, fmt.Sprintf("A%d", row), faculty.ID)
-			f.SetCellValue(facultySheet, fmt.Sprintf("B%d", row), faculty.Name)
-			f.SetCellValue(facultySheet, fmt.Sprintf("C%d", row), faculty.Code)
-		}
+	schoolHeaders := []string{"ID", "Name"}
+	for i, h := range schoolHeaders {
+		col := string('A' + i)
+		cell := fmt.Sprintf("%s1", col)
+		f.SetCellValue(schoolSheet, cell, h)
+		f.SetCellStyle(schoolSheet, cell, cell, headerStyle)
+	}
+	for idx, school := range schools {
+		row := idx + 2
+		f.SetCellValue(schoolSheet, fmt.Sprintf("A%d", row), school.ID)
+		f.SetCellValue(schoolSheet, fmt.Sprintf("B%d", row), school.Name)
+	}
 
-		for idx := range faculties {
-			row := idx + 2
-			for col := 'A'; col <= rune('A'+len(facultyHeaders)-1); col++ {
-				cell := fmt.Sprintf("%c%d", col, row)
-				if idx%2 == 0 {
-					f.SetCellStyle(facultySheet, cell, cell, oddRowStyle)
-				} else {
-					f.SetCellStyle(facultySheet, cell, cell, evenRowStyle)
-				}
-			}
-		}
-	} else {
-		// ===== Sheet: Schools =====
-		schoolSheet := "Schools"
-		f.NewSheet(schoolSheet)
-
-		schoolHeaders := []string{"ID", "Name"}
-		for i, h := range schoolHeaders {
-			col := string('A' + i)
-			cell := fmt.Sprintf("%s1", col)
-			f.SetCellValue(schoolSheet, cell, h)
-			f.SetCellStyle(schoolSheet, cell, cell, headerStyle)
-		}
-		for idx, school := range schools {
-			row := idx + 2
-			f.SetCellValue(schoolSheet, fmt.Sprintf("A%d", row), school.ID)
-			f.SetCellValue(schoolSheet, fmt.Sprintf("B%d", row), school.Name)
-		}
-
-		for idx := range schools {
-			row := idx + 2
-			for col := 'A'; col <= rune('A'+len(schoolHeaders)-1); col++ {
-				cell := fmt.Sprintf("%c%d", col, row)
-				if idx%2 == 0 {
-					f.SetCellStyle(schoolSheet, cell, cell, oddRowStyle)
-				} else {
-					f.SetCellStyle(schoolSheet, cell, cell, evenRowStyle)
-				}
+	for idx := range schools {
+		row := idx + 2
+		for col := 'A'; col <= rune('A'+len(schoolHeaders)-1); col++ {
+			cell := fmt.Sprintf("%c%d", col, row)
+			if idx%2 == 0 {
+				f.SetCellStyle(schoolSheet, cell, cell, oddRowStyle)
+			} else {
+				f.SetCellStyle(schoolSheet, cell, cell, evenRowStyle)
 			}
 		}
 	}
@@ -281,4 +222,3 @@ func (s *classService) Export(c *gin.Context) (string, error) {
 
 	return fileURL, nil
 }
-

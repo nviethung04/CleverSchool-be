@@ -3,73 +3,39 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
-    environment:
-      # When running inside Docker Compose the app must connect to the postgres service by name
-      - DB_MASTER_HOST=postgres
-      # containers talk to postgres on its internal port 5432
-      - DB_MASTER_PORT=5432
-      - DB_MASTER_USER=${DB_MASTER_USER}
-      - DB_MASTER_PASSWORD=${DB_MASTER_PASSWORD}
-      - DB_MASTER_NAME=${DB_MASTER_NAME}
-      # Disable replica lookup in container unless you explicitly provide a real replica host
-      - DB_REPLICA_HOST=
-      - DB_REPLICA_PORT=
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_ENABLED=${REDIS_ENABLED}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - cleverschool-network
+    container_name: lms-app
     ports:
-      - "${APP_PORT:-8080}:8080"
-    restart: unless-stopped
+      - "8080:8080"
 
   postgres:
     image: postgres:15-alpine
+    container_name: lms-postgres
     environment:
-      POSTGRES_DB: ${DB_MASTER_NAME:-clever_school}
-      POSTGRES_USER: ${DB_MASTER_USER:-admin}
-      POSTGRES_PASSWORD: ${DB_MASTER_PASSWORD:-admin123}
-    # map host port (from your .env DB_MASTER_PORT) to container 5432
+      POSTGRES_DB: lms_db
+      POSTGRES_USER: lms_user
+      POSTGRES_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
     ports:
-      - "${DB_MASTER_PORT:-5433}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - cleverschool-network
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_MASTER_USER:-admin} -d ${DB_MASTER_NAME:-clever_school}" ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - lms-network
 
   redis:
     image: redis:7-alpine
-    # If you set REDIS_PASSWORD in .env you can enable auth; by default keep redis open for local testing
-    command: [ "redis-server", "--appendonly", "yes" ]
+    container_name: lms-redis
+    command: redis-server --requirepass 0lJc4VUTFmyV
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
     networks:
-      - cleverschool-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - lms-network
 
 networks:
-  cleverschool-network:
+  lms-network:
     driver: bridge
 
 volumes:

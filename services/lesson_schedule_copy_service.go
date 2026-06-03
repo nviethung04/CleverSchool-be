@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/requests"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/requests"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,4 +47,3 @@ func (s *lessonScheduleCopyService) CopyLessonSchedules(c *gin.Context, req *req
 		CopiedSchedulesCount: result.CopiedSchedulesCount,
 	}, nil
 }
-

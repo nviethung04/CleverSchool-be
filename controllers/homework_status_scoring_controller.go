@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/jobs"
-	"be-cleverschool/utils"
+	"be-lms/jobs"
+	"be-lms/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -29,4 +29,3 @@ func (c *HomeworkStatusScoringController) SyncHomeworkStatusScoring(ctx *gin.Con
 		"timestamp": startTime.Format(time.RFC3339),
 	}, nil, "")
 }
-

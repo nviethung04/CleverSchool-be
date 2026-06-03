@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "google/protobuf/timestamp.proto";
 import "certificate.proto";
@@ -56,26 +56,14 @@ message User {
   string code = 19;
   string created_at = 20;
   string updated_at = 21;
-  string member_type = 22;
-  bool is_independent_student = 23;
-  bool is_failed_subject = 24;
-  int64 total_star = 25;
-  double total_exp = 26;
-  bool is_failed = 27;
 }
 
 message ClassInfo {
   int64 id = 1;
   string name = 2;
-  SchoolInfo school = 3;
 }
 
 message SchoolInfo {
-  int64 id = 1;
-  string name = 2;
-}
-
-message UserProgramInfo {
   int64 id = 1;
   string name = 2;
 }
@@ -84,15 +72,9 @@ message CourseInfo {
   int64 id = 1;
   string name = 2;
   string object_title = 3;
-  UserProgramInfo program = 4;
 }
 
 message SubjectInfo {
-  int64 id = 1;
-  string name = 2;
-}
-
-message FacultyInfo {
   int64 id = 1;
   string name = 2;
 }
@@ -118,9 +100,6 @@ message UserInfo {
   repeated prot.EmployeePosition positions = 9;
   repeated SubjectInfo subjects = 10;
   repeated UserRole roles = 11;
-  FacultyInfo faculty = 12;
-  repeated SchoolInfo schools = 13;
-  repeated ClassInfo classes = 14;
 }
 
 message ListUser {
@@ -164,7 +143,6 @@ message UserRequest  {
   string name = 3;
   bool main_teacher = 4;
   int32 type_teacher = 5;
-  bool is_failed = 6;
 }
 
 message UserCourseRequest {
@@ -203,13 +181,9 @@ message RegisterRequest {
   string email = 2;
   string phone_number = 3;
   int32 role_id = 4;
-  string member_type = 5;
-  string password = 6;
-  string username = 7;
 }
 
 message LogoutResponse {
   bool success = 1;
   string message = 2;
 }
-

@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -65,7 +65,7 @@ func (ctrl *ExamStudentController) GetExamByStudent(c *gin.Context) {
 
 	req.UserID = userID
 
-	resp, err := ctrl.service.GetExamByStudentService(c, req)
+	resp, err := ctrl.service.GetExamByStudentService(req)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -81,4 +81,3 @@ func (ctrl *ExamStudentController) GetExamByStudent(c *gin.Context) {
 	}
 	utils.Respond(c, resp, err, "")
 }
-

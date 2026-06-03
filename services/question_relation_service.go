@@ -1,23 +1,21 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/encoding/protojson"
-	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -35,10 +33,10 @@ func NewQuestionRelationService(repo repositories.QuestionRelationRepository) Qu
 }
 
 func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.CreateQuestionRelationRequest) error {
-	hasOrderData := len(req.QuestionsOrder) > 0 || len(req.SourceQuestionsOrder) > 0
-	emptyScoresAndFlags := len(req.QuestionScores) == 0 && len(req.SourceQuestionScores) == 0 && !req.IsReset && !req.ClearSelfScoringQuestions
+	fmt.Printf("🔍 AssignQuestions called: ExamId=%d, HomeworkId=%d, ContestRoundId=%d, LevelTestId=%d, LessonPlanPartId=%d, ExerciseId=%d, QuestionScores=%v, IsReset=%v\n",
+		req.ExamId, req.HomeworkId, req.ContestRoundId, req.LevelTestId, req.LessonPlanPartId, req.ExerciseId, req.QuestionScores, req.IsReset)
 
-	if emptyScoresAndFlags && !hasOrderData {
+	if len(req.QuestionScores) == 0 && len(req.SourceQuestionScores) == 0 && !req.IsReset && !req.ClearSelfScoringQuestions {
 		// Xóa theo exercise nếu có
 		if req.ExerciseId > 0 {
 			return s.repo.DeleteAllExerciseQuestions(int64(req.ExerciseId), db.MasterDB)
@@ -119,21 +117,27 @@ func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.Crea
 	if req.ResetAll {
 		// If specific assignment ID is provided, only reset that one
 		if req.ContestRoundId > 0 {
+			fmt.Printf("🔍 ResetAll with ContestRoundId=%d\n", req.ContestRoundId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.ContestRoundId), models.ClonedQuestionTypeContestRound, req)
 		}
 		if req.HomeworkId > 0 {
+			fmt.Printf("🔍 ResetAll with HomeworkId=%d\n", req.HomeworkId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.HomeworkId), models.ClonedQuestionTypeHomework, req)
 		}
 		if req.ExamId > 0 {
+			fmt.Printf("🔍 ResetAll with ExamId=%d\n", req.ExamId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.ExamId), models.ClonedQuestionTypeExam, req)
 		}
 		if req.LevelTestId > 0 {
+			fmt.Printf("🔍 ResetAll with LevelTestId=%d\n", req.LevelTestId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.LevelTestId), models.ClonedQuestionTypeLevelTest, req)
 		}
 		if req.LessonPlanPartId > 0 {
+			fmt.Printf("🔍 ResetAll with LessonPlanPartId=%d\n", req.LessonPlanPartId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.LessonPlanPartId), models.ClonedQuestionTypeLessonPlanPart, req)
 		}
 		if req.ExerciseId > 0 {
+			fmt.Printf("🔍 ResetAll with ExerciseId=%d\n", req.ExerciseId)
 			return s.UpdateCloneQuestion(c.Copy(), int64(req.ExerciseId), models.ClonedQuestionTypeExercise, req)
 		}
 
@@ -180,9 +184,10 @@ func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.Crea
 	}
 
 	if err == nil {
-		useOrderMode := len(req.QuestionsOrder) > 0 || len(req.SourceQuestionsOrder) > 0
-		if len(req.QuestionScores) > 0 || len(req.SourceQuestionScores) > 0 || req.IsReset || useOrderMode {
+		if len(req.QuestionScores) > 0 || req.IsReset {
+			fmt.Printf("🔍 Entering main condition: QuestionScores=%v, IsReset=%v\n", req.QuestionScores, req.IsReset)
 			if req.ExamId > 0 {
+				fmt.Printf("🔍 Processing ExamId=%d\n", req.ExamId)
 				if !isAssignedExam || req.IsReset {
 					return s.UpdateCloneQuestion(c.Copy(), int64(req.ExamId), models.ClonedQuestionTypeExam, req)
 				} else {
@@ -190,12 +195,15 @@ func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.Crea
 				}
 			}
 			if req.ExerciseId > 0 {
+				fmt.Printf("🔍 Processing ExerciseId=%d\n", req.ExerciseId)
 				return s.UpdateCloneQuestion(c.Copy(), int64(req.ExerciseId), models.ClonedQuestionTypeExercise, req)
 			}
 			if req.LessonPlanPartId > 0 {
+				fmt.Printf("🔍 Processing LessonPlanPartId=%d\n", req.LessonPlanPartId)
 				return s.UpdateCloneQuestion(c.Copy(), int64(req.LessonPlanPartId), models.ClonedQuestionTypeLessonPlanPart, req)
 			}
 			if req.HomeworkId > 0 {
+				fmt.Printf("🔍 Processing HomeworkId=%d\n", req.HomeworkId)
 				// Skip check assigned by homework
 				if !isAssignedHomework || req.IsReset {
 					return s.UpdateCloneQuestion(c.Copy(), int64(req.HomeworkId), models.ClonedQuestionTypeHomework, req)
@@ -204,11 +212,16 @@ func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.Crea
 				}
 			}
 			if req.LevelTestId > 0 {
+				fmt.Printf("🔍 Processing LevelTestId=%d\n", req.LevelTestId)
 				return s.UpdateCloneQuestion(c.Copy(), int64(req.LevelTestId), models.ClonedQuestionTypeLevelTest, req)
 			}
 			if req.ContestRoundId > 0 {
+				fmt.Printf("🔍 QuestionRelationService: Processing contest_round_id=%d\n", req.ContestRoundId)
 				return s.UpdateCloneQuestion(c.Copy(), int64(req.ContestRoundId), models.ClonedQuestionTypeContestRound, req)
 			}
+			fmt.Printf("🔍 No valid assignment ID found!\n")
+		} else {
+			fmt.Printf("🔍 Skipping main condition: QuestionScores=%v, IsReset=%v\n", req.QuestionScores, req.IsReset)
 		}
 	}
 
@@ -216,15 +229,18 @@ func (s *questionRelationService) AssignQuestions(c *gin.Context, req *prot.Crea
 }
 
 func (s *questionRelationService) UpdateCloneQuestion(c *gin.Context, assignmentId int64, assignmentType string, req *prot.CreateQuestionRelationRequest) error {
+	fmt.Printf("🔍 UpdateCloneQuestion: assignmentId=%d, assignmentType=%s\n", assignmentId, assignmentType)
 	clonedRepo := repositories.NewClonedQuestionRepository()
 	questionRepo := repositories.NewQuestionRepository()
 	questionService := NewQuestionService(questionRepo)
 	clonedData, err := clonedRepo.FindByAssignment(assignmentId, assignmentType)
 	filterKey, _ := questionService.GetKey(assignmentType)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) || clonedData == nil || clonedData.ID == 0 {
+	if errors.Is(err, gorm.ErrRecordNotFound) || clonedData.ID == 0 {
+		fmt.Printf("🔍 CreateOrUpdateCloneQuestion: Creating new (assignmentId=%d, assignmentType=%s)\n", assignmentId, assignmentType)
 		return s.CreateOrUpdateCloneQuestion(c, assignmentId, assignmentType, filterKey, &models.Question{}, req, &models.ClonedQuestion{})
 	} else {
+		fmt.Printf("🔍 CreateOrUpdateCloneQuestion: Updating existing (assignmentId=%d, assignmentType=%s, clonedData.ID=%d)\n", assignmentId, assignmentType, clonedData.ID)
 		return s.CreateOrUpdateCloneQuestion(c, assignmentId, assignmentType, filterKey, &models.Question{}, req, clonedData)
 	}
 }
@@ -237,7 +253,7 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 	questionRepo := repositories.NewQuestionRepository()
 
 	questionIds := make([]int, 0, len(req.QuestionScores))
-	sourceQuestionIds := make([]int, 0, len(req.SourceQuestionScores))
+	fmt.Printf("🔍 CreateOrUpdateCloneQuestion: assignmentId=%d, assignmentType=%s, clonedQuestion.ID=%d, QuestionScores=%v\n", assignmentId, assignmentType, clonedQuestion.ID, req.QuestionScores)
 
 	if clonedQuestion.ID != 0 {
 		if req.IsReset {
@@ -324,13 +340,6 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 				questionIds = append(questionIds, id)
 			}
 		}
-		for idStr := range req.SourceQuestionScores {
-			var id int
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				id = idNew
-			}
-			sourceQuestionIds = append(sourceQuestionIds, id)
-		}
 	} else {
 		for idStr := range req.QuestionScores {
 			var id int
@@ -339,74 +348,21 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 			}
 			questionIds = append(questionIds, id)
 		}
-		for idStr := range req.SourceQuestionScores {
-			var id int
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				id = idNew
-			}
-			sourceQuestionIds = append(sourceQuestionIds, id)
-		}
-	}
-
-	// Also include IDs from questions_order / source_questions_order
-	useOrder := len(req.QuestionsOrder) > 0 || len(req.SourceQuestionsOrder) > 0
-	if useOrder {
-		for idStr := range req.QuestionsOrder {
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				questionIds = append(questionIds, idNew)
-			}
-		}
-		for idStr := range req.SourceQuestionsOrder {
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				sourceQuestionIds = append(sourceQuestionIds, idNew)
-			}
-		}
-	}
-
-	// Build comma-separated list of source question IDs (in the same order as processed)
-	var sortSourceQuestionIds string
-	if len(sourceQuestionIds) > 0 {
-		sourceIdStrs := make([]string, len(sourceQuestionIds))
-		for i, id := range sourceQuestionIds {
-			sourceIdStrs[i] = strconv.Itoa(id)
-		}
-		sortSourceQuestionIds = strings.Join(sourceIdStrs, ",")
 	}
 
 	idStrs := make([]string, len(questionIds))
-	idSet := make(map[string]bool)
 
 	for i, id := range questionIds {
-		idStr := strconv.Itoa(id)
-		idStrs[i] = idStr
-		idSet[idStr] = true
-	}
-
-	if len(sourceQuestionIds) > 0 {
-		sourceIdStrs := make([]string, len(sourceQuestionIds))
-		for i, id := range sourceQuestionIds {
-			sourceIdStrs[i] = strconv.Itoa(id)
-		}
-		questionRepo.SetFilter(map[string]interface{}{
-			"source_question_id": "in:" + strings.Join(sourceIdStrs, ","),
-		})
-		questionBySourceIds, err := questionRepo.GetAll()
-		if err != nil {
-			return err
-		}
-
-		for _, q := range questionBySourceIds {
-			idStr := strconv.Itoa(int(q.ID))
-			if !idSet[idStr] {
-				idStrs = append(idStrs, idStr)
-				idSet[idStr] = true
-			}
-		}
+		idStrs[i] = strconv.Itoa(id)
 	}
 
 	filter := map[string]interface{}{
 		"id": "in:" + strings.Join(idStrs, ","),
 	}
+
+	// Debug log
+	config.Log.Infof("Question IDs to filter: %v", questionIds)
+	config.Log.Infof("Filter: %v", filter)
 
 	questionRepo.SetFilter(filter)
 	questionRepo.SetLimit(len(questionIds)) // Set limit to exact number of questions needed
@@ -420,186 +376,48 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 		"RefAttributes",
 		"RefAttributes.Attribute",
 		"RefAttributes.ParentAttribute",
-		"Source",
 	})
 
-	questions, err := questionRepo.GetAll()
+	questions, _, err := questionRepo.FindAll()
 	if err != nil {
 		return err
 	}
 
-	questionIDMap := make(map[int64]*models.Question)
-	for i := range questions {
-		questionIDMap[questions[i].ID] = &questions[i]
+	// Debug log
+	config.Log.Infof("Found %d questions for IDs %v", len(questions), questionIds)
+	for _, q := range questions {
+		config.Log.Infof("Question ID: %d, Title: %s", q.ID, q.Title)
 	}
 
-	var sortQuestionIds []int64
-	sortQuestionIdsMap := make(map[int64]bool)
+	var questionScores []repositories.QuesstionScore
 
-	if useOrder {
-		// Build source_question_id -> questions (sorted by sort_position)
-		sourceToQuestions := make(map[int64][]*models.Question)
-		for i := range questions {
-			q := questions[i]
-			if q.SourceQuestionId > 0 {
-				sourceToQuestions[q.SourceQuestionId] = append(sourceToQuestions[q.SourceQuestionId], &questions[i])
-			}
+	scoreMap := make(map[int64]float64)
+
+	for qIDStr, score := range req.QuestionScores {
+		var qID int
+		if idNew, err := strconv.Atoi(qIDStr); err == nil {
+			qID = idNew
 		}
-		for id, list := range sourceToQuestions {
-			sort.SliceStable(list, func(i, j int) bool {
-				return list[i].SortPosition < list[j].SortPosition
+		qID64 := int64(qID)
+		if existingScore, exists := scoreMap[qID64]; exists {
+			if existingScore != score {
+				scoreMap[qID64] = score
+			}
+		} else {
+			questionScores = append(questionScores, repositories.QuesstionScore{
+				QuestionID: qID64,
+				Score:      score,
 			})
-			sourceToQuestions[id] = list
 		}
+	}
 
-		type orderItem struct {
-			pos      int32
-			isSource bool
-			id       int64
-		}
-		var items []orderItem
-
-		for idStr, pos := range req.QuestionsOrder {
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				id64 := int64(idNew)
-				if _, ok := questionIDMap[id64]; ok {
-					items = append(items, orderItem{pos: pos, isSource: false, id: id64})
-				}
-			}
-		}
-		for idStr, pos := range req.SourceQuestionsOrder {
-			if idNew, err := strconv.Atoi(idStr); err == nil {
-				items = append(items, orderItem{pos: pos, isSource: true, id: int64(idNew)})
-			}
-		}
-
-		sort.SliceStable(items, func(i, j int) bool {
-			return items[i].pos < items[j].pos
-		})
-
-		for _, it := range items {
-			if !it.isSource {
-				if !sortQuestionIdsMap[it.id] {
-					sortQuestionIds = append(sortQuestionIds, it.id)
-					sortQuestionIdsMap[it.id] = true
-				}
-			} else {
-				if qs, ok := sourceToQuestions[it.id]; ok {
-					for _, q := range qs {
-						if !sortQuestionIdsMap[q.ID] {
-							sortQuestionIds = append(sortQuestionIds, q.ID)
-							sortQuestionIdsMap[q.ID] = true
-						}
-					}
-				}
-			}
-		}
-
-		// Append any remaining questions not mentioned in orders
-		for _, q := range questions {
-			if !sortQuestionIdsMap[q.ID] {
-				sortQuestionIds = append(sortQuestionIds, q.ID)
-				sortQuestionIdsMap[q.ID] = true
-			}
-		}
-	} else {
-		// Legacy sort based on sort_question_ids + scores
-		for _, id := range req.SortQuestionIds {
-			if _, ok := questionIDMap[id]; ok {
-				sortQuestionIds = append(sortQuestionIds, id)
-				sortQuestionIdsMap[id] = true
-			}
-		}
-
-		scoreMap := make(map[int64]float64)
-		isSort := true
-
-		reqSortQuestionIdsMap := make(map[int64]bool)
-		for _, id := range req.SortQuestionIds {
-			reqSortQuestionIdsMap[id] = true
-		}
-
-		for sqIDStr, score := range req.SourceQuestionScores {
-			var sqID int
-			if sidNew, err := strconv.Atoi(sqIDStr); err == nil {
-				sqID = sidNew
-			}
-			sqID64 := int64(sqID)
-
-			for _, q := range questions {
-				if q.SourceQuestionId == sqID64 {
-					if existingScore, exists := scoreMap[q.ID]; exists {
-						if existingScore != score {
-							scoreMap[q.ID] = score
-						}
-					}
-
-					if !sortQuestionIdsMap[q.ID] {
-						if isSort || reqSortQuestionIdsMap[q.ID] {
-							sortQuestionIds = append(sortQuestionIds, q.ID)
-							sortQuestionIdsMap[q.ID] = true
-						}
-					}
-				}
-			}
-		}
-
-		for qIDStr, score := range req.QuestionScores {
-			var qID int
-			if idNew, err := strconv.Atoi(qIDStr); err == nil {
-				qID = idNew
-			}
-			qID64 := int64(qID)
-
-			if !sortQuestionIdsMap[qID64] {
-				if isSort || reqSortQuestionIdsMap[qID64] {
-					sortQuestionIds = append(sortQuestionIds, qID64)
-					sortQuestionIdsMap[qID64] = true
-				}
-			}
-
-			if existingScore, exists := scoreMap[qID64]; exists {
-				if existingScore != score {
-					scoreMap[qID64] = score
-				}
-			}
-		}
-
-		// Apply scores to questions
+	if clonedQuestion.ID == 0 {
 		for i := range questions {
 			if score, ok := scoreMap[questions[i].ID]; ok && score > 0 {
 				questions[i].Point = score
 			}
 		}
-	}
 
-	// Reorder questions slice to match sortQuestionIds before persisting.
-	if len(sortQuestionIds) > 0 && len(questions) > 0 {
-		idToIdx := make(map[int64]int, len(questions))
-		for i := range questions {
-			idToIdx[questions[i].ID] = i
-		}
-
-		ordered := make([]models.Question, 0, len(questions))
-		used := make(map[int64]bool, len(sortQuestionIds))
-		for _, id := range sortQuestionIds {
-			if idx, ok := idToIdx[id]; ok && !used[id] {
-				ordered = append(ordered, questions[idx])
-				used[id] = true
-			}
-		}
-		// Append remaining (safety)
-		for _, q := range questions {
-			if !used[q.ID] {
-				ordered = append(ordered, q)
-				used[q.ID] = true
-			}
-		}
-
-		questions = ordered
-	}
-
-	if clonedQuestion.ID == 0 {
 		var questionPtrs []*models.Question
 		for i := range questions {
 			if questions[i].ID == question.ID {
@@ -616,7 +434,6 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 			formatQuestions[index] = formatted
 		}
 
-		// Marshal questions to JSON
 		marshalOptions := protojson.MarshalOptions{
 			EmitUnpopulated: true,
 			UseProtoNames:   true,
@@ -639,31 +456,10 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 
 		clonedQuestion.Questions = []byte(buf.String())
 
-		// Marshal source_questions (unique per source_question_id, only metadata)
-		sourceQuestionsJSON, err := marshalSourceQuestionsToJSONFromQuestions(formatQuestions)
-		if err != nil {
-			return err
-		}
-
-		// Marshal SortQuestionIds to JSON
-		var sortQuestionIdsJSON datatypes.JSON
-		if len(sortQuestionIds) > 0 {
-			sortQuestionIdsBytes, err := json.Marshal(sortQuestionIds)
-			if err != nil {
-				return err
-			}
-			sortQuestionIdsJSON = datatypes.JSON(sortQuestionIdsBytes)
-		} else {
-			sortQuestionIdsJSON = datatypes.JSON([]byte("[]"))
-		}
-
 		cloned := models.ClonedQuestion{
-			AssignmentID:          assignmentId,
-			AssignmentType:        assignmentType,
-			Questions:             []byte(buf.String()),
-			SortQuestionIds:       sortQuestionIdsJSON,
-			SortSourceQuestionIds: sortSourceQuestionIds,
-			SourceQuestions:       datatypes.JSON(sourceQuestionsJSON),
+			AssignmentID:   assignmentId,
+			AssignmentType: assignmentType,
+			Questions:      []byte(buf.String()),
 		}
 
 		if err := clonedRepo.Create(&cloned); err != nil {
@@ -715,7 +511,6 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 			}
 		}
 
-		// Marshal questions to JSON
 		marshalOptions := protojson.MarshalOptions{
 			EmitUnpopulated: true,
 			UseProtoNames:   true,
@@ -737,28 +532,6 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 		buf.WriteString("]")
 
 		clonedQuestion.Questions = []byte(buf.String())
-
-		// Marshal source_questions (unique per source_question_id, only metadata)
-		sourceQuestionsJSON, err := marshalSourceQuestionsToJSONFromQuestions(list)
-		if err != nil {
-			return err
-		}
-
-		// Marshal SortQuestionIds to JSON
-		if len(sortQuestionIds) > 0 {
-			sortQuestionIdsBytes, err := json.Marshal(sortQuestionIds)
-			if err != nil {
-				return err
-			}
-			clonedQuestion.SortQuestionIds = datatypes.JSON(sortQuestionIdsBytes)
-		} else {
-			clonedQuestion.SortQuestionIds = datatypes.JSON([]byte("[]"))
-		}
-
-		// Update sort_source_question_ids with the latest order from request
-		clonedQuestion.SortSourceQuestionIds = sortSourceQuestionIds
-		clonedQuestion.SourceQuestions = datatypes.JSON(sourceQuestionsJSON)
-
 		clonedRepo.SetContext(c)
 		clonedRepo.Update(clonedQuestion)
 	}
@@ -773,49 +546,3 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 	}
 	return err
 }
-
-// marshalSourceQuestionsToJSONFromQuestions builds a JSON array of unique source questions
-// (one per source_question_id), without including the list of child questions.
-func marshalSourceQuestionsToJSONFromQuestions(questions []*prot.Question) ([]byte, error) {
-	marshalOptions := protojson.MarshalOptions{
-		EmitUnpopulated: true,
-		UseProtoNames:   true,
-	}
-
-	sourceMap := make(map[int64]*prot.SourceQuestion)
-	for _, q := range questions {
-		if q.Source != nil && q.Source.Id > 0 {
-			if _, exists := sourceMap[q.Source.Id]; !exists {
-				srcCopy := *q.Source
-				sourceMap[q.Source.Id] = &srcCopy
-			}
-		}
-	}
-
-	if len(sourceMap) == 0 {
-		return []byte("[]"), nil
-	}
-
-	var srcList []*prot.SourceQuestion
-	for _, src := range sourceMap {
-		srcList = append(srcList, src)
-	}
-
-	var buf strings.Builder
-	buf.WriteString("[")
-	for i, src := range srcList {
-		b, err := marshalOptions.Marshal(src)
-		if err != nil {
-			config.Log.Errorf("marshal source question failed: %v", err)
-			continue
-		}
-		buf.Write(b)
-		if i != len(srcList)-1 {
-			buf.WriteString(",")
-		}
-	}
-	buf.WriteString("]")
-
-	return []byte(buf.String()), nil
-}
-

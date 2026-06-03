@@ -2,10 +2,10 @@
 package main
 
 import (
-	"be-cleverschool/app"
-	"be-cleverschool/command"
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
+	"be-lms/app"
+	"be-lms/command"
+	"be-lms/config"
+	"be-lms/database/db"
 	"embed"
 	"fmt"
 	"log"
@@ -52,23 +52,6 @@ func main() {
 			return
 		case "daily-course-statistics":
 			command.DailyCourseStatisticsCommand()
-			return
-		case "recalculate-total-questions":
-			if len(os.Args) < 3 {
-				log.Fatal("❌ Thiếu type. Dùng: recalculate-total-questions [homework|exam|exercise]")
-			}
-			assignmentType := os.Args[2]
-			if err := command.RunRecalculateTotalQuestionsCommand(assignmentType); err != nil {
-				log.Fatalf("❌ Error: %v", err)
-			}
-			return
-		case "recalculate-homework-users":
-			if err := command.RunRecalculateHomeworkUsersDataCommand(); err != nil {
-				log.Fatalf("❌ Error: %v", err)
-			}
-			return
-		case "sync-class-main":
-			command.SyncClassMainCommand()
 			return
 		}
 	}
@@ -189,4 +172,3 @@ func forceMigration(version int) {
 
 	fmt.Printf("✅ Forced version to %d.\n", version)
 }
-

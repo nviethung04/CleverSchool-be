@@ -1,10 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/table_manager"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/table_manager"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -391,14 +391,16 @@ func (r *historyUseRepository) AverageUsed(start, end time.Time, schoolId, cours
 	query := fmt.Sprintf(`
 		WITH
 		all_logs AS %s,
-		user_minutes AS (
-			SELECT al.user_id, COUNT(*)/15.0 AS total_minutes
+		sessions AS (
+			SELECT al.user_id,
+				FLOOR(EXTRACT(EPOCH FROM al.created_at)/1800) AS session_id,
+				COUNT(*) AS count_logs
 			FROM all_logs al
 			JOIN users u ON u.id = al.user_id
 			%s
 			WHERE al.created_at >= ? AND al.created_at < ?
 			%s
-			GROUP BY al.user_id
+			GROUP BY al.user_id, FLOOR(EXTRACT(EPOCH FROM al.created_at)/1800)
 		),
 		daily AS (
 			SELECT date_trunc('day', al.created_at) AS day,
@@ -422,7 +424,7 @@ func (r *historyUseRepository) AverageUsed(start, end time.Time, schoolId, cours
 		counts AS (
 			SELECT
 				COUNT(DISTINCT al.user_id) AS total,
-				COUNT(DISTINCT CASE WHEN user_log_count.log_count > 150 THEN al.user_id END) AS engaged
+				COUNT(DISTINCT CASE WHEN user_log_count.log_count > 100 THEN al.user_id END) AS engaged
 			FROM all_logs al
 			JOIN (
 				SELECT user_id, COUNT(*) AS log_count
@@ -437,7 +439,7 @@ func (r *historyUseRepository) AverageUsed(start, end time.Time, schoolId, cours
 			%s
 		)
 		SELECT
-			(SELECT AVG(total_minutes)::float FROM user_minutes) AS minutes_per_session,
+			(SELECT AVG(count_logs*1.5)::float FROM sessions) AS minutes_per_session,
 			(SELECT AVG(dau)::float FROM daily) AS daily_active_users,
 			(SELECT COALESCE(SUM(CASE WHEN active_days>1 THEN 1 END),0)::float /
 					NULLIF(COUNT(*),0) FROM user_days) AS returning_rate,
@@ -511,4 +513,3 @@ func (r *historyUseRepository) ActivityIds(start, end time.Time) (models.Activit
 
 	return models.ActivityIds{Ids: ids}, nil
 }
-

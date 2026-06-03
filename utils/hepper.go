@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
+	"be-lms/config"
+	"be-lms/i18n"
 	"bytes"
 	"fmt"
 	"io"
@@ -13,9 +13,6 @@ import (
 	"strings"
 	"time"
 	"unicode"
-
-	"be-cleverschool/prot"
-	"encoding/json"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/text/unicode/norm"
@@ -37,14 +34,6 @@ func Contains(slice []uint64, value uint64) bool {
 		}
 	}
 	return false
-}
-
-func GetCurrentMemberType(c *gin.Context) string {
-	memberType, ok := c.Get("memberType")
-	if !ok {
-		return ""
-	}
-	return memberType.(string)
 }
 
 func GetCurrentUserId(c *gin.Context) int {
@@ -136,11 +125,6 @@ func ParsePaginationParams(c *gin.Context, allowedFilters []string) (map[string]
 	}
 
 	keyword := strings.TrimSpace(c.Query("keyword"))
-	search := strings.TrimSpace(c.Query("search"))
-
-	if search != "" {
-		keyword = search
-	}
 
 	// ✅ Parse sort_*
 	sort := make(map[string]string)
@@ -217,14 +201,12 @@ func GetBody[T proto.Message](c *gin.Context, newFunc func() T) (T, error, strin
 			return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
 		}
 	} else {
-		// Đối với /save-score/bulk, không discard unknown fields để giữ question_id và data
-		isSaveScoreBulk := strings.Contains(c.Request.RequestURI, "/save-score/bulk")
 		unmarshalOpts := protojson.UnmarshalOptions{
-			DiscardUnknown: !isSaveScoreBulk,
+			DiscardUnknown: true,
 		}
 		if err := unmarshalOpts.Unmarshal(body, req); err != nil {
 			// Try to convert legacy SaveScoreBulk format
-			if isSaveScoreBulk {
+			if strings.Contains(c.Request.RequestURI, "/save-score/bulk") {
 				convertedBody, convertErr := ConvertLegacySaveScoreRequest(body)
 				if convertErr == nil {
 					if err := unmarshalOpts.Unmarshal(convertedBody, req); err == nil {
@@ -235,116 +217,6 @@ func GetBody[T proto.Message](c *gin.Context, newFunc func() T) (T, error, strin
 			return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
 		}
 	}
-
-	return req, nil, ""
-}
-
-// GetSaveScoreBulkBody parses JSON request body for /save-score/bulk endpoint
-// This function ensures question_id and data are preserved in each answer
-func GetSaveScoreBulkBody(c *gin.Context) (*prot.SaveScoreBulkRequest, error, string) {
-	req := &prot.SaveScoreBulkRequest{}
-
-	body, err := io.ReadAll(c.Request.Body)
-	if err != nil {
-		return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
-	}
-
-	// Reset body so it can be read again later if needed
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
-
-	contentType := strings.ToLower(strings.TrimSpace(c.GetHeader("Content-Type")))
-	accept := strings.ToLower(strings.TrimSpace(c.GetHeader("Accept")))
-
-	isProto := strings.Contains(contentType, "application/x-protobuf") ||
-		strings.Contains(contentType, "application/protobuf") ||
-		strings.Contains(accept, "application/x-protobuf") ||
-		strings.Contains(accept, "application/protobuf")
-
-	if isProto {
-		// Proto format
-		if err := proto.Unmarshal(body, req); err != nil {
-			return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
-		}
-		return req, nil, ""
-	}
-
-	// JSON format - parse trực tiếp để giữ question_id và data
-	var jsonMap map[string]interface{}
-	if err := json.Unmarshal(body, &jsonMap); err != nil {
-		// Try to convert legacy SaveScoreBulk format
-		convertedBody, convertErr := ConvertLegacySaveScoreRequest(body)
-		if convertErr != nil {
-			return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
-		}
-		if err := json.Unmarshal(convertedBody, &jsonMap); err != nil {
-			return req, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid"
-		}
-	}
-
-	// Map các fields từ JSON vào proto struct
-	if examId, ok := jsonMap["exam_id"].(float64); ok {
-		req.ExamId = int64(examId)
-	}
-	if exerciseId, ok := jsonMap["exercise_id"].(float64); ok {
-		req.ExerciseId = int64(exerciseId)
-	}
-	if levelTestId, ok := jsonMap["level_test_id"].(float64); ok {
-		req.LevelTestId = int64(levelTestId)
-	}
-	if homeworkId, ok := jsonMap["homework_id"].(float64); ok {
-		req.HomeworkId = int64(homeworkId)
-	}
-	if contestRoundId, ok := jsonMap["contest_round_id"].(float64); ok {
-		req.ContestRoundId = int64(contestRoundId)
-	}
-	if lessonId, ok := jsonMap["lesson_id"].(float64); ok {
-		req.LessonId = int64(lessonId)
-	}
-	if timeVal, ok := jsonMap["time"].(float64); ok {
-		req.Time = int64(timeVal)
-	}
-	if userId, ok := jsonMap["user_id"].(float64); ok {
-		req.UserId = int64(userId)
-	}
-
-	// Parse list_answers và giữ lại question_id và data
-	listAnswersInterface, ok := jsonMap["list_answers"]
-	if !ok {
-		return req, fmt.Errorf("missing list_answers in request"), "messages.data_invalid"
-	}
-
-	listAnswers, ok := listAnswersInterface.([]interface{})
-	if !ok {
-		return req, fmt.Errorf("list_answers is not an array"), "messages.data_invalid"
-	}
-
-	// Lưu JSON maps gốc vào context để dùng khi convert
-	answerJSONMaps := make([]map[string]interface{}, 0, len(listAnswers))
-
-	req.ListAnswers = make([]*prot.AnswerRequest, 0, len(listAnswers))
-	for i, answerInterface := range listAnswers {
-		answerMap, ok := answerInterface.(map[string]interface{})
-		if !ok {
-			return req, fmt.Errorf("answer at index %d is not an object", i), "messages.data_invalid"
-		}
-
-		// Lưu JSON map gốc
-		answerJSONMaps = append(answerJSONMaps, answerMap)
-
-		answerReq := &prot.AnswerRequest{}
-
-		// Set type_question
-		if typeQuestion, ok := answerMap["type_question"].(string); ok {
-			answerReq.TypeQuestion = typeQuestion
-		} else {
-			return req, fmt.Errorf("missing type_question in answer at index %d", i), "messages.data_invalid"
-		}
-
-		req.ListAnswers = append(req.ListAnswers, answerReq)
-	}
-
-	// Lưu JSON maps gốc vào context để dùng khi convert
-	c.Set("save_score_bulk_answer_json_maps", answerJSONMaps)
 
 	return req, nil, ""
 }
@@ -736,4 +608,3 @@ func FormatMonthOrQuarter(quarter int32, year int32, locale string) string {
 func PtrInt64(i int64) *int64 {
 	return &i
 }
-

@@ -1,11 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -56,13 +55,11 @@ func (s *weekService) GetByDate(date string) (*models.Week, error) {
 }
 
 func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{}) (map[string]interface{}, error) {
-	var courseIDs, semesterIDs []int64
 	if courseIDStr := c.Query("course_id"); courseIDStr != "" {
 		courseID, err := strconv.ParseInt(courseIDStr, 10, 64)
 		if err != nil {
 			return filter, err
 		}
-		courseIDs = append(courseIDs, courseID)
 		courseRepo := repositories.NewCourseRepository()
 		courseRepo.SetContext(c)
 		course, _ := courseRepo.FindByID(int(courseID))
@@ -70,7 +67,7 @@ func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{})
 		if course.ID != 0 {
 			if !course.StartDate.IsZero() && !course.EndDate.IsZero() {
 				startStr := course.StartDate.Format("2006-01-02")
-				endStr := course.EndDate.Format("2006-01-02")
+				endStr   := course.EndDate.Format("2006-01-02")
 
 				filter["end_date"] = ">=:" + startStr
 				filter["start_date"] = "<:" + endStr
@@ -83,7 +80,6 @@ func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{})
 		if err != nil {
 			return filter, err
 		}
-		semesterIDs = append(semesterIDs, semesterID)
 		semesterRepo := repositories.NewSemesterRepository()
 		semesterRepo.SetContext(c)
 		semester, _ := semesterRepo.FindByID(int(semesterID))
@@ -91,7 +87,7 @@ func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{})
 		if semester.ID != 0 {
 			if !semester.StartDate.IsZero() && !semester.EndDate.IsZero() {
 				startStr := semester.StartDate.Format("2006-01-02")
-				endStr := semester.EndDate.Format("2006-01-02")
+				endStr   := semester.EndDate.Format("2006-01-02")
 
 				filter["end_date"] = ">=:" + startStr
 				filter["start_date"] = "<:" + endStr
@@ -99,21 +95,5 @@ func (s *weekService) ApplyFilter(c *gin.Context, filter map[string]interface{})
 		}
 	}
 
-	if len(courseIDs) > 0 || len(semesterIDs) > 0 {
-		semesterRepository := repositories.NewSemesterRepository()
-		holidayWeeks, err := semesterRepository.GetHolidayWeeks(semesterIDs, courseIDs)
-		if err != nil {
-			return filter, err
-		}
-		if len(holidayWeeks) > 0 {
-			holidayWeekIDs := make([]string, len(holidayWeeks))
-			for i, week := range holidayWeeks {
-				holidayWeekIDs[i] = strconv.FormatInt(week.ID, 10)
-			}
-			filter["weeks.id"] = "not_in:" + strings.Join(holidayWeekIDs, ",")
-		}
-	}
-
 	return filter, nil
 }
-

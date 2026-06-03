@@ -1,8 +1,8 @@
 package redis
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"time"
 )
 
@@ -79,10 +79,6 @@ func (r *userSessionRepository) ListByUserID(userID int) ([]models.UserSession, 
 
 func (r *userSessionRepository) PermanentlyDeleteOldRecords() error {
 	var model models.UserSession
-	if !db.MasterDB.Migrator().HasTable(&model) {
-		return nil
-	}
-
 	return db.MasterDB.
 		Where("expires IS NOT NULL AND expires <= ?", time.Now()).
 		Delete(&model).Error

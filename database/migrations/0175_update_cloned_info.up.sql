@@ -3,7 +3,8 @@ UPDATE courses c
 SET clone_info = c.clone_info || jsonb_build_object('program_id', p.id)
 FROM programs p
 WHERE p.name = c.name
-  AND c.clone_info IS NOT NULL;
+  AND c.clone_info IS NOT NULL
+  AND c.deleted_at IS NULL;
 
 UPDATE courses c
 SET clone_info = jsonb_build_object(
@@ -14,7 +15,8 @@ SET clone_info = jsonb_build_object(
     )
 FROM programs p
 WHERE p.name = c.name
-  AND c.clone_info IS NULL;
+  AND c.clone_info IS NULL
+  AND c.deleted_at IS NULL;
 
 -- Chapter
 UPDATE chapters ch
@@ -23,7 +25,9 @@ SET clone_info = ch.clone_info || jsonb_build_object(
     )
 FROM courses c
 WHERE c.id = ch.course_id
-  AND ch.clone_info IS NOT NULL;
+  AND ch.clone_info IS NOT NULL
+  AND ch.deleted_at IS NULL
+  AND c.deleted_at IS NULL;
 
 UPDATE chapters ch
 SET clone_info = jsonb_build_object(
@@ -34,7 +38,9 @@ SET clone_info = jsonb_build_object(
     )
 FROM courses c
 WHERE c.id = ch.course_id
-  AND ch.clone_info IS NULL;
+  AND ch.clone_info IS NULL
+  AND ch.deleted_at IS NULL
+  AND c.deleted_at IS NULL;
 
 -- Lesson
 UPDATE lessons l
@@ -43,7 +49,9 @@ SET clone_info = l.clone_info || jsonb_build_object(
     )
 FROM chapters ch
 WHERE ch.id = l.chapter_id
-  AND l.clone_info IS NOT NULL;
+  AND l.clone_info IS NOT NULL
+  AND l.deleted_at IS NULL
+  AND ch.deleted_at IS NULL;
 
 UPDATE lessons l
 SET clone_info = jsonb_build_object(
@@ -54,7 +62,9 @@ SET clone_info = jsonb_build_object(
     )
 FROM chapters ch
 WHERE ch.id = l.chapter_id
-  AND l.clone_info IS NULL;
+  AND l.clone_info IS NULL
+  AND l.deleted_at IS NULL
+  AND ch.deleted_at IS NULL;
 
 
 -- LessonPlan
@@ -65,7 +75,9 @@ SET clone_info = lp.clone_info || jsonb_build_object(
 FROM lesson_plan_ref_lessons lprl
 JOIN lessons l ON l.id = lprl.lesson_id
 WHERE lprl.lesson_plan_id = lp.id
-  AND lp.clone_info IS NOT NULL;
+  AND lp.clone_info IS NOT NULL
+  AND lp.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 UPDATE lesson_plans lp
 SET clone_info = jsonb_build_object(
@@ -77,7 +89,9 @@ SET clone_info = jsonb_build_object(
 FROM lesson_plan_ref_lessons lprl
 JOIN lessons l ON l.id = lprl.lesson_id
 WHERE lprl.lesson_plan_id = lp.id
-  AND lp.clone_info IS NULL;
+  AND lp.clone_info IS NULL
+  AND lp.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 -- LessonPlanPart
 UPDATE lesson_plan_parts lpp
@@ -86,7 +100,9 @@ SET clone_info = lpp.clone_info || jsonb_build_object(
     )
 FROM lesson_plans lp
 WHERE lp.id = lpp.lesson_plan_id
-  AND lpp.clone_info IS NOT NULL;
+  AND lpp.clone_info IS NOT NULL
+  AND lpp.deleted_at IS NULL
+  AND lp.deleted_at IS NULL;
 
 UPDATE lesson_plan_parts lpp
 SET clone_info = jsonb_build_object(
@@ -97,7 +113,9 @@ SET clone_info = jsonb_build_object(
     )
 FROM lesson_plans lp
 WHERE lp.id = lpp.lesson_plan_id
-  AND lpp.clone_info IS NULL;
+  AND lpp.clone_info IS NULL
+  AND lpp.deleted_at IS NULL
+  AND lp.deleted_at IS NULL;
 
 -- Exam
 UPDATE exams e
@@ -106,7 +124,9 @@ SET clone_info = e.clone_info || jsonb_build_object(
     )
 FROM lessons l
 WHERE l.id = e.lesson_id
-  AND e.clone_info IS NOT NULL;
+  AND e.clone_info IS NOT NULL
+  AND e.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 UPDATE exams e
 SET clone_info = jsonb_build_object(
@@ -117,7 +137,9 @@ SET clone_info = jsonb_build_object(
     )
 FROM lessons l
 WHERE l.id = e.lesson_id
-  AND e.clone_info IS NULL;
+  AND e.clone_info IS NULL
+  AND e.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 -- Homework
 UPDATE homeworks h
@@ -126,7 +148,9 @@ SET clone_info = h.clone_info || jsonb_build_object(
     )
 FROM lessons l
 WHERE l.id = h.lesson_id
-  AND h.clone_info IS NOT NULL;
+  AND h.clone_info IS NOT NULL
+  AND h.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 UPDATE homeworks h
 SET clone_info = jsonb_build_object(
@@ -137,7 +161,9 @@ SET clone_info = jsonb_build_object(
     )
 FROM lessons l
 WHERE l.id = h.lesson_id
-  AND h.clone_info IS NULL;
+  AND h.clone_info IS NULL
+  AND h.deleted_at IS NULL
+  AND l.deleted_at IS NULL;
 
 -- ClonedQuestion
 -- Cập nhật clone_info cho homework
@@ -151,7 +177,9 @@ SET clone_info = COALESCE(cq.clone_info, '{}'::jsonb) ||
     )
 FROM homeworks h
 WHERE cq.assignment_type = 'homework'
-  AND cq.assignment_id = h.id;
+  AND cq.assignment_id = h.id
+  AND cq.deleted_at IS NULL
+  AND h.deleted_at IS NULL;
 
 -- Cập nhật clone_info cho exam
 UPDATE cloned_questions cq
@@ -164,5 +192,6 @@ SET clone_info = COALESCE(cq.clone_info, '{}'::jsonb) ||
     )
 FROM exams e
 WHERE cq.assignment_type = 'exam'
-  AND cq.assignment_id = e.id;
-
+  AND cq.assignment_id = e.id
+  AND cq.deleted_at IS NULL
+  AND e.deleted_at IS NULL;

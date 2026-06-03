@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
 	"gorm.io/gorm"
 	"time"
 )
@@ -21,8 +21,6 @@ type SaveScoreMultipleChoiceRepository interface {
 	SaveBatchExamQuestionUserMultipleChoice(records []*models.ExamQuestionUser, tx *gorm.DB) error
 	SaveBatchHomeworkQuestionUserMultipleChoice(records []*models.HomeworkQuestionUser, tx *gorm.DB) error
 	SaveBatchExerciseQuestionUserMultipleChoice(records []*models.ExerciseQuestionUser, tx *gorm.DB) error
-	SaveHomeworkUserQuestion(record *models.HomeworkUserQuestion, tx *gorm.DB) error
-	CountHomeworkUserQuestions(homeworkID, userID, questionID, lessonID int64) (int64, error)
 }
 
 type saveScoreMultipleChoiceRepository struct{}
@@ -167,20 +165,3 @@ func (r *saveScoreMultipleChoiceRepository) SaveBatchExerciseQuestionUserMultipl
 	}
 	return tx.Create(&records).Error
 }
-
-func (r *saveScoreMultipleChoiceRepository) SaveHomeworkUserQuestion(record *models.HomeworkUserQuestion, tx *gorm.DB) error {
-	record.CreatedAt = time.Now().UTC()
-	if tx == nil {
-		tx = db.MasterDB
-	}
-	return tx.Create(record).Error
-}
-
-func (r *saveScoreMultipleChoiceRepository) CountHomeworkUserQuestions(homeworkID, userID, questionID, lessonID int64) (int64, error) {
-	var count int64
-	err := db.MasterDB.Table("homework_user_questions").
-		Where("homework_id = ? AND user_id = ? AND question_id = ? AND lesson_id = ?", homeworkID, userID, questionID, lessonID).
-		Count(&count).Error
-	return count, err
-}
-

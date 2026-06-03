@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-lms/dto"
+	"be-lms/prot"
 )
 
 func DashboardSchoolListResource(school dto.DashboardSchool) *prot.DashboardSchoolList {
@@ -25,12 +25,9 @@ func DashboardSchoolListCollection(schools []dto.DashboardSchool) []*prot.Dashbo
 
 func DashboardCourseListResource(course dto.DashboardCourse) *prot.DashboardCourseList {
 	return &prot.DashboardCourseList{
-		Id:             course.ID,
-		Name:           course.Name,
-		ObjectTitle:    course.ObjectTitle,
-		ParentCourseId: course.ParentCourseID,
-		ProgramId:      course.ProgramID,
-		ProgramName:    course.ProgramName,
+		Id:          course.ID,
+		Name:        course.Name,
+		ObjectTitle: course.ObjectTitle,
 	}
 }
 
@@ -131,56 +128,6 @@ func DashboardLessonListCollection(lessons []dto.DashboardLesson) []*prot.Dashbo
 	var result []*prot.DashboardLessonList
 	for _, lesson := range lessons {
 		result = append(result, DashboardLessonListResource(lesson))
-	}
-	return result
-}
-
-func DashboardChapterListResource(chapter dto.DashboardChapter) *prot.DashboardChapterList {
-	return &prot.DashboardChapterList{
-		Id:         chapter.ID,
-		Title:      chapter.Title,
-		CourseId:   chapter.CourseID,
-		CourseName: chapter.CourseName,
-	}
-}
-
-func DashboardChapterListCollection(chapters []dto.DashboardChapter) []*prot.DashboardChapterList {
-	var result []*prot.DashboardChapterList
-	for _, chapter := range chapters {
-		result = append(result, DashboardChapterListResource(chapter))
-	}
-	return result
-}
-
-func DashboardClassListResource(class dto.DashboardClass) *prot.DashboardClassList {
-	return &prot.DashboardClassList{
-		Id:            class.ID,
-		ClassName:     class.ClassName,
-		ClassMainId:   class.ClassMainID,
-		ClassMainName: class.ClassMainName,
-	}
-}
-
-func DashboardClassListCollection(classes []dto.DashboardClass) []*prot.DashboardClassList {
-	var result []*prot.DashboardClassList
-	for _, class := range classes {
-		result = append(result, DashboardClassListResource(class))
-	}
-	return result
-}
-
-func DashboardClassMainListResource(classMain dto.DashboardClassMain) *prot.DashboardClassMainList {
-	return &prot.DashboardClassMainList{
-		Id:       classMain.ID,
-		Name:     classMain.Name,
-		SchoolId: classMain.SchoolID,
-	}
-}
-
-func DashboardClassMainListCollection(classMains []dto.DashboardClassMain) []*prot.DashboardClassMainList {
-	var result []*prot.DashboardClassMainList
-	for _, classMain := range classMains {
-		result = append(result, DashboardClassMainListResource(classMain))
 	}
 	return result
 } 

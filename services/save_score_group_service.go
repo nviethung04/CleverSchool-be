@@ -1,12 +1,12 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -19,19 +19,16 @@ type SaveScoreGroupService interface {
 }
 
 type saveScoreGroupService struct {
-	repo                        repositories.SaveScoreGroupRepository
-	correctRepo                 repositories.SaveCorrectHomeworkRepository
-	clonedQuestionService       ClonedQuestionService
-	homeworkUserQuestionService HomeworkUserQuestionService
+	repo                  repositories.SaveScoreGroupRepository
+	correctRepo           repositories.SaveCorrectHomeworkRepository
+	clonedQuestionService ClonedQuestionService
 }
 
 func NewSaveScoreGroupService(repo repositories.SaveScoreGroupRepository, clonedQuestionService ClonedQuestionService) SaveScoreGroupService {
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
 	return &saveScoreGroupService{
-		repo:                        repo,
-		correctRepo:                 repositories.NewSaveCorrectHomeworkRepository(),
-		clonedQuestionService:       clonedQuestionService,
-		homeworkUserQuestionService: NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService),
+		repo:                  repo,
+		correctRepo:           repositories.NewSaveCorrectHomeworkRepository(),
+		clonedQuestionService: clonedQuestionService,
 	}
 }
 
@@ -137,6 +134,8 @@ func (s *saveScoreGroupService) SaveScoreGroupExam(req *prot.SaveScoreGroupReque
 		score := 0.0
 		if isCorrect {
 			score = perGroupScore
+			correctCount++
+			totalScore += score
 		}
 		records = append(records, &models.ExamQuestionUserGroup{
 			ExamID:     req.ExamId,
@@ -147,6 +146,14 @@ func (s *saveScoreGroupService) SaveScoreGroupExam(req *prot.SaveScoreGroupReque
 			GroupID:    groupID,
 			IsCorrect:  isCorrect,
 			Score:      score,
+		})
+		groupResults = append(groupResults, &prot.GroupPair{
+			AnswerId:      answerID,
+			GroupId:       groupID,
+			AnswerContent: itemIdToText[answerID],
+			GroupContent:  groupIdToName[groupID],
+			IsCorrect:     isCorrect,
+			Score:         score,
 		})
 	}
 	if err := s.repo.SaveBatchExamQuestionUserGroup(records, tx); err != nil {
@@ -272,37 +279,19 @@ func (s *saveScoreGroupService) SaveScoreGroupHomework(req *prot.SaveScoreGroupR
 		})
 	}
 
-	isAllCorrect := correctCount == numGroups
-
-	// Lưu vào homework_user_questions và lấy star, ratioScore, weight, numberTimeSent
-	var star, numberTimeSent int
-	var ratioScore, weight float64
-	if req.HomeworkId != 0 {
-		var err error
-		star, ratioScore, weight, numberTimeSent, err = s.homeworkUserQuestionService.SaveHomeworkUserQuestion(req.HomeworkId, userID, req.QuestionId, req.LessonId, isAllCorrect, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
-
-	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại + thông tin star/ratio_score/weight/number_time_sent
+	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại
 	if !needSave {
 		tx.Commit()
 		return &prot.SaveScoreResponseGroup{
-			QuestionId:      req.QuestionId,
-			TotalScore:      utils.RoundTo2Decimal(totalScore),
-			Groups:          groupResults,
-			IsAllCorrect:    isAllCorrect,
-			Star:            int32(star),
-			RatioScore:      ratioScore,
-			Weight:          weight,
-			NumberTimeSent:  int32(numberTimeSent),
+			QuestionId:   req.QuestionId,
+			TotalScore:   utils.RoundTo2Decimal(totalScore),
+			Groups:       groupResults,
+			IsAllCorrect: correctCount == numGroups,
 		}, nil
 	}
 
 	// Upsert trạng thái hoàn thành nếu đúng hết
-	if isAllCorrect {
+	if correctCount == numGroups {
 		err := s.correctRepo.UpsertHomeworkUserOnCorrect(req.HomeworkId, req.LessonId, userID, req.QuestionId, "group")
 		if err != nil {
 			tx.Rollback()
@@ -316,14 +305,10 @@ func (s *saveScoreGroupService) SaveScoreGroupHomework(req *prot.SaveScoreGroupR
 	tx.Commit()
 
 	return &prot.SaveScoreResponseGroup{
-		QuestionId:      req.QuestionId,
-		TotalScore:      utils.RoundTo2Decimal(totalScore),
-		Groups:          groupResults,
-		IsAllCorrect:    isAllCorrect,
-		Star:            int32(star),
-		RatioScore:      ratioScore,
-		Weight:          weight,
-		NumberTimeSent:  int32(numberTimeSent),
+		QuestionId:   req.QuestionId,
+		TotalScore:   utils.RoundTo2Decimal(totalScore),
+		Groups:       groupResults,
+		IsAllCorrect: correctCount == numGroups,
 	}, nil
 }
 
@@ -400,4 +385,3 @@ func (s *saveScoreGroupService) SaveScoreGroupExercise(req *prot.SaveScoreGroupR
 	}
 	return &prot.SaveScoreResponseGroup{QuestionId: req.QuestionId, TotalScore: utils.RoundTo2Decimal(totalScore), Groups: groupResults, IsAllCorrect: correctCount == numGroups}, nil
 }
-

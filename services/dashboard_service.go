@@ -1,10 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"sync"
+	"be-lms/prot"
+	"be-lms/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,44 +39,30 @@ func (s *dashboardService) DashboardAdmin(c *gin.Context) (*prot.DashboardAdminR
 
 	switch tab {
 	case "overview":
-		var (
-			userRegister    *prot.DashboardAdminItem
-			studentRegister *prot.DashboardAdminItem
-			teacherRegister *prot.DashboardAdminItem
-			activity        *prot.DashboardAdminItem
-			school          *prot.DashboardAdminItem
-			userOnline      *prot.DashboardAdminItem
-			courseOverview  *prot.CourseOverview
-		)
-		wg := &sync.WaitGroup{}
-		wg.Add(7)
-		go func() { defer wg.Done(); userRegister = s.cache.GetCachedUserRegister(c) }()
-		go func() { defer wg.Done(); studentRegister = s.cache.GetCachedStudentRegister(c) }()
-		go func() { defer wg.Done(); teacherRegister = s.cache.GetCachedTeacherRegister(c) }()
-		go func() { defer wg.Done(); activity = s.cache.GetCachedActivity(c) }()
-		go func() { defer wg.Done(); school = s.cache.GetCachedSchool(c) }()
-		go func() { defer wg.Done(); userOnline = s.cache.GetCachedUserOnline(c) }()
-		go func() { defer wg.Done(); courseOverview = s.cache.GetCachedCourseOverview(c) }()
-		wg.Wait()
+		userRegister := s.cache.GetCachedUserRegister(c)
+		studentRegister := s.cache.GetCachedStudentRegister(c)
+		teacherRegister := s.cache.GetCachedTeacherRegister(c)
+		activity := s.cache.GetCachedActivity(c)
+		school := s.cache.GetCachedSchool(c)
+		courseOverview := s.cache.GetCachedCourseOverview(c)
 
 		return &prot.DashboardAdminResponse{
 			UserOverview: &prot.UserOverview{
-				User:       userRegister,
-				Student:    studentRegister,
-				Teacher:    teacherRegister,
-				Activity:   activity,
-				School:     school,
-				UserOnline: userOnline,
+				User:     userRegister,
+				Student:  studentRegister,
+				Teacher:  teacherRegister,
+				Activity: activity,
+				School:   school,
 			},
-			CourseOverview: courseOverview,
+			CourseOverview:             courseOverview,
 		}, nil
 	case "quality":
-		learningOverview := s.cache.GetCachedLearningOverview(c)
+		learningOverview  := s.cache.GetCachedLearningOverview(c)
 		scoreDistribution := s.cache.GetCachedScoreDistribution(c)
 
 		return &prot.DashboardAdminResponse{
-			OverviewLearning:          learningOverview,
-			ScoreDistributionOverview: scoreDistribution,
+			OverviewLearning:           learningOverview,
+			ScoreDistributionOverview:  scoreDistribution,
 		}, nil
 	case "behavior":
 		systemUsage := s.cache.GetCachedSystemUsage(c)
@@ -93,53 +77,35 @@ func (s *dashboardService) DashboardAdmin(c *gin.Context) (*prot.DashboardAdminR
 	case "question":
 		questionBank := s.cache.GetCachedQuestionBank(c)
 		return &prot.DashboardAdminResponse{
-			QuestionBankOverview: questionBank,
+			QuestionBankOverview:       questionBank,
 		}, nil
 	case "warning":
 		riskWarning := s.cache.GetCachedRiskWarning(c)
 		return &prot.DashboardAdminResponse{
-			RiskAndWarning: riskWarning,
+			RiskAndWarning:             riskWarning,
 		}, nil
 	default:
-		var (
-			userOverview       *prot.UserOverview
-			userOverviewErr    error
-			courseOverview     *prot.CourseOverview
-			learningOverview   *prot.OverviewLearning
-			scoreDistribution  *prot.ScoreDistributionOverview
-			systemUsage        *prot.SystemUsageOverview
-			teacherPerformance *prot.TeacherPerformanceOverview
-			questionBank       *prot.QuestionBankOverview
-			riskWarning        *prot.RiskAndWarning
-		)
-		wg := &sync.WaitGroup{}
-		wg.Add(8)
-		go func() { defer wg.Done(); userOverview, userOverviewErr = s.cache.GetCachedUserOverview(c) }()
-		go func() { defer wg.Done(); courseOverview = s.cache.GetCachedCourseOverview(c) }()
-		go func() { defer wg.Done(); learningOverview = s.cache.GetCachedLearningOverview(c) }()
-		go func() { defer wg.Done(); scoreDistribution = s.cache.GetCachedScoreDistribution(c) }()
-		go func() { defer wg.Done(); systemUsage = s.cache.GetCachedSystemUsage(c) }()
-		go func() { defer wg.Done(); teacherPerformance = s.cache.GetCachedTeacherPerformance(c) }()
-		go func() { defer wg.Done(); questionBank = s.cache.GetCachedQuestionBank(c) }()
-		go func() { defer wg.Done(); riskWarning = s.cache.GetCachedRiskWarning(c) }()
-		wg.Wait()
-
-		if userOverviewErr != nil {
-			config.Log.Error("GetCachedUserOverview error: ", userOverviewErr)
-		}
-		if userOverview != nil {
-			config.Log.Info("UserOverview created successfully")
-			if userOverview.UserOnline != nil {
-				config.Log.Info("UserOnline data: ", userOverview.UserOnline)
-			} else {
-				config.Log.Warn("UserOnline is nil")
-			}
-		} else {
-			config.Log.Warn("UserOverview is nil")
-		}
+		userRegister := s.cache.GetCachedUserRegister(c)
+		studentRegister := s.cache.GetCachedStudentRegister(c)
+		teacherRegister := s.cache.GetCachedTeacherRegister(c)
+		activity := s.cache.GetCachedActivity(c)
+		school := s.cache.GetCachedSchool(c)
+		courseOverview := s.cache.GetCachedCourseOverview(c)
+		learningOverview  := s.cache.GetCachedLearningOverview(c)
+		scoreDistribution := s.cache.GetCachedScoreDistribution(c)
+		systemUsage := s.cache.GetCachedSystemUsage(c)
+		teacherPerformance := s.cache.GetCachedTeacherPerformance(c)
+		questionBank := s.cache.GetCachedQuestionBank(c)
+		riskWarning := s.cache.GetCachedRiskWarning(c)
 
 		return &prot.DashboardAdminResponse{
-			UserOverview:               userOverview,
+			UserOverview: &prot.UserOverview{
+				User:     userRegister,
+				Student:  studentRegister,
+				Teacher:  teacherRegister,
+				Activity: activity,
+				School:   school,
+			},
 			CourseOverview:             courseOverview,
 			OverviewLearning:           learningOverview,
 			ScoreDistributionOverview:  scoreDistribution,
@@ -150,4 +116,3 @@ func (s *dashboardService) DashboardAdmin(c *gin.Context) (*prot.DashboardAdminR
 		}, nil
 	}
 }
-

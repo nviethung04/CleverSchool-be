@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/services"
+	"be-lms/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -91,4 +91,3 @@ func (crc *ContestResultController) GetContestRoundLeaderboard(c *gin.Context) {
 
 	utils.Respond(c, leaderboard, nil, "")
 }
-

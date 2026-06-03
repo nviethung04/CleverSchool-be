@@ -1,20 +1,16 @@
 package routes
 
 import (
-	"be-cleverschool/controllers"
-	"be-cleverschool/middleware"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"time"
+	"be-lms/controllers"
+	"be-lms/middleware"
+	"be-lms/repositories"
+	"be-lms/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RouteDashboard(router *gin.Engine) {
 	api := router.Group("/api")
-
-	api.Use(middleware.TimeoutWithSkip(60*time.Second, []string{}))
-
 	authRepo := repositories.NewAuthRepository()
 
 	dashboardRepository := repositories.NewDashboardRepository()
@@ -49,8 +45,5 @@ func RouteDashboard(router *gin.Engine) {
 	dashboardCoursesProtoService := services.NewDashboardCoursesProtoService(dashboardCoursesRepository)
 	dashboardCoursesProtoController := controllers.NewDashboardCoursesProtoController(dashboardCoursesProtoService)
 	api.GET("/dashboard/report/courses", middleware.AuthMiddleware(authRepo), dashboardCoursesProtoController.GetDashboardCoursesProto)
-	api.GET("/dashboard/report/courses/students", middleware.AuthMiddleware(authRepo), dashboardCoursesProtoController.GetCourseStudentsProto)
-	api.GET("/dashboard/report/courses/homeworks", middleware.AuthMiddleware(authRepo), dashboardCoursesProtoController.GetCourseHomeworksProto)
 
 }
-

@@ -1,12 +1,12 @@
 package services
 
 import (
-	_ "be-cleverschool/dto"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	_ "be-lms/dto"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,9 +19,6 @@ type DashboardListEntityService interface {
 	GetExams(c *gin.Context, req *requests.DashboardExamListRequest) (*prot.DashboardExamListResponse, error)
 	GetHomeworks(c *gin.Context, req *requests.DashboardHomeworkListRequest) (*prot.DashboardHomeworkListResponse, error)
 	GetLessons(c *gin.Context, req *requests.DashboardLessonListRequest) (*prot.DashboardLessonListResponse, error)
-	GetChapters(c *gin.Context, req *requests.DashboardChapterListRequest) (*prot.DashboardChapterListResponse, error)
-	GetClasses(c *gin.Context, req *requests.DashboardClassListRequest) (*prot.DashboardClassListResponse, error)
-	GetClassMains(c *gin.Context, req *requests.DashboardClassMainListRequest) (*prot.DashboardClassMainListResponse, error)
 }
 
 type dashboardListEntityService struct {
@@ -35,15 +32,7 @@ func NewDashboardListEntityService() DashboardListEntityService {
 }
 
 func (s *dashboardListEntityService) GetSchools(c *gin.Context, req *requests.DashboardSchoolListRequest) (*prot.DashboardSchoolListResponse, error) {
-	roleID := utils.GetCurrentRoleId(c)
-	userID := utils.GetCurrentUserId(c)
-
-	onlyUserSchools := false
-	if roleID == 2 && userID > 0 {
-		onlyUserSchools = true
-	}
-
-	schools, totalCount, err := s.repo.GetSchools(c, int64(userID), onlyUserSchools, req)
+	schools, totalCount, err := s.repo.GetSchools(c, req)
 	if err != nil {
 		return nil, err
 	}
@@ -157,40 +146,3 @@ func (s *dashboardListEntityService) GetLessons(c *gin.Context, req *requests.Da
 		Total:   totalCount,
 	}, nil
 }
-
-func (s *dashboardListEntityService) GetChapters(c *gin.Context, req *requests.DashboardChapterListRequest) (*prot.DashboardChapterListResponse, error) {
-	chapters, totalCount, err := s.repo.GetChapters(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &prot.DashboardChapterListResponse{
-		Chapters: resources.DashboardChapterListCollection(chapters),
-		Total:    totalCount,
-	}, nil
-}
-
-func (s *dashboardListEntityService) GetClasses(c *gin.Context, req *requests.DashboardClassListRequest) (*prot.DashboardClassListResponse, error) {
-	classes, totalCount, err := s.repo.GetClasses(c, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &prot.DashboardClassListResponse{
-		Classes: resources.DashboardClassListCollection(classes),
-		Total:   totalCount,
-	}, nil
-}
-
-func (s *dashboardListEntityService) GetClassMains(c *gin.Context, req *requests.DashboardClassMainListRequest) (*prot.DashboardClassMainListResponse, error) {
-	classMains, totalCount, err := s.repo.GetClassMains(c, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &prot.DashboardClassMainListResponse{
-		ClassMains: resources.DashboardClassMainListCollection(classMains),
-		Total:      totalCount,
-	}, nil
-}
-

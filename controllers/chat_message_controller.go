@@ -1,18 +1,16 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"mime/multipart"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -20,23 +18,19 @@ import (
 )
 
 type ChatMessageController struct {
-	service      services.ChatMessageService
-	mediaRepo    repositories.MediaRepository
-	mediaService services.MediaService
+	service services.ChatMessageService
 }
 
 func NewChatMessageController(service services.ChatMessageService) *ChatMessageController {
-	mediaRepo := repositories.NewMediaRepository()
-	mediaService := services.NewMediaService(mediaRepo)
 	return &ChatMessageController{
-		service:      service,
-		mediaRepo:    mediaRepo,
-		mediaService: mediaService,
+		service: service,
 	}
 }
 
+// GetMessages handles GET /courses/:id/chat/messages
 func (c *ChatMessageController) GetMessages(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
@@ -57,7 +51,7 @@ func (c *ChatMessageController) GetMessages(ctx *gin.Context) {
 		}
 	}
 
-	response, err := c.service.GetMessages(ctx, uint64(courseId), page, limit)
+	response, err := c.service.GetMessages(ctx.Request.Context(), courseId, page, limit)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -77,16 +71,35 @@ func (c *ChatMessageController) GetMessages(ctx *gin.Context) {
 	}, nil, "")
 }
 
+// DeleteMessage handles DELETE /courses/:id/chat/messages/:messageId
 func (c *ChatMessageController) DeleteMessage(ctx *gin.Context) {
-	messageId, err := strconv.Atoi(ctx.Param("messageId"))
+	messageIdStr := ctx.Param("messageId")
+	messageId, err := strconv.ParseUint(messageIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	userId := utils.GetCurrentUserId(ctx)
+	userIdInterface, exists := ctx.Get("userID")
+	if !exists {
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.unauthorized")), "messages.unauthorized")
+		return
+	}
 
-	err = c.service.DeleteMessage(ctx, uint64(messageId), uint64(userId))
+	var userId uint64
+	switch v := userIdInterface.(type) {
+	case int:
+		userId = uint64(v)
+	case uint64:
+		userId = v
+	case int64:
+		userId = uint64(v)
+	default:
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
+	}
+
+	err = c.service.DeleteMessage(ctx.Request.Context(), messageId, userId)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -98,16 +111,35 @@ func (c *ChatMessageController) DeleteMessage(ctx *gin.Context) {
 	}, nil, "")
 }
 
+// TogglePinMessage handles POST /courses/:id/chat/messages/:messageId/pin
 func (c *ChatMessageController) TogglePinMessage(ctx *gin.Context) {
-	messageId, err := strconv.Atoi(ctx.Param("messageId"))
+	messageIdStr := ctx.Param("messageId")
+	messageId, err := strconv.ParseUint(messageIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	userId := utils.GetCurrentUserId(ctx)
+	userIdInterface, exists := ctx.Get("userID")
+	if !exists {
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.unauthorized")), "messages.unauthorized")
+		return
+	}
 
-	err = c.service.TogglePinMessage(ctx, uint64(messageId), uint64(userId))
+	var userId uint64
+	switch v := userIdInterface.(type) {
+	case int:
+		userId = uint64(v)
+	case uint64:
+		userId = v
+	case int64:
+		userId = uint64(v)
+	default:
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
+	}
+
+	err = c.service.TogglePinMessage(ctx.Request.Context(), messageId, userId)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -119,14 +151,16 @@ func (c *ChatMessageController) TogglePinMessage(ctx *gin.Context) {
 	}, nil, "")
 }
 
+// GetPinnedMessages handles GET /courses/:id/chat/messages/pinned
 func (c *ChatMessageController) GetPinnedMessages(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	response, err := c.service.GetPinnedMessages(ctx, uint64(courseId))
+	response, err := c.service.GetPinnedMessages(ctx.Request.Context(), courseId)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -137,18 +171,20 @@ func (c *ChatMessageController) GetPinnedMessages(ctx *gin.Context) {
 
 	utils.Respond(ctx, &prot.PinnedMessagesResponse{
 		PinnedMessages: responseFormatted,
-		Count:          int32(len(responseFormatted)),
+		Count: int32(len(responseFormatted)),
 	}, nil, "")
 }
 
+// GetMessageCount handles GET /courses/:id/chat/messages/count
 func (c *ChatMessageController) GetMessageCount(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	count, err := c.service.CountMessages(ctx, uint64(courseId))
+	count, err := c.service.CountMessages(ctx.Request.Context(), courseId)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -159,8 +195,10 @@ func (c *ChatMessageController) GetMessageCount(ctx *gin.Context) {
 	}, nil, "")
 }
 
+// GetRecentMessages handles GET /courses/:id/chat/messages/recent
 func (c *ChatMessageController) GetRecentMessages(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
@@ -173,7 +211,7 @@ func (c *ChatMessageController) GetRecentMessages(ctx *gin.Context) {
 		}
 	}
 
-	response, err := c.service.GetRecentMessages(ctx, uint64(courseId), limit)
+	response, err := c.service.GetRecentMessages(ctx.Request.Context(), courseId, limit)
 	if err != nil {
 		utils.Respond(ctx, nil, err, "")
 		return
@@ -184,123 +222,35 @@ func (c *ChatMessageController) GetRecentMessages(ctx *gin.Context) {
 
 	utils.Respond(ctx, &prot.RecentMessagesResponse{
 		RecentMessages: responseFormatted,
-		Count:          int32(len(responseFormatted)),
+		Count: int32(len(responseFormatted)),
 	}, nil, "")
 }
 
-func (c *ChatMessageController) SendMessageWithMedias(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
-		return
-	}
-
-	userId := utils.GetCurrentUserId(ctx)
-
-	// Check if request has files (multipart form) or JSON
-	contentType := ctx.GetHeader("Content-Type")
-	isMultipart := strings.Contains(contentType, "multipart/form-data")
-
-	var req dto.SendChatMessageRequest
-	var uploadedMediaIDs []int64
-
-	if isMultipart {
-		// Handle multipart form with files
-		req.Content = ctx.PostForm("content")
-		
-		// Get files from form
-		form, err := ctx.MultipartForm()
-		if err != nil {
-			config.Log.Errorf("Failed to parse multipart form: %v", err)
-			utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
-			return
-		}
-
-		files := form.File["files"]
-		if len(files) == 0 {
-			files = form.File["file"] // Fallback to "file" field name
-		}
-
-		// Upload files and get media IDs
-		if len(files) > 0 {
-			uploadedMediaIDs, err = c.uploadChatFiles(ctx, files)
-			if err != nil {
-				config.Log.Errorf("Failed to upload chat files: %v", err)
-				utils.Respond(ctx, nil, fmt.Errorf("failed to upload files: %w", err), "")
-				return
-			}
-		}
-
-		// Get media_ids from form if provided (for already uploaded files)
-		if mediaIDsStr := ctx.PostForm("media_ids"); mediaIDsStr != "" {
-			// Parse comma-separated media IDs
-			parts := strings.Split(mediaIDsStr, ",")
-			for _, part := range parts {
-				part = strings.TrimSpace(part)
-				if part != "" {
-					if id, err := strconv.ParseInt(part, 10, 64); err == nil {
-						uploadedMediaIDs = append(uploadedMediaIDs, id)
-					}
-				}
-			}
-		}
-
-		req.MediaIDs = uploadedMediaIDs
-	} else {
-		// Handle JSON request
-		if err := ctx.ShouldBindJSON(&req); err != nil {
-			config.Log.Errorf("Failed to bind JSON in SendMessageWithMedias: %v", err)
-			utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
-			return
-		}
-	}
-
-	// Validate request
-	if len(req.Content) == 0 && len(req.MediaIDs) == 0 {
-		config.Log.Warnf("Empty message request from user %d in course %d", userId, courseId)
-		utils.Respond(ctx, nil, errors.New("message must have either content or media attachments"), "")
-		return
-	}
-
-	result, err := c.service.SendMessageWithMedias(ctx, uint64(courseId), uint64(userId), req)
-	if err != nil {
-		config.Log.Errorf("Error in SendMessageWithMedias: %v (courseId: %d, userId: %d, mediaIDs: %v)", err, courseId, userId, req.MediaIDs)
-		utils.Respond(ctx, nil, err, "")
-		return
-	}
-
-	resource := resources.NewChatResource()
-	responseFormatted := resource.FormatChat(result)
-
-	utils.Respond(ctx, responseFormatted, nil, "")
-}
-
-func (c *ChatMessageController) SendToRecipientMessage(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
-		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
-		return
-	}
-
-	recipientId, err := strconv.Atoi(ctx.Param("recipientId"))
-	if err != nil {
-		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
-		return
-	}
-
-	senderId := utils.GetCurrentUserId(ctx)
-
+// handleTextMessage xử lý tin nhắn text thông thường
+func (c *ChatMessageController) handleTextMessage(ctx *gin.Context, courseId, userId uint64) {
 	var req dto.SendChatMessageRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("DEBUG: Lỗi bind JSON: %v\n", err)
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	result, err := c.service.SendToRecipient(ctx, uint64(courseId), uint64(senderId), uint64(recipientId), req)
+	fmt.Printf("DEBUG: Request data - Content: %s\n", req.Content)
+
+	// Validate content for text messages
+	if len(strings.TrimSpace(req.Content)) == 0 {
+		utils.Respond(ctx, nil, errors.New("Text message content cannot be empty"), "Text message content cannot be empty")
+		return
+	}
+
+	result, err := c.service.SendMessage(ctx.Request.Context(), courseId, userId, req)
 	if err != nil {
+		fmt.Printf("DEBUG: Lỗi service.SendMessage: %v\n", err)
 		utils.Respond(ctx, nil, err, "")
 		return
 	}
+
+	fmt.Printf("DEBUG: Gửi tin nhắn thành công với ID: %d\n", result.ID)
 
 	resource := resources.NewChatResource()
 	responseFormatted := resource.FormatChat(result)
@@ -308,191 +258,248 @@ func (c *ChatMessageController) SendToRecipientMessage(ctx *gin.Context) {
 	utils.Respond(ctx, responseFormatted, nil, "")
 }
 
-func (c *ChatMessageController) GetFromRecipientMessage(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
-	if err != nil {
+// handleFileUpload xử lý upload file kèm tin nhắn
+func (c *ChatMessageController) handleFileUpload(ctx *gin.Context, courseId, userId uint64) {
+	fmt.Printf("=== DEBUG: handleFileUpload START ===\n")
+	fmt.Printf("DEBUG: courseId: %d, userId: %d\n", courseId, userId)
+
+	var req dto.SendChatMessageWithFilesRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		fmt.Printf("DEBUG: Lỗi bind form: %v\n", err)
+		fmt.Printf("DEBUG: Error type: %T\n", err)
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	recipientId, err := strconv.Atoi(ctx.Param("recipientId"))
+	fmt.Printf("DEBUG: File upload request - Content: '%s'\n", req.Content)
+
+	// Get uploaded files
+	form, err := ctx.MultipartForm()
 	if err != nil {
+		fmt.Printf("DEBUG: Lỗi get multipart form: %v\n", err)
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	senderId := utils.GetCurrentUserId(ctx)
+	fmt.Printf("DEBUG: Multipart form keys: %+v\n", func() []string {
+		keys := make([]string, 0, len(form.File))
+		for k := range form.File {
+			keys = append(keys, k)
+		}
+		return keys
+	}())
 
-	page := 1
-	limit := 20
+	files := form.File["files"]
+	fmt.Printf("DEBUG: Số file với key 'files': %d\n", len(files))
 
-	if pageStr := ctx.Query("page"); pageStr != "" {
-		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
-			page = p
+	if len(files) == 0 {
+		fmt.Printf("DEBUG: Không tìm thấy files với key 'files', checking all keys\n")
+		for key, fileHeaders := range form.File {
+			fmt.Printf("DEBUG: Key '%s' có %d files\n", key, len(fileHeaders))
+		}
+		utils.Respond(ctx, nil, errors.New("No files uploaded"), "No files uploaded")
+		return
+	}
+
+	fmt.Printf("DEBUG: Số file upload: %d\n", len(files))
+
+	// Validate files
+	for i, file := range files {
+		fmt.Printf("DEBUG: File %d: name='%s', size=%d\n", i, file.Filename, file.Size)
+		if err := c.validateUploadedFile(file); err != nil {
+			fmt.Printf("DEBUG: File validation failed: %v\n", err)
+			utils.Respond(ctx, nil, err, "")
+			return
 		}
 	}
 
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 100 {
-			limit = l
-		}
+	// Convert to SendChatMessageRequest
+	sendReq := dto.SendChatMessageRequest{
+		Content: req.Content,
 	}
 
-	response, err := c.service.GetMessagesWithRecipient(ctx, uint64(courseId), uint64(senderId), uint64(recipientId), page, limit)
+	fmt.Printf("DEBUG: Calling service.SendMessageWithFiles\n")
+	// Call service with files
+	result, err := c.service.SendMessageWithFiles(ctx.Request.Context(), courseId, userId, sendReq, files)
 	if err != nil {
+		fmt.Printf("DEBUG: Lỗi service.SendMessageWithFiles: %v\n", err)
 		utils.Respond(ctx, nil, err, "")
 		return
 	}
+
+	fmt.Printf("DEBUG: Gửi tin nhắn với file thành công với ID: %d\n", result.ID)
+
 
 	resource := resources.NewChatResource()
-	chatMessages := resource.FormatChats(response.Messages)
+	responseFormatted := resource.FormatChat(result)
 
-	utils.Respond(ctx, &prot.ChatMessagesListResponse{
-		Messages: chatMessages,
-		Pagination: &prot.PaginationResponse{
-			Page:    int32(response.Pagination.Page),
-			Limit:   int32(response.Pagination.Limit),
-			Total:   int32(response.Pagination.Total),
-			HasMore: response.Pagination.HasMore,
-		},
-	}, nil, "")
+	utils.Respond(ctx, responseFormatted, nil, "")
+
+	fmt.Printf("=== DEBUG: handleFileUpload END ===\n")
 }
 
-func (c *ChatMessageController) GetRecentSenders(ctx *gin.Context) {
-	courseId, err := strconv.Atoi(ctx.Param("id"))
+// validateUploadedFile kiểm tra file upload
+func (c *ChatMessageController) validateUploadedFile(file *multipart.FileHeader) error {
+	// Check file size (max 50MB)
+	maxSize := int64(50 * 1024 * 1024) // 50MB
+	if file.Size > maxSize {
+		return errors.New("File size too large (max 50MB)")
+	}
+
+	// Check file extension
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	allowedExts := map[string]bool{
+		// Images
+		".jpg": true, ".jpeg": true, ".png": true, ".gif": true, ".webp": true, ".svg": true,
+		// Videos
+		".mp4": true, ".avi": true, ".mov": true, ".wmv": true, ".flv": true, ".webm": true, ".mkv": true,
+		// Audio
+		".mp3": true, ".wav": true, ".flac": true, ".aac": true, ".ogg": true, ".m4a": true,
+		// Documents
+		".pdf": true, ".doc": true, ".docx": true, ".xls": true, ".xlsx": true, ".ppt": true, ".pptx": true,
+		".txt": true, ".rtf": true, ".zip": true, ".rar": true, ".7z": true,
+	}
+
+	if !allowedExts[ext] {
+		return fmt.Errorf("File type %s not allowed", ext)
+	}
+
+	return nil
+}
+
+// SendMessageWithMedias handles POST /courses/:id/chat/messages/send-message-with-medias
+func (c *ChatMessageController) SendMessageWithMedias(ctx *gin.Context) {
+	fmt.Printf("=== DEBUG: SendMessageWithMedias START ===\n")
+
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
 	if err != nil {
 		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
 		return
 	}
 
-	currentUserId := utils.GetCurrentUserId(ctx)
-
-	limit := 20
-	if limitStr := ctx.Query("limit"); limitStr != "" {
-		if l, err := strconv.Atoi(limitStr); err == nil && l > 0 && l <= 50 {
-			limit = l
-		}
+	// Get user ID from context
+	userIdInterface, exists := ctx.Get("userID")
+	if !exists {
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.unauthorized")), "messages.unauthorized")
+		return
 	}
 
-	response, err := c.service.GetRecentSenders(ctx, uint64(courseId), uint64(currentUserId), limit)
+	var userId uint64
+	switch v := userIdInterface.(type) {
+	case int:
+		userId = uint64(v)
+	case uint64:
+		userId = v
+	case int64:
+		userId = uint64(v)
+	default:
+		fmt.Printf("DEBUG: userID có type không hỗ trợ: %T, value: %+v\n", userIdInterface, userIdInterface)
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
+	}
+
+	// Parse request body
+	var req dto.SendChatMessageRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("DEBUG: Lỗi bind JSON: %v\n", err)
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
+	}
+
+	fmt.Printf("DEBUG: SendMessageWithMedias - courseId: %d, userId: %d, content: %s, media_ids: %v\n",
+		courseId, userId, req.Content, req.MediaIDs)
+
+	// Call service
+	result, err := c.service.SendMessageWithMedias(ctx.Request.Context(), courseId, userId, req)
 	if err != nil {
+		fmt.Printf("DEBUG: Lỗi service.SendMessageWithMedias: %v\n", err)
 		utils.Respond(ctx, nil, err, "")
 		return
 	}
 
-	utils.Respond(ctx, map[string]interface{}{
-		"senders": response,
-		"count":   len(response),
-	}, nil, "")
+	fmt.Printf("DEBUG: SendMessageWithMedias thành công với ID: %d\n", result.ID)
+
+	resource := resources.NewChatResource()
+	responseFormatted := resource.FormatChat(result)
+
+	utils.Respond(ctx, responseFormatted, nil, "")
+
+	fmt.Printf("=== DEBUG: SendMessageWithMedias END ===\n")
 }
 
-// uploadChatFiles uploads files and returns media IDs
-func (c *ChatMessageController) uploadChatFiles(ctx *gin.Context, files []*multipart.FileHeader) ([]int64, error) {
-	var mediaIDs []int64
-	path := "chat" // Path for chat files
+// UploadFilesToMedias handles POST /courses/:id/chat/messages/upload-files-to-medias
+func (c *ChatMessageController) UploadFilesToMedias(ctx *gin.Context) {
+	fmt.Printf("=== DEBUG: UploadFilesToMedias START ===\n")
 
-	// Find or create folder for chat files
-	folder, err := c.mediaRepo.FindByPath(path, "public")
-	if err != nil || folder == nil {
-		// Create folder if not exists
-		folderReq := prot.Media{
-			FilePath: path,
-			ParentId: 0,
-		}
-		if err := c.mediaService.UploadFolder(ctx, folderReq); err != nil {
-			config.Log.Warnf("Failed to create chat folder, continuing anyway: %v", err)
-		}
-		// Try to find again
-		folder, _ = c.mediaRepo.FindByPath(path, "public")
+	courseIdStr := ctx.Param("id")
+	courseId, err := strconv.ParseUint(courseIdStr, 10, 64)
+	if err != nil {
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
 	}
 
-	folderID := int64(0)
-	if folder != nil {
-		folderID = folder.ID
+	// Get user ID from context
+	userIdInterface, exists := ctx.Get("userID")
+	if !exists {
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.unauthorized")), "messages.unauthorized")
+		return
 	}
 
-	// Upload each file
-	for _, file := range files {
-		// Open the file
-		src, err := file.Open()
-		if err != nil {
-			config.Log.Errorf("Failed to open file %s: %v", file.Filename, err)
-			continue
-		}
-		
-		// Read file content
-		fileData := make([]byte, file.Size)
-		if _, err := src.Read(fileData); err != nil {
-			src.Close()
-			config.Log.Errorf("Failed to read file %s: %v", file.Filename, err)
-			continue
-		}
-		src.Close()
-		
-		// Use StoreFileFromBytes to upload
-		uploader := utils.NewUploaderWithStorage(path, "file", models.Storage)
-		info, err := uploader.StoreFileFromBytes(fileData, file.Filename)
-		if err != nil {
-			config.Log.Errorf("Failed to upload file %s: %v", file.Filename, err)
-			continue
-		}
-
-		// Parse file size
-		var fileSizeInt64 int64
-		if info.FileSize != "" {
-			if size, err := strconv.ParseInt(info.FileSize, 10, 64); err == nil {
-				fileSizeInt64 = size
-			} else {
-				// Try to parse human-readable size (e.g., "1.5 MB")
-				parts := strings.Fields(info.FileSize)
-				if len(parts) == 2 {
-					if val, err := strconv.ParseFloat(parts[0], 64); err == nil {
-						unit := strings.ToUpper(parts[1])
-						switch unit {
-						case "KB":
-							fileSizeInt64 = int64(val * 1024)
-						case "MB":
-							fileSizeInt64 = int64(val * 1024 * 1024)
-						case "GB":
-							fileSizeInt64 = int64(val * 1024 * 1024 * 1024)
-						default:
-							fileSizeInt64 = int64(val)
-						}
-					}
-				}
-			}
-		}
-
-		// Strip domain from URL
-		stripped := utils.StripDomain(info.Url, models.Storage)
-		fileUrl := &stripped
-
-		// Save media to database
-		media := &models.Media{
-			FolderID:      folderID,
-			FileName:      info.FileName,
-			FilePath:      info.FilePath,
-			FileType:      utils.StringPtr(info.FileMimeType),
-			FileSize:      utils.Int64Ptr(fileSizeInt64),
-			FileExtension: utils.StringPtr(info.FileExt),
-			DiskName:      utils.StringPtr(models.Storage),
-			StaticURL:     fileUrl,
-			Type:          "file",
-		}
-
-		if err := c.mediaRepo.Save(media); err != nil {
-			config.Log.Errorf("Failed to save media for file %s: %v", file.Filename, err)
-			continue // Skip this file and continue with others
-		}
-
-		mediaIDs = append(mediaIDs, media.ID)
-		config.Log.Infof("Successfully uploaded chat file: %s (media ID: %d)", file.Filename, media.ID)
+	var userId uint64
+	switch v := userIdInterface.(type) {
+	case int:
+		userId = uint64(v)
+	case uint64:
+		userId = v
+	case int64:
+		userId = uint64(v)
+	default:
+		fmt.Printf("DEBUG: userID có type không hỗ trợ: %T, value: %+v\n", userIdInterface, userIdInterface)
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
 	}
 
-	if len(mediaIDs) == 0 && len(files) > 0 {
-		return nil, fmt.Errorf("failed to upload any files")
+	// Parse multipart form
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		fmt.Printf("DEBUG: Lỗi parse multipart form: %v\n", err)
+		utils.Respond(ctx, nil, errors.New(i18n.Localize("messages.data_invalid")), "messages.data_invalid")
+		return
 	}
 
-	return mediaIDs, nil
+	files := form.File["files"]
+	if len(files) == 0 {
+		utils.Respond(ctx, nil, errors.New("No files uploaded"), "No files uploaded")
+		return
+	}
+
+	fmt.Printf("DEBUG: Số files upload: %d\n", len(files))
+
+	// Validate files
+	for i, file := range files {
+		fmt.Printf("DEBUG: Validating file %d: %s (size: %d)\n", i, file.Filename, file.Size)
+		if err := c.validateUploadedFile(file); err != nil {
+			fmt.Printf("DEBUG: File validation failed: %v\n", err)
+			utils.Respond(ctx, nil, fmt.Errorf("File %s validation failed: %v", file.Filename, err), "")
+			return
+		}
+	}
+
+	// Call service to upload files to medias
+	result, err := c.service.UploadFilesToMedias(ctx.Request.Context(), courseId, userId, files)
+	if err != nil {
+		fmt.Printf("DEBUG: Lỗi service.UploadFilesToMedias: %v\n", err)
+		utils.Respond(ctx, nil, err, "")
+		return
+	}
+
+	fmt.Printf("DEBUG: UploadFilesToMedias thành công - uploaded %d files\n", len(result))
+
+	resource := resources.NewChatResource()
+	responseFormatted := resource.FormatChatMedias(result)
+
+	utils.Respond(ctx, responseFormatted, nil, "")
+
+	fmt.Printf("=== DEBUG: UploadFilesToMedias END ===\n")
 }
-

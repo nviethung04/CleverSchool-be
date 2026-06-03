@@ -1,10 +1,9 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/utils"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/prot"
 	"sort"
 	"time"
 )
@@ -15,17 +14,17 @@ type LessonScheduleResource interface {
 	FormatScheduleGroups(groups []dto.ScheduleGroup) []*prot.LessonScheduleGroup
 }
 
-type LessonScheduleResourceImpl struct {
-	BeginTime    *time.Time
+type LessonScheduleResourceImpl struct{
+	BeginTime *time.Time
 	HolidayWeeks []models.Week
-	AutoIndex    bool
+	AutoIndex bool
 }
 
 func NewLessonScheduleResource() LessonScheduleResource {
 	return &LessonScheduleResourceImpl{
-		BeginTime:    nil,
+		BeginTime: nil,
 		HolidayWeeks: []models.Week{},
-		AutoIndex:    false,
+		AutoIndex: false,
 	}
 }
 
@@ -75,39 +74,10 @@ func (r *LessonScheduleResourceImpl) FormatLessonSchedule(schedule *models.Lesso
 
 	var lesson *prot.LessonBySchedule
 	if schedule.Lesson.ID != 0 {
-		var lessonPlans []*prot.LessonPlanBySchedule
-		lessonPlanId := schedule.LessonPlanID
-
-		for _, lessonPlan := range schedule.Lesson.LessonPlans {
-			var author *prot.LessonPlanAuthor
-			if lessonPlan.Author != nil {
-				author = &prot.LessonPlanAuthor{
-					Id:     lessonPlan.Author.ID,
-					Name:   lessonPlan.Author.Name,
-					Avatar: utils.StaticURL(lessonPlan.Author.AvatarInfo.Path, models.Storage),
-				}
-			}
-			lessonPlans = append(lessonPlans, &prot.LessonPlanBySchedule{
-				Id:          lessonPlan.ID,
-				Name:        lessonPlan.Name,
-				Description: lessonPlan.Description,
-				IsActive:    lessonPlan.ID == lessonPlanId || len(schedule.Lesson.LessonPlans) == 1,
-				Author:      author,
-			})
-		}
-
-		sort.SliceStable(lessonPlans, func(i, j int) bool {
-			if lessonPlans[i].IsActive != lessonPlans[j].IsActive {
-				return lessonPlans[i].IsActive
-			}
-			return lessonPlans[i].Id < lessonPlans[j].Id
-		})
-
 		lesson = &prot.LessonBySchedule{
 			Id:          schedule.Lesson.ID,
 			Title:       schedule.Lesson.Title,
 			Description: schedule.Lesson.Description,
-			LessonPlans: lessonPlans,
 		}
 	}
 
@@ -121,11 +91,12 @@ func (r *LessonScheduleResourceImpl) FormatLessonSchedule(schedule *models.Lesso
 		}
 	}
 
+
 	var chapter *prot.ChapterBySchedule
 	if schedule.Lesson.Chapter.ID != 0 {
 		chapter = &prot.ChapterBySchedule{
-			Id:          schedule.Lesson.Chapter.ID,
-			Title:       schedule.Lesson.Chapter.Title,
+			Id:   schedule.Lesson.Chapter.ID,
+			Title: schedule.Lesson.Chapter.Title,
 			Description: schedule.Lesson.Chapter.Description,
 		}
 	}
@@ -312,7 +283,7 @@ func (r *LessonScheduleResourceImpl) FormatLessonSchedulesInfo(lessonScheduleDet
 	})
 
 	return &prot.LessonSchedulesInfoResponse{
-		Weeks:     result,
+		Weeks: result,
 		Semesters: semesters,
 	}
 }
@@ -342,4 +313,3 @@ func (r *LessonScheduleResourceImpl) FormatLessonSchedulesByWeek(group dto.Lesso
 		Schedules:        schedules,
 	}
 }
-

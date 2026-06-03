@@ -20,8 +20,6 @@ type DashboardStudentHomeworkListItemDTO struct {
     LessonTitle       string  `json:"lesson_title"`
     Ratio             float64 `json:"ratio"`
     SkipQuestionsCount int    `json:"skip_questions_count"`
-    QuestionForm      string  `json:"question_form"`
-    Rate              string  `json:"rate"`
 }
 
 type DashboardStudentHomeworkListResponseDTO struct {

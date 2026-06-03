@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-lms/prot"
+	"be-lms/repositories"
 )
 
 type DashboardStudentExamListService interface {
@@ -52,4 +52,3 @@ func (s *dashboardStudentExamListService) GetStudentExamList(userID int64, cours
 		Total: total,
 	}, nil
 }
-

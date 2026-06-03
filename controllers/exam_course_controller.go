@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/services"
+	"be-lms/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -68,4 +68,3 @@ func (ctl *ExamCourseController) GetExamCourseDetail(c *gin.Context) {
 	}
 	utils.Respond(c, resp, err, "")
 }
-

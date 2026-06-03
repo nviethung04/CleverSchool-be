@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"fmt"
 	"time"
 
@@ -95,13 +95,6 @@ type ContestRoundRepository interface {
 	RemovePersonJoiner(contestRoundId int64, userId int64, deletedBy int64) error
 	RemoveJoinerClass(contestRoundId int64, classId int64, deletedBy int64) error
 	ReplaceJoinersByLevel(contestRoundId int64, joinLevel string, joinerIds []int64, createdBy int64) error
-
-	// New bulk remove methods by entity IDs
-	BulkRemoveJoinerSchools(contestRoundId int64, schoolIds []int64, deletedBy int64) error
-	BulkRemoveJoinerProvinces(contestRoundId int64, provinceIds []int64, deletedBy int64) error
-	BulkRemoveJoinerClasses(contestRoundId int64, classIds []int64, deletedBy int64) error
-	BulkRemoveJoinerPersons(contestRoundId int64, userIds []int64, deletedBy int64) error
-
 	GetContestRoundProvinces(contestRoundId int64) (interface{}, error)
 	GetContestRoundSchools(contestRoundId int64) (interface{}, error)
 	GetContestRoundClasses(contestRoundId int64) (interface{}, error)
@@ -623,52 +616,3 @@ func (r *contestRoundRepository) RemovePersonJoiner(contestRoundId int64, userId
 		WHERE contest_round_id = $3 AND user_id = $4
 	`, time.Now(), deletedBy, contestRoundId, userId).Error
 }
-
-// BulkRemoveJoinerSchools - Xóa nhiều trường học khỏi joiner
-func (r *contestRoundRepository) BulkRemoveJoinerSchools(contestRoundId int64, schoolIds []int64, deletedBy int64) error {
-	if len(schoolIds) == 0 {
-		return nil
-	}
-	return db.MasterDB.Exec(`
-		UPDATE contest_round_joiner_schools 
-		SET deleted_at = $1, deleted_by = $2 
-		WHERE contest_round_id = $3 AND school_id = ANY($4)
-	`, time.Now(), deletedBy, contestRoundId, schoolIds).Error
-}
-
-// BulkRemoveJoinerProvinces - Xóa nhiều tỉnh thành khỏi joiner
-func (r *contestRoundRepository) BulkRemoveJoinerProvinces(contestRoundId int64, provinceIds []int64, deletedBy int64) error {
-	if len(provinceIds) == 0 {
-		return nil
-	}
-	return db.MasterDB.Exec(`
-		UPDATE contest_round_joiner_provinces 
-		SET deleted_at = $1, deleted_by = $2 
-		WHERE contest_round_id = $3 AND province_id = ANY($4)
-	`, time.Now(), deletedBy, contestRoundId, provinceIds).Error
-}
-
-// BulkRemoveJoinerClasses - Xóa nhiều lớp học khỏi joiner
-func (r *contestRoundRepository) BulkRemoveJoinerClasses(contestRoundId int64, classIds []int64, deletedBy int64) error {
-	if len(classIds) == 0 {
-		return nil
-	}
-	return db.MasterDB.Exec(`
-		UPDATE contest_round_joiner_classes 
-		SET deleted_at = $1, deleted_by = $2 
-		WHERE contest_round_id = $3 AND class_id = ANY($4)
-	`, time.Now(), deletedBy, contestRoundId, classIds).Error
-}
-
-// BulkRemoveJoinerPersons - Xóa nhiều học sinh khỏi joiner
-func (r *contestRoundRepository) BulkRemoveJoinerPersons(contestRoundId int64, userIds []int64, deletedBy int64) error {
-	if len(userIds) == 0 {
-		return nil
-	}
-	return db.MasterDB.Exec(`
-		UPDATE contest_round_joiner_persons 
-		SET deleted_at = $1, deleted_by = $2 
-		WHERE contest_round_id = $3 AND user_id = ANY($4)
-	`, time.Now(), deletedBy, contestRoundId, userIds).Error
-}
-

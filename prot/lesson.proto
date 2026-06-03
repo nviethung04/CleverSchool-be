@@ -2,13 +2,11 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "week.proto";
 import "user.proto";
 import "flashcard.proto";
-import "lesson_plan.proto";
-import "teaching_plan.proto";
 
 message ChapterInfo {
   int64 id = 1;
@@ -31,18 +29,12 @@ message SkillInfo {
   string name = 2;
 }
 
-message HeadingInfo {
-  int64 id = 1;
-  string name = 2;
-}
-
 message LessonInfo {
   int64 id = 1;
   string title = 2;
   int32 sort_position = 3;
   bool is_complete = 4;
-  bool is_studying = 5;
-  string object_title = 6;
+  string object_title = 5;
 }
 
 message ExamInfo {
@@ -57,7 +49,6 @@ message ExamInfo {
   string deadline = 9;
   string object_title = 10;
   bool is_program = 11;
-  string question_form = 12;
 }
 
 message HomeworkInfo {
@@ -70,8 +61,6 @@ message HomeworkInfo {
   bool is_assigned = 7;
   string object_title = 11;
   bool is_program = 12;
-  string question_form = 13;
-  bool is_submitted = 14;
 }
 
 message ExerciseInfo {
@@ -86,18 +75,6 @@ message ExerciseInfo {
   string deadline = 9;
   string object_title = 10;
   bool is_program = 11;
-  string question_form = 12;
-}
-
-message AssessmentInfo {
-  int64 id = 1;
-  string name = 2;
-  string description = 3;
-  string type = 4;
-  bool is_assigned = 5;
-  string object_title = 6;
-  bool is_program = 7;
-  bool publish = 8;
 }
 
 message AuthorInfo {
@@ -118,8 +95,6 @@ message LessonPlanInfo {
   int64 total_time = 7;
   bool is_complete = 8;
   string object_title = 9;
-  bool is_active = 10;
-  LessonPlanAuthor author = 11;
 }
 
 message LessonScheduleInfo {
@@ -154,19 +129,15 @@ message Lesson {
   repeated ExerciseInfo exercises = 14;
   repeated LessonPlanInfo lesson_plans = 15;
   repeated LessonScheduleInfo schedules = 16;
-  repeated AssessmentInfo assessment = 17;
-  LessonProgramInfo program = 18;
-  int32 views = 19;
-  bool is_complete = 20;
-  string object_title = 21;
-  repeated Vocabulary vocabularies = 22;
-  int32 vocabulary_count = 23;
-  string created_at = 24;
-  string updated_at = 25;
-  CourseInfo course = 26;
-  HeadingInfo heading = 27;
-  TeachingPlan teaching_plan = 28;
-  bool is_studying = 29;
+  LessonProgramInfo program = 17;
+  int32 views = 18;
+  bool is_complete = 19;
+  string object_title = 20;
+  repeated Vocabulary vocabularies = 21;
+  int32 vocabulary_count = 22;
+  string created_at = 23;
+  string updated_at = 24;
+  CourseInfo course = 25;
 }
 
 message GetLessonRequest {
@@ -196,12 +167,8 @@ message LessonRequest {
   repeated ExerciseInfo exercises = 13;
   repeated LessonPlanInfo lesson_plans = 14;
   repeated LessonScheduleInfo schedules = 15;
-  repeated AssessmentInfo assessment = 16;
-  int32 views = 17;
-  string object_title = 18;
-  int64 program_id = 19;
-  HeadingInfo heading = 20;
-  TeachingPlan teaching_plan = 21;
+  int32 views = 16;
+  string object_title = 17;
 }
 
 message LessonIDRequest {
@@ -224,13 +191,6 @@ message LessonCompletion {
   string completion_at = 4;
 }
 
-message LessonStudying {
-  int64 id = 1;
-  int64 student_id = 2;
-  bool is_studying = 3;
-  string studying_at = 4;
-}
-
 message AssignedLesson {
   int64 id = 1;
   string title = 2;
@@ -242,4 +202,3 @@ message AssignedLesson {
 message AssignedLessons {
   repeated AssignedLesson lessons = 1;
 }
-

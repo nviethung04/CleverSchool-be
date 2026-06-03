@@ -1,13 +1,13 @@
 package services
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,19 +22,16 @@ type SaveScoreMultipleChoiceService interface {
 }
 
 type saveScoreMultipleChoiceService struct {
-	repo                        repositories.SaveScoreMultipleChoiceRepository
-	correctRepo                 repositories.SaveCorrectHomeworkRepository
-	clonedQuestionService       ClonedQuestionService
-	homeworkUserQuestionService HomeworkUserQuestionService
+	repo                  repositories.SaveScoreMultipleChoiceRepository
+	correctRepo           repositories.SaveCorrectHomeworkRepository
+	clonedQuestionService ClonedQuestionService
 }
 
 func NewSaveScoreMultipleChoiceService(repo repositories.SaveScoreMultipleChoiceRepository, clonedQuestionService ClonedQuestionService) SaveScoreMultipleChoiceService {
-	homeworkUserQuestionRepo := repositories.NewHomeworkUserQuestionRepository()
 	return &saveScoreMultipleChoiceService{
-		repo:                        repo,
-		correctRepo:                 repositories.NewSaveCorrectHomeworkRepository(),
-		clonedQuestionService:       clonedQuestionService,
-		homeworkUserQuestionService: NewHomeworkUserQuestionService(homeworkUserQuestionRepo, clonedQuestionService),
+		repo:                  repo,
+		correctRepo:           repositories.NewSaveCorrectHomeworkRepository(),
+		clonedQuestionService: clonedQuestionService,
 	}
 }
 
@@ -158,6 +155,7 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceExam(req *prot.S
 	for _, ans := range options.Answers {
 		idToContent[ans.ID.String()] = ans.Content
 	}
+
 	perAnswerScore := 1.0 // hoặc lấy từ q.Metadata nếu có
 	tx := db.MasterDB.Begin()
 	defer func() {
@@ -223,7 +221,6 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceExam(req *prot.S
 		Score:         utils.RoundTo2Decimal(score),
 	}, nil
 }
-
 
 func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceHomework(req *prot.SaveScoreMultipleChoiceRequest, userID int64) (*prot.SaveScoreResponse, error) {
 	if req.HomeworkId == 0 {
@@ -336,31 +333,8 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceHomework(req *pr
 		})
 	}
 
-	// Lưu vào homework_user_questions và lấy star, ratioScore, weight, numberTimeSent
-	var star, numberTimeSent int
-	var ratioScore, weight float64
-	if req.HomeworkId != 0 {
-		var err error
-		star, ratioScore, weight, numberTimeSent, err = s.homeworkUserQuestionService.SaveHomeworkUserQuestion(req.HomeworkId, userID, req.QuestionId, req.LessonId, isAllCorrect, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
-
-	// Nếu không cần lưu (đã có câu trả lời đúng hết), query từ DB để lấy star, ratio_score, weight, number_time_sent
+	// Nếu không cần lưu (đã có câu trả lời đúng hết), trả về kết quả hiện tại
 	if !needSave {
-		// Query bản ghi có is_all_correct = true để lấy star, ratio_score, weight, number_time_sent
-		if req.HomeworkId != 0 {
-			existingRecord, err := s.homeworkUserQuestionService.GetHomeworkUserQuestionByCorrect(req.HomeworkId, userID, req.QuestionId, req.LessonId)
-			if err == nil && existingRecord != nil {
-				star = existingRecord.Star
-				ratioScore = existingRecord.RatioScore
-				weight = existingRecord.Weight
-				numberTimeSent = existingRecord.NumberTimeSent
-			}
-		}
-		
 		tx.Commit()
 		// Chuẩn bị response
 		trueAnswerIDs := make([]int64, len(correctList))
@@ -376,17 +350,13 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceHomework(req *pr
 			userAnswerContents[i] = idToContent[strconv.FormatInt(id, 10)]
 		}
 		return &prot.SaveScoreResponse{
-			QuestionId:      req.QuestionId,
-			AnswerIds:       userAnswerIDs,
-			TrueAnswerIds:   trueAnswerIDs,
-			Answers:         userAnswerContents,
-			TrueAnswers:     trueAnswerContents,
-			IsCorrect:       isAllCorrect,
-			Score:           utils.RoundTo2Decimal(score),
-			Star:            int32(star),
-			RatioScore:      ratioScore,
-			Weight:          weight,
-			NumberTimeSent:  int32(numberTimeSent),
+			QuestionId:    req.QuestionId,
+			AnswerIds:     userAnswerIDs,
+			TrueAnswerIds: trueAnswerIDs,
+			Answers:       userAnswerContents,
+			TrueAnswers:   trueAnswerContents,
+			IsCorrect:     isAllCorrect,
+			Score:         utils.RoundTo2Decimal(score),
 		}, nil
 	}
 
@@ -419,18 +389,14 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceHomework(req *pr
 		userAnswerContents[i] = idToContent[strconv.FormatInt(id, 10)]
 	}
 	return &prot.SaveScoreResponse{
-		Id:             0,
-		QuestionId:     req.QuestionId,
-		AnswerIds:      userAnswerIDs,
-		TrueAnswerIds:  trueAnswerIDs,
-		Answers:        userAnswerContents,
-		TrueAnswers:    trueAnswerContents,
-		IsCorrect:      isAllCorrect,
-		Score:          utils.RoundTo2Decimal(score),
-		Star:           int32(star),
-		RatioScore:     ratioScore,
-		Weight:         weight,
-		NumberTimeSent: int32(numberTimeSent),
+		Id:            0,
+		QuestionId:    req.QuestionId,
+		AnswerIds:     userAnswerIDs,
+		TrueAnswerIds: trueAnswerIDs,
+		Answers:       userAnswerContents,
+		TrueAnswers:   trueAnswerContents,
+		IsCorrect:     isAllCorrect,
+		Score:         utils.RoundTo2Decimal(score),
 	}, nil
 }
 
@@ -628,5 +594,3 @@ func (s *saveScoreMultipleChoiceService) SaveScoreMultipleChoiceExercise(req *pr
 		Score:         utils.RoundTo2Decimal(score),
 	}, nil
 }
-
-

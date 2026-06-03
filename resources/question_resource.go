@@ -1,11 +1,11 @@
 package resources
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"sort"
 	"strconv"
 
@@ -76,7 +76,7 @@ func (resource *QuestionResourceImpl) FormatQuestion(question *models.Question) 
 		Points:       question.Point,
 		Time:         float32(question.TimeLimitSeconds),
 		IsRandom:     question.IsRandom != 0,
-		Display:      question.Display,
+		Display: question.Display,
 	}
 
 	mediaQuestions := make([]*prot.MediaQuestion, 0, len(question.FileInfos))
@@ -103,8 +103,8 @@ func (resource *QuestionResourceImpl) FormatQuestion(question *models.Question) 
 	}
 
 	questionContent := prot.QuestionContent{
-		Text:   question.Content,
-		Media:  mediaQuestion,
+		Text:  question.Content,
+		Media: mediaQuestion,
 		Medias: mediaQuestions,
 	}
 
@@ -137,41 +137,26 @@ func (resource *QuestionResourceImpl) FormatQuestion(question *models.Question) 
 	var subject *prot.QuestionSubjectInfo
 	if question.Subject != nil {
 		subject = &prot.QuestionSubjectInfo{
-			Id:          question.Subject.ID,
-			Name:        question.Subject.Name,
+			Id:   question.Subject.ID,
+			Name: question.Subject.Name,
 			Description: question.Subject.Description,
 		}
 	}
 
-	var sourceQuestion *prot.SourceQuestion
-	if question.Source != nil {
-		sourceQuestion = &prot.SourceQuestion{
-			Id:        question.Source.ID,
-			Title:     question.Source.Title,
-			Skill:     question.Source.Skill,
-			Content:   question.Source.Content,
-			Level:     question.Source.Level,
-			CreatedAt: question.Source.CreatedAt.Format("2006-01-02 15:04:05"),
-			UpdatedAt: question.Source.UpdatedAt.Format("2006-01-02 15:04:05"),
-		}
-	}
-
 	questionFormatted := &prot.Question{
-		Id:               question.ID,
-		Type:             question.QuestionType,
-		Status:           question.Status,
-		SortPosition:     int32(question.SortPosition),
-		Options:          options,
-		Metadata:         &metaData,
-		Content:          &questionContent,
-		CorrectAnswers:   correctAnswers,
-		Attributes:       attributes,
-		SubjectId:        subjectId,
-		Subject:          subject,
-		SourceQuestionId: question.SourceQuestionId,
-		Source:           sourceQuestion,
-		CreatedAt:        question.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:        question.UpdatedAt.Format("2006-01-02 15:04:05"),
+		Id:             question.ID,
+		Type:           question.QuestionType,
+		Status:         question.Status,
+		SortPosition:   int32(question.SortPosition),
+		Options:        options,
+		Metadata:       &metaData,
+		Content:        &questionContent,
+		CorrectAnswers: correctAnswers,
+		Attributes:     attributes,
+		SubjectId:      subjectId,
+		Subject:        subject,
+		CreatedAt:      question.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:      question.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 
 	if utils.InArray(question.QuestionType, []string{models.QuestionTypeOrdering, models.QuestionTypeFillInBlanks, models.QuestionTypeDragDrop}) {
@@ -245,7 +230,7 @@ func (r *QuestionResourceImpl) FormatModelQuestion(question *prot.Question) *mod
 		Status:           question.Status,
 		SourceQuestionId: int64(question.SourceQuestionId),
 		SubjectId:        subjectId,
-		Display:          display,
+		Display: display,
 	}
 }
 
@@ -346,7 +331,7 @@ func (r *QuestionResourceImpl) FormatByRole(question *prot.Question, roleId int6
 func (r *QuestionResourceImpl) FormatMedias(question *prot.Question) *prot.Question {
 	if question.Content.Media.Url != "" && len(question.Content.Medias) == 0 {
 		question.Content.Medias = append(question.Content.Medias, &prot.MediaQuestion{
-			Url:  question.Content.Media.Url,
+			Url: question.Content.Media.Url,
 			Type: question.Content.Media.Type,
 			File: question.Content.Media.File,
 		})
@@ -559,18 +544,18 @@ func (resource *QuestionResourceImpl) FormatCorrectAnswersByType(question *model
 }
 
 func (resource *QuestionResourceImpl) FormatCorrectAnswers(question *prot.Question) *prot.QuestionCorrectAnswers {
-	if question == nil {
+    if question == nil {
 		config.Log.Info("question is nil")
-		return nil
-	}
+        return nil
+    }
 
-	opts := question.Options
-	if opts == nil {
-		return nil
-	}
+    opts := question.Options
+    if opts == nil {
+        return nil
+    }
 
-	switch question.Type {
-	case models.QuestionTypeCategory:
+    switch question.Type {
+    case models.QuestionTypeCategory:
 		correct := make(map[string]string)
 
 		for _, item := range opts.Items {
@@ -585,66 +570,66 @@ func (resource *QuestionResourceImpl) FormatCorrectAnswers(question *prot.Questi
 			correct[key] = val
 		}
 		return &prot.QuestionCorrectAnswers{List: correct}
-	case models.QuestionTypeLabeling:
-		correct := make(map[string]string)
-		for _, lbl := range opts.Labels {
-			key := strconv.FormatInt(int64(lbl.GetId()), 10)
-			correct[key] = key
-		}
-		return &prot.QuestionCorrectAnswers{List: correct}
-	case models.QuestionTypeDragDrop:
-		correct := make(map[string]string)
-		for _, ans := range opts.Answers {
-			if ans.GetCorrectPosition() != 0 {
-				key := strconv.FormatInt(int64(ans.GetCorrectPosition()), 10)
-				val := strconv.FormatInt(int64(ans.GetGroupPosition()), 10)
-				correct[key] = val
-			}
-		}
-		return &prot.QuestionCorrectAnswers{List: correct}
-	case models.QuestionTypeMatching:
-		correct := make(map[string]string)
-		for _, tgt := range opts.Targets {
-			key := strconv.FormatInt(tgt.GetId(), 10)
-			correct[key] = key
-		}
-		return &prot.QuestionCorrectAnswers{List: correct}
-	case models.QuestionTypeOrdering:
-		answers := opts.Answers
-		sort.Slice(answers, func(i, j int) bool {
-			return answers[i].GetCorrectPosition() < answers[j].GetCorrectPosition()
-		})
+    case models.QuestionTypeLabeling:
+        correct := make(map[string]string)
+        for _, lbl := range opts.Labels {
+            key := strconv.FormatInt(int64(lbl.GetId()), 10)
+            correct[key] = key
+        }
+        return &prot.QuestionCorrectAnswers{List: correct}
+    case models.QuestionTypeDragDrop:
+        correct := make(map[string]string)
+        for _, ans := range opts.Answers {
+            if ans.GetCorrectPosition() != 0 {
+                key := strconv.FormatInt(int64(ans.GetCorrectPosition()), 10)
+                val := strconv.FormatInt(int64(ans.GetGroupPosition()), 10)
+                correct[key] = val
+            }
+        }
+        return &prot.QuestionCorrectAnswers{List: correct}
+    case models.QuestionTypeMatching:
+        correct := make(map[string]string)
+        for _, tgt := range opts.Targets {
+            key := strconv.FormatInt(tgt.GetId(), 10)
+            correct[key] = key
+        }
+        return &prot.QuestionCorrectAnswers{List: correct}
+    case models.QuestionTypeOrdering:
+        answers := opts.Answers
+        sort.Slice(answers, func(i, j int) bool {
+            return answers[i].GetCorrectPosition() < answers[j].GetCorrectPosition()
+        })
 
-		ids := make([]int64, 0, len(answers))
-		for _, a := range answers {
-			ids = append(ids, int64(a.GetId()))
-		}
+        ids := make([]int64, 0, len(answers))
+        for _, a := range answers {
+            ids = append(ids, int64(a.GetId()))
+        }
 
-		correct := make(map[string]string)
-		for _, a := range answers {
-			key := strconv.FormatInt(int64(a.GetId()), 10)
-			val := strconv.FormatInt(int64(a.GetGroupPosition()), 10)
-			correct[key] = val
-		}
-		return &prot.QuestionCorrectAnswers{Ids: ids, List: correct}
-	case models.QuestionTypeFillInBlanks:
-		correct := make(map[string]string)
-		for _, a := range opts.Answers {
-			key := strconv.FormatInt(int64(a.GetCorrectPosition()), 10)
-			correct[key] = a.GetText()
-		}
-		return &prot.QuestionCorrectAnswers{List: correct}
-	case models.QuestionTypeMultipleChoice:
-		var ids []int64
-		for _, a := range opts.Answers {
-			if a.GetIsCorrect() {
-				ids = append(ids, int64(a.GetId()))
-			}
-		}
-		return &prot.QuestionCorrectAnswers{Ids: ids}
-	}
+        correct := make(map[string]string)
+        for _, a := range answers {
+            key := strconv.FormatInt(int64(a.GetId()), 10)
+            val := strconv.FormatInt(int64(a.GetGroupPosition()), 10)
+            correct[key] = val
+        }
+        return &prot.QuestionCorrectAnswers{Ids: ids, List: correct}
+    case models.QuestionTypeFillInBlanks:
+        correct := make(map[string]string)
+        for _, a := range opts.Answers {
+            key := strconv.FormatInt(int64(a.GetCorrectPosition()), 10)
+            correct[key] = a.GetText()
+        }
+        return &prot.QuestionCorrectAnswers{List: correct}
+    case models.QuestionTypeMultipleChoice:
+        var ids []int64
+        for _, a := range opts.Answers {
+            if a.GetIsCorrect() {
+                ids = append(ids, int64(a.GetId()))
+            }
+        }
+        return &prot.QuestionCorrectAnswers{Ids: ids}
+    }
 
-	return nil
+    return nil
 }
 
 func (resource *QuestionResourceImpl) FormatAnswersByType(question *models.Question, questionType string) *prot.QuestionOption {
@@ -1207,4 +1192,3 @@ func (resource *QuestionResourceImpl) FormatGroups(question *prot.Question) []*p
 
 	return groups
 }
-

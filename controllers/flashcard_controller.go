@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -372,4 +372,3 @@ func (c *FlashcardController) UpdateVocabularyProgress(ctx *gin.Context) {
 
 	utils.JSONResponse(ctx, http.StatusOK, "Progress updated successfully", nil)
 }
-

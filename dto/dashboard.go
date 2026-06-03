@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-cleverschool/models"
+	"be-lms/models"
 	"time"
 )
 
@@ -48,12 +48,11 @@ type GemsByWeek struct {
 
 type StudentScore struct {
 	Id         int64
-	TypeId     int64
+	ExamId     int64
 	Name       string
-	TypeUserId int64
-	TypeName   string
+	ExamUserId int64
+	ExamName   string
 	Score      float32
-	Type       string           `json:"type"` // "exam", "homework", "exercise"
 	AvatarInfo models.MediaInfo `json:"avatar_info"`
 	ClassName  string
 	SchoolName string
@@ -92,9 +91,8 @@ type ScoreDistributionOverview struct {
 }
 
 type WeeklyUsage struct {
-	Week      int32
-	Duration  float32
-	IsCurrent bool
+	Week     string
+	Duration float32
 }
 
 type DeviceUsage struct {
@@ -104,11 +102,9 @@ type DeviceUsage struct {
 }
 
 type SystemUsageOverview struct {
-	WeeklyUsages  []WeeklyUsage
-	DeviceUsages  []DeviceUsage
-	AverageUsed   models.AverageUsed
-	CompletedRate float32
-	CompleteCount int32
+	WeeklyUsages []WeeklyUsage
+	DeviceUsages []DeviceUsage
+	AverageUsed  models.AverageUsed
 }
 
 type QuestionDistributionItem struct {
@@ -231,82 +227,9 @@ type UngradedSubmissionExam struct {
 	SubmittedAt   string
 }
 
-type NotAssignAssignment struct {
-	TeacherId            int64
-	AssignAssignmentId   int64
-	TeacherName          string
-	AssignAssignmentName string
-	QuestionIds          string
-	QuestionCount        int32
-}
-
-type NotGraded struct {
-	TeacherId     int64
-	NotGradedId   int64
-	StudentId     int64
-	CourseId      int64
-	TeacherName   string
-	StudentName   string
-	CourseName    string
-	LessonName    string
-	NotGradedName string
-	QuestionIds   string
-	QuestionCount int32
-	SubmittedAt   string
-}
-
-type WeeklyAssignAssignmentRate struct {
-	Id                           int64
-	WeekNumber                   string
-	Total                        int32
-	AssignAssignment             int32
-	NotAssignAssignmentExams     []NotAssignAssignment
-	NotAssignAssignmentHomeworks []NotAssignAssignment
-	NotAssignAssignmentExercises []NotAssignAssignment
-}
-
-type WeeklySubmitRate struct {
-	Id                 int64
-	WeekNumber         string
-	Total              int32
-	NotGraded          int32
-	NotGradedExams     []NotGraded
-	NotGradedHomeworks []NotGraded
-	NotGradedExercises []NotGraded
-}
-
-type NotSubmittedExam struct {
-	SubmittedId int64   // exam_id
-	Name        string  // exam_name
-	UserIds     []int64 // Danh sách user_id chưa làm bài này
-}
-
-type NotSubmittedGrouped struct {
-	SubmittedId   int64   // homework_id hoặc exercise_id
-	Name          string  // homework_name hoặc exercise_name
-	SubmittedType string  // "homework" hoặc "exercise"
-	StudentIds    []int64 // Danh sách student_id chưa làm bài này
-}
-
-type WeeklyPerformanceOverviewRate struct {
-	Id                      int64
-	WeekNumber              string
-	AssignAssignmentPercent float32
-	SubmitPercent           float32
-	NotGradedPercent        float32
-	TotalRequired           int32
-	TotalSubmitted          int32
-	NotSubmittedExams       []NotSubmittedExam
-	NotSubmittedHomeworks   []NotSubmittedGrouped
-	NotSubmittedExercises   []NotSubmittedGrouped
-}
-
 type TeacherPerformanceOverview struct {
-	GradingSummary                 GradingSummary
-	WeeklyMarkingRates             []WeeklyMarkingRate
-	WeeklyAssignAssignmentRates    []WeeklyAssignAssignmentRate
-	WeeklySubmitRates              []WeeklySubmitRate
-	WeeklyPerformanceOverviewRates []WeeklyPerformanceOverviewRate
+	GradingSummary     GradingSummary
+	WeeklyMarkingRates []WeeklyMarkingRate
 }
 
 type FilterAddress struct {
@@ -334,6 +257,5 @@ type FilterDashboardAdmin struct {
 	LastYear          int32
 	LastMonth         int32
 	LastQuarter       int32
-	ObjectType        string
+	GradingType              string
 }
-

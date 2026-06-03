@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-lms/prot"
+	"be-lms/repositories"
 )
 
 type ContestStudentService interface {
@@ -44,4 +44,3 @@ func (s *contestStudentService) GetContestRoundsByStudent(userID int64, limit, p
 		TotalCount:    total,
 	}, nil
 }
-

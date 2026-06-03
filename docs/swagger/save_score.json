@@ -434,51 +434,5 @@
       ],
       "responses": {}
     }
-  },
-  "/api/study/save-score/evaluate": {
-    "post": {
-      "summary": "Chấm điểm bài tập",
-      "description": "API để lưu điểm bài tập",
-      "tags": [
-        "SaveScore"
-      ],
-      "security": [
-        {
-          "ApiKeyAuth": []
-        }
-      ],
-      "consumes": [
-        "application/json"
-      ],
-      "produces": [
-        "application/json"
-      ],
-      "parameters": [
-        {
-          "$ref": "#/parameters/AcceptHeader"
-        },
-        {
-          "$ref": "#/parameters/LocaleHeader"
-        },
-        {
-          "in": "body",
-          "name": "answer",
-          "description": "Thông tin danh sách câu trả lời",
-          "required": false,
-          "schema": {
-            "type": "object",
-            "example": {
-              "exam_id": 30,
-              "homework_id": 30,
-              "exercise_id": 30,
-              "contest_round_id": 30,
-              "user_id": 25,
-              "score": 75.5
-            }
-          }
-        }
-      ],
-      "responses": {}
-    }
   }
 }

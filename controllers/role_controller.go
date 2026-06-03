@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -94,4 +94,3 @@ func (rc *RoleController) UpdateDisplayPermissions(c *gin.Context) {
 
 	utils.Respond(c, permissions, err, "")
 }
-

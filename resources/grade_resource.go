@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-lms/models"
+	"be-lms/prot"
 )
 
 type GradeResource interface {
@@ -54,4 +54,3 @@ func (r *GradeResourceImpl) FormatModelGrade(grade *prot.GradeRequest) *models.G
 		NameEN: grade.NameEn,
 	}
 }
-

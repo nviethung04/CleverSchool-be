@@ -1,11 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
-	"errors"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/requests"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +14,11 @@ type ExamRepository interface {
 	GetAll() ([]models.Exam, error)
 	GetAllWithPaging(req *requests.GetExamRequest, c *gin.Context) ([]models.Exam, int64, error)
 	GetByID(id int64, c *gin.Context) (*models.Exam, error)
-	IsRandomQuestion(id int64) (bool, error)
 	Create(exam *models.Exam) error
 	Update(exam *models.Exam) error
 	Delete(id int64, deletedBy int64) error
 	Assigned(ref models.ExamRefLesson) error
 	AssignedLesson(id int64) (*models.Exam, error)
-	UpdateEvaluate(userId, examId int64, score float64) error
 }
 
 type examRepository struct{}
@@ -97,18 +93,6 @@ func (r *examRepository) GetByID(id int64, c *gin.Context) (*models.Exam, error)
 	return &exam, nil
 }
 
-func (r *examRepository) IsRandomQuestion(id int64) (bool, error) {
-	var isRandom bool
-	err := db.ReplicaDB.Table("exams").
-		Select("is_random_question").
-		Where("id = ? AND deleted_at IS NULL", id).
-		Scan(&isRandom).Error
-	if err != nil {
-		return false, err
-	}
-	return isRandom, nil
-}
-
 func (r *examRepository) Create(exam *models.Exam) error {
 	return db.MasterDB.Create(exam).Error
 }
@@ -142,7 +126,6 @@ func (r *examRepository) Update(exam *models.Exam) error {
 	updates["is_random_question"] = exam.IsRandomQuestion
 	updates["file_infos"] = exam.FileInfos
 	updates["question_form"] = exam.QuestionForm
-	updates["type"] = exam.Type
 
 	return db.MasterDB.Omit("clone_info").
 		Model(&models.Exam{}).
@@ -191,21 +174,3 @@ func (r *examRepository) AssignedLesson(id int64) (*models.Exam, error) {
 	}
 	return &exam, nil
 }
-
-func (r *examRepository) UpdateEvaluate(userId, examId int64, score float64) error {
-    result := db.MasterDB.Table("exam_users").
-        Where("user_id = ? AND exam_id = ?", userId, examId).
-        Update("ratio", score)
-
-    if result.Error != nil {
-		config.Log.Errorf("Error updating evaluate: %v", result.Error)
-        return result.Error
-    }
-
-    if result.RowsAffected == 0 {
-		return errors.New("exam user not found")
-    }
-
-    return nil
-}
-

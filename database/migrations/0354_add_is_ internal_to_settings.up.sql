@@ -1,2 +1,0 @@
-ALTER TABLE settings
-    ADD COLUMN is_internal BOOLEAN NOT NULL DEFAULT FALSE;

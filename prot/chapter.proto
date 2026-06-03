@@ -2,10 +2,9 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "lesson.proto";
-import "heading.proto";
 
 message Chapter {
   int64 id = 1;
@@ -19,9 +18,6 @@ message Chapter {
   string created_at = 9;
   string updated_at = 10;
   int64 program_id = 11;
-  int32 time = 12;
-  string target = 13;
-  repeated prot.Heading headings = 14;
 }
 
 message GetChapterRequest {
@@ -45,9 +41,6 @@ message ChapterRequest {
   repeated prot.LessonInfo lessons = 7;
   string object_title = 8;
   int64 program_id = 9;
-  int32 time = 10;
-  string target = 11;
-  repeated prot.Heading headings = 13;
 }
 
 message ChapterIDRequest {
@@ -66,4 +59,3 @@ message LessonSort {
 message ChapterLessonSort {
   repeated LessonSort lessons = 1;
 }
-

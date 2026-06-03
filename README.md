@@ -1,81 +1,124 @@
-# CleverSchool Backend
+# 📦 Hướng dẫn Cài đặt Hệ thống LMS
+cd đến docker-project
+Chạy lần lượt:
 
-Backend CleverSchool là dịch vụ Go cho hệ thống LMS: quản lý trường, lớp, khóa học, bài học, câu hỏi, bài tập, bài thi, đánh giá, báo cáo, media, thông báo, meeting và các tác vụ nền.
+cp .env-example .env (có thể sửa đổi các thông số db trong .env)
+docker compose up -d
+docker compose exec postgres-master bash
 
-## Thành phần chính
+cp /etc/postgresql/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf
 
-- `main.go`: điểm vào của app; chạy server hoặc command như migrate, thống kê, recalculation.
-- `app/`: khởi động config, DB, Redis, Firebase, Gin middleware, route, observer và cron job.
-- `routes/`: khai báo API public, quản trị, học tập, dashboard, websocket và internal command.
-- `controllers/`, `services/`, `repositories/`: luồng xử lý request theo từng module.
-- `models/`: model GORM cho dữ liệu chính.
-- `requests/`, `dto/`, `resources/`, `prot/`: input, output, format response và protobuf.
-- `database/migrations/`: lịch sử thay đổi database.
-- `docs/`: Swagger và tài liệu hệ thống.
-- `jobs/`, `command/`: tác vụ nền và tác vụ chạy theo lệnh.
+Ctrl D
+docker compose restart
+docker compose up -d
 
-## Cách chạy nhanh
+file .env trong be-lms cấu hình các thông số giống với dile .env trong docker
 
-Yêu cầu cơ bản:
+## 📥 Vào thư mục chứa migrates
+    cd database/migrations
 
-- Go 1.24
-- Postgres
-- Redis nếu bật `REDIS_ENABLED=true`
-- File `.env` có thông tin DB, JWT, CORS, port và tích hợp ngoài nếu cần
+## 📥 Chạy Migration
+    migrate -path . -database "postgres://admin:admin123@localhost:5433/lms?sslmode=disable" up
+---
+Vào data base, chạy lệnh
+CREATE EXTENSION IF NOT EXISTS unaccent; (cho phép tìm kiếm bỏ qua dấu)
 
-Chạy local:
+# Hướng dẫn deploy lên sever
+cd vào be-lms
+Với hdh Window: chạy deploy.bat
+Với hdh ios/liux: chạy ./deploy-mac.sh
+Lưu ý phải đặt Key là địa chỉ đến file ssh-key trên máy cá nhân
 
-```bash
-go run .
-```
+Trên sever cần có 1 file deploy.sh nằm cùng cấp với file thực thi, có nội dung:
 
-Chạy migration:
+###################################################################################
+#!/bin/bash
 
-```bash
-go run . migrate
-```
+# --- Đặt biến cấu hình ---
+APP_NAME="myapp"
+APP_DIR="/var/www/source-code-lms/be-lms"
+TEMP_DIR="/home/enspire/backend-lms"
+LOG_FILE="app.log"
 
-Xem version migration:
+echo "🚀 Bắt đầu deploy $APP_NAME..."
 
-```bash
-go run . migrate:version
-```
+# Bước 0: Xóa file cũ và thư mục cũ
+echo "🧹 Xóa file và thư mục cũ nếu có..."
+sudo -n rm -f "$APP_DIR/$APP_NAME" && echo "✔️ Đã xóa $APP_NAME cũ" || echo "ℹ️ Không có file $APP_NAME để xóa"
+sudo -n rm -rf "$APP_DIR/templates" && echo "✔️ Đã xóa thư mục templates cũ" || echo "ℹ️ Không có thư mục templates để xóa"
+sudo -n rm -f "$APP_DIR/package.json" && echo "✔️ Đã xóa package.json cũ" || echo "ℹ️ Không có package.json để xóa"
+sudo -n rm -f "$APP_DIR/package-lock.json" && echo "✔️ Đã xóa package-lock.json cũ" || echo "ℹ️ Không có package-lock.json để xóa"
 
-Generate protobuf:
+# Bước 1: Copy file và thư mục mới từ TEMP_DIR vào APP_DIR
+echo "📂 Di chuyển file mới từ $TEMP_DIR sang $APP_DIR..."
+sudo -n mv "$TEMP_DIR/$APP_NAME" "$APP_DIR/" && echo "✔️ Đã di chuyển $APP_NAME mới" || echo "❌ Lỗi di chuyển $APP_NAME"
+sudo -n mv "$TEMP_DIR/templates" "$APP_DIR/" && echo "✔️ Đã di chuyển templates mới" || echo "❌ Lỗi di chuyển templates"
+sudo -n mv "$TEMP_DIR/package.json" "$APP_DIR/" && echo "✔️ Đã di chuyển package.json mới" || echo "ℹ️ Không có package.json mới"
+sudo -n mv "$TEMP_DIR/package-lock.json" "$APP_DIR/" && echo "✔️ Đã di chuyển package-lock.json mới" || echo "ℹ️ Không có package-lock.json mới"
 
-```bash
-make gen-proto
-```
+# Bước 2: Vào thư mục deploy
+cd "$APP_DIR" || { echo "❌ Không tìm thấy thư mục $APP_DIR"; exit 1; }
 
-Build:
+# Bước 3: Stop app cũ trước
+echo "🛑 Dừng app cũ nếu đang chạy..."
+pid=$(ps aux | grep "./$APP_NAME" | grep -v grep | awk '{print $2}')
+if [ -n "$pid" ]; then
+kill "$pid"
+echo "✅ Đã kill tiến trình cũ: $pid"
+sleep 2
+else
+echo "ℹ️  Không có tiến trình cũ đang chạy."
+fi
 
-```bash
-go build ./...
-```
 
-Chạy bằng Docker Compose:
+# Bước 4: Cấp quyền thực thi cho file mới
+echo "🔒 Cấp quyền thực thi cho $APP_NAME..."
+chmod +x "./$APP_NAME"
 
-```bash
-docker compose up --build
-```
+# Bước 5: Cài đặt node modules nếu có package.json
+if [ -f package.json ]; then
+echo "📦 Cài đặt Node.js dependencies (production only)..."
+npm install --omit=dev || echo "❌ npm install thất bại"
+else
+echo "⚠️ package.json không tồn tại, bỏ qua bước npm install."
+fi
+# Bước 6: Chạy migration
+echo "🚀 Chạy database migration..."
+./$APP_NAME migrate
+MIGRATE_STATUS=$?
 
-## Tài liệu nên đọc
+if [ $MIGRATE_STATUS -ne 0 ]; then
+echo "⚠️ Migration thất bại. Kiểm tra có phải database đang ở trạng thái 'dirty' không..."
 
-- `AGENTS.md`: nguyên tắc làm việc, trình tự đọc project, cách suy nghĩ theo hệ thống.
-- `docs/requirement.md`: yêu cầu và nhóm nghiệp vụ chính.
-- `docs/architecture.md`: kiến trúc, luồng request, tác vụ nền, tích hợp ngoài.
-- `docs/database.md`: database, migration, nhóm bảng và lưu ý dữ liệu.
-- `docs/swagger.yaml`: tài liệu API hiện có.
+    # Force version nếu dirty
+    ./$APP_NAME migrate version | grep "dirty=true" > /dev/null
+    if [ $? -eq 0 ]; then
+        echo "🧹 Database đang ở trạng thái dirty. Thực hiện force fix..."
 
-## Ghi chú thuật ngữ
+        CURRENT_VERSION=$(./$APP_NAME migrate:version | grep -oE '[0-9]+' | head -1)
+        ./$APP_NAME migrate:force "$CURRENT_VERSION"
+        
+        echo "🔁 Thử chạy lại migration..."
+        ./$APP_NAME migrate
 
-- LMS: hệ thống quản lý học tập.
-- API: cổng backend cho frontend hoặc hệ thống khác gọi.
-- CRUD: tạo, đọc, cập nhật, xóa.
-- Migration: file SQL thay đổi database theo thứ tự version.
-- Protobuf: định nghĩa kiểu dữ liệu để sinh code Go.
-- Swagger: tài liệu API.
-- Job: tác vụ chạy nền theo lịch.
-- Command: tác vụ chạy bằng lệnh hoặc API nội bộ.
-- H5P: nội dung học tập tương tác.
-- SCORM: chuẩn đóng gói bài học e-learning.
+        if [ $? -ne 0 ]; then
+            echo "❌ Migration vẫn thất bại sau khi force fix. Dừng deploy."
+            exit 1
+        else
+            echo "✅ Migration thành công sau khi force."
+        fi
+    else
+        echo "❌ Migration thất bại vì lý do khác. Dừng deploy."
+        exit 1
+    fi
+else
+echo "✅ Migration thành công."
+fi
+
+# Bước 7: Khởi động lại app
+echo "▶️ Khởi động app mới..."
+nohup "./$APP_NAME" > "$LOG_FILE" 2>&1 &
+
+echo "✅ Deploy hoàn tất!"
+
+###################################################################################

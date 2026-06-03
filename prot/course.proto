@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "subject.proto";
 import "chapter.proto";
@@ -25,7 +25,6 @@ message ProgramInfo {
   int64 id = 1;
   string name = 2;
   string description = 3;
-  string book_url = 4;
 }
 
 message Course {
@@ -59,7 +58,6 @@ message Course {
   string updated_at = 28;
   bool copy_schedule_success = 29;
   string copy_schedule_message = 30;
-  bool eligible_for_final_exam = 31;
 }
 
 message GetCourseRequest {
@@ -95,7 +93,7 @@ message CourseRequest {
   string object_title = 19;
   int64 program_id = 20;
   string state = 21;
-  int64 parent_course_id = 22;
+  int64 target_course_id = 22;
 }
 
 message CourseIDRequest {
@@ -151,21 +149,4 @@ message ResyncScheduleRequest {
 
 message ResyncScheduleResponse {
   string message = 1;
-}
-
-message CourseFamilyItem {
-  int64 id = 1;
-  string name = 2;
-  string object_title = 3;
-}
-
-message CourseFamilyParent {
-  int64 id = 1;
-  string name = 2;
-  string object_title = 3;
-  repeated CourseFamilyItem children_courses = 4;
-}
-
-message ListCoursesFamilyResponse {
-  repeated CourseFamilyParent parent_courses = 1;
 }

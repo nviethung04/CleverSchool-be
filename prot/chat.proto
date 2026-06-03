@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package prot;
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message ChatActionResponse {
   bool success = 1;
@@ -57,8 +57,6 @@ message ChatMessageResponse {
   ChatMessageResponse reply_to_message = 13;
   repeated ChatMessageFileResponse files = 14;
   repeated ChatMediaResponse medias = 15;
-  uint64 recipient_id = 16;
-  ChatUserResponse recipient = 17;
 }
 
 message PinnedMessagesResponse {
@@ -99,71 +97,3 @@ message ChatMessagesListResponse {
   repeated ChatMessageResponse messages = 1;
   PaginationResponse pagination = 2;
 }
-
-message RecentSender {
-  ChatUserResponse sender = 1;
-  ChatMessageResponse last_message = 2;
-}
-
-message RecentSendersResponse {
-  repeated RecentSender senders = 1;
-  int32 count = 2;
-}
-
-// SSE Event Messages
-message ChatSSEEvent {
-  string type = 1; // "message", "reply", "reaction", "pin", "delete", "private_message", "notification"
-  uint64 course_id = 2;
-  uint64 message_id = 3;
-  uint64 user_id = 4;
-  string timestamp = 5;
-  oneof data {
-    ChatSSEMessageEvent message = 6;
-    ChatSSEReplyEvent reply = 7;
-    ChatSSEReactionEvent reaction = 8;
-    ChatSSEPinEvent pin = 9;
-    ChatSSEDeleteEvent delete = 10;
-    ChatSSEPrivateMessageEvent private_message = 11;
-    ChatSSENotificationEvent notification = 12;
-  }
-}
-
-message ChatSSEMessageEvent {
-  ChatMessageResponse message = 1;
-}
-
-message ChatSSEReplyEvent {
-  ChatMessageResponse reply = 1;
-  uint64 parent_message_id = 2;
-}
-
-message ChatSSEReactionEvent {
-  string action = 1; // "add", "remove", "remove_all"
-  uint64 reaction_id = 2;
-  uint64 message_id = 3;
-  uint64 user_id = 4;
-  string emoji = 5;
-  int32 reaction_count = 6;
-}
-
-message ChatSSEPinEvent {
-  uint64 message_id = 1;
-  bool is_pinned = 2;
-  uint64 user_id = 3;
-}
-
-message ChatSSEDeleteEvent {
-  uint64 message_id = 1;
-  uint64 user_id = 2;
-}
-
-message ChatSSEPrivateMessageEvent {
-  ChatMessageResponse message = 1;
-  uint64 recipient_id = 2;
-}
-
-message ChatSSENotificationEvent {
-  string notification_type = 1;
-  string data = 2; // JSON string of notification data
-}
-

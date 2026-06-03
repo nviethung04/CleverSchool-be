@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/services"
+	"be-lms/utils"
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
@@ -368,8 +368,6 @@ func ActivityLoggerMiddleware() gin.HandlerFunc {
 			strings.Contains(pathUrl, "/import") ||
 			strings.Contains(pathUrl, "/scorm") ||
 			strings.Contains(pathUrl, "/api/tus-uploads") ||
-			strings.Contains(pathUrl, "/ws/") || // Skip WebSocket connections
-			strings.Contains(pathUrl, "/api/manage/settings/by-key") ||
 			(strings.Contains(pathUrl, "/api/medias") && method == "GET") ||
 			pathUrl == "/api/h5p/upload" ||
 			pathUrl == "/api/upload-file" {
@@ -458,4 +456,3 @@ func GenerateSessionId(ip, userAgent string) string {
 	hash := sha256.Sum256([]byte(raw))
 	return hex.EncodeToString(hash[:])
 }
-

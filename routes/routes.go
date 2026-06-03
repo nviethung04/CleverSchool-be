@@ -1,24 +1,18 @@
 package routes
 
 import (
-	"be-cleverschool/command"
-	"be-cleverschool/controllers"
-	"be-cleverschool/middleware"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-lms/command"
+	"be-lms/controllers"
+	"be-lms/middleware"
+	"be-lms/repositories"
+	"be-lms/services"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 // ====== INIT ROUTES ======
 func InitRoutes(router *gin.Engine) {
-	// iOS Universal Links - apple-app-site-association (public, no auth)
-	appleAASAController := controllers.NewAppleAppSiteAssociationController()
-	router.GET("/.well-known/apple-app-site-association", appleAASAController.GetAppleAppSiteAssociation)
-	router.GET("/apple-app-site-association", appleAASAController.GetAppleAppSiteAssociation)
-
 	RegisterCliRoutes(router)
 	RegisterLogRoute(router)
 	RouteMedia(router)
@@ -29,9 +23,6 @@ func InitRoutes(router *gin.Engine) {
 	InitStatic(router)
 	RegisterScormRoutes(router)
 	RegisterMigrationRoutes(router)
-	RoutePushNotification(router)
-	RouteMessage(router)
-	RegisterWebsocketRoutes(router)
 
 	// Upload routes (no auth required)
 	uploadController := controllers.NewUploadController()
@@ -45,25 +36,14 @@ func InitRoutes(router *gin.Engine) {
 	// tusd resumable uploads endpoint (no auth)
 	tusHandler := services.GetTusHandler()
 	tusGroup := router.Group("/api/tus-uploads")
-	tusGroup.Any("", gin.WrapH(http.StripPrefix("/api/tus-uploads/", tusHandler)))
-	tusGroup.Any("/*any", gin.WrapH(http.StripPrefix("/api/tus-uploads/", tusHandler)))
+	tusGroup.Use(middleware.RoleMiddleware("medias.update"))
+	{
+		tusGroup.Any("", gin.WrapH(http.StripPrefix("/api/tus-uploads", tusHandler)))
+		tusGroup.Any("/*any", gin.WrapH(http.StripPrefix("/api/tus-uploads", tusHandler)))
+	}
 
 	api := router.Group("/api")
 	authRepo := repositories.NewAuthRepository()
-
-	publicMeetingJoinController := controllers.NewPublicMeetingJoinController(authRepo)
-	api.GET("/meet/:code", publicMeetingJoinController.Join)
-	// Timeout 30s for all /api/* routes
-	api.Use(middleware.TimeoutWithSkip(30*time.Second, []string{
-		"/api/manage/course-schedule/sync-all-family",
-	}))
-
-	// Public config endpoint (no auth required)
-	appConfigController := NewAppConfigController()
-	api.GET("/config", appConfigController.GetConfig)
-
-	// iOS Universal Links - bản dưới /api để tránh 404 khi có reverse proxy (path không dấu chấm)
-	api.GET("/well-known/apple-app-site-association", appleAASAController.GetAppleAppSiteAssociation)
 
 	//api.POST("/refresh", authController.Register)
 
@@ -72,14 +52,6 @@ func InitRoutes(router *gin.Engine) {
 
 	managementRouter := api.Group("/manage")
 	managementRouter.Use(middleware.AuthMiddleware(authRepo))
-
-	// OAuth callback routes - no auth required (called by OAuth providers)
-	zoomAuthController := NewZoomAuthController()
-	googleAuthController := NewGoogleAuthController()
-	microsoftAuthController := NewMicrosoftAuthController()
-	api.GET("/manage/zoom/auth/callback", zoomAuthController.Callback)
-	api.GET("/manage/google/auth/callback", googleAuthController.Callback)
-	api.GET("/manage/microsoft/auth/callback", microsoftAuthController.HandleCallback)
 	{
 
 		classController := NewClassController()
@@ -90,14 +62,8 @@ func InitRoutes(router *gin.Engine) {
 		examController := NewExamController()
 		exerciseController := NewExerciseController()
 		homeworkController := NewHomeworkController()
-		assessmentController := NewAssessmentController()
-		assessmentCriterionController := NewAssessmentCriterionController()
-		assessmentSubcriterionController := NewAssessmentSubcriterionController()
-		assessmentCriteriaGroupController := NewAssessmentCriteriaGroupController()
 		programController := NewProgramController()
 		courseController := NewCourseController()
-		courseFamilyController := controllers.NewCourseFamilyController()
-		courseScheduleController := NewCourseScheduleController()
 		schoolController := NewSchoolController()
 		subjectController := NewSubjectController()
 		chapterController := NewChapterController()
@@ -115,33 +81,28 @@ func InitRoutes(router *gin.Engine) {
 		topicController := NewTopicController()
 		skillController := NewSkillController()
 		questionAttributeController := NewQuestionAttributeController()
-		noticeController := NewNoticeController()
 
 		studyShiftController := NewStudyShiftController()
 		weekController := NewWeekController()
 		lessonScheduleController := NewLessonScheduleController()
 
 		gradeController := NewGradeController()
-		facultyController := NewFacultyController()
-
-		studyReportCriteriaController := NewStudyReportCriteriaController()
-		studyReportController := NewStudyReportController()
 
 		// Semester controller
 		semesterController := NewSemesterController()
 		holidayController := NewHolidayController()
 
+		// Chat controller
+		chatMessageController := NewChatMessageController()
+
+		chatReactionController := NewChatMessageReactionController()
+
+		// Chat reply controller
+		chatReplyController := NewChatReplyController()
+
 		// Contest controllers
 		contestController := NewContestController()
 		contestRoundController := NewContestRoundController()
-		contestQuestionController := NewContestQuestionController()
-		contestResultController := NewContestResultController()
-
-		settingController := NewSettingController()
-		headingController := NewHeadingController()
-		trainingLevelController := NewTrainingLevelController()
-
-		teachingPlanController := NewTeachingPlanController()
 
 		RegisterModuleRoute(managementRouter, "questions", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, questionController)
 		RegisterModuleRoute(managementRouter, "classes", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, classController)
@@ -151,73 +112,24 @@ func InitRoutes(router *gin.Engine) {
 		RegisterModuleRoute(managementRouter, "exams", []string{"index", "show", "store", "update", "destroy"}, examController)
 		RegisterModuleRoute(managementRouter, "exercises", []string{"index", "show", "store", "update", "destroy"}, exerciseController)
 		RegisterModuleRoute(managementRouter, "homeworks", []string{"index", "show", "store", "update", "destroy"}, homeworkController)
-		RegisterModuleRoute(managementRouter, "assessment-criteria", []string{"index", "show", "store", "update", "destroy"}, assessmentCriterionController)
-		managementRouter.POST("/assessment-criteria/bulk", middleware.RoleMiddleware("assessment-criteria.store"), assessmentCriterionController.CreateBulk)
-		RegisterModuleRoute(managementRouter, "assessment-subcriteria", []string{"index", "show", "store", "update", "destroy"}, assessmentSubcriterionController)
-		RegisterModuleRoute(managementRouter, "assessment-criteria-groups", []string{"index", "show", "store", "update", "destroy"}, assessmentCriteriaGroupController)
-		managementRouter.POST("/assessment-criteria-group/with-criteria", middleware.RoleMiddleware("assessment-criteria-groups.store"), assessmentCriteriaGroupController.CreateWithCriteria)
-		managementRouter.PUT("/assessment-criteria-group/with-criteria/:id", middleware.RoleMiddleware("assessment-criteria-groups.update"), assessmentCriteriaGroupController.UpdateWithCriteria)
-
-		managementRouter.POST("/assessments/ref-lesson", middleware.RoleMiddleware("assessments.store"), assessmentController.AssignRefLesson)
-		managementRouter.POST("/assessments/with-criteria", middleware.RoleMiddleware("assessments.store"), assessmentController.CreateWithCriteria)
-		managementRouter.POST("/assessments/save-score/bulk", middleware.RoleMiddleware("assessments.store"), assessmentController.SaveScoreBulk)
-		assessmentExportController := NewAssessmentExportController()
-		managementRouter.GET("/assessments/export-excel", middleware.RoleMiddleware("assessments.index"), assessmentExportController.ExportExcel)
-		managementRouter.POST("/assessments/import-excel", middleware.RoleMiddleware("assessments.store"), assessmentExportController.ImportExcel)
-		RegisterModuleRoute(managementRouter, "assessments", []string{"index", "show", "store", "update", "destroy"}, assessmentController)
-
-		// Routes accessible without /manage prefix but still require auth/role
-		assessmentsRouter := api.Group("/assessments")
-		assessmentsRouter.Use(middleware.AuthMiddleware(authRepo))
-		assessmentsRouter.POST("/save-score/bulk", middleware.RoleMiddleware("assessments.store"), assessmentController.SaveScoreBulk)
 		RegisterModuleRoute(managementRouter, "contests", []string{"index", "show", "store", "update", "destroy", "restore"}, contestController)
-		RegisterModuleRoute(managementRouter, "contest_rounds", []string{"index", "show", "store", "update", "destroy", "restore"}, contestRoundController)
-		managementRouter.GET("/publish-assessments", middleware.RoleMiddleware("assessments.index"), assessmentController.GetPublish)
-		managementRouter.PUT("/publish-assessments", middleware.RoleMiddleware("assessments.store"), assessmentController.UpdatePublish)
+		RegisterModuleRoute(managementRouter, "contest-rounds", []string{"index", "show", "store", "update", "destroy", "restore"}, contestRoundController)
+
 		// Contest custom routes
 		managementRouter.GET("/contests/:id/rounds", contestController.GetContestRounds)
 		managementRouter.GET("/contests/:id/with-rounds", contestController.GetContestWithRounds)
 
 		// Contest Round custom routes
-		managementRouter.GET("/contests/:id/contest_rounds", contestRoundController.GetByContestId)
-		managementRouter.GET("/contest_rounds/:id/users", contestRoundController.GetContestRoundUsers)
-		managementRouter.GET("/contest_rounds/:id/joiners", contestRoundController.GetContestRoundJoiners)
-		managementRouter.POST("/contest_rounds/:id/joiners", contestRoundController.AddJoiner)
-		managementRouter.DELETE("/contest_rounds/:id/joiners", contestRoundController.RemoveJoiner)
-		managementRouter.DELETE("/contest_rounds/:id/joiners/bulk", contestRoundController.BulkRemoveJoiners)
-
-		// Contest Round joiner list routes (deprecated - use /joiners instead)
-		managementRouter.GET("/contest_rounds/:id/provinces", contestRoundController.GetContestRoundProvinces)
-		managementRouter.GET("/contest_rounds/:id/schools", contestRoundController.GetContestRoundSchools)
-		managementRouter.GET("/contest_rounds/:id/classes", contestRoundController.GetContestRoundClasses)
-		managementRouter.GET("/contest_rounds/:id/students", contestRoundController.GetContestRoundStudents)
-
-		// Contest Questions routes for Admin
-		managementRouter.GET("/contest_rounds/:id/questions", middleware.RoleMiddleware("contest_rounds.show"), contestQuestionController.GetContestRoundQuestions)
-		managementRouter.POST("/contest_rounds/:id/questions", middleware.RoleMiddleware("contest_rounds.update"), contestQuestionController.AssignQuestionsToContestRound)
-		managementRouter.DELETE("/contest_rounds/:id/questions", middleware.RoleMiddleware("contest_rounds.update"), contestQuestionController.RemoveQuestionsFromContestRound)
-
-		// Contest Results routes for Admin
-		managementRouter.GET("/contest_rounds/:id/answers", middleware.RoleMiddleware("contest_rounds.show"), contestResultController.GetContestRoundAnswers)
-		managementRouter.GET("/contest_rounds/:id/answers/student", middleware.RoleMiddleware("contest_rounds.show"), contestResultController.GetContestRoundAnswersByStudent)
-		managementRouter.GET("/contest_rounds/:id/results", middleware.RoleMiddleware("contest_rounds.show"), contestResultController.GetContestRoundResults)
-
+		managementRouter.GET("/contests/:id/contest-rounds", contestRoundController.GetByContestId)
+		managementRouter.GET("/contest-rounds/:id/users", contestRoundController.GetContestRoundUsers)
+		managementRouter.GET("/contest-rounds/:id/joiners", contestRoundController.GetContestRoundJoiners)
+		managementRouter.POST("/contest-rounds/:id/joiners", contestRoundController.AddJoiner)
+		managementRouter.DELETE("/contest-rounds/:id/joiners", contestRoundController.RemoveJoiner)
 		RegisterModuleRoute(managementRouter, "programs", []string{"index", "show", "store", "update", "destroy", "restore"}, programController)
-		managementRouter.GET("/programs/:id/export", middleware.RoleMiddleware("programs.export"), programController.Export)
-		managementRouter.POST("/programs/import", middleware.RoleMiddleware("programs.import"), programController.Import)
-
-		RegisterModuleRoute(managementRouter, "courses", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, courseController)
-		managementRouter.GET("/courses/:id/export-users", middleware.RoleMiddleware("courses.export"), courseController.ExportUsers)
-		managementRouter.POST("/courses/:id/import-users", middleware.RoleMiddleware("courses.import"), courseController.ImportUsers)
-		managementRouter.GET("/list-courses-family", courseController.ListCoursesFamily)
-		managementRouter.POST("/course-schedule/assign-parent", courseScheduleController.AssignParent)
-		managementRouter.POST("/course-schedule/sync-all-family", courseScheduleController.SyncFamily)
-		managementRouter.GET("/course-schedule/family", courseFamilyController.GetCourseFamily)
+		RegisterModuleRoute(managementRouter, "courses", []string{"index", "show", "store", "update", "destroy", "restore"}, courseController)
 		RegisterModuleRoute(managementRouter, "schools", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, schoolController)
-		RegisterModuleRoute(managementRouter, "subjects", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, subjectController)
+		RegisterModuleRoute(managementRouter, "subjects", []string{"index", "show", "store", "update", "destroy", "restore"}, subjectController)
 		RegisterModuleRoute(managementRouter, "chapters", []string{"index", "show", "store", "update", "destroy", "restore"}, chapterController)
-		RegisterModuleRoute(managementRouter, "headings", []string{"index", "show", "store", "update", "destroy"}, headingController)
-		RegisterModuleRoute(managementRouter, "training-levels", []string{"index", "show", "store", "update", "destroy"}, trainingLevelController)
 		RegisterModuleRoute(managementRouter, "roles", []string{"index", "show", "store", "update", "destroy"}, roleController)
 		RegisterModuleRoute(managementRouter, "users", []string{"index", "show", "store", "update", "destroy", "export", "import", "restore"}, userController)
 		RegisterModuleRoute(managementRouter, "source-questions", []string{"index", "show", "store", "update", "destroy", "restore"}, sourceQuestionController)
@@ -233,25 +145,10 @@ func InitRoutes(router *gin.Engine) {
 
 		RegisterModuleRoute(managementRouter, "grades", []string{"index", "show", "store", "update", "destroy", "restore"}, gradeController)
 
-		// Faculty
-		RegisterModuleRoute(managementRouter, "faculties", []string{"index", "show", "store", "update", "destroy", "restore", "export", "import"}, facultyController)
-
-		RegisterModuleRoute(managementRouter, "study-report-criterias", []string{"index", "show", "store", "update", "destroy"}, studyReportCriteriaController)
-		RegisterModuleRoute(managementRouter, "study-reports", []string{"index", "show", "store", "update", "destroy"}, studyReportController)
-		managementRouter.GET("/study-reports/evaluates/:course_id", middleware.RoleMiddleware("study-reports.index"), studyReportController.Evaluate)
-		managementRouter.GET("/publish-study-report", middleware.RoleMiddleware("study-reports.index"), studyReportController.GetPublish)
-		managementRouter.PUT("/publish-study-report", middleware.RoleMiddleware("study-reports.store"), studyReportController.UpdatePublish)
 		RegisterModuleRoute(managementRouter, "question-attributes", []string{"index", "show", "store", "update", "destroy", "restore"}, questionAttributeController)
 		managementRouter.GET("/question-attributes/parent", middleware.RoleMiddleware("question-attributes.index"), questionAttributeController.GetParents)
 		RegisterModuleRoute(managementRouter, "study-shifts", []string{"index", "show", "store", "update", "destroy", "restore"}, studyShiftController)
-		RegisterModuleRoute(managementRouter, "holidays", []string{"index", "show", "store", "update", "destroy"}, holidayController)
-		RegisterModuleRoute(managementRouter, "semesters", []string{"index", "show", "store", "update", "destroy"}, semesterController)
 
-		// Notice routes
-		RegisterModuleRoute(managementRouter, "notices", []string{"index", "show", "store", "update", "destroy"}, noticeController)
-
-		RegisterModuleRoute(managementRouter, "settings", []string{"index", "show", "store", "update", "destroy"}, settingController)
-		api.GET("/manage/settings/by-key/:key", settingController.GetByKey)
 		// Lesson for course
 		managementRouter.GET("/lessons/lesson-plans/:lesson_id/:course_id", middleware.RoleMiddleware("homeworks.index"), lessonController.GetLessonPlanByCourse)
 		managementRouter.GET("/lessons/exams/:lesson_id/:course_id", middleware.RoleMiddleware("homeworks.index"), lessonController.GetExamByCourse)
@@ -275,115 +172,6 @@ func InitRoutes(router *gin.Engine) {
 		managementRouter.GET("/warnings/failed-logins-count", middleware.RoleMiddleware("users.index"), warningController.GetFailedLoginsCount)
 		managementRouter.GET("/warnings/failed-logins", middleware.RoleMiddleware("users.index"), warningController.GetFailedLogins)
 
-		// Zoom Integration Routes
-		zoomAuthController := NewZoomAuthController()
-		zoomMeetingController := NewZoomMeetingController()
-
-		// Zoom Auth routes
-		managementRouter.POST("/zoom/auth/connect", middleware.AuthMiddleware(authRepo), zoomAuthController.Connect)
-		managementRouter.POST("/zoom/auth/disconnect", middleware.AuthMiddleware(authRepo), zoomAuthController.Disconnect)
-		managementRouter.GET("/zoom/auth/status", middleware.AuthMiddleware(authRepo), zoomAuthController.Status)
-		managementRouter.POST("/zoom/auth/refresh", middleware.AuthMiddleware(authRepo), zoomAuthController.RefreshToken)
-
-		// Zoom Meeting routes
-		managementRouter.POST("/zoom/meetings", middleware.AuthMiddleware(authRepo), zoomMeetingController.CreateMeeting)
-		managementRouter.GET("/zoom/meetings/:id", middleware.AuthMiddleware(authRepo), zoomMeetingController.GetMeeting)
-		managementRouter.GET("/zoom/meetings", middleware.AuthMiddleware(authRepo), zoomMeetingController.GetUserMeetings)
-		managementRouter.PUT("/zoom/meetings/:id", middleware.AuthMiddleware(authRepo), zoomMeetingController.UpdateMeeting)
-		managementRouter.DELETE("/zoom/meetings/:id", middleware.AuthMiddleware(authRepo), zoomMeetingController.DeleteMeeting)
-		managementRouter.POST("/zoom/meetings/:id/start", middleware.AuthMiddleware(authRepo), zoomMeetingController.StartMeeting)
-
-		// Course and Lesson integration routes
-		managementRouter.GET("/courses/:id/zoom-meetings", middleware.AuthMiddleware(authRepo), zoomMeetingController.GetCourseMeetings)
-		managementRouter.POST("/courses/:id/zoom-meeting", middleware.AuthMiddleware(authRepo), zoomMeetingController.CreateCourseMeeting)
-		managementRouter.GET("/lessons/:id/zoom-meetings", middleware.AuthMiddleware(authRepo), zoomMeetingController.GetLessonMeetings)
-		managementRouter.POST("/lessons/:id/zoom-meeting", middleware.AuthMiddleware(authRepo), zoomMeetingController.CreateLessonMeeting)
-
-		// Google Meet Integration Routes
-		googleAuthController := NewGoogleAuthController()
-		googleMeetingController := NewGoogleMeetingController()
-
-		// Google Auth routes
-		managementRouter.POST("/google/auth/connect", middleware.AuthMiddleware(authRepo), googleAuthController.Connect)
-		managementRouter.POST("/google/auth/disconnect", middleware.AuthMiddleware(authRepo), googleAuthController.Disconnect)
-		managementRouter.GET("/google/auth/status", middleware.AuthMiddleware(authRepo), googleAuthController.Status)
-		managementRouter.POST("/google/auth/refresh", middleware.AuthMiddleware(authRepo), googleAuthController.RefreshToken)
-
-		// Google Meeting routes
-		managementRouter.POST("/google/meetings", middleware.AuthMiddleware(authRepo), middleware.RoleMiddleware("meetings.store"), googleMeetingController.CreateMeeting)
-		managementRouter.GET("/google/meetings/:id", middleware.AuthMiddleware(authRepo), googleMeetingController.GetMeeting)
-		managementRouter.GET("/google/meetings", middleware.AuthMiddleware(authRepo), googleMeetingController.GetUserMeetings)
-		managementRouter.PUT("/google/meetings/:id", middleware.AuthMiddleware(authRepo), googleMeetingController.UpdateMeeting)
-		managementRouter.DELETE("/google/meetings/:id", middleware.AuthMiddleware(authRepo), googleMeetingController.DeleteMeeting)
-		managementRouter.DELETE("/google/meetings/:id/force", middleware.AuthMiddleware(authRepo), googleMeetingController.ForceDeleteMeeting)
-		managementRouter.POST("/google/meetings/:id/recording", middleware.AuthMiddleware(authRepo), googleMeetingController.UpdateRecording)
-		managementRouter.GET("/google/meetings/upcoming", middleware.AuthMiddleware(authRepo), googleMeetingController.GetUpcomingMeetings)
-
-		// Google Meet Course and Lesson integration routes
-		managementRouter.GET("/google-courses/:id/meetings", middleware.AuthMiddleware(authRepo), googleMeetingController.GetCourseMeetings)
-		managementRouter.POST("/google-courses/:id/meeting", middleware.AuthMiddleware(authRepo), middleware.RoleMiddleware("meetings.store"), googleMeetingController.CreateCourseIntegration)
-		managementRouter.GET("/google-lessons/:id/meetings", middleware.AuthMiddleware(authRepo), googleMeetingController.GetLessonMeetings)
-		managementRouter.POST("/google-lessons/:id/meeting", middleware.AuthMiddleware(authRepo), middleware.RoleMiddleware("meetings.store"), googleMeetingController.CreateLessonIntegration)
-
-		// Google Meeting Attendance routes
-		googleMeetingAttendanceController := controllers.NewGoogleMeetingAttendanceController()
-		managementRouter.POST("/google/meetings/join/:code", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.JoinByShortCode)
-		managementRouter.POST("/google/meetings/:id/join", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.JoinMeeting)
-		managementRouter.POST("/google/meetings/:id/leave", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.LeaveMeeting)
-		managementRouter.GET("/google/meetings/:id/attendances", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.GetMeetingAttendances)
-		managementRouter.GET("/google/meetings/:id/attendances/export", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.ExportAttendancesExcel)
-		managementRouter.GET("/google/meetings/:id/summary", middleware.AuthMiddleware(authRepo), googleMeetingAttendanceController.GetAttendanceSummary)
-
-		microsoftAuthController := NewMicrosoftAuthController()
-		microsoftMeetingController := NewMicrosoftMeetingController()
-
-		managementRouter.POST("/microsoft/auth/connect", middleware.AuthMiddleware(authRepo), microsoftAuthController.ConnectAccount)
-		managementRouter.GET("/microsoft/auth/status", middleware.AuthMiddleware(authRepo), microsoftAuthController.CheckConnection)
-		managementRouter.POST("/microsoft/auth/disconnect", middleware.AuthMiddleware(authRepo), microsoftAuthController.DisconnectAccount)
-
-		managementRouter.GET("/microsoft/meetings/permissions", middleware.AuthMiddleware(authRepo), microsoftMeetingController.CheckMeetingPermissions)
-		managementRouter.POST("/microsoft/meetings", middleware.AuthMiddleware(authRepo), middleware.RoleMiddleware("meetings.store"), microsoftMeetingController.CreateMeeting)
-		managementRouter.GET("/microsoft/meetings/:id", middleware.AuthMiddleware(authRepo), microsoftMeetingController.GetMeeting)
-		managementRouter.PUT("/microsoft/meetings/:id", middleware.AuthMiddleware(authRepo), microsoftMeetingController.UpdateMeeting)
-		managementRouter.DELETE("/microsoft/meetings/:id", middleware.AuthMiddleware(authRepo), microsoftMeetingController.DeleteMicrosoftMeeting)
-		managementRouter.POST("/microsoft/meetings/:id/share-link", middleware.AuthMiddleware(authRepo), microsoftMeetingController.SetRecordingShareURL)
-		managementRouter.GET("/microsoft/meetings/user", middleware.AuthMiddleware(authRepo), microsoftMeetingController.GetUserMeetings)
-		managementRouter.GET("/microsoft/meetings/upcoming", middleware.AuthMiddleware(authRepo), microsoftMeetingController.GetUpcomingMeetings)
-		managementRouter.GET("/microsoft/meetings/course/:course_id", middleware.AuthMiddleware(authRepo), microsoftMeetingController.GetCourseMeetings)
-		managementRouter.GET("/microsoft/meetings/lesson/:lesson_id", middleware.AuthMiddleware(authRepo), microsoftMeetingController.GetLessonMeetings)
-		managementRouter.POST("/microsoft/lessons/:lesson_id/meeting", middleware.AuthMiddleware(authRepo), middleware.RoleMiddleware("meetings.store"), microsoftMeetingController.CreateLessonIntegration)
-		managementRouter.POST("/microsoft/meetings/:id/recording", middleware.AuthMiddleware(authRepo), microsoftMeetingController.FetchRecording)
-		managementRouter.GET("/microsoft/meetings/:id/recording", middleware.AuthMiddleware(authRepo), microsoftMeetingController.FetchRecording)
-		// Meeting Attendance routes (for online class)
-		meetingAttendanceController := controllers.NewMeetingAttendanceController()
-		managementRouter.POST("/microsoft/meetings/join/:code", middleware.AuthMiddleware(authRepo), meetingAttendanceController.JoinByShortCode)
-		managementRouter.POST("/microsoft/meetings/:id/join", middleware.AuthMiddleware(authRepo), meetingAttendanceController.JoinMeeting)
-		managementRouter.POST("/microsoft/meetings/:id/leave", middleware.AuthMiddleware(authRepo), meetingAttendanceController.LeaveMeeting)
-		managementRouter.GET("/microsoft/meetings/:id/attendances", middleware.AuthMiddleware(authRepo), meetingAttendanceController.GetMeetingAttendances)
-		managementRouter.GET("/microsoft/meetings/:id/attendances/export", middleware.AuthMiddleware(authRepo), meetingAttendanceController.ExportAttendancesToExcel)
-		managementRouter.GET("/microsoft/meetings/:id/summary", middleware.AuthMiddleware(authRepo), meetingAttendanceController.GetAttendanceSummary)
-		managementRouter.GET("/microsoft/meetings/my-attendance", middleware.AuthMiddleware(authRepo), meetingAttendanceController.GetUserAttendanceHistory)
-
-		meetingNotificationController := controllers.NewMeetingNotificationController()
-		managementRouter.GET("/microsoft/meeting-notifications", middleware.AuthMiddleware(authRepo), meetingNotificationController.ListMyNotifications)
-		managementRouter.PUT("/microsoft/meeting-notifications/:id/read", middleware.AuthMiddleware(authRepo), meetingNotificationController.MarkRead)
-		managementRouter.GET("/microsoft/meeting-notifications/unread-count", middleware.AuthMiddleware(authRepo), meetingNotificationController.CountUnread)
-
-		// AI Grading Routes
-		// aiGradingController := NewAIGradingController()
-		// managementRouter.POST("/ai/grading/writing", aiGradingController.GradeWriting)
-		// managementRouter.POST("/ai/grading/speaking", aiGradingController.GradeSpeaking)
-
-		// Clone course
-		// TODO: Re-enable these routes when methods are implemented
-		// managementRouter.POST("/courses/:id/cloned", middleware.RoleMiddleware("courses.store"), courseController.Cloned)
-		// managementRouter.DELETE("/courses/:id/cloned", middleware.RoleMiddleware("courses.store"), courseController.DeleteClone)
-		// managementRouter.POST("/courses/:id/publish", middleware.RoleMiddleware("courses.store"), courseController.Publish)
-		// managementRouter.POST("/courses/:id/sync", middleware.RoleMiddleware("courses.store"), courseController.Sync)
-		// managementRouter.POST("/programs/:id/sync", middleware.RoleMiddleware("programs.store"), programController.Sync)
-		// managementRouter.POST("/programs/create-by-course", middleware.RoleMiddleware("programs.store"), programController.CreateByCourse)
-		// managementRouter.POST("/programs/:id/resync", middleware.RoleMiddleware("programs.store"), programController.ReSync)
-
 		// Clone data
 		managementRouter.POST("/homeworks/:id/cloned", middleware.RoleMiddleware("homeworks.store"), homeworkController.Cloned)
 		managementRouter.POST("/exams/:id/cloned", middleware.RoleMiddleware("exams.store"), examController.Cloned)
@@ -396,14 +184,26 @@ func InitRoutes(router *gin.Engine) {
 
 		// Assigned lesson
 		managementRouter.GET("/homeworks/:id/assigned-lessons", middleware.RoleMiddleware("homeworks.index"), homeworkController.AssignedLesson)
-		managementRouter.GET("/homeworks/students-doing", middleware.RoleMiddleware("homeworks.index"), homeworkController.StudentsDoing)
 		managementRouter.GET("/exams/:id/assigned-lessons", middleware.RoleMiddleware("exams.index"), examController.AssignedLesson)
 		managementRouter.GET("/exercises/:id/assigned-lessons", middleware.RoleMiddleware("exercises.index"), exerciseController.AssignedLesson)
 
 		managementRouter.PUT("/lesson-plans/:id/complete", middleware.RoleMiddleware("lesson-plans.update"), lessonPlanController.Complete)
 		managementRouter.PUT("/chapters/:id/sort-lessons", middleware.RoleMiddleware("chapters.update"), chapterController.SortLessons)
-		managementRouter.PUT("/programs/:id/sort-chapters", middleware.RoleMiddleware("programs.update"), programController.SortChapters)
 		managementRouter.PUT("/questions/sync-keywords", middleware.RoleMiddleware("questions.update"), questionController.SyncKeywords)
+
+		// Semester
+		managementRouter.GET("/semesters", semesterController.GetAll)
+		managementRouter.GET("/semesters/:id", semesterController.GetByID)
+		managementRouter.POST("/semesters", semesterController.Create)
+		managementRouter.PUT("/semesters/:id", semesterController.Update)
+		managementRouter.DELETE("/semesters/:id", semesterController.Delete)
+
+		// Holiday
+		managementRouter.GET("/holidays", holidayController.GetAll)
+		managementRouter.GET("/holidays/:id", holidayController.GetByID)
+		managementRouter.POST("/holidays", holidayController.Create)
+		managementRouter.PUT("/holidays/:id", holidayController.Update)
+		managementRouter.DELETE("/holidays/:id", holidayController.Delete)
 
 		managementRouter.GET("/weeks", weekController.GetAll)
 		managementRouter.GET("/weeks/by-date", weekController.GetWeekByDate)
@@ -414,7 +214,6 @@ func InitRoutes(router *gin.Engine) {
 		// Lesson Schedule Copy
 		lessonScheduleCopyController := NewLessonScheduleCopyController()
 		managementRouter.POST("/lesson-schedules/copy", middleware.RoleMiddleware("lesson_schedule.store"), lessonScheduleCopyController.CopyLessonSchedules)
-		managementRouter.POST("/lesson-schedules/sync-all-program", middleware.RoleMiddleware("lesson_schedule.store"), lessonScheduleController.SyncAllProgram)
 
 		managementRouter.PUT("/profile", middleware.AuthMiddleware(authRepo), userController.UpdateProfile)
 		managementRouter.GET("/users/permissions", middleware.RoleMiddleware("users.show"), userController.GetPermissions)
@@ -448,7 +247,6 @@ func InitRoutes(router *gin.Engine) {
 		managementRouter.GET("/school-dashboard-starts", schoolDashboardController.GetSchoolSummary)
 
 		managementRouter.PUT("/lessons/:id/completion", middleware.RoleMiddleware("lessons.show"), lessonController.Completion)
-		managementRouter.PUT("/lessons/:id/studying", middleware.RoleMiddleware("lessons.show"), lessonController.Studying)
 
 		managementRouter.PUT("/class/user-relation", NewClassUserRelationController().UpdateUserClassRelation)
 
@@ -480,11 +278,37 @@ func InitRoutes(router *gin.Engine) {
 		managementRouter.POST("/flashcard-sessions/:sessionId/activities", flashcardController.RecordFlashcardActivity)
 
 		// Student progress routes
-		managementRouter.PUT("/vocabulary-progress/:vocabularyId", flashcardController.UpdateVocabularyProgress)
+		managementRouter.PUT("/vocabulary-progress/:vocabularyId", flashcardController.UpdateVocabularyProgress) // Chat Message Routes
+		managementRouter.POST("/courses/:id/chat/messages", chatMessageController.SendMessageWithMedias)
+		managementRouter.POST("/courses/:id/chat/messages/upload-files-to-medias", chatMessageController.UploadFilesToMedias)
+		managementRouter.GET("/courses/:id/chat/messages", chatMessageController.GetMessages)
+		managementRouter.DELETE("/courses/:id/chat/messages/:messageId", chatMessageController.DeleteMessage)
+		managementRouter.POST("/courses/:id/chat/messages/:messageId/pin", chatMessageController.TogglePinMessage)
+		managementRouter.GET("/courses/:id/chat/messages/pinned", chatMessageController.GetPinnedMessages)
+		managementRouter.GET("/courses/:id/chat/messages/count", chatMessageController.GetMessageCount)
+		managementRouter.GET("/courses/:id/chat/messages/recent", chatMessageController.GetRecentMessages)
 
-		RegisterModuleRoute(managementRouter, "teaching-plans", []string{"index", "show", "store", "update", "destroy"}, teachingPlanController)
-		managementRouter.PUT("/teaching-plan-approve", middleware.RoleMiddleware("teaching-plans.approve"), teachingPlanController.Approve)
+		// Chat Message Reaction Routes
+		managementRouter.POST("/courses/:id/chat/messages/:messageId/reactions", chatReactionController.AddReaction)
+		managementRouter.DELETE("/courses/:id/chat/messages/:messageId/reactions", chatReactionController.RemoveReaction)
+		managementRouter.GET("/courses/:id/chat/messages/:messageId/reactions", chatReactionController.GetMessageReactions)
+		managementRouter.DELETE("/courses/:id/chat/messages/:messageId/reactions/all", chatReactionController.DeleteAllReactions)
+
+		// Chat Message Reply Routes
+		managementRouter.POST("/courses/:id/chat/messages/:messageId/replies", chatReplyController.SendReply)
+		// managementRouter.GET("/courses/:id/chat/messages/:messageId/replies", chatReplyController.GetReplies) // Tạm thời comment - chưa cần thiết
+		managementRouter.GET("/courses/:id/chat/messages/:messageId/with-replies", chatReplyController.GetMessageWithReplies)
+		// managementRouter.DELETE("/courses/:id/chat/messages/:messageId/replies/:replyId", chatReplyController.DeleteReply) // Không cần - đã có cascade delete trong DeleteMessage
+
 	}
+
+	// Chat SSE (Server-Sent Events) Routes for real-time notifications - no auth middleware needed (self-authenticated)
+	chatSSEController := controllers.NewChatSSEController()
+	api.GET("/manage/courses/:id/chat/events", chatSSEController.StreamCourseEvents)
+	api.GET("/manage/courses/events", chatSSEController.StreamMultipleCourseEvents)
+	api.GET("/manage/users/events", chatSSEController.StreamUserEvents)
+	managementRouter.GET("/chat/channels", chatSSEController.GetActiveChannels)
+	managementRouter.GET("/chat/channels/stats", chatSSEController.GetChannelStats)
 
 	// Feedback routes
 	feedbackController := NewFeedbackController()
@@ -509,8 +333,7 @@ func InitRoutes(router *gin.Engine) {
 		studyRouter.POST("/save-score/manual-scoring", saveScoreController.SaveScoreManualScoring)
 		studyRouter.POST("/save-score/bulk", saveScoreController.SaveScoreBulk)
 		studyRouter.POST("/save-score/submit-homework", saveScoreController.SubmitHomework)
-		studyRouter.POST("/save-score/evaluate", saveScoreController.Evaluate)
-		studyRouter.POST("/save-score/teacher-evaluate", saveScoreController.TeacherEvaluate)
+
 		// Skip question
 		skipQuestionController := controllers.NewSkipQuestionController()
 		studyRouter.POST("/save-score/skip-question", skipQuestionController.SkipQuestion)
@@ -548,15 +371,6 @@ func InitRoutes(router *gin.Engine) {
 
 		examCommentController := NewExamCommentController()
 		studyRouter.POST("/exam-comment", examCommentController.PostExamComment)
-
-		// Contest student routes
-		contestStudentController := NewContestStudentController()
-		studyRouter.GET("/contest-rounds-by-student", contestStudentController.GetContestRoundsByStudent)
-		studyRouter.GET("/contest_rounds_by_student", contestStudentController.GetContestRoundsByStudent) // Backward compatibility
-
-		// Contest Questions routes for Students
-		contestQuestionController := NewContestQuestionController()
-		studyRouter.GET("/contest_rounds/:id/questions", contestQuestionController.GetContestRoundQuestions)
 	}
 
 	dashboardRouter := api.Group("/dashboard")
@@ -571,17 +385,10 @@ func InitRoutes(router *gin.Engine) {
 		dashboardRouter.GET("/student/homework", middleware.AuthMiddleware(authRepo), dashboardStudentHomeworkController.GetStudentHomeworkStats)
 		dashboardRouter.GET("/student/exam-list", dashboardStudentExamListController.GetStudentExamList)
 		dashboardRouter.GET("/student/homework-list", dashboardStudentHomeworkListController.GetStudentHomeworkList)
-		dashboardStudentAssessmentController := NewDashboardStudentAssessmentController()
-		dashboardRouter.GET("/student/assessments", dashboardStudentAssessmentController.GetStudentAssessments)
-		dashboardAssessmentReportExcelController := NewDashboardAssessmentReportExcelController()
-		dashboardRouter.POST("/assessment/report-excel", dashboardAssessmentReportExcelController.ReportExcel)
 		dashboardRouter.GET("/exam-list", dashboardListEntityController.GetExams)
 		dashboardRouter.GET("/homework-list", dashboardListEntityController.GetHomeworks)
 		dashboardRouter.GET("/school-list", dashboardListEntityController.GetSchools)
 		dashboardRouter.GET("/course-list", dashboardListEntityController.GetCourses)
-		dashboardRouter.GET("/class-list", dashboardListEntityController.GetClasses)
-		dashboardRouter.GET("/class-main-list", dashboardListEntityController.GetClassMains)
-		dashboardRouter.GET("/chapter-list", dashboardListEntityController.GetChapters)
 		dashboardRouter.GET("/lesson-list", dashboardListEntityController.GetLessons)
 		dashboardRouter.GET("/teacher-list", dashboardListEntityController.GetTeachers)
 		dashboardRouter.GET("/subject-list", dashboardListEntityController.GetSubjects)
@@ -592,9 +399,6 @@ func InitRoutes(router *gin.Engine) {
 		dashboardRouter.GET("/teacher/exam-overview", NewDashboardTeacherExamOverviewController().DashboardTeacherExamOverview)
 
 		// Dashboard Teacher Homework routes
-		dashboardRouter.GET("/teacher/homework/list-homeworks", NewDashboardTeacherHomeworkListController().GetHomeworkList)
-		dashboardRouter.GET("/teacher/homework/export", NewDashboardTeacherHomeworkStudentController().ExportTeacherHomeworkStats)
-		dashboardRouter.GET("/teacher/homework/:homework_id/export", NewDashboardTeacherHomeworkStudentController().ExportTeacherHomeworkStudent)
 		dashboardRouter.GET("/teacher/homework/:homework_id", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStudent)
 		dashboardRouter.GET("/teacher/homework", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStats)
 		dashboardRouter.GET("/teacher/homework-overview", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkOverview)
@@ -602,22 +406,11 @@ func InitRoutes(router *gin.Engine) {
 		dashboardRouter.GET("/teacher/homework-unscored", NewDashboardTeacherHomeworkUnscoredController().DashboardTeacherHomeworkUnscored)
 		dashboardRouter.GET("/teacher/homework-scored", NewDashboardTeacherHomeworkScoredController().DashboardTeacherHomeworkScored)
 
-		// Dashboard Teacher Assessment routes
-		dashboardRouter.GET("/teacher/assessment/students", NewAssessmentStudentController().GetStudentsWithAssessment)
-
-		// Dashboard Assessment Report routes
-		dashboardRouter.GET("/assessment/report", controllers.NewDashboardAssessmentReportController().GetAssessmentReport)
-
 		// Dashboard Exam Ranking routes
 		dashboardRouter.GET("/exam/ranking", NewDashboardExamRankingController().GetExamRanking)
 
 		// Dashboard Contest Ranking routes (TODO: Implement controllers)
 		// dashboardRouter.GET("/contest/ranking", NewDashboardContestRankingController().GetContestRanking)
-
-		// Homework Ranking routes
-		dashboardRouter.GET("/ranking/homework", controllers.NewHomeworkRankingController().GetHomeworkRanking)
-		// Assessment Ranking routes
-		dashboardRouter.GET("/ranking/assessment", controllers.NewAssessmentRankingController().GetAssessmentRanking)
 
 		// Dashboard Contest routes (TODO: Implement controllers)
 		// dashboardRouter.GET("/contests/stats", dashboardContestController.GetContestStats)
@@ -633,8 +426,7 @@ func InitRoutes(router *gin.Engine) {
 	aiGradingController := NewAIGradingController()
 	managementRouter.POST("/ai/grading/writing", aiGradingController.GradeWriting)
 	managementRouter.POST("/ai/grading/speaking", aiGradingController.GradeSpeaking)
-	managementRouter.POST("/ai/grading/image", aiGradingController.GradeImage)
-	internalController := controllers.NewInternalCommandController()
+
 	// Internal command routes
 	internalRouter := api.Group("/internal/command")
 	internalRouter.Use(middleware.AuthMiddleware(authRepo))
@@ -652,32 +444,10 @@ func InitRoutes(router *gin.Engine) {
 		// Homework status scoring sync
 		homeworkStatusScoringController := controllers.NewHomeworkStatusScoringController()
 		internalRouter.POST("/sync-homework-status-scoring", homeworkStatusScoringController.SyncHomeworkStatusScoring)
-
-		// Recalculate total questions
-		recalculateTotalQuestionsController := NewRecalculateTotalQuestionsController()
-		internalRouter.POST("/recalculate-homework-total-questions", recalculateTotalQuestionsController.RecalculateHomeworkTotalQuestions)
-		internalRouter.POST("/recalculate-exam-total-questions", recalculateTotalQuestionsController.RecalculateExamTotalQuestions)
-		internalRouter.POST("/recalculate-exercise-total-questions", recalculateTotalQuestionsController.RecalculateExerciseTotalQuestions)
-		internalRouter.POST("/recalculate-all-total-questions", recalculateTotalQuestionsController.RecalculateAllTotalQuestions)
-
-		// Recalculate homework users data
-		recalculateHomeworkUsersController := NewRecalculateHomeworkUsersController()
-		internalRouter.POST("/recalculate-homework-users-data", recalculateHomeworkUsersController.RecalculateHomeworkUsersData)
-
-		// Recalculate study reports star
-		recalculateStudyReportsStarController := controllers.NewRecalculateStudyReportsStarController()
-		internalRouter.POST("/recalculate-study-reports-star", recalculateStudyReportsStarController.RecalculateStudyReportsStar)
-
-		internalRouter.POST("/sync-homework-user-questions", internalController.SyncHomeworkUserQuestions)
-
-		// Recalculate homework users metrics (full logic như submit homework)
-		internalRouter.POST("/recalculate-homework-users-metrics", internalController.RecalculateHomeworkUsersMetrics)
-
-		// Sync teacher classes
-		internalRouter.POST("/sync-teacher-classes", internalController.SyncTeacherClasses)
 	}
 
 	// Internal command routes
+	internalController := controllers.NewInternalCommandController()
 	internal := api.Group("/internal")
 	internal.Use(middleware.AuthMiddleware(authRepo))
 	internal.Use(middleware.RoleMiddleware("internal.command"))
@@ -695,21 +465,14 @@ func InitRoutes(router *gin.Engine) {
 		// Routes cho daily statistics
 		internal.POST("/daily/school-statistics", internalController.RunDailySchoolStatistics)
 		internal.POST("/daily/course-statistics", internalController.RunDailyCourseStatistics)
-		internal.POST("/daily/all-statistic-courses", internalController.RunAllDailyCourseStatistics)
-		internal.POST("/daily/all-statistic-schools", internalController.RunAllDailySchoolStatistics)
-		internal.POST("/sync-homework-user-questions", internalController.SyncHomeworkUserQuestions)
+		internal.POST("/daily/all-statistics", internalController.RunAllDailyStatistics)
+
 		// Route để liệt kê tất cả jobs
 		internal.GET("/jobs", internalController.ListAvailableJobs)
 
 		// Routes để xóa dữ liệu
 		internal.DELETE("/school-statistics/clear", internalController.ClearDashboardSchoolsData)
 		internal.DELETE("/course-statistics/clear", internalController.ClearDashboardCoursesData)
-
-		// Routes cho sync class main
-		internal.POST("/sync-class-main", internalController.SyncClassMain)
-
-		// Routes cho sync assessment ref lesson
-		internal.POST("/sync-assessment-ref-lesson", internalController.SyncAssessmentRefLesson)
 	}
 }
 
@@ -725,12 +488,3 @@ func NewContestRoundController() *controllers.ContestRoundController {
 	contestRoundService := services.NewContestRoundService(contestRoundRepo)
 	return controllers.NewContestRoundController(contestRoundService)
 }
-
-func NewContestQuestionController() *controllers.ContestQuestionController {
-	return controllers.NewContestQuestionController()
-}
-
-func NewContestResultController() *controllers.ContestResultController {
-	return controllers.NewContestResultController()
-}
-

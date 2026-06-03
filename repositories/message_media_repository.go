@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"context"
 
 	"github.com/gin-gonic/gin"
@@ -105,4 +105,3 @@ func (r *messageMediaRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *
 	// Có thể thêm các điều kiện filter chung ở đây
 	return query
 }
-

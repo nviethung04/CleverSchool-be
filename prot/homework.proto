@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 message HomeworkFile {
   string type = 1;
@@ -73,7 +73,6 @@ message HomeworkStudentInfo {
   int32 manual_questions_count = 8; // số câu hỏi manual scoring đã làm
   string object_title = 9;
   int64 course_id = 10; // course mà học sinh thuộc về
-  bool is_submitted = 11;
 }
 
 message HomeworkStudentsResponse {
@@ -86,8 +85,6 @@ message HomeworkStudentsResponse {
     int32 total_questions = 6;
     int64 created_at = 7; // timestamp
     string object_title = 8;
-    string question_form = 9;
-    repeated HomeworkFile question_files = 10;
   }
   HomeworkInfo homework_info = 1;
   repeated HomeworkStudentInfo students = 2;
@@ -110,28 +107,4 @@ message HomeworkByCourse {
   repeated Homework homework_by_programs = 2;
 }
 
-message HomeworkStudentsDoingItem {
-  int64 user_id = 1;
-  string username = 2;
-  string name = 3;
-  string school_name = 4;
-  int64 homework_id = 5;
-  int64 submitted_at = 6;
-}
-
-message HomeworkStudentsDoingResponse {
-  repeated HomeworkStudentsDoingItem students = 1;
-  int64 total = 2;
-  int32 page = 3;
-  int32 limit = 4;
-}
-
-message TeacherEvaluateRequest {
-  int64 user_id = 1;
-  int64 object_id = 2;
-  string object_type = 3;
-  string rate = 4;
-}
-
 //protoc --go_out=. --go_opt=paths=source_relative prot/homework.proto
-

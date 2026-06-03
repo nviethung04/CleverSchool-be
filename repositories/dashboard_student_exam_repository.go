@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
 	"fmt"
 	"time"
 )
@@ -196,4 +196,3 @@ func (r *dashboardStudentExamRepository) GetStudentExamStats(userID int64, cours
 		Chart:    result,
 	}, nil
 }
-

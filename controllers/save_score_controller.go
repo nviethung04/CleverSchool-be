@@ -1,21 +1,19 @@
 package controllers
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/services"
+	"be-lms/utils"
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type SaveScoreController struct {
@@ -30,8 +28,6 @@ type SaveScoreController struct {
 	saveScoreManualScoringService services.SaveScoreManualScoringService
 	homeworkUserService           services.HomeworkUserService
 	homeworkSkipQuestionService   services.HomeworkSkipQuestionService
-	homeworkCalculationService    services.HomeworkCalculationService
-	userStarExpService            services.UserStarExpService
 }
 
 func NewSaveScoreController(
@@ -46,8 +42,6 @@ func NewSaveScoreController(
 	saveScoreManualScoringService services.SaveScoreManualScoringService,
 	homeworkUserService services.HomeworkUserService,
 	homeworkSkipQuestionService services.HomeworkSkipQuestionService,
-	homeworkCalculationService services.HomeworkCalculationService,
-	userStarExpService services.UserStarExpService,
 ) *SaveScoreController {
 	return &SaveScoreController{
 		serviceMC:                     serviceMC,
@@ -61,8 +55,6 @@ func NewSaveScoreController(
 		saveScoreManualScoringService: saveScoreManualScoringService,
 		homeworkUserService:           homeworkUserService,
 		homeworkSkipQuestionService:   homeworkSkipQuestionService,
-		homeworkCalculationService:    homeworkCalculationService,
-		userStarExpService:            userStarExpService,
 	}
 }
 
@@ -73,46 +65,6 @@ func (c *SaveScoreController) checkAndUpdateSkipQuestionIfCorrect(homeworkID, us
 		// Chỉ gọi service để update did_it_again khi câu hỏi được làm đúng
 		c.homeworkSkipQuestionService.UpdateDidItAgainIfSkipped(homeworkID, userID, questionID)
 	}
-}
-
-// Helper để lấy question_id từ AnswerRequest (hỗ trợ cả proto và JSON format)
-func getQuestionIdFromAnswer(answer *prot.AnswerRequest) int64 {
-	// Kiểm tra proto format (oneof) trước
-	if answer.GetManualRequest() != nil {
-		return answer.GetManualRequest().QuestionId
-	}
-	if answer.GetGroupRequest() != nil {
-		return answer.GetGroupRequest().QuestionId
-	}
-	if answer.GetLabelingRequest() != nil {
-		return answer.GetLabelingRequest().QuestionId
-	}
-	if answer.GetMatchingRequest() != nil {
-		return answer.GetMatchingRequest().QuestionId
-	}
-	if answer.GetPositionRequest() != nil {
-		return answer.GetPositionRequest().QuestionId
-	}
-	if answer.GetFillInBlankRequest() != nil {
-		return answer.GetFillInBlankRequest().QuestionId
-	}
-	if answer.GetMultipleChoiceRequest() != nil {
-		return answer.GetMultipleChoiceRequest().QuestionId
-	}
-	// Nếu không có oneof, lấy từ JSON format (sử dụng protojson để parse)
-	// Note: Proto struct có thể chưa có field QuestionId, cần dùng protojson
-	jsonBytes, err := protojson.Marshal(answer)
-	if err != nil {
-		return 0
-	}
-	var jsonMap map[string]interface{}
-	if err := json.Unmarshal(jsonBytes, &jsonMap); err != nil {
-		return 0
-	}
-	if qid, ok := jsonMap["question_id"].(float64); ok {
-		return int64(qid)
-	}
-	return 0
 }
 
 func (c *SaveScoreController) SaveScoreMultipleChoice(ctx *gin.Context) {
@@ -329,13 +281,14 @@ func (c *SaveScoreController) SaveScoreBulk(ctx *gin.Context) {
 	fmt.Printf("🔍 Raw Body: %s\n", string(body))
 	fmt.Printf("🔍 Content-Type: %s\n", ctx.GetHeader("Content-Type"))
 
-	// Reset body để GetSaveScoreBulkBody có thể đọc
+	// Reset body để GetBody có thể đọc
 	ctx.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 
-	// Sử dụng helper function riêng cho SaveScoreBulk
-	req, err, message := utils.GetSaveScoreBulkBody(ctx)
+	req, err, message := utils.GetBody[*prot.SaveScoreBulkRequest](ctx, func() *prot.SaveScoreBulkRequest {
+		return &prot.SaveScoreBulkRequest{}
+	})
 	if err != nil {
-		fmt.Printf("🔍 GetSaveScoreBulkBody Error: %v, Message: %s\n", err, message)
+		fmt.Printf("🔍 GetBody Error: %v, Message: %s\n", err, message)
 		utils.Respond(ctx, nil, err, message)
 		return
 	}
@@ -343,14 +296,6 @@ func (c *SaveScoreController) SaveScoreBulk(ctx *gin.Context) {
 	// Debug log
 	fmt.Printf("🔍 SaveScoreBulk: ExamId=%d, ExerciseId=%d, HomeworkId=%d, ContestRoundId=%d, LevelTestId=%d, ListAnswers=%v\n",
 		req.ExamId, req.ExerciseId, req.HomeworkId, req.ContestRoundId, req.LevelTestId, len(req.ListAnswers))
-
-	// Lấy JSON maps gốc từ context
-	var jsonMaps []map[string]interface{}
-	if mapsInterface, exists := ctx.Get("save_score_bulk_answer_json_maps"); exists {
-		if maps, ok := mapsInterface.([]map[string]interface{}); ok {
-			jsonMaps = maps
-		}
-	}
 
 	tokenStr := ctx.GetHeader("Token")
 	userID, err := utils.GetUserID(tokenStr)
@@ -365,11 +310,11 @@ func (c *SaveScoreController) SaveScoreBulk(ctx *gin.Context) {
 
 	var data *prot.SaveScoreBulkResponse
 	if req.ExamId != 0 {
-		data, err = c.serviceB.SaveScoreBulkExam(req, jsonMaps, userID)
+		data, err = c.serviceB.SaveScoreBulkExam(req, userID)
 	} else if req.ExerciseId != 0 {
-		data, err = c.serviceB.SaveScoreBulkExercise(req, jsonMaps, userID)
+		data, err = c.serviceB.SaveScoreBulkExercise(req, userID)
 	} else if req.HomeworkId != 0 {
-		data, err = c.serviceB.SaveScoreBulkHomework(req, jsonMaps, userID)
+		data, err = c.serviceB.SaveScoreBulkHomework(req, userID)
 		// Check và update did_it_again cho từng question chỉ khi làm đúng
 		if err == nil && data != nil {
 			// Tạo map để check kết quả của từng câu hỏi
@@ -400,14 +345,13 @@ func (c *SaveScoreController) SaveScoreBulk(ctx *gin.Context) {
 
 			// Check và update cho từng câu hỏi
 			for _, answer := range req.ListAnswers {
-				questionId := getQuestionIdFromAnswer(answer)
-				if isCorrect, exists := questionResults[questionId]; exists {
-					c.checkAndUpdateSkipQuestionIfCorrect(req.HomeworkId, userID, questionId, isCorrect)
+				if isCorrect, exists := questionResults[answer.QuestionId]; exists {
+					c.checkAndUpdateSkipQuestionIfCorrect(req.HomeworkId, userID, answer.QuestionId, isCorrect)
 				}
 			}
 		}
 	} else if req.ContestRoundId != 0 {
-		data, err = c.serviceB.SaveScoreBulkContestRound(req, jsonMaps, userID)
+		data, err = c.serviceB.SaveScoreBulkContestRound(req, userID)
 	} else {
 		// LevelTest and other types not yet implemented
 		utils.Respond(ctx, nil, fmt.Errorf(i18n.Localize("messages.data_invalid")), "messages.data_invalid", http.StatusBadRequest)
@@ -447,100 +391,47 @@ func (c *SaveScoreController) SubmitHomework(ctx *gin.Context) {
 
 	score := 0.0
 	ratio := 0.0
-	star := 0.0
-	exp := 0.0
 	hasManualScoring := false
-	isCompleted := false
 
 	if homework.QuestionForm == models.QuestionFormQuestionType {
 		// Kiểm tra bộ 3 (homework_id, user_id, lesson_id) từ homework_users
 		homeworkUserRepo := repositories.NewHomeworkUserRepository()
-		oldHomeworkUser, err := homeworkUserRepo.GetByHomeworkUserAndLesson(req.HomeworkId, userID, req.LessonId)
+		_, err = homeworkUserRepo.GetByHomeworkUserAndLesson(req.HomeworkId, userID, req.LessonId)
 		if err != nil {
 			utils.Respond(ctx, nil, err, "Không tìm thấy homework user với lesson_id tương ứng")
 			return
 		}
 
-		// Lấy giá trị cũ trước khi tính toán mới
-		var oldExp float64
-		var oldStar int64
-		if oldHomeworkUser != nil {
-			oldExp = oldHomeworkUser.Exp
-			// Lấy star cũ từ homework_users.star
-			oldStar = int64(oldHomeworkUser.Star)
-		}
-
-		// Tính toán lại exp, star, ratio_score qua service chuyên dụng
-		calculationResult, err := c.homeworkCalculationService.CalculateHomeworkMetrics(req.HomeworkId, userID, req.LessonId)
+		score, err = c.homeworkUserService.CalculateHomeworkScoreService(req.HomeworkId, userID)
 		if err != nil {
 			utils.Respond(ctx, nil, err, "")
 			return
 		}
-
-		// Lưu các giá trị đã tính toán vào database
-		score = calculationResult.Score
 		if err := c.homeworkUserService.SaveHomeworkScoreService(req.HomeworkId, userID, score); err != nil {
 			utils.Respond(ctx, nil, err, "")
 			return
 		}
 
-		ratio = calculationResult.Ratio
-		if err := c.homeworkUserService.SaveHomeworkRatioService(req.HomeworkId, userID, ratio); err != nil {
-			utils.Respond(ctx, nil, err, "")
-			return
-		}
-
-		exp = calculationResult.Exp
-		if err := c.homeworkUserService.SaveHomeworkExpService(req.HomeworkId, userID, exp); err != nil {
-			utils.Respond(ctx, nil, err, "")
-			return
-		}
-
-		star = float64(calculationResult.Star)
-		if err := c.homeworkUserService.SaveHomeworkStarService(req.HomeworkId, userID, calculationResult.Star); err != nil {
-			utils.Respond(ctx, nil, err, "")
-			return
-		}
-
-		isCompleted = calculationResult.IsCompleted
-
-		// Tính change_star và change_exp
-		// Nếu chưa có record cũ: change = giá trị mới
-		// Nếu đã có record cũ: change = giá trị mới - giá trị cũ (có thể âm nếu mới < cũ)
-		var changeStar int64
-		var changeExp float64
-		if oldHomeworkUser == nil {
-			// Chưa có record cũ, change = giá trị mới
-			changeStar = calculationResult.Star
-			changeExp = exp
-		} else {
-			// Đã có record cũ, change = giá trị mới - giá trị cũ
-			changeStar = calculationResult.Star - oldStar
-			changeExp = exp - oldExp
-		}
-
-		// Lưu tổng star và exp vào bảng user_star_exp
-		note := fmt.Sprintf("homework %d", req.HomeworkId)
-		if err := c.userStarExpService.UpdateStarAndExp(userID, changeStar, changeExp, note); err != nil {
-			// Log lỗi nhưng không dừng flow
-			fmt.Printf("Lỗi khi lưu star và exp: %v\n", err)
-		}
-
-		// Kiểm tra xem homework có câu hỏi type speaking hoặc writing không từ cloned_questions
-		hasManualScoring, err = c.homeworkUserService.CheckHomeworkHasManualScoringFromClonedQuestions(req.HomeworkId)
+		ratio, err = c.homeworkUserService.CalculateHomeworkRatioService(req.HomeworkId, userID)
 		if err != nil {
 			utils.Respond(ctx, nil, err, "")
 			return
 		}
-
-		// Lưu has_manual_scoring vào homework_users
-		if err := c.homeworkUserService.SaveHomeworkHasManualScoringService(req.HomeworkId, userID, hasManualScoring); err != nil {
+		if err := c.homeworkUserService.SaveHomeworkRatioService(req.HomeworkId, userID, ratio); err != nil {
 			utils.Respond(ctx, nil, err, "")
 			return
 		}
 
 		// Cập nhật status_scoring sau khi tính lại điểm
 		if err := c.homeworkUserService.UpdateHomeworkStatusScoringService(req.HomeworkId, userID); err != nil {
+			utils.Respond(ctx, nil, err, "")
+			return
+		}
+
+		// Kiểm tra xem homework có câu hỏi nào cần chấm thủ công không
+		manualScoringRepo := repositories.NewSaveScoreManualScoringRepository()
+		hasManualScoring, err = manualScoringRepo.CheckUnscoredQuestionsHomework(req.HomeworkId, userID)
+		if err != nil {
 			utils.Respond(ctx, nil, err, "")
 			return
 		}
@@ -587,46 +478,14 @@ func (c *SaveScoreController) SubmitHomework(ctx *gin.Context) {
 		})
 	}
 
-	// Lấy total_exp, total_star, change_exp, change_star từ bảng user_star_exp (is_current = true)
-	var totalExp float64
-	var totalStar int64
-	var responseChangeExp float64
-	var responseChangeStar int64
-
-	if homework.QuestionForm == models.QuestionFormQuestionType {
-		userStarExpRepo := repositories.NewUserStarExpRepository()
-		currentUserStarExp, err := userStarExpRepo.GetCurrentByUserID(userID)
-		if err == nil && currentUserStarExp != nil {
-			totalExp = currentUserStarExp.TotalExp
-			totalStar = currentUserStarExp.TotalStar
-			responseChangeExp = currentUserStarExp.ChangeExp
-			responseChangeStar = currentUserStarExp.ChangeStar
-		}
-	}
-
-	// Tính completion_rate qua service
-	completionRate, err := c.homeworkUserService.CalculateCompletionRate(req.HomeworkId, userID)
-	if err != nil {
-		// Nếu có lỗi, để completion_rate = 0
-		completionRate = 0
-	}
-
 	response := &prot.SubmitHomeworkResponse{
 		HomeworkId:                    req.HomeworkId,
-		UserId:                         userID,
+		UserId:                        userID,
 		Score:                         score,
 		Ratio:                         ratio,
 		HasManualScoring:              hasManualScoring,
 		HasQuestionsNeedManualGrading: hasManualScoring,
 		Files:                         files,
-		Star:                          star,
-		IsCompleted:                   isCompleted,
-		Exp:                           exp,
-		TotalExp:                      totalExp,
-		TotalStar:                     totalStar,
-		ChangeExp:                     responseChangeExp,
-		ChangeStar:                    responseChangeStar,
-		CompletionRate:                completionRate,
 	}
 
 	utils.Respond(ctx, response, nil, "")
@@ -713,6 +572,17 @@ func (c *SaveScoreController) SaveScoreManualScoring(ctx *gin.Context) {
 		err = c.saveScoreManualScoringService.SaveScoreManualScoringExercise(req, userID)
 	} else if req.HomeworkId > 0 {
 		err = c.saveScoreManualScoringService.SaveScoreManualScoringHomework(req, userID)
+	} else {
+		utils.Respond(ctx, nil, fmt.Errorf("exam_id, exercise_id or homework_id is required"), "messages.data_invalid", http.StatusBadRequest)
+		return
+	}
+	// Kiểm tra xem là exam, exercise hay homework
+	if req.ExamId > 0 {
+		err = c.saveScoreManualScoringService.SaveScoreManualScoring(req, userID)
+	} else if req.ExerciseId > 0 {
+		err = c.saveScoreManualScoringService.SaveScoreManualScoringExercise(req, userID)
+	} else if req.HomeworkId > 0 {
+		err = c.saveScoreManualScoringService.SaveScoreManualScoringHomework(req, userID)
 		// Check và update did_it_again cho từng question_id trong score_list (luôn coi là đúng vì đã được save)
 		if err == nil {
 			for questionIdStr := range req.ScoreList {
@@ -743,42 +613,3 @@ func (c *SaveScoreController) SaveScoreManualScoring(ctx *gin.Context) {
 
 	utils.Respond(ctx, responseData, nil, "")
 }
-
-func (s *SaveScoreController) Evaluate(c *gin.Context) {
-	req, err, message := utils.GetBody[*prot.EvaluateRequest](c, func() *prot.EvaluateRequest {
-		return &prot.EvaluateRequest{}
-	})
-	if err != nil {
-		utils.Respond(c, nil, err, message)
-		return
-	}
-
-	data, err := s.serviceB.Evaluate(req)
-
-	if err != nil {
-		utils.Respond(c, nil, err, "")
-		return
-	}
-
-	utils.Respond(c, data, nil, "")
-}
-
-func (s *SaveScoreController) TeacherEvaluate(c *gin.Context) {
-	req, err, message := utils.GetBody[*prot.TeacherEvaluateRequest](c, func() *prot.TeacherEvaluateRequest {
-		return &prot.TeacherEvaluateRequest{}
-	})
-	if err != nil {
-		utils.Respond(c, nil, err, message)
-		return
-	}
-
-	data, err := s.homeworkUserService.TeacherEvaluate(req)
-
-	if err != nil {
-		utils.Respond(c, nil, err, err.Error())
-		return
-	}
-
-	utils.Respond(c, data, nil, "")
-}
-

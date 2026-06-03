@@ -1,27 +1,24 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
 
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type SaveScoreBulkService interface {
-	SaveScoreBulkExam(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error)
-	SaveScoreBulkExercise(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error)
-	SaveScoreBulkHomework(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error)
-	SaveScoreBulkContestRound(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error)
-	Evaluate(req *prot.EvaluateRequest) (*prot.EvaluateResponse, error)
+	SaveScoreBulkExam(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error)
+	SaveScoreBulkExercise(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error)
+	SaveScoreBulkHomework(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error)
+	SaveScoreBulkContestRound(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error)
 }
 
 type saveScoreBulkService struct {
@@ -57,181 +54,7 @@ func NewSaveScoreBulkService(
 	}
 }
 
-// Helper struct để chứa answer ở JSON format (có question_id và data)
-type jsonAnswerFormat struct {
-	TypeQuestion string
-	QuestionId   int64
-	Data         map[string]*structpb.Value
-}
-
-// Helper để kiểm tra xem answer là proto format (oneof) hay JSON format (Data)
-func isProtoFormat(answer *prot.AnswerRequest) bool {
-	return answer.GetRequest() != nil
-}
-
-// ConvertProtoAnswerToJSONFormat converts proto AnswerRequest to JSON format (with question_id and data)
-// jsonMap: JSON map gốc chứa question_id và data (optional, chỉ dùng khi answer không có oneof)
-func convertProtoAnswerToJSONFormat(answer *prot.AnswerRequest, jsonMap map[string]interface{}) (*jsonAnswerFormat, error) {
-	result := &jsonAnswerFormat{
-		TypeQuestion: answer.TypeQuestion,
-	}
-
-	// Nếu đã là JSON format (không có oneof), lấy question_id và data từ JSON map gốc
-	if !isProtoFormat(answer) {
-		if jsonMap == nil {
-			return nil, fmt.Errorf("missing JSON map for answer with type_question: %s", answer.TypeQuestion)
-		}
-
-		// Lấy question_id từ JSON map gốc
-		var questionId int64
-		if qid, ok := jsonMap["question_id"].(float64); ok {
-			questionId = int64(qid)
-		}
-		if questionId == 0 {
-			return nil, fmt.Errorf("missing question_id in JSON format for type_question: %s", answer.TypeQuestion)
-		}
-		result.QuestionId = questionId
-
-		// Lấy data từ JSON map gốc và convert sang map[string]*structpb.Value
-		data := make(map[string]*structpb.Value)
-		if dataMap, ok := jsonMap["data"].(map[string]interface{}); ok {
-			for k, v := range dataMap {
-				val, err := structpb.NewValue(v)
-				if err == nil {
-					data[k] = val
-				}
-			}
-		}
-		result.Data = data
-
-		return result, nil
-	}
-
-	// Convert từ oneof sang JSON format
-	var questionId int64
-	var data map[string]*structpb.Value
-
-	switch answer.TypeQuestion {
-	case "multiple_choice":
-		if reqMC := answer.GetMultipleChoiceRequest(); reqMC != nil {
-			questionId = reqMC.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answer_ids
-			listValues := make([]*structpb.Value, len(reqMC.AnswerIds))
-			for i, id := range reqMC.AnswerIds {
-				listValues[i] = structpb.NewNumberValue(float64(id))
-			}
-			data["answer_ids"] = structpb.NewListValue(&structpb.ListValue{Values: listValues})
-		}
-
-	case "fill_in_blank":
-		if reqFB := answer.GetFillInBlankRequest(); reqFB != nil {
-			questionId = reqFB.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answers
-			answersStruct := make(map[string]*structpb.Value)
-			for k, v := range reqFB.Answers {
-				answersStruct[k] = structpb.NewStringValue(v)
-			}
-			data["answers"] = structpb.NewStructValue(&structpb.Struct{Fields: answersStruct})
-		}
-
-	case "ordering", "dragdrop":
-		if reqP := answer.GetPositionRequest(); reqP != nil {
-			questionId = reqP.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answers
-			answersStruct := make(map[string]*structpb.Value)
-			for k, v := range reqP.Answers {
-				answersStruct[k] = structpb.NewNumberValue(float64(v))
-			}
-			data["answers"] = structpb.NewStructValue(&structpb.Struct{Fields: answersStruct})
-		}
-
-	case "matching":
-		if reqM := answer.GetMatchingRequest(); reqM != nil {
-			questionId = reqM.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answers
-			answersStruct := make(map[string]*structpb.Value)
-			for k, v := range reqM.Answers {
-				answersStruct[k] = structpb.NewNumberValue(float64(v))
-			}
-			data["answers"] = structpb.NewStructValue(&structpb.Struct{Fields: answersStruct})
-		}
-
-	case "labeling":
-		if reqL := answer.GetLabelingRequest(); reqL != nil {
-			questionId = reqL.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answers
-			answersStruct := make(map[string]*structpb.Value)
-			for k, v := range reqL.Answers {
-				answersStruct[k] = structpb.NewNumberValue(float64(v))
-			}
-			data["answers"] = structpb.NewStructValue(&structpb.Struct{Fields: answersStruct})
-		}
-
-	case "category":
-		if reqG := answer.GetGroupRequest(); reqG != nil {
-			questionId = reqG.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answers
-			answersStruct := make(map[string]*structpb.Value)
-			for k, v := range reqG.Answers {
-				answersStruct[k] = structpb.NewNumberValue(float64(v))
-			}
-			data["answers"] = structpb.NewStructValue(&structpb.Struct{Fields: answersStruct})
-		}
-
-	case "manual":
-		if reqManual := answer.GetManualRequest(); reqManual != nil {
-			questionId = reqManual.QuestionId
-			data = make(map[string]*structpb.Value)
-
-			// Convert answer và file_url
-			if reqManual.Answer != "" {
-				data["answer"] = structpb.NewStringValue(reqManual.Answer)
-			}
-			if reqManual.FileUrl != "" {
-				data["file_url"] = structpb.NewStringValue(reqManual.FileUrl)
-			}
-		}
-
-	default:
-		return nil, fmt.Errorf("unknown type_question: %s", answer.TypeQuestion)
-	}
-
-	result.QuestionId = questionId
-	result.Data = data
-	return result, nil
-}
-
-// ConvertToJSONAnswers converts all answers in request to JSON format
-// jsonMaps: JSON maps gốc chứa question_id và data cho mỗi answer (optional, chỉ dùng khi answers không có oneof)
-func convertToJSONAnswers(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}) ([]*jsonAnswerFormat, error) {
-	result := make([]*jsonAnswerFormat, 0, len(req.ListAnswers))
-	for i, answer := range req.ListAnswers {
-		var jsonMap map[string]interface{}
-		if i < len(jsonMaps) {
-			jsonMap = jsonMaps[i]
-		}
-		jsonAnswer, err := convertProtoAnswerToJSONFormat(answer, jsonMap)
-		if err != nil {
-			return nil, fmt.Errorf("failed to convert answer at index %d: %v", i, err)
-		}
-		result = append(result, jsonAnswer)
-	}
-	return result, nil
-}
-
-func (s *saveScoreBulkService) SaveScoreBulkExam(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error) {
+func (s *saveScoreBulkService) SaveScoreBulkExam(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error) {
 	if req.ExamId == 0 {
 		return nil, errors.New("exam_id is required")
 	}
@@ -287,13 +110,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExam(req *prot.SaveScoreBulkRequest,
 	// Khởi tạo biến hasManualScoring = true
 	hasManualScoring := false
 
-	// Convert tất cả answers sang JSON format trước khi xử lý
-	jsonAnswers, err := convertToJSONAnswers(req, jsonMaps)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, answer := range jsonAnswers {
+	for _, answer := range req.ListAnswers {
 		switch answer.TypeQuestion {
 		case "multiple_choice":
 			var answerIDs []int64
@@ -595,7 +412,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExam(req *prot.SaveScoreBulkRequest,
 	return response, nil
 }
 
-func (s *saveScoreBulkService) SaveScoreBulkHomework(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error) {
+func (s *saveScoreBulkService) SaveScoreBulkHomework(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error) {
 	if req.HomeworkId == 0 {
 		return nil, errors.New("homework_id is required")
 	}
@@ -627,13 +444,7 @@ func (s *saveScoreBulkService) SaveScoreBulkHomework(req *prot.SaveScoreBulkRequ
 
 	//hasManualScoring := false
 
-	// Convert tất cả answers sang JSON format trước khi xử lý
-	jsonAnswers, err := convertToJSONAnswers(req, jsonMaps)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, answer := range jsonAnswers {
+	for _, answer := range req.ListAnswers {
 		switch answer.TypeQuestion {
 		case "multiple_choice":
 			answerIDs := []int64{}
@@ -908,7 +719,7 @@ func (s *saveScoreBulkService) SaveScoreBulkHomework(req *prot.SaveScoreBulkRequ
 	return response, nil
 }
 
-func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error) {
+func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error) {
 	if req.ExerciseId == 0 {
 		return nil, errors.New("exercise_id is required")
 	}
@@ -972,13 +783,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 	hasManualScoring := false
 
-	// Convert tất cả answers sang JSON format trước khi xử lý
-	jsonAnswers, err := convertToJSONAnswers(req, jsonMaps)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, answer := range jsonAnswers {
+	for _, answer := range req.ListAnswers {
 		switch answer.TypeQuestion {
 		case "multiple_choice":
 			var ids []int64
@@ -1248,7 +1053,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 	return response, nil
 }
 
-func (s *saveScoreBulkService) SaveScoreBulkContestRound(req *prot.SaveScoreBulkRequest, jsonMaps []map[string]interface{}, userID int64) (*prot.SaveScoreBulkResponse, error) {
+func (s *saveScoreBulkService) SaveScoreBulkContestRound(req *prot.SaveScoreBulkRequest, userID int64) (*prot.SaveScoreBulkResponse, error) {
 	fmt.Printf("🔍 SaveScoreBulkContestRound: ContestRoundId=%d, ListAnswers=%d, UserID=%d\n", req.ContestRoundId, len(req.ListAnswers), userID)
 
 	if req.ContestRoundId == 0 {
@@ -1311,13 +1116,7 @@ func (s *saveScoreBulkService) SaveScoreBulkContestRound(req *prot.SaveScoreBulk
 	hasManualScoring := false
 
 	// Process each answer - support all question types for contest rounds using correct tables
-	// Convert tất cả answers sang JSON format trước khi xử lý
-	jsonAnswers, err := convertToJSONAnswers(req, jsonMaps)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, answer := range jsonAnswers {
+	for _, answer := range req.ListAnswers {
 		fmt.Printf("🔍 Processing answer: TypeQuestion=%s, QuestionId=%d\n", answer.TypeQuestion, answer.QuestionId)
 		switch answer.TypeQuestion {
 		case "multiple_choice":
@@ -1770,106 +1569,3 @@ func (s *saveScoreBulkService) SaveBulkWrite(req *prot.SaveScoreBulkRequest, use
 
 	return nil, fmt.Errorf("Failed to update SaveBulkWrite")
 }
-
-func (s *saveScoreBulkService) Evaluate(req *prot.EvaluateRequest) (*prot.EvaluateResponse, error) {
-	if req.HomeworkId > 0 {
-		homeworkRepo := repositories.NewHomeworkRepository()
-		homework, err := homeworkRepo.GetByID(req.HomeworkId, 0, nil)
-
-		if err != nil {
-			return nil, err
-		}
-
-		config.Log.Info("homework.QuestionForm: ", homework.QuestionForm)
-
-		if homework.QuestionForm != models.QuestionFormWriteType {
-			return nil, errors.New("question form is not write type")
-		}
-
-		err = homeworkRepo.UpdateEvaluate(req.UserId, req.HomeworkId, req.Score)
-
-		if err != nil {
-			return nil, errors.New("failed to update evaluate")
-		}
-
-		return &prot.EvaluateResponse{
-			HomeworkId: req.HomeworkId,
-			UserId: req.UserId,
-			Score: req.Score,
-		}, nil
-	} else if req.ExamId > 0 {
-
-		examRepo := repositories.NewExamRepository()
-		exam, err := examRepo.GetByID(req.ExamId, nil)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if exam.QuestionForm != models.QuestionFormWriteType {
-			return nil, errors.New("question form is not write type")
-		}
-
-		err = examRepo.UpdateEvaluate(req.UserId, req.ExamId, req.Score)
-
-		if err != nil {
-			return nil, errors.New("failed to update evaluate")
-		}
-
-		return &prot.EvaluateResponse{
-			ExamId: req.ExamId,
-			UserId: req.UserId,
-			Score: req.Score,
-		}, nil
-	} else if req.ExerciseId > 0 {
-
-		exerciseRepo := repositories.NewExerciseRepository()
-		exam, err := exerciseRepo.GetByID(req.ExerciseId, nil)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if exam.QuestionForm != models.QuestionFormWriteType {
-			return nil, errors.New("question form is not write type")
-		}
-
-		err = exerciseRepo.UpdateEvaluate(req.UserId, req.ExerciseId, req.Score)
-
-		if err != nil {
-			return nil, errors.New("failed to update evaluate")
-		}
-
-		return &prot.EvaluateResponse{
-			ExerciseId: req.ExerciseId,
-			UserId: req.UserId,
-			Score: req.Score,
-		}, nil
-	} else if req.ContestRoundId > 0 {
-		contestRoundRepo := repositories.NewContestScoreRepository()
-		contestRound, err := contestRoundRepo.GetContestRoundByID(req.ContestRoundId)
-
-		if err != nil {
-			return nil, err
-		}
-
-		if contestRound.QuestionForm != models.QuestionFormWriteType {
-			return nil, errors.New("question form is not write type")
-		}
-
-		err = contestRoundRepo.UpdateEvaluate(req.UserId, req.ContestRoundId, req.Score)
-
-		if err != nil {
-			return nil, errors.New("failed to update evaluate")
-		}
-
-		return &prot.EvaluateResponse{
-			ContestRoundId: req.ContestRoundId,
-			UserId: req.UserId,
-			Score: req.Score,
-		}, nil
-	}
-
-	return nil, errors.New("invalid request")
-}
-

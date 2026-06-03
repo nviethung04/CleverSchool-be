@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"strconv"
 
@@ -118,12 +118,11 @@ func (cc *ClassController) Import(c *gin.Context) {
 	go func() {
 		err := cc.service.Import(cCp, file)
 		if err != nil {
-			config.Log.Error("Class import failed", "error", err)
+			config.Log.Error("User import failed", "error", err)
 		} else {
-			config.Log.Info("Class import finished successfully")
+			config.Log.Info("User import finished successfully")
 		}
 	}()
 
 	utils.Respond(c, &prot.Import{Message: i18n.Localize("messages.import_complete")}, nil, "")
 }
-

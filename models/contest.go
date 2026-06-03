@@ -42,25 +42,24 @@ type ContestRound struct {
 	DeletedAt    gorm.DeletedAt `gorm:"column:deleted_at;index" json:"deleted_at"`
 	DeletedBy    int64          `gorm:"column:deleted_by" json:"deleted_by"`
 
-	QuestionForm string     `gorm:"type:question_form_enum;not null"`
-	FileInfos    MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
+	QuestionForm string `gorm:"type:question_form_enum;not null"`
+	FileInfos   MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
 
 	// Relationships
 	Contest Contest `gorm:"foreignKey:ContestId" json:"contest"`
 }
 
 type ContestRoundUser struct {
-	ID               int64      `gorm:"primaryKey;autoIncrement" json:"id"`
-	ContestRoundId   int64      `json:"contest_round_id"`
-	UserId           int64      `json:"user_id"`
-	Score            float64    `gorm:"type:numeric(5,2)" json:"score"`
-	Ratio            float64    `gorm:"type:numeric(5,2)" json:"ratio"`
-	Time             int64      `json:"time"`
-	HasManualScoring bool       `json:"has_manual_scoring"`
-	FileInfos        MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
-	Rate             string     `json:"rate"`
-	CreatedAt        time.Time  `json:"created_at"`
-	UpdatedAt        time.Time  `json:"updated_at"`
+	ID               int64     `gorm:"primaryKey;autoIncrement" json:"id"`
+	ContestRoundId   int64     `json:"contest_round_id"`
+	UserId           int64     `json:"user_id"`
+	Score            float64   `gorm:"type:numeric(5,2)" json:"score"`
+	Ratio            float64   `gorm:"type:numeric(5,2)" json:"ratio"`
+	Time             int64     `json:"time"`
+	HasManualScoring bool      `json:"has_manual_scoring"`
+	FileInfos   MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 
 	// Relationships
 	ContestRound ContestRound `gorm:"foreignKey:ContestRoundId" json:"contest_round"`

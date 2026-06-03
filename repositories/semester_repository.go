@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"errors"
 	"time"
 
@@ -16,7 +16,6 @@ type SemesterRepository interface {
 	UpdateOrCreate(holiday models.Holiday) (*models.Holiday, error)
 	GetAllHolidaysBySemesterID(semesterID int64) ([]models.Holiday, error)
 	GetHolidayWeeksBySemesterID(semesterID int64) ([]models.Week, error)
-	GetHolidayWeeks(semesterIDs, courseIDs []int64) ([]models.Week, error)
 	UpdateOrCreateHoliday(holiday models.SemesterRefHoliday) error
 	DeleteOldHolidays(id int64, holidayIds []int64) error
 }
@@ -121,105 +120,57 @@ func (r *semesterRepository) GetAllHolidaysBySemesterID(semesterID int64) ([]mod
 	return holidays, nil
 }
 
+
 func (r *semesterRepository) GetHolidayWeeksBySemesterID(semesterID int64) ([]models.Week, error) {
-	holidays, err := r.GetAllHolidaysBySemesterID(semesterID)
-	if err != nil {
-		return nil, err
-	}
-	if len(holidays) == 0 {
-		return []models.Week{}, nil
-	}
+    holidays, err := r.GetAllHolidaysBySemesterID(semesterID)
+    if err != nil {
+        return nil, err
+    }
+    if len(holidays) == 0 {
+        return []models.Week{}, nil
+    }
 
-	var semester models.Semester
-	if err := db.MasterDB.First(&semester, semesterID).Error; err != nil {
-		return nil, err
-	}
+    var semester models.Semester
+    if err := db.MasterDB.First(&semester, semesterID).Error; err != nil {
+        return nil, err
+    }
 
-	weeks, _ := r.GetWeeksForSemester(semester)
+    weeks, _ := r.GetWeeksForSemester(semester)
 
-	var holidayWeeks []models.Week
-	for _, week := range weeks {
-		ws := dateOnly(week.StartDate)
-		we := dateOnly(week.EndDate)
+    var holidayWeeks []models.Week
+    for _, week := range weeks {
+        ws := dateOnly(week.StartDate)
+        we := dateOnly(week.EndDate)
 
-		for _, holiday := range holidays {
-			hs := dateOnly(holiday.StartDate)
-			he := dateOnly(holiday.EndDate)
+        for _, holiday := range holidays {
+            hs := dateOnly(holiday.StartDate)
+            he := dateOnly(holiday.EndDate)
 
-			// Tuần nghỉ hợp lệ chỉ khi toàn bộ tuần nằm trong khoảng holiday
-			if (hs.Before(ws) || hs.Equal(ws)) && (he.After(we) || he.Equal(we)) {
-				holidayWeeks = append(holidayWeeks, week)
-				break
-			}
-		}
-	}
+            // Tuần nghỉ hợp lệ chỉ khi toàn bộ tuần nằm trong khoảng holiday
+            if (hs.Before(ws) || hs.Equal(ws)) && (he.After(we) || he.Equal(we)) {
+                holidayWeeks = append(holidayWeeks, week)
+                break
+            }
+        }
+    }
 
-	return holidayWeeks, nil
-}
-
-func (r *semesterRepository) GetHolidayWeeks(semesterIDs, courseIDs []int64) ([]models.Week, error) {
-	seen := make(map[int64]struct{})
-	var ids []int64
-
-	for _, id := range semesterIDs {
-		if _, ok := seen[id]; !ok {
-			seen[id] = struct{}{}
-			ids = append(ids, id)
-		}
-	}
-
-	if len(courseIDs) > 0 {
-		var refs []models.CourseRefSemester
-		if err := db.MasterDB.
-			Where("course_id IN ?", courseIDs).
-			Find(&refs).Error; err != nil {
-			return nil, err
-		}
-		for _, ref := range refs {
-			if _, ok := seen[ref.SemesterId]; !ok {
-				seen[ref.SemesterId] = struct{}{}
-				ids = append(ids, ref.SemesterId)
-			}
-		}
-	}
-
-	if len(ids) == 0 {
-		return []models.Week{}, nil
-	}
-
-	weekByID := make(map[int64]models.Week)
-	for _, sid := range ids {
-		weeks, err := r.GetHolidayWeeksBySemesterID(sid)
-		if err != nil {
-			return nil, err
-		}
-		for _, w := range weeks {
-			weekByID[w.ID] = w
-		}
-	}
-
-	result := make([]models.Week, 0, len(weekByID))
-	for _, w := range weekByID {
-		result = append(result, w)
-	}
-	return result, nil
+    return holidayWeeks, nil
 }
 
 // Helper: generate weeks from semester
 func (r *semesterRepository) GetWeeksForSemester(semester models.Semester) ([]models.Week, error) {
-	var weeks []models.Week
-	if err := db.MasterDB.
-		Where("start_date >= ? AND end_date <= ?", semester.BeginDate, semester.EndDate).
-		Order("start_date ASC").
-		Find(&weeks).Error; err != nil {
-		return nil, err
-	}
+    var weeks []models.Week
+    if err := db.MasterDB.
+        Where("start_date >= ? AND end_date <= ?", semester.BeginDate, semester.EndDate).
+        Order("start_date ASC").
+        Find(&weeks).Error; err != nil {
+        return nil, err
+    }
 
-	return weeks, nil
+    return weeks, nil
 }
 
 func dateOnly(t time.Time) time.Time {
-	y, m, d := t.Date()
-	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+    y, m, d := t.Date()
+    return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
 }
-

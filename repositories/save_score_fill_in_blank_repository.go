@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"errors"
 	"gorm.io/gorm"
 	"time"
@@ -13,8 +13,6 @@ type SaveScoreFillInBlankRepository interface {
 	SaveBatchHomeworkQuestionUserFillInBlanks(records []*models.HomeworkQuestionUserFillInBlank, tx *gorm.DB) error
 	SaveBatchExerciseQuestionUserFillInBlanks(records []*models.ExerciseQuestionUserFillInBlank, tx *gorm.DB) error
 	FindTrueAnswerFillInBlank(questionID int64, sortPosition int) (*models.AnswerPosition, error)
-	SaveHomeworkUserQuestion(record *models.HomeworkUserQuestion, tx *gorm.DB) error
-	CountHomeworkUserQuestions(homeworkID, userID, questionID, lessonID int64) (int64, error)
 }
 
 type saveScoreFillInBlankRepository struct{}
@@ -22,6 +20,9 @@ type saveScoreFillInBlankRepository struct{}
 func NewSaveScoreFillInBlankRepository() SaveScoreFillInBlankRepository {
 	return &saveScoreFillInBlankRepository{}
 }
+
+
+
 
 func (r *saveScoreFillInBlankRepository) FindTrueAnswerFillInBlank(questionID int64, sortPosition int) (*models.AnswerPosition, error) {
 	var answer models.AnswerPosition
@@ -71,36 +72,11 @@ func (r *saveScoreFillInBlankRepository) SaveBatchHomeworkQuestionUserFillInBlan
 }
 
 func (r *saveScoreFillInBlankRepository) SaveBatchExerciseQuestionUserFillInBlanks(records []*models.ExerciseQuestionUserFillInBlank, tx *gorm.DB) error {
-	if len(records) == 0 {
-		return nil
-	}
-	for _, rec := range records {
-		rec.CreatedAt = time.Now().UTC()
-	}
-	if tx == nil {
-		tx = db.MasterDB
-	}
+	if len(records) == 0 { return nil }
+	for _, rec := range records { rec.CreatedAt = time.Now().UTC() }
+	if tx == nil { tx = db.MasterDB }
 	first := records[0]
 	if err := tx.Where("exercise_id = ? AND user_id = ? AND question_id = ?", first.ExerciseID, first.UserID, first.QuestionID).
-		Delete(&models.ExerciseQuestionUserFillInBlank{}).Error; err != nil {
-		return err
-	}
+		Delete(&models.ExerciseQuestionUserFillInBlank{}).Error; err != nil { return err }
 	return tx.CreateInBatches(records, len(records)).Error
 }
-
-func (r *saveScoreFillInBlankRepository) SaveHomeworkUserQuestion(record *models.HomeworkUserQuestion, tx *gorm.DB) error {
-	record.CreatedAt = time.Now().UTC()
-	if tx == nil {
-		tx = db.MasterDB
-	}
-	return tx.Create(record).Error
-}
-
-func (r *saveScoreFillInBlankRepository) CountHomeworkUserQuestions(homeworkID, userID, questionID, lessonID int64) (int64, error) {
-	var count int64
-	err := db.MasterDB.Table("homework_user_questions").
-		Where("homework_id = ? AND user_id = ? AND question_id = ? AND lesson_id = ?", homeworkID, userID, questionID, lessonID).
-		Count(&count).Error
-	return count, err
-}
-

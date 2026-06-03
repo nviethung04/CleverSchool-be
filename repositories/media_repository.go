@@ -1,14 +1,12 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
-
-	"be-cleverschool/config"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +30,6 @@ type MediaRepository interface {
 	ClearDuplicateMedia() error
 	CleanupOrphanedMedia() error
 	PaginateGetFileByFolder(folderId int64, keyword string, page int, perPage int, filterTime, filterType, filterExtension string) ([]models.Media, int64, error)
-	ClearMedias() error
 }
 
 type mediaRepository struct{}
@@ -85,15 +82,11 @@ func (r *mediaRepository) FindByStaticUrl(url string, disk string) (*models.Medi
 
 func (r *mediaRepository) FindByPathMaster(path string, disk string) (*models.Media, error) {
 	var media models.Media
-	publicPath := "public/" + path
-
 	if err := db.MasterDB.
-		Where("disk_name = ?", disk).
-		Where("full_path = ? OR full_path = ?", path, publicPath).
+		Where("full_path = ? AND disk_name = ?", path, disk).
 		First(&media).Error; err != nil {
 		return nil, err
 	}
-
 	return &media, nil
 }
 
@@ -163,6 +156,7 @@ func (r *mediaRepository) UpdateOrCreate(media *models.Media) error {
 		Updates(updates).Error
 }
 
+
 func (r *mediaRepository) UpdateOrCreateV2(media *models.Media) error {
 	var existing models.Media
 
@@ -179,18 +173,18 @@ func (r *mediaRepository) UpdateOrCreateV2(media *models.Media) error {
 	}
 
 	updates := map[string]interface{}{
-		"file_name":      media.FileName,
-		"file_type":      media.FileType,
-		"file_size":      media.FileSize,
+		"file_name":     media.FileName,
+		"file_type":     media.FileType,
+		"file_size":     media.FileSize,
 		"file_extension": media.FileExtension,
-		"file_path":      media.FilePath,
-		// "parent_id":     media.ParentID,
-		"type":       media.Type,
-		"disk_name":  media.DiskName,
-		"updated_at": media.UpdatedAt,
-		"updated_by": media.UpdatedBy,
-		"deleted_at": nil,
-		"deleted_by": 0,
+		"file_path":     media.FilePath,
+		"parent_id":     media.ParentID,
+		"type":          media.Type,
+		"disk_name":     media.DiskName,
+		"updated_at":    media.UpdatedAt,
+		"updated_by":    media.UpdatedBy,
+		"deleted_at":    nil,
+		"deleted_by":     0,
 	}
 
 	return db.MasterDB.Unscoped().Model(&existing).Updates(updates).Error
@@ -299,6 +293,7 @@ func (r *mediaRepository) PaginateGetFileByFolder(folderId int64, keyword string
 	return medias, total, nil
 }
 
+
 func (r *mediaRepository) Delete(id int64) error {
 	return db.MasterDB.Where("id = ?", id).Delete(&models.Media{}).Error
 }
@@ -370,11 +365,6 @@ func (r *mediaRepository) ClearDuplicateMedia() error {
 }
 
 func (r *mediaRepository) CleanupOrphanedMedia() error {
-	if !db.MasterDB.Migrator().HasTable("medias") {
-		config.Log.Warn("medias table does not exist, skipping orphaned media cleanup")
-		return nil
-	}
-
 	// Step 1: Xóa các bản ghi đã bị soft-delete
 	deleteSoftDeletedSQL := `
 		DELETE FROM medias
@@ -404,69 +394,4 @@ func (r *mediaRepository) CleanupOrphanedMedia() error {
 	}
 
 	return tx.Commit().Error
-}
-
-func (r *mediaRepository) ClearMedias() error {
-	config.Log.Info("clear medias...")
-	// delete all medias except the root folder and the public folder
-	err := db.MasterDB.Exec("DELETE FROM medias WHERE parent_id = 0 AND id <> 2 AND type = 'folder'").Error
-	if err != nil {
-		return fmt.Errorf("failed to clear medias: %w", err)
-	}
-
-	sqlCleanupOrphans := `
-DELETE FROM medias m
-WHERE m.id <> 2
-  AND (
-    (
-      m.type = 'folder'
-      AND m.parent_id IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1
-        FROM medias p
-        WHERE p.id = m.parent_id
-      )
-    )
-    OR
-    (
-      m.type = 'file'
-      AND m.folder_id IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1
-        FROM medias f
-        WHERE f.id = m.folder_id
-      )
-    )
-  );`
-
-	sqlDeleteEmptyFolders := `
-DELETE FROM medias m
-WHERE m.type = 'folder'
-  AND m.id <> 2
-  AND NOT EXISTS (
-    SELECT 1
-    FROM medias c1
-    WHERE c1.folder_id = m.id
-      AND c1.type = 'file'
-  )
-  AND NOT EXISTS (
-    SELECT 1
-    FROM medias c2
-    WHERE c2.parent_id = m.id
-      AND c2.type = 'folder'
-  );`
-
-	for i := 0; i < 20; i++ {
-		if err = db.MasterDB.Exec(sqlCleanupOrphans).Error; err != nil {
-			return fmt.Errorf("failed to clear medias: %w", err)
-		}
-	}
-
-	for i := 0; i < 20; i++ {
-		if err = db.MasterDB.Exec(sqlDeleteEmptyFolders).Error; err != nil {
-			return fmt.Errorf("failed to clear medias: %w", err)
-		}
-	}
-
-	return nil
 }

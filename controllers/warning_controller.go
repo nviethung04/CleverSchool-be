@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 	"errors"
 	"net/http"
 	"strconv"
@@ -35,7 +35,7 @@ func (wc *WarningController) GetActiveUsersCount(c *gin.Context) {
 	if minutes == 0 {
 		startTimeStr := c.Query("start_time")
 		endTimeStr := c.Query("end_time")
-
+		
 		if startTimeStr == "" || endTimeStr == "" {
 			utils.Respond(c, nil, errors.New("start_time and end_time are required when minutes=0"), "", http.StatusBadRequest)
 			return
@@ -189,7 +189,7 @@ func (wc *WarningController) GetFailedLoginsCount(c *gin.Context) {
 	if req.Minutes == 0 {
 		startTimeStr := c.Query("start_time")
 		endTimeStr := c.Query("end_time")
-
+		
 		if startTimeStr == "" || endTimeStr == "" {
 			utils.Respond(c, nil, errors.New("start_time and end_time are required when minutes=0"), "", http.StatusBadRequest)
 			return
@@ -333,4 +333,3 @@ func (wc *WarningController) GetFailedLogins(c *gin.Context) {
 
 	utils.Respond(c, result, nil, "")
 }
-

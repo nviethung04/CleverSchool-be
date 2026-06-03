@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"be-cleverschool/config"
+	"be-lms/config"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +17,7 @@ func NewUploadController() *UploadController {
 func (c *UploadController) ShowUploadPage(ctx *gin.Context) {
 	cfg := config.LoadConfig()
 	ctx.HTML(http.StatusOK, "upload.html", gin.H{
-		"title":     "Upload File - Clever School Clever School",
+		"title":     "Upload File - LMS Enspire",
 		"apiDomain": cfg.APIDomain,
 	})
 }
@@ -34,4 +34,3 @@ func (c *UploadController) GetUploadStats(ctx *gin.Context) {
 		},
 	})
 }
-

@@ -8,7 +8,6 @@ type LessonSchedule struct {
 	ID            int64     `json:"id" gorm:"primaryKey"`
 	CourseID      int64     `json:"course_id"`
 	LessonID      int64     `json:"lesson_id"`
-	LessonPlanID  int64     `json:"lesson_plan_id"`
 	ShiftID       *int64    `json:"shift_id"` // nullable
 	ScheduledDate time.Time `json:"scheduled_date"`
 	WeekID        int64     `json:"week_id"`

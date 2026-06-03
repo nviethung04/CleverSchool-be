@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"be-cleverschool/config"
+	"be-lms/config"
 
 	"github.com/robfig/cron/v3"
 )
@@ -29,4 +29,3 @@ func StartDailySchoolStatisticsCronJob() {
 	c.Start()
 	config.Log.Info("⏰ Daily School Statistics Cron Job scheduled - runs daily at 1:00 AM")
 }
-

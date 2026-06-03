@@ -73,7 +73,7 @@ class FileUploader {
     }
 
     // Set document title with path info
-    document.title = `Upload File - ${this.params.path} - Clever School Clever School`;
+    document.title = `Upload File - ${this.params.path} - LMS Enspire`;
 
     // Update param info display
     if (this.paramInfo) {

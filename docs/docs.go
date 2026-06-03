@@ -44,41 +44,32 @@ var docTemplate = `{
     "paths": {
         ` +
 	authPath + `,` + rolePath + `,` + permissionPath + `,` + userPath + `,` + schoolDashboardPath + `,` +
-	schoolPath + `,` + classPath + `,` + subjectPath + `,` + programPath + `,` +
-	headingPath + `,` + coursePath + `,` + courseSchedulePath + `,` +
+	schoolPath + `,` + classPath + `,` + subjectPath + `,` + programPath + `,` + coursePath + `,` +
 	chapterPath + `,` + lessonPath + `,` + sourceQuestionPath + `,` + questionPath + `,` +
-	lessonPlanPath + `,` + lessonPlanPart + `,` + exam + `,` + homework + `,` + assessment + `,` + assessmentCriterion + `,` + assessmentSubcriterion + `,` + assessmentCriteriaGroup + `,` + employeePositionPath + `,` +
+	lessonPlanPath + `,` + lessonPlanPart + `,` + exam + `,` + homework + `,` + employeePositionPath + `,` +
 	departmentPath + `,` + degreePath + `,` + certificatePath + `,` + tagPath + `,` + skillPath + `,` +
 	topicPath + `,` + questionAttributePath + `,` + mediaPath + `,` + saveScore + `,` +
 	gradePath + `,` + regionPath + `,` + lessonSchedulePath + `,` +
 	weekPath + `,` + studyShiftPath + `,` + dashboardPath + `,` +
 	h5pPath + `,` + semesterPath + `,` + holidayPath + `,` + uploadPath + `,` +
 	chatPath + `,` + warningPath + `,` + flashcardPath + `,` + doHomework + `,` +
-	dashboardTeacherScoringPath + `,` + internalCommandPath + `,` + contest + `,` +
-	contestScoring + `,` + dashboardCoursesPath + `,` + dashboardListEntityPath + `,` +
-	settingPath + `,` + dashboardTeacherHomeworkListPath + `,` + facultyPath + `,` +
-	studyReportPath + `,` + studyReportCriteriaPath + `,` + noticePath + `,` +
-	pushFirebasePath + `,` + trainingLevelPath + `,` + teachingPlanPath + `,` +
+	dashboardTeacherScoringPath + `,` + internalCommandPath + `,` + contest + `,` + contestRound + `,` + contestScoring + `,` + dashboardCoursesPath + `,` +
 	`
 	},
     "definitions": {
         ` +
 	skillProt + `,` + tagProt + `,` + topicProt + `,` + questionAttributeProt + `,` +
 	authProt + `,` + roleProt + `,` + permissionProt + `,` + userProt + `,` +
-	classProt + `,` + subjectProt + `,` + programProt + `,` +
-	headingProt + `,` + courseProt + `,` + courseScheduleProt + `,` +
+	classProt + `,` + subjectProt + `,` + programProt + `,` + courseProt + `,` +
 	chapterProt + `,` + lessonProt + `,` + sourceQuestionProt + `,` + questionProt + `,` +
 	lessonPlanProt + `,` + employeePositionProt + `,` + departmentsProt + `,` +
 	degreeProt + `,` + certificateProt + `,` + mediaProt + `,` + schoolProt + `,` +
 	gradeProt + `,` + regionProt + `,` + lessonScheduleProt + `,` +
 	weekProt + `,` + studyShiftProt + `,` + dashboardProt + `,` +
 	h5pProt + `,` + semesterProt + `,` + holidayProt + `,` +
-	chatProt + `,` + warningProt + `,` + flashcardProt + `,` + examProt + `,` + homeworkProt + `,` + assessmentProt + `,` + assessmentCriterionProt + `,` + assessmentSubcriterionProt + `,` +
+	chatProt + `,` + warningProt + `,` + flashcardProt + `,` + examProt + `,` + homeworkProt + `,` +
 	dashboardTeacherScoringProt + `,` + internalCommandProt + `,` + contest + `,` +
-	contestScoring + `,` + submitHomeworkProt + `,` + dashboardListEntityProt + `,` +
-	settingProt + `,` + dashboardTeacherHomeworkListProt + `,` + facultyProt + `,` +
-	studyReportProt + `,` + studyReportCriteriaProt + `,` + noticeProt + `,` +
-	pushFirebaseProt + `,` + trainingLevelProt + `,` + teachingPlanProt + `,` +
+	contestRound + `,` + contestScoring + `,` + submitHomeworkProt + `,` +
 	`
 	}
 }`

@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 	"encoding/json"
 	"errors"
 	"strconv"
@@ -284,4 +284,3 @@ func (s *contestQuestionService) CreateOrUpdateCloneQuestion(c *gin.Context, ass
 		return s.clonedRepo.Update(clonedData)
 	}
 }
-

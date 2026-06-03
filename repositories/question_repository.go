@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"errors"
 	"reflect"
 	"time"
@@ -14,7 +14,6 @@ import (
 type QuestionRepository interface {
 	base.BaseRepositoryInterface[models.Question]
 	UpdateOrCreate(question models.Question) (int64, error)
-	UpdateFileInfos(questionId int64, fileInfos models.MediaInfos) error
 	GetQuestionIdsAndScoresByLessonPlanPartId(lessonPlanPartkId int64) ([]QuesstionScore, error)
 	GetQuestionIdsAndScoresByLevelTestId(examId int64) ([]QuesstionScore, error)
 	UpdateOrCreateAttribute(attribute models.QuestionRefAttribute) error
@@ -25,18 +24,6 @@ type QuestionRepository interface {
 	GetLessonPlanPartIDsByQuestionID(questionId int64) ([]int64, error)
 	GetLevelTestIDsByQuestionID(questionId int64) ([]int64, error)
 	GetQuestionIdsByQuestionAttributeIds(questionAttributeIDs []int64) ([]int64, error)
-	// UpdateSortPositionsForSource cập nhật source_question_id và sort_position cho danh sách câu hỏi thuộc một source question
-	UpdateSortPositionsForSource(sourceQuestionID int64, orders []QuestionSortOrder) error
-	// ClearQuestionsFromSource gỡ toàn bộ câu hỏi khỏi source question (set source_question_id = 0, sort_position = 0)
-	ClearQuestionsFromSource(sourceQuestionID int64) error
-	// FindBySourceQuestionID lấy danh sách câu hỏi thuộc source question, sắp xếp theo sort_position (preload đủ để format như detail)
-	FindBySourceQuestionID(sourceQuestionID int64) ([]*models.Question, error)
-}
-
-// QuestionSortOrder dùng khi gán/thay đổi thứ tự câu hỏi thuộc source question
-type QuestionSortOrder struct {
-	ID           int64
-	SortPosition int32
 }
 
 type questionRepository struct {
@@ -64,11 +51,7 @@ func (r *questionRepository) UpdateOrCreate(question models.Question) (int64, er
 	}
 }
 
-func (r *questionRepository) UpdateFileInfos(questionId int64, fileInfos models.MediaInfos) error {
-	return db.MasterDB.Model(&models.Question{}).
-		Where("id = ?", questionId).
-		Update("file_infos", fileInfos).Error
-}
+
 
 func (r *questionRepository) GetQuestionIdsAndScoresByLevelTestId(levelTestId int64) ([]QuesstionScore, error) {
 	var records []QuesstionScore
@@ -98,75 +81,6 @@ func (r *questionRepository) GetQuestionIdsAndScoresByLessonPlanPartId(lessonPla
 	return records, nil
 }
 
-func (r *questionRepository) UpdateSortPositionsForSource(sourceQuestionID int64, orders []QuestionSortOrder) error {
-	if len(orders) == 0 {
-		return nil
-	}
-	tx := db.MasterDB.Begin()
-	if tx.Error != nil {
-		return tx.Error
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-	for _, o := range orders {
-		if o.ID == 0 {
-			continue
-		}
-		if err := tx.Model(&models.Question{}).
-			Where("id = ?", o.ID).
-			Updates(map[string]interface{}{
-				"source_question_id": sourceQuestionID,
-				"sort_position":      o.SortPosition,
-			}).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-	return tx.Commit().Error
-}
-
-func (r *questionRepository) ClearQuestionsFromSource(sourceQuestionID int64) error {
-	if sourceQuestionID == 0 {
-		return nil
-	}
-	return db.MasterDB.Model(&models.Question{}).
-		Where("source_question_id = ?", sourceQuestionID).
-		Updates(map[string]interface{}{
-			"source_question_id": 0,
-			"sort_position":     0,
-		}).Error
-}
-
-var questionDetailPreloads = []string{
-	"Answers",
-	"AnswerPositions",
-	"AnswerGroups",
-	"AnswerGroups.Group",
-	"AnswerCoordinates",
-	"AnswerMatchings",
-	"RefAttributes",
-	"RefAttributes.Attribute",
-	"RefAttributes.ParentAttribute",
-	"Source",
-}
-
-func (r *questionRepository) FindBySourceQuestionID(sourceQuestionID int64) ([]*models.Question, error) {
-	if sourceQuestionID == 0 {
-		return nil, nil
-	}
-	var list []*models.Question
-	query := db.ReplicaDB.Model(&models.Question{}).
-		Where("source_question_id = ?", sourceQuestionID).
-		Order("sort_position ASC, id ASC")
-	for _, preload := range questionDetailPreloads {
-		query = query.Preload(preload)
-	}
-	err := query.Find(&list).Error
-	return list, err
-}
 
 func StoreAnswers[T models.AnswerGroup | models.AnswerCoordinates | models.AnswerPosition | models.Answer | models.AnswerMatching](answers []T) error {
 	if len(answers) > 0 {
@@ -450,4 +364,3 @@ func (r *questionRepository) GetQuestionIdsByQuestionAttributeIds(questionAttrib
 
 	return questionIDs, nil
 }
-

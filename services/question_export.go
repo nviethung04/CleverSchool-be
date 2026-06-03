@@ -1,10 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/repositories"
 	"bytes"
 	"fmt"
 	"strconv"
@@ -18,24 +17,12 @@ func (s *questionService) Export(c *gin.Context) (string, error) {
 	attibuteRepo := repositories.NewQuestionAttributeRepository()
 	attibutes, err := attibuteRepo.GetParents()
 
-	allowedFilters := []string{"status", "question_type", "subject_id"}
-	filter, _, _, _, _, err := utils.ParsePaginationParams(c, allowedFilters)
-	if err != nil {
-		return "", err
-	}
-
-	filter, _, _ = s.ApplyFilter(c, filter)
-
 	s.repo.SetPreload([]string{
 		"Answers", "AnswerPositions", "AnswerGroups",
 		"AnswerCoordinates", "AnswerMatchings", "AnswerGroups.Group",
 		"RefAttributes",
 	})
 
-	s.repo.SetFilter(filter)
-	s.repo.SetSort(map[string]string{
-		"id": "asc",
-	})
 	questions, err := s.repo.GetAll()
 	if err != nil {
 		return "", err
@@ -270,8 +257,6 @@ func (s *questionService) SetSheetQuestion(f *excelize.File, sheetName string, q
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		col := 1
 		_ = s.SetCell(f, sheetName, col, row, q.ID)
 		col++
@@ -283,7 +268,10 @@ func (s *questionService) SetSheetQuestion(f *excelize.File, sheetName string, q
 		col++
 		_ = s.SetCell(f, sheetName, col, row, q.Content)
 		col++
-		s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+		_ = s.SetCell(f, sheetName, col, row, q.Kind)
+		col++
+		_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+		col++
 		_ = s.SetCell(f, sheetName, col, row, q.Point)
 		col++
 		_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -298,8 +286,6 @@ func (s *questionService) SetSheetQuestion(f *excelize.File, sheetName string, q
 		}
 
 		row++
-
-		s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
 	}
 
 	return nil
@@ -327,8 +313,6 @@ func (s *questionService) SetSheetAnswerPosition(f *excelize.File, sheetName str
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		for i, ans := range q.AnswerPositions {
 			col := 1
 			if i == 0 {
@@ -342,7 +326,10 @@ func (s *questionService) SetSheetAnswerPosition(f *excelize.File, sheetName str
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Content)
 				col++
-				s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+				_ = s.SetCell(f, sheetName, col, row, q.Kind)
+				col++
+				_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Point)
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -378,10 +365,6 @@ func (s *questionService) SetSheetAnswerPosition(f *excelize.File, sheetName str
 			}
 
 			row++
-
-			if i == 0 {
-				s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
-			}
 		}
 	}
 
@@ -412,8 +395,6 @@ func (s *questionService) SetSheetAnswerMatching(f *excelize.File, sheetName str
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		for i, ans := range q.AnswerMatchings {
 			col := 1
 			if i == 0 {
@@ -427,7 +408,10 @@ func (s *questionService) SetSheetAnswerMatching(f *excelize.File, sheetName str
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Content)
 				col++
-				s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+				_ = s.SetCell(f, sheetName, col, row, q.Kind)
+				col++
+				_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Point)
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -469,10 +453,6 @@ func (s *questionService) SetSheetAnswerMatching(f *excelize.File, sheetName str
 			}
 
 			row++
-
-			if i == 0 {
-				s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
-			}
 		}
 	}
 
@@ -501,8 +481,6 @@ func (s *questionService) SetSheetAnswer(f *excelize.File, sheetName string, que
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		for i, ans := range q.Answers {
 			col := 1
 			if i == 0 {
@@ -516,7 +494,10 @@ func (s *questionService) SetSheetAnswer(f *excelize.File, sheetName string, que
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Content)
 				col++
-				s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+				_ = s.SetCell(f, sheetName, col, row, q.Kind)
+				col++
+				_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Point)
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -550,10 +531,6 @@ func (s *questionService) SetSheetAnswer(f *excelize.File, sheetName string, que
 			}
 
 			row++
-
-			if i == 0 {
-				s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
-			}
 		}
 	}
 
@@ -583,8 +560,6 @@ func (s *questionService) SetSheetAnswerLabeling(f *excelize.File, sheetName str
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		for i, ans := range q.AnswerCoordinates {
 			col := 1
 			if i == 0 {
@@ -598,7 +573,10 @@ func (s *questionService) SetSheetAnswerLabeling(f *excelize.File, sheetName str
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Content)
 				col++
-				s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+				_ = s.SetCell(f, sheetName, col, row, q.Kind)
+				col++
+				_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Point)
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -640,10 +618,6 @@ func (s *questionService) SetSheetAnswerLabeling(f *excelize.File, sheetName str
 			}
 
 			row++
-
-			if i == 0 {
-				s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
-			}
 		}
 	}
 
@@ -673,8 +647,6 @@ func (s *questionService) SetSheetAnswerCategory(f *excelize.File, sheetName str
 	// Fill data
 	row := 2
 	for _, q := range questions {
-		fileInfosToUse := s.getFileInfo(q)
-
 		for i, ans := range q.AnswerGroups {
 			col := 1
 			if i == 0 {
@@ -688,7 +660,10 @@ func (s *questionService) SetSheetAnswerCategory(f *excelize.File, sheetName str
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Content)
 				col++
-				s.setKindAndPath(f, sheetName, &col, row, fileInfosToUse, q)
+				_ = s.SetCell(f, sheetName, col, row, q.Kind)
+				col++
+				_ = s.SetCell(f, sheetName, col, row, q.FileInfo.Path)
+				col++
 				_ = s.SetCell(f, sheetName, col, row, q.Point)
 				col++
 				_ = s.SetCell(f, sheetName, col, row, q.TimeLimitSeconds)
@@ -728,10 +703,6 @@ func (s *questionService) SetSheetAnswerCategory(f *excelize.File, sheetName str
 			}
 
 			row++
-
-			if i == 0 {
-				s.appendKindPathOnlyRows(f, sheetName, &row, fileInfosToUse)
-			}
 		}
 	}
 
@@ -866,59 +837,3 @@ func (s *questionService) applyStylesToAllSheets(f *excelize.File) {
 		}
 	}
 }
-
-func (s *questionService) getFileInfo(q models.Question) models.MediaInfos {
-	fileInfosToUse := q.FileInfos
-	if len(fileInfosToUse) == 0 {
-		if q.FileInfo.Path != "" {
-			fileInfosToUse = models.MediaInfos{models.MediaDetail{
-				Id:   q.FileInfo.Id,
-				Disk: q.FileInfo.Disk,
-				Path: q.FileInfo.Path,
-				Type: q.Kind,
-			}}
-		}
-	} else {
-		for i, fileInfo := range fileInfosToUse {
-			if fileInfo.Type == "" {
-				fileInfosToUse[i].Type = q.Kind
-			}
-		}
-	}
-	return fileInfosToUse
-}
-
-// setKindAndPath sets Kind and Path columns for a row
-func (s *questionService) setKindAndPath(f *excelize.File, sheetName string, col *int, row int, fileInfosToUse models.MediaInfos, q models.Question) {
-	if len(fileInfosToUse) > 0 {
-		_ = s.SetCell(f, sheetName, *col, row, fileInfosToUse[0].Type)
-		*col = *col + 1
-		_ = s.SetCell(f, sheetName, *col, row, fileInfosToUse[0].Path)
-	} else {
-		_ = s.SetCell(f, sheetName, *col, row, q.Kind)
-		*col = *col + 1
-		_ = s.SetCell(f, sheetName, *col, row, q.FileInfo.Path)
-	}
-	*col = *col + 1
-}
-
-// appendKindPathOnlyRows appends extra rows for file infos (starting at index 1),
-// filling ONLY the Kind and File url columns. It increments *row for each appended row.
-//
-// The sheet layout used in exports is:
-// 1: Question ID, 2: Source ID, 3: Title, 4: Description, 5: Content, 6: Kind, 7: File url, ...
-func (s *questionService) appendKindPathOnlyRows(f *excelize.File, sheetName string, row *int, fileInfosToUse models.MediaInfos) {
-	if len(fileInfosToUse) <= 1 {
-		return
-	}
-
-	for fileIdx := 1; fileIdx < len(fileInfosToUse); fileIdx++ {
-		fileInfo := fileInfosToUse[fileIdx]
-		col := 6 // Kind column
-		_ = s.SetCell(f, sheetName, col, *row, fileInfo.Type)
-		col++ // File url column
-		_ = s.SetCell(f, sheetName, col, *row, fileInfo.Path)
-		*row = *row + 1
-	}
-}
-

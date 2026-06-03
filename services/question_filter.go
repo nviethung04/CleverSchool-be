@@ -1,9 +1,9 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -91,11 +91,11 @@ func (s *questionService) ApplyFilter(c *gin.Context, filter map[string]interfac
 
 	if questionAttributeIDsStr != "" {
 		ids := utils.ParseIDs(questionAttributeIDsStr)
-		questionIDs, err := s.repo.GetQuestionIdsByQuestionAttributeIds(ids)
-		if err != nil {
-			return filter, questionScores, err
+		var idStrs []string
+		for _, id := range ids {
+			idStrs = append(idStrs, fmt.Sprintf("%d", id))
 		}
-		appendQuestionIDs(questionIDs)
+		filter["question_attribute_id"] = fmt.Sprintf("in:%s", strings.Join(idStrs, ","))
 	}
 
 	if len(allQuestionIds) > 0 {
@@ -128,4 +128,3 @@ func (s *questionService) GetKey(assignmentType string) (string, error) {
 
 	return filterKey, err
 }
-

@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -23,14 +22,6 @@ type S3Writer struct {
 	Bucket    string
 	KeyPrefix string
 	Domain    string
-
-	// Async S3 upload
-	logChan     chan []byte
-	buffer      map[string]*bytes.Buffer // key -> buffer
-	bufferMu    sync.Mutex
-	flushTicker *time.Ticker
-	stopChan    chan struct{}
-	wg          sync.WaitGroup
 }
 
 func (w *S3Writer) Write(p []byte) (n int, err error) {
@@ -58,161 +49,48 @@ func (w *S3Writer) Write(p []byte) (n int, err error) {
 		return len(p), nil
 	}
 
-	// Production: Push vào channel để xử lý async, không block
-	if w.logChan != nil {
-		// Copy data để tránh race condition
-		data := make([]byte, len(p))
-		copy(data, p)
-
-		select {
-		case w.logChan <- data:
-			// Successfully queued
-		default:
-			// Channel full, drop log to avoid blocking (có thể log warning nếu cần)
-		}
-	}
-
-	return len(p), nil
-}
-
-// StartAsyncWorker khởi động goroutine để xử lý log async
-func (w *S3Writer) StartAsyncWorker() {
-	if w.Domain == "localhost" || w.Domain == "127.0.0.1" {
-		return // Không cần async cho local
-	}
-
-	// Buffer channel với capacity 1000 entries
-	w.logChan = make(chan []byte, 1000)
-	w.buffer = make(map[string]*bytes.Buffer)
-	w.stopChan = make(chan struct{})
-
-	// Flush mỗi 10 giây
-	w.flushTicker = time.NewTicker(10 * time.Second)
-
-	w.wg.Add(1)
-	go w.worker()
-}
-
-// Stop dừng worker và flush tất cả log còn lại
-func (w *S3Writer) Stop() {
-	if w.flushTicker != nil {
-		w.flushTicker.Stop()
-	}
-	if w.stopChan != nil {
-		close(w.stopChan)
-	}
-	w.wg.Wait()
-
-	// Flush lần cuối
-	w.flushAll()
-}
-
-// worker xử lý log entries từ channel
-func (w *S3Writer) worker() {
-	defer w.wg.Done()
-
-	for {
-		select {
-		case data, ok := <-w.logChan:
-			if !ok {
-				return // Channel closed
-			}
-			w.appendToBuffer(data)
-
-		case <-w.flushTicker.C:
-			w.flushAll()
-
-		case <-w.stopChan:
-			return
-		}
-	}
-}
-
-// appendToBuffer thêm log vào buffer theo key (ngày)
-func (w *S3Writer) appendToBuffer(data []byte) {
-	key := w.getS3Key()
-
-	w.bufferMu.Lock()
-	defer w.bufferMu.Unlock()
-
-	if w.buffer[key] == nil {
-		w.buffer[key] = &bytes.Buffer{}
-	}
-	w.buffer[key].Write(data)
-}
-
-// flushAll upload tất cả buffer lên S3
-func (w *S3Writer) flushAll() {
-	w.bufferMu.Lock()
-	buffers := make(map[string]*bytes.Buffer)
-	for k, v := range w.buffer {
-		buffers[k] = v
-		w.buffer[k] = &bytes.Buffer{} // Reset buffer
-	}
-	w.bufferMu.Unlock()
-
-	for key, buf := range buffers {
-		if buf.Len() == 0 {
-			continue
-		}
-		w.uploadToS3(key, buf.Bytes())
-	}
-}
-
-// uploadToS3 upload log lên S3 (đồng bộ, nhưng chạy trong goroutine riêng)
-func (w *S3Writer) uploadToS3(key string, newData []byte) {
-	if w.Client == nil {
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	// Đọc nội dung cũ (nếu có)
-	var oldData []byte
-	obj, err := w.Client.GetObject(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(w.Bucket),
-		Key:    aws.String(key),
-	})
-	if err == nil && obj.Body != nil {
-		oldData, _ = io.ReadAll(obj.Body)
-		obj.Body.Close()
-	}
-
-	// Append log mới
-	finalData := append(oldData, newData...)
-
-	// Ghi đè lại object
-	_, err = w.Client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(w.Bucket),
-		Key:    aws.String(key),
-		Body:   bytes.NewReader(finalData),
-	})
-	if err != nil {
-		// Log error nhưng không block (có thể ghi vào stderr)
-		fmt.Fprintf(os.Stderr, "Failed to upload log to S3: %v\n", err)
-	}
-}
-
-// getS3Key trả về S3 key cho ngày hiện tại
-func (w *S3Writer) getS3Key() string {
-	return fmt.Sprintf("%s/%s-%s.log",
+	// Ngược lại → ghi log lên S3
+	key := fmt.Sprintf("%s/%s-%s.log",
 		w.KeyPrefix,
 		w.Domain,
 		time.Now().Format("2006-01-02"),
 	)
+
+	// Đọc nội dung cũ (nếu có)
+	var oldData []byte
+	obj, err := w.Client.GetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(w.Bucket),
+		Key:    aws.String(key),
+	})
+	if err == nil && obj.Body != nil {
+		defer obj.Body.Close()
+		oldData, _ = io.ReadAll(obj.Body)
+	}
+
+	// Append log mới
+	newData := append(oldData, p...)
+
+	// Ghi đè lại object
+	_, err = w.Client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(w.Bucket),
+		Key:    aws.String(key),
+		Body:   bytes.NewReader(newData),
+	})
+	if err != nil {
+		return 0, err
+	}
+	return len(p), nil
 }
 
 var Log *logrus.Logger
-var s3WriterInstance *S3Writer // Global instance để có thể stop khi shutdown
 
 func InitLogger() {
-	// set timezone VN
-	loc, err := time.LoadLocation("Asia/Ho_Chi_Minh")
-	if err != nil {
-		panic(err)
-	}
-	time.Local = loc
+    // set timezone VN
+    loc, err := time.LoadLocation("Asia/Ho_Chi_Minh")
+    if err != nil {
+        panic(err)
+    }
+    time.Local = loc
 
 	// Domain để đặt tên log
 	domain := os.Getenv("API_DOMAIN")
@@ -239,10 +117,6 @@ func InitLogger() {
 		Domain:    domain,
 	}
 
-	// Khởi động async worker cho S3 (chỉ khi không phải local)
-	s3Writer.StartAsyncWorker()
-	s3WriterInstance = s3Writer // Lưu để có thể stop khi shutdown
-
 	Log = logrus.New()
 
 	// Ghi log ra stdout + writer (S3 hoặc local file)
@@ -250,7 +124,7 @@ func InitLogger() {
 
 	Log.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
-		TimestampFormat: "2006-01-02 15:04:05",
+        TimestampFormat: "2006-01-02 15:04:05",
 		DisableColors:   true,
 	})
 
@@ -295,12 +169,4 @@ func ExtractDomainName(rawURL string) string {
 	}
 
 	return strings.ReplaceAll(host, "-", "_")
-}
-
-// StopLogger dừng async S3 logger worker và flush tất cả log còn lại
-// Nên gọi hàm này khi app shutdown để đảm bảo không mất log
-func StopLogger() {
-	if s3WriterInstance != nil {
-		s3WriterInstance.Stop()
-	}
 }

@@ -1,10 +1,10 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"sort"
 )
 
@@ -105,4 +105,3 @@ func (r *LessonPlanPartResourceImpl) FormatModelLessonPlanPart(lessonPlanPart *p
 		MaxScore:       float64(lessonPlanPart.MaxScore),
 	}
 }
-

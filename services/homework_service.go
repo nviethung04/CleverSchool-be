@@ -1,17 +1,17 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/requests"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/requests"
+	"be-lms/resources"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -23,7 +23,6 @@ import (
 type HomeworkService interface {
 	GetAll(c *gin.Context) ([]models.Homework, int64, error)
 	GetByID(c *gin.Context, id int) (*prot.Homework, error)
-	GetStudentsDoing(c *gin.Context) (*prot.HomeworkStudentsDoingResponse, error)
 	Create(c *gin.Context, req *prot.HomeworkRequest) (*models.Homework, error)
 	Update(c *gin.Context, req *prot.HomeworkRequest) (*models.Homework, error)
 	Delete(c *gin.Context, id int) error
@@ -53,52 +52,6 @@ func (s *homeworkService) GetAll(c *gin.Context) ([]models.Homework, int64, erro
 	}
 
 	return homeworks, total, nil
-}
-
-func (s *homeworkService) GetStudentsDoing(c *gin.Context) (*prot.HomeworkStudentsDoingResponse, error) {
-	var req requests.HomeworkStudentsDoingRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		return nil, err
-	}
-
-	if req.HomeworkID <= 0 {
-		return nil, fmt.Errorf("homework_id phải lớn hơn 0")
-	}
-
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.Limit <= 0 {
-		req.Limit = 20
-	}
-
-	items, total, err := s.repo.GetStudentsDoing(&req)
-	if err != nil {
-		return nil, err
-	}
-
-	responseItems := make([]*prot.HomeworkStudentsDoingItem, 0, len(items))
-	for _, item := range items {
-		var submittedAt int64
-		if !item.SubmittedAt.IsZero() {
-			submittedAt = item.SubmittedAt.Unix()
-		}
-		responseItems = append(responseItems, &prot.HomeworkStudentsDoingItem{
-			UserId:      item.UserID,
-			Username:    item.Username,
-			Name:        item.Name,
-			SchoolName:  item.SchoolName,
-			HomeworkId:  item.HomeworkID,
-			SubmittedAt: submittedAt,
-		})
-	}
-
-	return &prot.HomeworkStudentsDoingResponse{
-		Students: responseItems,
-		Total: total,
-		Page:  int32(req.Page),
-		Limit: int32(req.Limit),
-	}, nil
 }
 
 func (s *homeworkService) GetByID(c *gin.Context, id int) (*prot.Homework, error) {
@@ -451,4 +404,3 @@ func dtoToProtoHomework(hw *dto.HomeworkDTO) *prot.Homework {
 		QuestionFiles: questionFiles,
 	}
 }
-

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/repositories"
-	"be-cleverschool/services"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/repositories"
+	"be-lms/services"
 )
 
 type DailyCourseStatisticsCronJob struct {
@@ -45,6 +45,8 @@ func (j *DailyCourseStatisticsCronJob) Run() error {
 	}
 
 	now := time.Now()
+	yesterday := now.AddDate(0, 0, -1)
+	
 	fmt.Printf("🚀 Bắt đầu Daily Course Statistics Job - %s\n", now.Format("2006-01-02 15:04:05"))
 
 	// Định nghĩa các khoảng thời gian
@@ -54,26 +56,36 @@ func (j *DailyCourseStatisticsCronJob) Run() error {
 		endDate   time.Time
 	}{
 		{
-			name:      "Từ 15/9/2025 đến cuối tuần hiện tại",
+			name:      "Từ 15/9/2025 đến hôm qua",
 			startDate: time.Date(2025, 9, 15, 0, 0, 0, 0, time.UTC),
-			endDate:   j.getEndOfWeek(now),
+			endDate:   yesterday,
+		},
+		{
+			name:      "Từ 8/9/2025 đến hôm qua", 
+			startDate: time.Date(2025, 9, 8, 0, 0, 0, 0, time.UTC),
+			endDate:   yesterday,
 		},
 		{
 			name:      "Từ đầu tuần hiện tại đến cuối tuần hiện tại",
 			startDate: j.getStartOfWeek(now),
 			endDate:   j.getEndOfWeek(now),
 		},
+		{
+			name:      "Từ 15/9/2025 đến cuối tuần trước",
+			startDate: time.Date(2025, 9, 15, 0, 0, 0, 0, time.UTC),
+			endDate:   j.getEndOfWeek(yesterday),
+		},
 	}
 
 	// Chạy từng khoảng thời gian
 	for i, dateRange := range dateRanges {
 		fmt.Printf("\n📊 [%d/4] Xử lý: %s\n", i+1, dateRange.name)
-		fmt.Printf("   📅 Từ: %s đến: %s\n",
-			dateRange.startDate.Format("2006-01-02"),
+		fmt.Printf("   📅 Từ: %s đến: %s\n", 
+			dateRange.startDate.Format("2006-01-02"), 
 			dateRange.endDate.Format("2006-01-02"))
 
 		startTime := time.Now()
-
+		
 		if err := j.service.GenerateCourseStatistics(dateRange.startDate, dateRange.endDate); err != nil {
 			fmt.Printf("❌ Lỗi khi tạo thống kê cho %s: %v\n", dateRange.name, err)
 			continue
@@ -104,4 +116,3 @@ func (j *DailyCourseStatisticsCronJob) getEndOfWeek(t time.Time) time.Time {
 	}
 	return t.AddDate(0, 0, 7-weekday)
 }
-

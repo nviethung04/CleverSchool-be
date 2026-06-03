@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 // Dashboard Teacher Homework Student
 message DashboardTeacherHomeworkStudent {
@@ -29,9 +29,6 @@ message DashboardTeacherHomeworkStudentStats {
   int64 completed_homework = 7;
   int64 not_started_homework = 8;
   double average_ratio = 9;  // Tỷ lệ điểm trung bình của học sinh
-  double completed_homework_ratio = 10;  // Tỷ lệ hoàn thành = completed_homework / total_assigned_homeworks
-  int64 total_questions = 11;
-  int64 questions_completed = 12;
 }
 
 message DashboardTeacherHomeworkStudentStatsResponse {

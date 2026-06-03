@@ -1,10 +1,10 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/models"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -36,8 +36,6 @@ func (s *userService) Import(c *gin.Context, fileHeader *multipart.FileHeader) e
 	if len(rows) < 2 {
 		return errors.New("no data to import")
 	}
-
-	isVtg := config.LoadConfig().IsVtg
 
 	courseUserMap := make(map[int64][]int64)
 	classUserMap := make(map[int64][]int64)
@@ -109,7 +107,7 @@ func (s *userService) Import(c *gin.Context, fileHeader *multipart.FileHeader) e
 		code := row[3]
 
 		user := models.User{
-			ID:          id,
+			ID: id,
 			Username:    username,
 			Identifier:  identifier,
 			Code:        code,
@@ -119,25 +117,6 @@ func (s *userService) Import(c *gin.Context, fileHeader *multipart.FileHeader) e
 			AvatarInfo:  fileInfo,
 			Status:      status,
 			SchoolID:    schoolId,
-		}
-
-		// Parse Is Independent Student và Is Failed Subject nếu isVtg = true
-		if isVtg {
-			if len(row) > 15 && strings.TrimSpace(row[15]) != "" {
-				isIndependentStudent := false
-				if row[15] == "1" || row[15] == "true" || row[15] == "TRUE" {
-					isIndependentStudent = true
-				}
-				user.IsIndependentStudent = isIndependentStudent
-			}
-
-			if len(row) > 16 && strings.TrimSpace(row[16]) != "" {
-				isFailedSubject := false
-				if row[16] == "1" || row[16] == "true" || row[16] == "TRUE" {
-					isFailedSubject = true
-				}
-				user.IsFailedSubject = isFailedSubject
-			}
 		}
 
 		if row[8] != "" || isNewUser {
@@ -199,7 +178,7 @@ func (s *userService) Import(c *gin.Context, fileHeader *multipart.FileHeader) e
 	}
 
 	for courseId, userIds := range courseUserMap {
-		courseRepo.AddUserCourse(courseId, userIds, 0, []int64{})
+		courseRepo.AddUserCourse(courseId, userIds, 0)
 	}
 
 	for roleId, userIds := range roleUserMap {
@@ -281,4 +260,3 @@ func (s *userService) GenerateUsername(name string, schoolName string, roleId in
 
 	return username
 }
-

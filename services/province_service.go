@@ -1,11 +1,11 @@
 package services
 
 import (
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/requests"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/requests"
 	_ "time"
 )
 
@@ -87,4 +87,3 @@ func (s *provinceService) modelToProtoWard(w *models.Ward) *prot.Ward {
 		FullName:     tr.FullName,
 	}
 }
-

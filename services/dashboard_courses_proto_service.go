@@ -1,16 +1,14 @@
 package services
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
+	"be-lms/dto"
+	"be-lms/prot"
+	"be-lms/repositories"
 	"math"
 )
 
 type DashboardCoursesProtoService interface {
 	GetDashboardCoursesProto(req *prot.DashboardCoursesRequest) (*prot.DashboardCoursesResponse, error)
-	GetCourseStudentsProto(req *prot.DashboardCourseStudentsRequest) (*prot.DashboardCourseStudentsResponse, error)
-	GetCourseHomeworksProto(req *prot.DashboardCourseHomeworksRequest) (*prot.DashboardCourseHomeworksResponse, error)
 }
 
 type dashboardCoursesProtoService struct {
@@ -32,7 +30,7 @@ func (s *dashboardCoursesProtoService) GetDashboardCoursesProto(req *prot.Dashbo
 	// Nếu không truyền page và limit thì lấy hết
 	if req.Page <= 0 && req.Limit <= 0 {
 		// Lấy tất cả courses
-		courses, err = s.dashboardCoursesRepo.GetDashboardCourses(req.SchoolId, req.TeacherId, req.CourseId, req.StartDate, req.EndDate)
+		courses, err = s.dashboardCoursesRepo.GetDashboardCourses(req.SchoolId, req.StartDate, req.EndDate)
 		if err != nil {
 			return nil, err
 		}
@@ -47,13 +45,13 @@ func (s *dashboardCoursesProtoService) GetDashboardCoursesProto(req *prot.Dashbo
 		}
 
 		// Get courses with pagination and search
-		courses, err = s.dashboardCoursesRepo.GetDashboardCoursesWithPagination(req.SchoolId, req.TeacherId, req.CourseId, req.Search, int(req.Page), int(req.Limit), req.StartDate, req.EndDate)
+		courses, err = s.dashboardCoursesRepo.GetDashboardCoursesWithPagination(req.SchoolId, req.Search, int(req.Page), int(req.Limit), req.StartDate, req.EndDate)
 		if err != nil {
 			return nil, err
 		}
 
 		// Get total count for pagination
-		total, err = s.dashboardCoursesRepo.GetDashboardCoursesCount(req.SchoolId, req.TeacherId, req.CourseId, req.Search)
+		total, err = s.dashboardCoursesRepo.GetDashboardCoursesCount(req.SchoolId, req.Search)
 		if err != nil {
 			return nil, err
 		}
@@ -73,26 +71,25 @@ func (s *dashboardCoursesProtoService) GetDashboardCoursesProto(req *prot.Dashbo
 		}
 
 		protoCourse := &prot.DashboardReportCourse{
-			Id:                            course.ID,
-			CourseId:                      course.CourseID,
-			CourseName:                    course.CourseName,
-			ObjectTitle:                   course.ObjectTitle,
-			SchoolId:                      course.SchoolID,
-			SchoolName:                    course.SchoolName,
-			TotalStudents:                 course.TotalStudents,
-			TotalTeachers:                 course.TotalTeachers,
-			TeacherIds:                    course.TeacherIDs,
-			TeacherInfos:                  protoTeacherInfos,
-			ActiveTeachers:                course.ActiveTeachersSelectedWeek,
-			ActiveStudents:                course.ActiveStudentsSelectedWeek,
-			StudentsCompletedHomework:     course.StudentsCompletedHomeworkSelectedWeek,
-			TotalHomeworks:                course.TotalHomeworks,
-			AssignedHomeworks:             course.AssignedHomeworks,
-			StudentsCompletedAllHomeworks: course.StudentsCompletedAllHomeworks,
-			StudentsDoingHomeworks:        course.StudentsDoingHomeworks,
-			StudentsNotStartedAnyHomework: course.StudentsNotStartedAnyHomework,
-			StudentActiveNotStartedAnyHomework: course.StudentActiveNotStartedAnyHomework,
-			HomeworkOver_50PercentStudentComplete: course.HomeworkOver50PercentStudentComplete,
+			Id:                                    course.ID,
+			CourseId:                              course.CourseID,
+			CourseName:                            course.CourseName,
+			ObjectTitle:                           course.ObjectTitle,
+			SchoolId:                              course.SchoolID,
+			SchoolName:                            course.SchoolName,
+			TotalStudents:                         course.TotalStudents,
+			TotalTeachers:                         course.TotalTeachers,
+			TeacherIds:                            course.TeacherIDs,
+			TeacherInfos:                          protoTeacherInfos,
+			ActiveTeachersFromSep8:                course.ActiveTeachersFromSep8,
+			ActiveStudentsFromSep15:               course.ActiveStudentsFromSep15,
+			StudentsCompletedHomeworkFromSep15:    course.StudentsCompletedHomeworkFromSep15,
+			StudentsCompletedHomeworkSelectedWeek:     course.StudentsCompletedHomeworkSelectedWeek,
+			ActiveStudentsSelectedWeek:                course.ActiveStudentsSelectedWeek,
+			ActiveTeachersSelectedWeek:                course.ActiveTeachersSelectedWeek,
+			TotalHomeworks:                        course.TotalHomeworks,
+			AssignedHomeworks:                     course.AssignedHomeworks,
+			CompletedHomeworks:                    course.CompletedHomeworks,
 		}
 		protoCourses = append(protoCourses, protoCourse)
 	}
@@ -113,64 +110,3 @@ func (s *dashboardCoursesProtoService) GetDashboardCoursesProto(req *prot.Dashbo
 		TotalPages:  totalPages,
 	}, nil
 }
-
-// GetCourseStudentsProto lấy danh sách học sinh trong course kèm thông tin homework
-func (s *dashboardCoursesProtoService) GetCourseStudentsProto(req *prot.DashboardCourseStudentsRequest) (*prot.DashboardCourseStudentsResponse, error) {
-	// Gọi repository để lấy dữ liệu
-	response, err := s.dashboardCoursesRepo.GetCourseStudents(req.CourseId, req.StartDate, req.EndDate)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert DTO sang protobuf
-	var protoStudents []*prot.DashboardCourseStudent
-	for _, student := range response.Students {
-		var protoHomeworks []*prot.DashboardCourseStudentHomework
-		for _, homework := range student.Homeworks {
-			protoHomeworks = append(protoHomeworks, &prot.DashboardCourseStudentHomework{
-				Id:              homework.ID,
-				Name:            homework.Name,
-				IsCompleted:     homework.IsCompleted,
-				IsCompletedLate: homework.IsCompletedLate,
-			})
-		}
-
-		protoStudent := &prot.DashboardCourseStudent{
-			Id:        student.ID,
-			Name:      student.Name,
-			IsActive:  student.IsActive,
-			Homeworks: protoHomeworks,
-		}
-		protoStudents = append(protoStudents, protoStudent)
-	}
-
-	return &prot.DashboardCourseStudentsResponse{
-		Students: protoStudents,
-	}, nil
-}
-
-func (s *dashboardCoursesProtoService) GetCourseHomeworksProto(req *prot.DashboardCourseHomeworksRequest) (*prot.DashboardCourseHomeworksResponse, error) {
-	response, err := s.dashboardCoursesRepo.GetCourseHomeworks(req.CourseId, req.StartDate, req.EndDate)
-	if err != nil {
-		return nil, err
-	}
-
-	var protoHomeworks []*prot.DashboardCourseHomework
-	for _, homework := range response.Homeworks {
-		var assignedAt int64
-		if homework.AssignedAt != nil {
-			assignedAt = homework.AssignedAt.Unix()
-		}
-		protoHomeworks = append(protoHomeworks, &prot.DashboardCourseHomework{
-			Id:             homework.ID,
-			Name:           homework.Name,
-			AssignedAt:     assignedAt,
-			IsAssignedLate: homework.IsAssignedLate,
-		})
-	}
-
-	return &prot.DashboardCourseHomeworksResponse{
-		Homeworks: protoHomeworks,
-	}, nil
-}
-

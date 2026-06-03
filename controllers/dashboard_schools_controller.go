@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/services"
+	"be-lms/dto"
+	"be-lms/services"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -117,7 +117,7 @@ func (c *DashboardSchoolsController) createExcelFile(ctx *gin.Context, schools [
 
 	// Set headers
 	headers := []string{
-		"School ID", "School Name", "Total Students", "Total Teachers",
+		"ID", "School ID", "School Name", "Total Students", "Total Teachers",
 		"Active Teachers (Sep 8)", "Active Students (Sep 15)", "Students Completed Homework (Sep 15)",
 		"Students Completed Homework (Selected Week)", "Active Students (Selected Week)", "Active Teachers (Selected Week)",
 	}
@@ -132,16 +132,17 @@ func (c *DashboardSchoolsController) createExcelFile(ctx *gin.Context, schools [
 	for row, school := range schools {
 		rowIndex := row + 2 // Start from row 2 (after headers)
 		
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowIndex), school.SchoolID)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowIndex), school.SchoolName)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowIndex), school.TotalStudents)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowIndex), school.TotalTeachers)
-		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowIndex), school.ActiveTeachersFromSep8)
-		f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowIndex), school.ActiveStudentsFromSep15)
-		f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowIndex), school.StudentsCompletedHomeworkFromSep15)
-		f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowIndex), school.StudentsCompletedHomeworkSelectedWeek)
-		f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowIndex), school.ActiveStudentsSelectedWeek)
-		f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowIndex), school.ActiveTeachersSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowIndex), school.ID)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowIndex), school.SchoolID)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowIndex), school.SchoolName)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowIndex), school.TotalStudents)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowIndex), school.TotalTeachers)
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowIndex), school.ActiveTeachersFromSep8)
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowIndex), school.ActiveStudentsFromSep15)
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowIndex), school.StudentsCompletedHomeworkFromSep15)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowIndex), school.StudentsCompletedHomeworkSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowIndex), school.ActiveStudentsSelectedWeek)
+		f.SetCellValue(sheetName, fmt.Sprintf("K%d", rowIndex), school.ActiveTeachersSelectedWeek)
 	}
 
 	// Auto-fit columns
@@ -153,4 +154,3 @@ func (c *DashboardSchoolsController) createExcelFile(ctx *gin.Context, schools [
 	// Write to response
 	return f.Write(ctx.Writer)
 }
-

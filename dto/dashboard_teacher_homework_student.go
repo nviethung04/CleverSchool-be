@@ -1,6 +1,6 @@
 package dto
 
-import "be-cleverschool/models"
+import "be-lms/models"
 
 type DashboardTeacherHomeworkStudent struct {
 	StudentID         int64      `json:"student_id"`
@@ -20,9 +20,6 @@ type DashboardTeacherHomeworkStudentStats struct {
 	CompletedHomework    int64      `json:"completed_homework"`
 	NotStartedHomework   int64      `json:"not_started_homework"`
 	AverageRatio         float64    `json:"average_ratio"`
-	CompletedHomeworkRatio float64  `json:"completed_homework_ratio"` // completed_homework / total_assigned_homeworks
-	TotalQuestions        int64     `json:"total_questions"`
-	QuestionsCompleted    int64     `json:"questions_completed"`
 }
 
 type DashboardTeacherHomeworkOverview struct {

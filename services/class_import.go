@@ -1,9 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories"
+	"be-lms/config"
+	"be-lms/models"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -34,33 +33,13 @@ func (s *classService) Import(c *gin.Context, fileHeader *multipart.FileHeader) 
 		return errors.New("no data to import")
 	}
 
-	facultyRepo := repositories.NewFacultyRepository()
-	isVtg := config.LoadConfig().IsVtg
-	facultyRepo.SetContext(c)
-	faculties, err := facultyRepo.GetAll()
-
 	for _, row := range rows[1:] {
 		if len(row) < 2 {
 			continue
 		}
 
 		cID, _ := strconv.ParseInt(row[0], 10, 64)
-
-		var schoolID, facultyID int64
-
-		if isVtg {
-			facultyID, _ = strconv.ParseInt(row[1], 10, 64)
-
-			for _, faculty := range faculties {
-				if faculty.ID == facultyID {
-					schoolID = faculty.SchoolId
-					break
-				}
-			}
-		} else {
-			schoolID, _ = strconv.ParseInt(row[1], 10, 64)
-		}
-
+		schoolID, _ := strconv.ParseInt(row[1], 10, 64)
 		gradeID, _ := strconv.ParseInt(row[2], 10, 64)
 		maxStudents, _ := strconv.ParseInt(row[4], 10, 32)
 		status := false
@@ -77,7 +56,6 @@ func (s *classService) Import(c *gin.Context, fileHeader *multipart.FileHeader) 
 		class := models.Class{
 			ID:          cID,
 			SchoolId:    schoolID,
-			FacultyId:   facultyID,
 			GradeId:     gradeID,
 			Name:        row[3],
 			MaxStudents: int32(maxStudents),
@@ -94,4 +72,3 @@ func (s *classService) Import(c *gin.Context, fileHeader *multipart.FileHeader) 
 
 	return nil
 }
-

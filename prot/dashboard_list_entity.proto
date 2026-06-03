@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 // Dashboard School List
 message DashboardSchoolList {
@@ -23,9 +23,6 @@ message DashboardCourseList {
   int64 id = 1;
   string name = 2;
   string object_title = 3;
-  int64 parent_course_id = 4;
-  int64 program_id = 5;
-  string program_name = 6;
 }
 
 message DashboardCourseListResponse {
@@ -98,44 +95,6 @@ message DashboardLessonList {
 
 message DashboardLessonListResponse {
   repeated DashboardLessonList lessons = 1;
-  int64 total = 2;
-}
-
-// Dashboard Chapter List
-message DashboardChapterList {
-  int64 id = 1;
-  string title = 2;
-  int64 course_id = 3;
-  string course_name = 4;
-}
-
-message DashboardChapterListResponse {
-  repeated DashboardChapterList chapters = 1;
-  int64 total = 2;
-}
-
-// Dashboard Class List
-message DashboardClassList {
-  int64 id = 1;
-  string class_name = 2;
-  int64 class_main_id = 3;
-  string class_main_name = 4;
-}
-
-message DashboardClassListResponse {
-  repeated DashboardClassList classes = 1;
-  int64 total = 2;
-}
-
-// Dashboard Class Main List
-message DashboardClassMainList {
-  int64 id = 1;
-  string name = 2;
-  int64 school_id = 3;
-}
-
-message DashboardClassMainListResponse {
-  repeated DashboardClassMainList class_mains = 1;
   int64 total = 2;
 }
 

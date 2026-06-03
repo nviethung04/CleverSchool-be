@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
+	"be-lms/models"
+	"be-lms/prot"
 	"sort"
 )
 
@@ -15,16 +15,12 @@ type ChapterResource interface {
 }
 
 type ChapterResourceImpl struct {
-	HideLessonIds     []int64
-	StudyingLessonIds []int64
 	CompleteLessonIds []int64
 	LessonSchedules   []models.LessonSchedule
 }
 
 func NewChapterResource() ChapterResource {
 	return &ChapterResourceImpl{
-		HideLessonIds:     []int64{},
-		StudyingLessonIds: []int64{},
 		CompleteLessonIds: []int64{},
 		LessonSchedules:   []models.LessonSchedule{},
 	}
@@ -41,8 +37,6 @@ func (r *ChapterResourceImpl) FormatChapter(chapter *models.Chapter) *prot.Chapt
 		Description: chapter.Description,
 		ObjectTitle: chapter.ObjectTitle,
 		Status:      chapter.Status,
-		Time:        chapter.Time,
-		Target:      chapter.Target,
 		CreatedAt:   chapter.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   chapter.UpdatedAt.Format("2006-01-02 15:04:05"),
 		ProgramId:   int64(chapter.ProgramId),
@@ -59,16 +53,6 @@ func (r *ChapterResourceImpl) FormatChapterDetail(chapter *models.Chapter) *prot
 		completedMap[id] = true
 	}
 
-	studyingMap := make(map[int64]bool, len(r.StudyingLessonIds))
-	for _, id := range r.StudyingLessonIds {
-		studyingMap[id] = true
-	}
-
-	hideLessonMap := make(map[int64]bool, len(r.StudyingLessonIds))
-	for _, id := range r.HideLessonIds {
-		hideLessonMap[id] = true
-	}
-
 	// Tạo map order từ LessonSchedules
 	lessonOrder := make(map[int64]int64)
 	for _, ls := range r.LessonSchedules {
@@ -78,16 +62,11 @@ func (r *ChapterResourceImpl) FormatChapterDetail(chapter *models.Chapter) *prot
 
 	lessons := make([]*prot.LessonInfo, 0, len(chapter.Lessons))
 	for _, lesson := range chapter.Lessons {
-		if hideLessonMap[lesson.ID] {
-			continue
-		}
-
 		lessons = append(lessons, &prot.LessonInfo{
 			Id:           lesson.ID,
 			Title:        lesson.Title,
 			SortPosition: int32(lesson.SortPosition),
 			IsComplete:   completedMap[lesson.ID],
-			IsStudying:   studyingMap[lesson.ID] && !completedMap[lesson.ID],
 		})
 	}
 
@@ -118,55 +97,16 @@ func (r *ChapterResourceImpl) FormatChapterDetail(chapter *models.Chapter) *prot
 		return lessons[i].SortPosition < lessons[j].SortPosition
 	})
 
-	headings := make([]*prot.Heading, 0, len(chapter.Headings))
-	for _, heading := range chapter.Headings {
-		headingLessons := make([]*prot.LessonInfo, 0, len(heading.Lessons))
-		for _, l := range chapter.Lessons {
-			if l.HeadingID == heading.ID {
-				headingLessons = append(headingLessons, &prot.LessonInfo{
-					Id:           l.ID,
-					Title:        l.Title,
-					SortPosition: int32(l.SortPosition),
-				})
-			}
-		}
-
-		sort.Slice(headingLessons, func(i, j int) bool {
-			if headingLessons[i].SortPosition == headingLessons[j].SortPosition {
-				return headingLessons[i].Id < headingLessons[j].Id
-			}
-			return headingLessons[i].SortPosition < headingLessons[j].SortPosition
-		})
-
-		headings = append(headings, &prot.Heading{
-			Id:           heading.ID,
-			Name:         heading.Name,
-			Lessons:      headingLessons,
-			SortPosition: int32(heading.SortPosition),
-			Time:         heading.Time,
-		})
-	}
-
-	sort.Slice(headings, func(i, j int) bool {
-		if headings[i].SortPosition == headings[j].SortPosition {
-			return headings[i].Id < headings[j].Id
-		}
-		return headings[i].SortPosition < headings[j].SortPosition
-	})
-
 	return &prot.Chapter{
 		Id:          int64(chapter.ID),
 		Title:       chapter.Title,
 		Description: chapter.Description,
 		ObjectTitle: chapter.ObjectTitle,
 		Lessons:     lessons,
-		Headings:    headings,
 		Status:      chapter.Status,
-		ProgramId:   int64(chapter.ProgramId),
-		Time:        chapter.Time,
-		Target:      chapter.Target,
 		CreatedAt:   chapter.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:   chapter.UpdatedAt.Format("2006-01-02 15:04:05"),
+		ProgramId:   int64(chapter.ProgramId),
 	}
 }
 
@@ -202,8 +142,5 @@ func (r *ChapterResourceImpl) FormatModelChapter(chapter *prot.ChapterRequest) *
 		ObjectTitle: chapter.ObjectTitle,
 		Status:      chapter.Status,
 		ProgramId:   int64(chapter.ProgramId),
-		Time:        chapter.Time,
-		Target:      chapter.Target,
 	}
 }
-

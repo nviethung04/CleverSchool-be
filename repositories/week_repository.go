@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
-	"be-cleverschool/repositories/base"
+	"be-lms/database/db"
+	"be-lms/models"
+	"be-lms/repositories/base"
 	"time"
 )
 
@@ -80,5 +80,4 @@ func minTime(a, b time.Time) time.Time {
 	}
 	return b
 }
-
 

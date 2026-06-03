@@ -1,18 +1,13 @@
 package routes
 
 import (
-	"be-cleverschool/controllers"
-	"be-cleverschool/middleware"
-	"time"
+	"be-lms/controllers"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterMigrationRoutes(r *gin.Engine) {
 	migrationController := new(controllers.MigrationController)
-	api := r.Group("/api/upload")
-	// Skip timeout cho /complete (xử lý async) và /extract (job dài), các route khác vẫn 60s
-	api.Use(middleware.TimeoutWithSkip(60*time.Second, []string{"/api/upload/complete", "/api/upload/extract"}))
 	migration := r.Group("/api/migration")
 	{
 		migration.POST("/upload-public", migrationController.UploadPublicDirectory)
@@ -20,9 +15,7 @@ func RegisterMigrationRoutes(r *gin.Engine) {
 
 	uploadController := controllers.NewUploadS3Controller()
 
-	api.POST("/presign", uploadController.PresignUpload)
-	api.POST("/complete", uploadController.UploadComplete)
-	api.POST("/extract", uploadController.Extract)
-	api.GET("/progress", uploadController.GetExtractProgress)
+	r.POST("/api/upload/presign", uploadController.PresignUpload)
+	r.POST("/api/upload/complete", uploadController.UploadComplete)
+	r.POST("/api/upload/extract", uploadController.Extract)
 }
-

@@ -31,8 +31,4 @@ type ClonedQuestion struct {
 	DeletedBy int64          `gorm:"column:deleted_by"`
 
 	CloneInfo *CloneInfo `gorm:"type:jsonb" json:"clone_info"`
-
-	SortQuestionIds       datatypes.JSON `gorm:"type:jsonb;column:sort_question_ids" json:"sort_question_ids"`
-	SortSourceQuestionIds string         `gorm:"column:sort_source_question_ids" json:"sort_source_question_ids"`
-	SourceQuestions       datatypes.JSON `gorm:"type:jsonb;column:source_questions" json:"source_questions"`
 }

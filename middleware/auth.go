@@ -1,12 +1,12 @@
 package middleware
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/redis"
+	"be-lms/repositories"
+	"be-lms/utils"
 	"crypto/sha256"
 	"encoding/hex"
 	"net"
@@ -70,7 +70,6 @@ func AuthMiddleware(authRepo repositories.AuthRepository) gin.HandlerFunc {
 		c.Set("roleIDs", claims.RoleIDs)
 		c.Set("roles", claims.Roles)
 		c.Set("roleType", claims.RoleType)
-		c.Set("memberType", claims.MemberType)
 
 		c.Next()
 	}
@@ -173,10 +172,8 @@ func RateLimitMiddleware(limiter *redis.RateLimiter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 
-		// Skip rate limiting for WebSocket connections and public paths
 		if strings.HasPrefix(path, "/public/") ||
-			strings.HasPrefix(path, "/power-point/") ||
-			strings.HasPrefix(path, "/ws/") { // Skip WebSocket connections
+			strings.HasPrefix(path, "/power-point/") {
 			c.Next()
 			return
 		}
@@ -257,4 +254,3 @@ func GetClientIP(c *gin.Context) string {
 
 	return ""
 }
-

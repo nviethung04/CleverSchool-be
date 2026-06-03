@@ -4,13 +4,6 @@ import (
 	"time"
 )
 
-const (
-	RateNotRatedYet = "not_rated_yet"
-	RateNotAchieved = "not_achieved"
-	RatePass        = "pass"
-	RateExcellent   = "excellent"
-)
-
 type HomeworkUser struct {
 	ID                      int64     `gorm:"primaryKey;column:id" json:"id"`
 	HomeworkID              int64     `gorm:"column:homework_id" json:"homework_id"`
@@ -22,10 +15,7 @@ type HomeworkUser struct {
     Ratio                   float64   `gorm:"column:ratio" json:"ratio"`
     HasManualScoring        bool      `gorm:"column:has_manual_scoring" json:"has_manual_scoring"`
     StatusScoring           int16     `gorm:"column:status_scoring" json:"status_scoring"`
-	Exp                     float64   `gorm:"column:exp" json:"exp"`
-	Star                    int       `gorm:"column:star" json:"star"`
 	FileInfos   MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
-	Rate                    string     `gorm:"column:rate" json:"rate"`
 	CreatedAt               time.Time `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt               time.Time `gorm:"column:updated_at" json:"updated_at"`
 }

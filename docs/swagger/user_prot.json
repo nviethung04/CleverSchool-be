@@ -71,18 +71,6 @@
               },
               "name": {
                 "type": "string"
-              },
-              "school": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "format": "int64"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
               }
             }
           },
@@ -166,48 +154,6 @@
                 }
               }
             }
-          },
-          "classes": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "school": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "schools": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                }
-              }
-            }
           }
         }
       },
@@ -225,9 +171,6 @@
       "updated_at": {
         "type": "string",
         "format": "date-time"
-      },
-      "is_failed": {
-        "type": "boolean"
       }
     }
   },
@@ -301,18 +244,6 @@
               },
               "name": {
                 "type": "string"
-              },
-              "school": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "format": "int64"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
               }
             }
           },
@@ -503,48 +434,6 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "classes": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "school": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "schools": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
                   "type": "string"
                 }
               }
@@ -622,18 +511,6 @@
               },
               "name": {
                 "type": "string"
-              },
-              "school": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "integer",
-                    "format": "int64"
-                  },
-                  "name": {
-                    "type": "string"
-                  }
-                }
               }
             }
           },
@@ -824,48 +701,6 @@
                   "type": "string"
                 },
                 "description": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "classes": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "school": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer",
-                      "format": "int64"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "schools": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "name": {
                   "type": "string"
                 }
               }

@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"be-cleverschool/services"
+	"be-lms/services"
 	"net/http"
 	"strconv"
 
@@ -184,4 +184,3 @@ func (c *ScormController) ListScormActivities(ctx *gin.Context) {
 		"note":    "Implement pagination and filtering as needed",
 	})
 }
-

@@ -1,15 +1,15 @@
 package services
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/dto"
-	"be-cleverschool/i18n"
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/redis"
-	"be-cleverschool/repositories"
-	"be-cleverschool/repositories/base"
-	"be-cleverschool/utils"
+	"be-lms/config"
+	"be-lms/dto"
+	"be-lms/i18n"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/redis"
+	"be-lms/repositories"
+	"be-lms/repositories/base"
+	"be-lms/utils"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -32,7 +32,6 @@ const (
 	DashboardLearningKey           = "dashboard:learning"
 	DashboardScoreDistributionKey  = "dashboard:score_distribution"
 	DashboardSystemUsageKey        = "dashboard:system_usage"
-	DashboardSystemUsageTypeKey    = "dashboard:system_usage_type"
 	DashboardTeacherPerformanceKey = "dashboard:teacher_performance"
 	DashboardQuestionBankKey       = "dashboard:question_bank"
 	DashboardRiskWarningKey        = "dashboard:risk_warning"
@@ -42,15 +41,11 @@ const (
 )
 
 type DashboardCacheService struct {
-	repo            repositories.DashboardRepository
-	activityLogRepo repositories.MonthlyActivityLogRepository
+	repo repositories.DashboardRepository
 }
 
 func NewDashboardCacheService(repo repositories.DashboardRepository) *DashboardCacheService {
-	return &DashboardCacheService{
-		repo:            repo,
-		activityLogRepo: repositories.NewMonthlyActivityLogRepository(),
-	}
+	return &DashboardCacheService{repo: repo}
 }
 
 // Generate cache key with filter parameters
@@ -177,7 +172,7 @@ func (dcs *DashboardCacheService) GetCachedActivity(c *gin.Context) *prot.Dashbo
 		"end_current":   filter.EndTime.Unix(),
 		"province_code": filter.Address.ProvinceCode,
 		"ward_code":     filter.Address.WardCode,
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"course_id":     filter.CourseId,
 		"school_id":     filter.SchoolId,
 	}
@@ -201,37 +196,6 @@ func (dcs *DashboardCacheService) GetCachedActivity(c *gin.Context) *prot.Dashbo
 	return dcs.formatActivityData(cachedData["total"], cachedData["current"], cachedData["old"], cachedData["new"], filter, c)
 }
 
-// Cache for User Online (active users in last 15 minutes)
-func (dcs *DashboardCacheService) GetCachedUserOnline(c *gin.Context) *prot.DashboardAdminItem {
-	filter := dcs.getFilter(c, Month)
-
-	filters := map[string]interface{}{
-		"minutes":    15,
-		"program_id": filter.ProgramId,
-		"course_id":  filter.CourseId,
-		"school_id":  filter.SchoolId,
-	}
-
-	cacheKey := dcs.generateCacheKey("dashboard:user_online", filters)
-
-	cachedData, err := redis.RememberCache[int](cacheKey, 1*time.Minute, func() (int, error) {
-		count, err := dcs.activityLogRepo.GetActiveUsersCount(15, filter.SchoolId, filter.CourseId, filter.ProgramId)
-		if err != nil {
-			return 0, err
-		}
-		return int(count), nil
-	})
-
-	// Not use cache
-	if err != nil {
-		// Fallback to direct fetch if cache fails
-		activeUsersCount, _ := dcs.activityLogRepo.GetActiveUsersCount(15, filter.SchoolId, filter.CourseId, filter.ProgramId)
-		return dcs.formatUserOnlineData(int32(activeUsersCount), c)
-	}
-
-	return dcs.formatUserOnlineData(int32(cachedData), c)
-}
-
 // Cache for User Overview (unified method)
 func (dcs *DashboardCacheService) GetCachedUserOverview(c *gin.Context) (*prot.UserOverview, error) {
 	filter := dcs.getFilter(c, Month)
@@ -241,6 +205,8 @@ func (dcs *DashboardCacheService) GetCachedUserOverview(c *gin.Context) (*prot.U
 		"start_previous": filter.StartPreviousTime.Unix(),
 		"end_current":    filter.EndTime.Unix(),
 		"end_previous":   filter.EndPreviousTime.Unix(),
+		"province_code":  filter.Address.ProvinceCode,
+		"ward_code":      filter.Address.WardCode,
 		"program_id":     filter.ProgramId,
 		"course_id":      filter.CourseId,
 		"school_id":      filter.SchoolId,
@@ -272,21 +238,12 @@ func (dcs *DashboardCacheService) convertUserOverviewToProt(c *gin.Context, dto 
 
 	filter := dcs.getFilter(c, Month)
 
-	// Get active users count (15 minutes)
-	activeUsersCount, err := dcs.activityLogRepo.GetActiveUsersCount(15, filter.SchoolId, filter.CourseId, filter.ProgramId)
-	if err != nil {
-		config.Log.Error("GetActiveUsersCount error: ", err)
-	}
-	config.Log.Info("Active users count (15 min): ", activeUsersCount)
-	userOnline := dcs.formatUserOnlineData(int32(activeUsersCount), c)
-
 	return &prot.UserOverview{
-		User:       dcs.formatUserRegisterData(dto.User.TotalNumber, dto.User.TotalNumber, dto.User.TotalNumber-int32(dto.User.ChangeValue), filter, c),
-		Student:    dcs.formatStudentRegisterData(dto.Student.Total, dto.Student.Total, dto.Student.TotalNumber, c),
-		Teacher:    dcs.formatTeacherRegisterData(dto.Teacher.Total, dto.Teacher.Total, dto.Teacher.TotalNumber, c),
-		Activity:   dcs.formatActivityData(dto.Activity.TotalNumber, dto.Activity.TotalNumber, dto.Activity.TotalNumber-int32(dto.Activity.ChangeValue), int32(dto.Activity.ChangeValue), filter, c),
-		School:     dcs.formatSchoolData(dto.School.Total, int32(dto.School.ChangeValue), dto.School.TotalNumber, filter, c),
-		UserOnline: userOnline,
+		User:     dcs.formatUserRegisterData(dto.User.TotalNumber, dto.User.TotalNumber, dto.User.TotalNumber - int32(dto.User.ChangeValue), filter, c),
+		Student:  dcs.formatStudentRegisterData(dto.Student.Total, dto.Student.Total, dto.Student.TotalNumber, c),
+		Teacher:  dcs.formatTeacherRegisterData(dto.Teacher.Total, dto.Teacher.Total, dto.Teacher.TotalNumber, c),
+		Activity: dcs.formatActivityData(dto.Activity.TotalNumber, dto.Activity.TotalNumber, dto.Activity.TotalNumber - int32(dto.Activity.ChangeValue), int32(dto.Activity.ChangeValue), filter, c),
+		School:   dcs.formatSchoolData(dto.School.Total, int32(dto.School.ChangeValue), dto.School.TotalNumber, filter, c),
 	}
 }
 
@@ -299,7 +256,7 @@ func (dcs *DashboardCacheService) GetCachedSchool(c *gin.Context) *prot.Dashboar
 		"end_current":   filter.EndTime.Unix(),
 		"province_code": filter.Address.ProvinceCode,
 		"ward_code":     filter.Address.WardCode,
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"school_id":     filter.SchoolId,
 	}
 
@@ -329,7 +286,7 @@ func (dcs *DashboardCacheService) GetCachedCourseOverview(c *gin.Context) *prot.
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"course_id":     filter.CourseId,
 		"school_id":     filter.SchoolId,
 	}
@@ -358,12 +315,11 @@ func (dcs *DashboardCacheService) GetCachedLearningOverview(c *gin.Context) *pro
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"course_id":     filter.CourseId,
 		"school_id":     filter.SchoolId,
 		"class_id":      filter.ClassId,
 		"teacher_id":    filter.TeacherId,
-		"object_type":   filter.ObjectType,
 	}
 
 	cacheKey := dcs.generateCacheKey(DashboardLearningKey, filters)
@@ -390,12 +346,11 @@ func (dcs *DashboardCacheService) GetCachedScoreDistribution(c *gin.Context) *pr
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"course_id":     filter.CourseId,
 		"school_id":     filter.SchoolId,
 		"class_id":      filter.ClassId,
 		"teacher_id":    filter.TeacherId,
-		"object_type":   filter.ObjectType,
 	}
 
 	cacheKey := dcs.generateCacheKey(DashboardScoreDistributionKey, filters)
@@ -422,23 +377,13 @@ func (dcs *DashboardCacheService) GetCachedSystemUsage(c *gin.Context) *prot.Sys
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"school_id":     filter.SchoolId,
 		"course_id":     filter.CourseId,
-		"role_id":       filter.RoleId,
-	}
-
-	filterTypes := map[string]interface{}{
-		"start_current": filter.StartTime.Unix(),
-		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
-		"school_id":     filter.SchoolId,
-		"course_id":     filter.CourseId,
-		"object_type":   filter.ObjectType,
+		"role_id":     filter.RoleId,
 	}
 
 	cacheKey := dcs.generateCacheKey(DashboardSystemUsageKey, filters)
-	cacheTypeKey := dcs.generateCacheKey(DashboardSystemUsageTypeKey, filterTypes)
 
 	data, err := redis.RememberCache[*dto.SystemUsageOverview](cacheKey, DashboardCacheTTL, func() (*dto.SystemUsageOverview, error) {
 		return dcs.repo.GetSystemUsage(filter)
@@ -453,22 +398,6 @@ func (dcs *DashboardCacheService) GetCachedSystemUsage(c *gin.Context) *prot.Sys
 		}
 	}
 
-	dataType, err := redis.RememberCache[*dto.SystemUsageOverview](cacheTypeKey, DashboardCacheTTL, func() (*dto.SystemUsageOverview, error) {
-		return dcs.repo.GetSystemUsageType(filter)
-	})
-
-	if err != nil {
-		dataType, err = dcs.repo.GetSystemUsageType(filter)
-
-		if err != nil || data == nil {
-			config.Log.Error("GetSystemUsageType: ", err)
-			return &prot.SystemUsageOverview{}
-		}
-	}
-
-	data.CompleteCount = dataType.CompleteCount
-	data.CompletedRate = dataType.CompletedRate
-
 	return dcs.formatSystemUsageData(*data, c)
 }
 
@@ -479,11 +408,7 @@ func (dcs *DashboardCacheService) GetCachedTeacherPerformance(c *gin.Context) *p
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
-		"school_id":     filter.SchoolId,
-		"course_id":     filter.CourseId,
-		"teacher_id":    filter.TeacherId,
-		"object_type":   filter.ObjectType,
+		"grading_type":          filter.GradingType,
 	}
 
 	cacheKey := dcs.generateCacheKey(DashboardTeacherPerformanceKey, filters)
@@ -537,7 +462,7 @@ func (dcs *DashboardCacheService) GetCachedRiskWarning(c *gin.Context) *prot.Ris
 	filters := map[string]interface{}{
 		"start_current": filter.StartTime.Unix(),
 		"end_current":   filter.EndTime.Unix(),
-		"program_id":    filter.ProgramId,
+		"program_id":     filter.ProgramId,
 		"school_id":     filter.SchoolId,
 		"course_id":     filter.CourseId,
 		"teacher_id":    filter.TeacherId,
@@ -575,7 +500,6 @@ func (dcs *DashboardCacheService) ClearAllDashboardCache() error {
 		DashboardTeacherPerformanceKey,
 		DashboardQuestionBankKey,
 		DashboardRiskWarningKey,
-		DashboardSystemUsageTypeKey,
 	}
 
 	for _, key := range keys {
@@ -659,7 +583,7 @@ func (dcs *DashboardCacheService) getFilter(c *gin.Context, userTimeDefault stri
 	yearStr := c.DefaultQuery("year", "")
 	monthStr := c.DefaultQuery("month", "")
 	quarterStr := c.DefaultQuery("quarter", "")
-	objectTypeStr := c.DefaultQuery("object_type", "all")
+	gradingTypeStr := c.DefaultQuery("grading_type", "all")
 
 	parseInt64 := func(s string) int64 {
 		if s == "" {
@@ -802,14 +726,14 @@ func (dcs *DashboardCacheService) getFilter(c *gin.Context, userTimeDefault stri
 		TeacherId:   teacherId,
 		SchoolId:    schoolId,
 		ClassId:     classId,
-		RoleId:      roleId,
+		RoleId: roleId,
 		Year:        int32(year),
 		Month:       int32(month),
 		Quarter:     int32(quarter),
 		LastYear:    lastYear,
 		LastMonth:   lastMonth,
 		LastQuarter: lastQuarter,
-		ObjectType:  objectTypeStr,
+		GradingType: gradingTypeStr,
 	}
 }
 
@@ -839,8 +763,7 @@ func (dcs *DashboardCacheService) formatUserRegisterData(totalActivity, currentR
 	}
 
 	var status, message string
-	var percent float32
-	diff := currentRegister - lastRegister
+	var percent, diff float32
 
 	if lastRegister == 0 {
 		if currentRegister == 0 {
@@ -849,17 +772,20 @@ func (dcs *DashboardCacheService) formatUserRegisterData(totalActivity, currentR
 		} else {
 			percent = 100
 			status = "up"
-			message = i18n.Localize("dashboard.user_up", map[string]interface{}{"Count": diff, "Time": timeStr})
+			formattedPercent := utils.FormatPercent(float64(percent), 1)
+			message = i18n.Localize("dashboard.user_up", map[string]interface{}{"Percent": formattedPercent, "Time": timeStr})
 		}
 	} else {
+		diff = float32(currentRegister - lastRegister)
 		percent = (float32(diff) / float32(lastRegister)) * 100
+		formattedPercent := utils.FormatPercent(float64(percent), 1)
 
-		if diff > 0 {
+		if percent > 0 {
 			status = "up"
-			message = i18n.Localize("dashboard.user_up", map[string]interface{}{"Count": diff, "Time": timeStr})
-		} else if diff < 0 {
+			message = i18n.Localize("dashboard.user_up", map[string]interface{}{"Percent": formattedPercent, "Time": timeStr})
+		} else if percent < 0 {
 			status = "down"
-			message = i18n.Localize("dashboard.user_down", map[string]interface{}{"Count": -diff, "Time": timeStr})
+			message = i18n.Localize("dashboard.user_down", map[string]interface{}{"Percent": formattedPercent, "Time": timeStr})
 		} else {
 			status = "same"
 		}
@@ -878,20 +804,20 @@ func (dcs *DashboardCacheService) formatUserRegisterData(totalActivity, currentR
 func (dcs *DashboardCacheService) formatStudentRegisterData(totalActivity, currentRegister, oldRegister int32, c *gin.Context) *prot.DashboardAdminItem {
 	totalRegister := totalActivity
 	var status, message string
-	var percent float32
-	diff := currentRegister - oldRegister
+	var percent, diff float32
 
 	if oldRegister == 0 {
 		if currentRegister == 0 {
 			percent = 0
 			status = "same"
 		} else {
-			percent = 100
+			percent = (float32(currentRegister) / float32(totalRegister)) * 100
 			status = "up"
 			formattedPercent := utils.FormatPercent(float64(percent), 1)
 			message = i18n.Localize("dashboard.percent_total", map[string]interface{}{"Percent": formattedPercent})
 		}
 	} else {
+		diff = float32(currentRegister - oldRegister)
 		percent = (float32(diff) / float32(oldRegister)) * 100
 		formattedPercent := utils.FormatPercent(float64(float32(currentRegister)/float32(totalRegister)*100), 1)
 
@@ -922,20 +848,20 @@ func (dcs *DashboardCacheService) formatTeacherRegisterData(totalActivity, curre
 	totalRegister := totalActivity
 
 	var status, message string
-	var percent float32
-	diff := currentRegister - oldRegister
+	var percent, diff float32
 
 	if oldRegister == 0 {
 		if currentRegister == 0 {
 			percent = 0
 			status = "same"
 		} else {
-			percent = 100
+			percent = (float32(currentRegister) / float32(totalRegister)) * 100
 			status = "up"
 			formattedPercent := utils.FormatPercent(float64(percent), 1)
 			message = i18n.Localize("dashboard.percent_total", map[string]interface{}{"Percent": formattedPercent})
 		}
 	} else {
+		diff = float32(currentRegister - oldRegister)
 		percent = (float32(diff) / float32(oldRegister)) * 100
 		formattedPercent := utils.FormatPercent(float64((float32(currentRegister)/float32(totalRegister))*100), 1)
 
@@ -959,17 +885,6 @@ func (dcs *DashboardCacheService) formatTeacherRegisterData(totalActivity, curre
 		Title:       i18n.Localize("dashboard.teacher"),
 		Message:     message,
 		Status:      status,
-	}
-}
-
-func (dcs *DashboardCacheService) formatUserOnlineData(activeUsersCount int32, c *gin.Context) *prot.DashboardAdminItem {
-	return &prot.DashboardAdminItem{
-		Total:       activeUsersCount,
-		TotalNumber: activeUsersCount,
-		ChangeValue: 0,
-		Title:       i18n.Localize("dashboard.user_online"),
-		Message:     i18n.Localize("dashboard.currently_online"),
-		Status:      "online",
 	}
 }
 
@@ -1066,7 +981,7 @@ func (dcs *DashboardCacheService) formatActivityData(totalActivity, currentActiv
 			}
 		}
 	} else {
-		percent = (float32(currentActivity-oldActivity) / float32(currentActivity)) * 100
+		percent = (float32(currentActivity) / float32(oldActivity)) * 100
 
 		if percent > 0 {
 			status = "up"
@@ -1092,15 +1007,9 @@ func (dcs *DashboardCacheService) formatActivityData(totalActivity, currentActiv
 }
 
 func (dcs *DashboardCacheService) formatCourseOverviewData(dataItem dto.CourseOverviewDataItem, c *gin.Context) *prot.CourseOverview {
-	progranText := i18n.Localize("dashboard.program")
-
-	if config.LoadConfig().IsVtg {
-		progranText = i18n.Localize("dashboard.subject")
-	}
-
 	return &prot.CourseOverview{
 		Overviews: []*prot.CourseOverviewItem{
-			{Title: progranText, Count: dataItem.Programs},
+			{Title: i18n.Localize("dashboard.program"), Count: dataItem.Programs},
 			{Title: i18n.Localize("dashboard.lesson"), Count: dataItem.Lessons},
 			{Title: i18n.Localize("dashboard.homework"), Count: dataItem.Homeworks},
 			{Title: i18n.Localize("dashboard.lesson_plan"), Count: dataItem.LessonPlans},
@@ -1166,15 +1075,14 @@ func (dcs *DashboardCacheService) formatLearnigOverviewData(dataItem dto.Learnin
 	for _, highest := range dataItem.TopHighest {
 		topHighest = append(topHighest, &prot.StudentScore{
 			Id:          highest.Id,
-			TypeId:      highest.TypeId,
-			TypeUserId:  highest.TypeUserId,
+			ExamId:      highest.ExamId,
+			ExamUserId:  highest.ExamUserId,
 			StudentName: highest.Name,
-			TypeName:    highest.TypeName,
+			ExamName:    highest.ExamName,
 			Score:       highest.Score,
 			Avatar:      utils.StaticURL(highest.AvatarInfo.Path, models.Storage),
 			SchoolName:  highest.SchoolName,
 			ClassName:   highest.ClassName,
-			Type:        highest.Type,
 		})
 	}
 
@@ -1182,15 +1090,14 @@ func (dcs *DashboardCacheService) formatLearnigOverviewData(dataItem dto.Learnin
 	for _, lowest := range dataItem.TopLowest {
 		topLowest = append(topLowest, &prot.StudentScore{
 			Id:          lowest.Id,
-			TypeId:      lowest.TypeId,
-			TypeUserId:  lowest.TypeUserId,
+			ExamId:      lowest.ExamId,
+			ExamUserId:  lowest.ExamUserId,
 			StudentName: lowest.Name,
-			TypeName:    lowest.TypeName,
+			ExamName:    lowest.ExamName,
 			Score:       lowest.Score,
 			Avatar:      utils.StaticURL(lowest.AvatarInfo.Path, models.Storage),
 			SchoolName:  lowest.SchoolName,
 			ClassName:   lowest.ClassName,
-			Type:        lowest.Type,
 		})
 	}
 
@@ -1234,10 +1141,9 @@ func (dcs *DashboardCacheService) formatSystemUsageData(dataItem dto.SystemUsage
 
 	for _, usage := range dataItem.WeeklyUsages {
 		weeklyUsage = append(weeklyUsage, &prot.WeeklyUsage{
-			WeekLabel:             i18n.Localize("dashboard.week_number", map[string]interface{}{"Number": usage.Week}),
+			WeekLabel:             usage.Week,
 			AverageDuration:       utils.FormatDurationMinutes(usage.Duration, 2),
 			AverageDurationMinute: int32(usage.Duration),
-			IsCurrent:             usage.IsCurrent,
 		})
 	}
 
@@ -1281,22 +1187,6 @@ func (dcs *DashboardCacheService) formatSystemUsageData(dataItem dto.SystemUsage
 		Value: fmt.Sprintf("%.2f%%", dataItem.AverageUsed.EngagementRate*100),
 	})
 
-	averageUsed = append(averageUsed, &prot.AverageUsedItem{
-		Key: "complete_count",
-		Title: i18n.Localize("dashboard.complete_count", map[string]interface{}{
-			"Number": dataItem.CompleteCount,
-		}),
-		Value: fmt.Sprintf("%d", dataItem.CompleteCount),
-	})
-
-	averageUsed = append(averageUsed, &prot.AverageUsedItem{
-		Key: "complete_rate",
-		Title: i18n.Localize("dashboard.complete_rate", map[string]interface{}{
-			"Number": dataItem.CompletedRate,
-		}),
-		Value: fmt.Sprintf("%.2f%%", dataItem.CompletedRate),
-	})
-
 	return &prot.SystemUsageOverview{
 		WeeklyUsage:  weeklyUsage,
 		DeviceUsages: deviceUsages,
@@ -1306,8 +1196,6 @@ func (dcs *DashboardCacheService) formatSystemUsageData(dataItem dto.SystemUsage
 
 func (dcs *DashboardCacheService) formatTeacherPerformanceData(dataItem dto.TeacherPerformanceOverview, c *gin.Context) *prot.TeacherPerformanceOverview {
 	weeklyMarkingRates := []*prot.WeeklyMarkingRate{}
-
-	var totalExercise, totalAssigned, gradedSubmission, ungradedSubmission int32
 
 	for _, week := range dataItem.WeeklyMarkingRates {
 		ungradedSubmissionExams := []*prot.UngradedSubmission{}
@@ -1377,317 +1265,25 @@ func (dcs *DashboardCacheService) formatTeacherPerformanceData(dataItem dto.Teac
 		}
 
 		weeklyMarkingRates = append(weeklyMarkingRates, &prot.WeeklyMarkingRate{
-			Id:                          week.Id,
-			WeekLabel:                   i18n.Localize("dashboard.week_number", map[string]interface{}{"Number": week.WeekNumber}),
-			MarkingPercent:              float32(utils.FormatFloat(float64(week.MarkingPercent), 2)),
-			AssignedCount:               week.AssignedCount,
-			MarkedCount:                 week.MarkedCount,
-			UngradedSubmissionHomeworks: ungradedSubmissionHomeworks,
-			UngradedSubmissionExams:     ungradedSubmissionExams,
-			UngradedSubmissionExercises: ungradedSubmissionExercises,
-		})
-	}
-
-	// Format WeeklyAssignAssignmentRate
-	weeklyAssignAssignmentRates := []*prot.WeeklyAssignAssignmentRate{}
-	for _, week := range dataItem.WeeklyAssignAssignmentRates {
-		notAssignAssignmentExams := []*prot.NotAssignAssignment{}
-		notAssignAssignmentHomeworks := []*prot.NotAssignAssignment{}
-		notAssignAssignmentExercises := []*prot.NotAssignAssignment{}
-
-		for _, notAssign := range week.NotAssignAssignmentExams {
-			questionIdsStr := notAssign.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			notAssignAssignmentExams = append(notAssignAssignmentExams, &prot.NotAssignAssignment{
-				TeacherId:            notAssign.TeacherId,
-				AssignAssignmentId:   notAssign.AssignAssignmentId,
-				TeacherName:          notAssign.TeacherName,
-				AssignAssignmentName: notAssign.AssignAssignmentName,
-				QuestionIds:          questionIds,
-				QuestionCount:        notAssign.QuestionCount,
-			})
-		}
-
-		for _, notAssign := range week.NotAssignAssignmentHomeworks {
-			questionIdsStr := notAssign.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			notAssignAssignmentHomeworks = append(notAssignAssignmentHomeworks, &prot.NotAssignAssignment{
-				TeacherId:            notAssign.TeacherId,
-				AssignAssignmentId:   notAssign.AssignAssignmentId,
-				TeacherName:          notAssign.TeacherName,
-				AssignAssignmentName: notAssign.AssignAssignmentName,
-				QuestionIds:          questionIds,
-				QuestionCount:        notAssign.QuestionCount,
-			})
-		}
-
-		for _, notAssign := range week.NotAssignAssignmentExercises {
-			questionIdsStr := notAssign.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			notAssignAssignmentExercises = append(notAssignAssignmentExercises, &prot.NotAssignAssignment{
-				TeacherId:            notAssign.TeacherId,
-				AssignAssignmentId:   notAssign.AssignAssignmentId,
-				TeacherName:          notAssign.TeacherName,
-				AssignAssignmentName: notAssign.AssignAssignmentName,
-				QuestionIds:          questionIds,
-				QuestionCount:        notAssign.QuestionCount,
-			})
-		}
-
-		totalExercise += week.Total
-		totalAssigned += week.AssignAssignment
-
-		weeklyAssignAssignmentRates = append(weeklyAssignAssignmentRates, &prot.WeeklyAssignAssignmentRate{
-			Id:                           week.Id,
-			WeekLabel:                    i18n.Localize("dashboard.week_number", map[string]interface{}{"Number": week.WeekNumber}),
-			Total:                        week.Total,
-			AssignAssignment:             week.AssignAssignment,
-			NotAssignAssignmentExams:     notAssignAssignmentExams,
-			NotAssignAssignmentHomeworks: notAssignAssignmentHomeworks,
-			NotAssignAssignmentExercises: notAssignAssignmentExercises,
-		})
-	}
-
-	// Format WeeklySubmitRate
-	weeklySubmitRates := []*prot.WeeklySubmitRate{}
-	for _, week := range dataItem.WeeklySubmitRates {
-		notGradedExams := []*prot.NotGraded{}
-		notGradedHomeworks := []*prot.NotGraded{}
-		notGradedExercises := []*prot.NotGraded{}
-
-		// Use maps to track unique items by (not_graded_id, student_id) to avoid duplicates
-		examSeenMap := make(map[string]bool)
-		homeworkSeenMap := make(map[string]bool)
-		exerciseSeenMap := make(map[string]bool)
-
-		for _, notGraded := range week.NotGradedExams {
-			uniqueKey := fmt.Sprintf("%d_%d", notGraded.NotGradedId, notGraded.StudentId)
-			if examSeenMap[uniqueKey] {
-				continue
-			}
-			examSeenMap[uniqueKey] = true
-
-			questionIdsStr := notGraded.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			parsed, _ := time.Parse(time.RFC3339, notGraded.SubmittedAt)
-			formatted := parsed.Format("2006-01-02 15:04")
-
-			notGradedExams = append(notGradedExams, &prot.NotGraded{
-				TeacherId:     notGraded.TeacherId,
-				NotGradedId:   notGraded.NotGradedId,
-				StudentId:     notGraded.StudentId,
-				TeacherName:   notGraded.TeacherName,
-				StudentName:   notGraded.StudentName,
-				NotGradedName: notGraded.NotGradedName,
-				QuestionIds:   questionIds,
-				QuestionCount: notGraded.QuestionCount,
-				SubmittedAt:   formatted,
-			})
-		}
-
-		for _, notGraded := range week.NotGradedHomeworks {
-			uniqueKey := fmt.Sprintf("%d_%d", notGraded.NotGradedId, notGraded.StudentId)
-			if homeworkSeenMap[uniqueKey] {
-				continue
-			}
-			homeworkSeenMap[uniqueKey] = true
-
-			questionIdsStr := notGraded.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			parsed, _ := time.Parse(time.RFC3339, notGraded.SubmittedAt)
-			formatted := parsed.Format("2006-01-02 15:04")
-
-			notGradedHomeworks = append(notGradedHomeworks, &prot.NotGraded{
-				TeacherId:     notGraded.TeacherId,
-				NotGradedId:   notGraded.NotGradedId,
-				StudentId:     notGraded.StudentId,
-				CourseId:      notGraded.CourseId,
-				TeacherName:   notGraded.TeacherName,
-				StudentName:   notGraded.StudentName,
-				CourseName:    notGraded.CourseName,
-				LessonName:    notGraded.LessonName,
-				NotGradedName: notGraded.NotGradedName,
-				QuestionIds:   questionIds,
-				QuestionCount: notGraded.QuestionCount,
-				SubmittedAt:   formatted,
-			})
-		}
-
-		for _, notGraded := range week.NotGradedExercises {
-			uniqueKey := fmt.Sprintf("%d_%d", notGraded.NotGradedId, notGraded.StudentId)
-			if exerciseSeenMap[uniqueKey] {
-				continue
-			}
-			exerciseSeenMap[uniqueKey] = true
-
-			questionIdsStr := notGraded.QuestionIds
-			questionIdsStr = strings.Trim(questionIdsStr, "{}")
-			var questionIds []int64
-			if questionIdsStr != "" {
-				parts := strings.Split(questionIdsStr, ",")
-				for _, p := range parts {
-					id, err := strconv.ParseInt(strings.TrimSpace(p), 10, 64)
-					if err == nil {
-						questionIds = append(questionIds, id)
-					}
-				}
-			}
-
-			parsed, _ := time.Parse(time.RFC3339, notGraded.SubmittedAt)
-			formatted := parsed.Format("2006-01-02 15:04")
-
-			notGradedExercises = append(notGradedExercises, &prot.NotGraded{
-				TeacherId:     notGraded.TeacherId,
-				NotGradedId:   notGraded.NotGradedId,
-				StudentId:     notGraded.StudentId,
-				TeacherName:   notGraded.TeacherName,
-				StudentName:   notGraded.StudentName,
-				NotGradedName: notGraded.NotGradedName,
-				QuestionIds:   questionIds,
-				QuestionCount: notGraded.QuestionCount,
-				SubmittedAt:   formatted,
-			})
-		}
-
-		gradedSubmission += week.Total
-		ungradedSubmission += week.NotGraded
-
-		weeklySubmitRates = append(weeklySubmitRates, &prot.WeeklySubmitRate{
-			Id:                 week.Id,
-			WeekLabel:          i18n.Localize("dashboard.week_number", map[string]interface{}{"Number": week.WeekNumber}),
-			Total:              week.Total,
-			NotGraded:          week.NotGraded,
-			NotGradedExams:     notGradedExams,
-			NotGradedHomeworks: notGradedHomeworks,
-			NotGradedExercises: notGradedExercises,
-		})
-	}
-
-	// Format WeeklyPerformanceOverviewRate
-	weeklyPerformanceOverviewRates := []*prot.WeeklyPerformanceOverviewRate{}
-	for _, week := range dataItem.WeeklyPerformanceOverviewRates {
-		// Format exams (grouped by submitted_id)
-		notSubmittedExamsList := []*prot.NotSubmittedExam{}
-		for _, exam := range week.NotSubmittedExams {
-			notSubmittedExamsList = append(notSubmittedExamsList, &prot.NotSubmittedExam{
-				SubmittedId: exam.SubmittedId,
-				Name:        exam.Name,
-				UserIds:     exam.UserIds,
-			})
-		}
-
-		// Format homeworks (grouped by submitted_id)
-		notSubmittedHomeworksList := []*prot.NotSubmittedGrouped{}
-		for _, homework := range week.NotSubmittedHomeworks {
-			notSubmittedHomeworksList = append(notSubmittedHomeworksList, &prot.NotSubmittedGrouped{
-				SubmittedId:   homework.SubmittedId,
-				Name:          homework.Name,
-				SubmittedType: homework.SubmittedType,
-				StudentIds:    homework.StudentIds,
-			})
-		}
-
-		// Format exercises (grouped by submitted_id)
-		notSubmittedExercisesList := []*prot.NotSubmittedGrouped{}
-		for _, exercise := range week.NotSubmittedExercises {
-			notSubmittedExercisesList = append(notSubmittedExercisesList, &prot.NotSubmittedGrouped{
-				SubmittedId:   exercise.SubmittedId,
-				Name:          exercise.Name,
-				SubmittedType: exercise.SubmittedType,
-				StudentIds:    exercise.StudentIds,
-			})
-		}
-
-		weeklyPerformanceOverviewRates = append(weeklyPerformanceOverviewRates, &prot.WeeklyPerformanceOverviewRate{
 			Id:                      week.Id,
 			WeekLabel:               i18n.Localize("dashboard.week_number", map[string]interface{}{"Number": week.WeekNumber}),
-			AssignAssignmentPercent: float32(utils.FormatFloat(float64(week.AssignAssignmentPercent), 2)),
-			SubmitPercent:           float32(utils.FormatFloat(float64(week.SubmitPercent), 2)),
-			NotGradedPercent:        float32(utils.FormatFloat(float64(week.NotGradedPercent), 2)),
-			TotalRequired:           week.TotalRequired,
-			TotalSubmitted:          week.TotalSubmitted,
-			NotSubmittedExams:       notSubmittedExamsList,
-			NotSubmittedHomeworks:   notSubmittedHomeworksList,
-			NotSubmittedExercises:   notSubmittedExercisesList,
+			MarkingPercent:          float32(utils.FormatFloat(float64(week.MarkingPercent), 2)),
+			AssignedCount:           week.AssignedCount,
+			MarkedCount:             week.MarkedCount,
+			UngradedSubmissionHomeworks: ungradedSubmissionHomeworks,
+			UngradedSubmissionExams: ungradedSubmissionExams,
+			UngradedSubmissionExercises: ungradedSubmissionExercises,
 		})
-	}
-
-	var ungradedPercent float32
-
-	if ungradedSubmission > 0 {
-		ungradedPercent = float32(ungradedSubmission) / float32(gradedSubmission) * 100
-	} else {
-		ungradedPercent = 0
 	}
 
 	return &prot.TeacherPerformanceOverview{
 		GradingSummary: &prot.GradingSummary{
 			TotalSubmissions:    dataItem.GradingSummary.TotalSubmissions,
-			GradedSubmissions:   gradedSubmission,
-			UngradedSubmissions: ungradedSubmission,
-			UngradedPercent:     float32(utils.FormatFloat(float64(ungradedPercent), 2)),
-			TotalExercise:       totalExercise,
-			TotalAssigned:       totalAssigned,
+			GradedSubmissions:   dataItem.GradingSummary.GradedSubmissions,
+			UngradedSubmissions: dataItem.GradingSummary.UngradedSubmissions,
+			UngradedPercent:     float32(utils.FormatFloat(float64(dataItem.GradingSummary.UngradedPercent), 2)),
 		},
-		WeeklyMarkingRates:             weeklyMarkingRates,
-		WeeklyAssignAssignmentRates:    weeklyAssignAssignmentRates,
-		WeeklySubmitRates:              weeklySubmitRates,
-		WeeklyPerformanceOverviewRates: weeklyPerformanceOverviewRates,
+		WeeklyMarkingRates: weeklyMarkingRates,
 	}
 }
 
@@ -1819,4 +1415,3 @@ func (dcs *DashboardCacheService) formatRiskWarningData(dataItem dto.RiskAndWarn
 		SlowGradingTeachers: slowGradingTeachers,
 	}
 }
-

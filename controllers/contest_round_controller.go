@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/resources"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/resources"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 	"strconv"
 	"strings"
@@ -218,18 +218,44 @@ func (crc *ContestRoundController) GetContestRoundJoiners(c *gin.Context) {
 		return
 	}
 
-	// Get all joiners (all types: schools, provinces, classes, persons)
+	// Get the contest round to check join_level
+	round, err := crc.service.GetByID(c, contestRoundId)
+	if err != nil {
+		utils.Respond(c, nil, err, "messages.error_get_data")
+		return
+	}
+
+	// Get all joiners
 	allJoiners, err := crc.service.GetContestRoundJoiners(c, contestRoundId)
 	if err != nil {
 		utils.Respond(c, nil, err, "messages.error_get_list_data")
 		return
 	}
 
-	// Return all joiners organized by type
-	utils.Respond(c, allJoiners, nil, "")
+	// Extract joiners based on join_level
+	var joiners interface{}
+	joinersMap, ok := allJoiners.(map[string]interface{})
+	if ok {
+		switch round.JoinLevel {
+		case "school":
+			joiners = joinersMap["schools"]
+		case "province":
+			joiners = joinersMap["provinces"]
+		case "class":
+			joiners = joinersMap["classes"]
+		case "student":
+			joiners = joinersMap["persons"]
+		default:
+			joiners = []interface{}{}
+		}
+	} else {
+		joiners = []interface{}{}
+	}
+
+	utils.Respond(c, joiners, nil, "")
 }
 
-// AddJoiner - Add joiners to contest round (supports all types: student/class/school/province)
+// AddJoiner - Add joiners to contest round (supports student/class/school)
 func (crc *ContestRoundController) AddJoiner(c *gin.Context) {
 	contestRoundId, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -247,7 +273,7 @@ func (crc *ContestRoundController) AddJoiner(c *gin.Context) {
 		return
 	}
 
-	// Validate join_level - allow all types
+	// Validate join_level
 	if req.JoinLevel != "student" && req.JoinLevel != "class" && req.JoinLevel != "school" && req.JoinLevel != "province" {
 		utils.Respond(c, nil, fmt.Errorf("invalid join_level: must be student, class, school, or province"), "messages.invalid_request")
 		return
@@ -340,41 +366,8 @@ func (crc *ContestRoundController) UpdateJoiner(c *gin.Context) {
 }
 
 func (crc *ContestRoundController) RemoveJoiner(c *gin.Context) {
-	contestRoundId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.invalid_id")
-		return
-	}
-
-	var req struct {
-		JoinLevel string `json:"join_level" binding:"required"`
-		JoinerId  int64  `json:"joiner_id" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.Respond(c, nil, err, "messages.invalid_request")
-		return
-	}
-
-	// Validate join_level
-	if req.JoinLevel != "student" && req.JoinLevel != "class" && req.JoinLevel != "school" && req.JoinLevel != "province" {
-		utils.Respond(c, nil, fmt.Errorf("invalid join_level: must be student, class, school, or province"), "messages.invalid_request")
-		return
-	}
-
-	// Map student to person for service call
-	joinLevel := req.JoinLevel
-	if joinLevel == "student" {
-		joinLevel = "person"
-	}
-
-	err = crc.service.RemoveJoiner(c, contestRoundId, joinLevel, req.JoinerId)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.error_delete_data")
-		return
-	}
-
-	utils.Respond(c, gin.H{"message": fmt.Sprintf("%s joiner removed successfully", req.JoinLevel)}, nil, "")
+	// Disabled due to technical issues
+	utils.Respond(c, nil, fmt.Errorf("remove joiner is temporarily disabled"), "messages.error_delete_data")
 }
 
 func (crc *ContestRoundController) GetContestRoundProvinces(c *gin.Context) {
@@ -412,50 +405,3 @@ func (crc *ContestRoundController) GetContestRoundEligibleUsers(c *gin.Context) 
 	// Disabled due to technical issues
 	utils.Respond(c, []interface{}{}, nil, "")
 }
-
-// BulkRemoveJoiners - Bulk remove joiners by type
-func (crc *ContestRoundController) BulkRemoveJoiners(c *gin.Context) {
-	contestRoundId, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.invalid_id")
-		return
-	}
-
-	var req struct {
-		JoinLevel string  `json:"join_level" binding:"required"`
-		JoinerIds []int64 `json:"joiner_ids" binding:"required"`
-	}
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.Respond(c, nil, err, "messages.invalid_request")
-		return
-	}
-
-	// Validate join_level
-	if req.JoinLevel != "student" && req.JoinLevel != "class" && req.JoinLevel != "school" && req.JoinLevel != "province" {
-		utils.Respond(c, nil, fmt.Errorf("invalid join_level: must be student, class, school, or province"), "messages.invalid_request")
-		return
-	}
-
-	// Call appropriate bulk remove method
-	switch req.JoinLevel {
-	case "student":
-		err = crc.service.BulkRemoveJoinerPersons(c, contestRoundId, req.JoinerIds)
-	case "class":
-		err = crc.service.BulkRemoveJoinerClasses(c, contestRoundId, req.JoinerIds)
-	case "school":
-		err = crc.service.BulkRemoveJoinerSchools(c, contestRoundId, req.JoinerIds)
-	case "province":
-		err = crc.service.BulkRemoveJoinerProvinces(c, contestRoundId, req.JoinerIds)
-	}
-
-	if err != nil {
-		utils.Respond(c, nil, err, "messages.error_delete_data")
-		return
-	}
-
-	utils.Respond(c, gin.H{
-		"message": fmt.Sprintf("Successfully removed %d %s joiners", len(req.JoinerIds), req.JoinLevel),
-	}, nil, "")
-}
-

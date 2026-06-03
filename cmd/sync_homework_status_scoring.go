@@ -1,9 +1,9 @@
 package main
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/jobs"
+	"be-lms/config"
+	"be-lms/database/db"
+	"be-lms/jobs"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -35,4 +35,3 @@ func main() {
 
 	log.Println("✅ Manual sync homework status scoring completed!")
 }
-

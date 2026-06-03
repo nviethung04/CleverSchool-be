@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	_ "be-cleverschool/prot"
-	"be-cleverschool/requests"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	_ "be-lms/prot"
+	"be-lms/requests"
+	"be-lms/services"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -93,38 +93,5 @@ func (ctl *DashboardListEntityController) GetLessons(c *gin.Context) {
 	}
 
 	resp, err := ctl.svc.GetLessons(c, &req)
-	utils.Respond(c, resp, err, "")
-}
-
-func (ctl *DashboardListEntityController) GetChapters(c *gin.Context) {
-	var req requests.DashboardChapterListRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.Respond(c, nil, err, "")
-		return
-	}
-
-	resp, err := ctl.svc.GetChapters(c, &req)
-	utils.Respond(c, resp, err, "")
-}
-
-func (ctl *DashboardListEntityController) GetClasses(c *gin.Context) {
-	var req requests.DashboardClassListRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.Respond(c, nil, err, "")
-		return
-	}
-
-	resp, err := ctl.svc.GetClasses(c, &req)
-	utils.Respond(c, resp, err, "")
-}
-
-func (ctl *DashboardListEntityController) GetClassMains(c *gin.Context) {
-	var req requests.DashboardClassMainListRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
-		utils.Respond(c, nil, err, "")
-		return
-	}
-
-	resp, err := ctl.svc.GetClassMains(c, &req)
 	utils.Respond(c, resp, err, "")
 }

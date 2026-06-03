@@ -14,20 +14,15 @@ type DashboardReportCourses struct {
 	ActiveStudents            int64     `json:"active_students" gorm:"default:0"`
 	ActiveTeachers            int64     `json:"active_teachers" gorm:"default:0"`
 	StudentsCompletedHomework int64     `json:"students_completed_homework" gorm:"default:0"`
-	TotalHomeworks                  int64     `json:"total_homeworks" gorm:"default:0"`           // Tổng số homework trong khoảng thời gian
-	AssignedHomeworks               int64     `json:"assigned_homeworks" gorm:"default:0"`       // Số homework đã được giao (assigned_at IS NOT NULL)
-	CompletedHomeworks              int64     `json:"completed_homeworks" gorm:"default:0"`      // Số homework đã hoàn thành (có ít nhất 1 user hoàn thành)
-	StudentsCompletedAllHomeworks   int64     `json:"students_completed_all_homeworks" gorm:"default:0"` // Số học sinh đã hoàn thành tất cả homework được giao
-	StudentsDoingHomeworks          int64     `json:"students_doing_homeworks" gorm:"default:0"` // Số học sinh đang làm homework
-	StudentsNotStartedAnyHomework   int64     `json:"students_not_started_any_homework" gorm:"default:0"` // Số học sinh chưa làm homework nào
-	StudentActiveNotStartedAnyHomework int64  `json:"student_active_not_started_any_homework" gorm:"column:student_active_not_started_any_homework;default:0"` // Số học sinh active nhưng chưa làm homework nào
-	HomeworkOver50PercentStudentComplete int64 `json:"homework_over_50_percent_student_complete" gorm:"column:homework_over_50_percent_student_complete;default:0"` // Số lượng homework có trên 50% học sinh active hoàn thành
-	TeacherIDs                      string    `json:"teacher_ids" gorm:"type:text;default:''"`   // Danh sách ID các teacher, phân cách bằng dấu phẩy
-	TeacherInfos                    DashboardTeacherInfos `json:"teacher_infos" gorm:"type:jsonb;default:'[]'"` // JSON array chứa thông tin chi tiết teachers
-	StartDate                       time.Time `json:"start_date" gorm:"not null"`
-	EndDate                         time.Time `json:"end_date" gorm:"not null"`
-	CreatedAt                       time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt                       time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	TotalHomeworks            int64     `json:"total_homeworks" gorm:"default:0"`           // Tổng số homework trong khoảng thời gian
+	AssignedHomeworks         int64     `json:"assigned_homeworks" gorm:"default:0"`       // Số homework đã được giao (assigned_at IS NOT NULL)
+	CompletedHomeworks        int64     `json:"completed_homeworks" gorm:"default:0"`      // Số homework đã hoàn thành (có ít nhất 1 user hoàn thành)
+	TeacherIDs                string    `json:"teacher_ids" gorm:"type:text;default:''"`   // Danh sách ID các teacher, phân cách bằng dấu phẩy
+	TeacherInfos              DashboardTeacherInfos `json:"teacher_infos" gorm:"type:jsonb;default:'[]'"` // JSON array chứa thông tin chi tiết teachers
+	StartDate                 time.Time `json:"start_date" gorm:"not null"`
+	EndDate                   time.Time `json:"end_date" gorm:"not null"`
+	CreatedAt                 time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt                 time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 
 	// Relations
 	Course Course `json:"course,omitempty" gorm:"foreignKey:CourseID;references:ID"`

@@ -1,18 +1,18 @@
 package services
 
 import (
-	"be-cleverschool/models"
-	"be-cleverschool/prot"
-	"be-cleverschool/repositories"
-	"be-cleverschool/resources"
-	"be-cleverschool/utils"
+	"be-lms/models"
+	"be-lms/prot"
+	"be-lms/repositories"
+	"be-lms/resources"
+	"be-lms/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 type SourceQuestionService interface {
 	GetAll(c *gin.Context) ([]models.SourceQuestion, int64, error)
-	GetByID(c *gin.Context, id int) (*models.SourceQuestion, []*models.Question, error)
+	GetByID(c *gin.Context, id int) (*models.SourceQuestion, error)
 	Create(c *gin.Context, req *prot.SourceQuestionRequest) (*models.SourceQuestion, error)
 	Update(c *gin.Context, req *prot.SourceQuestionRequest) (*models.SourceQuestion, error)
 	Delete(c *gin.Context, id int) error
@@ -20,12 +20,11 @@ type SourceQuestionService interface {
 }
 
 type sourceQuestionService struct {
-	repo           repositories.SourceQuestionRepository
-	questionRepo   repositories.QuestionRepository
+	repo repositories.SourceQuestionRepository
 }
 
-func NewSourceQuestionService(repo repositories.SourceQuestionRepository, questionRepo repositories.QuestionRepository) SourceQuestionService {
-	return &sourceQuestionService{repo: repo, questionRepo: questionRepo}
+func NewSourceQuestionService(repo repositories.SourceQuestionRepository) SourceQuestionService {
+	return &sourceQuestionService{repo}
 }
 
 func (s *sourceQuestionService) GetAll(c *gin.Context) ([]models.SourceQuestion, int64, error) {
@@ -49,16 +48,8 @@ func (s *sourceQuestionService) GetAll(c *gin.Context) ([]models.SourceQuestion,
 	return sourceQuestions, rows, nil
 }
 
-func (s *sourceQuestionService) GetByID(c *gin.Context, id int) (*models.SourceQuestion, []*models.Question, error) {
-	sourceQuestion, err := s.repo.FindByID(id)
-	if err != nil || sourceQuestion == nil {
-		return sourceQuestion, nil, err
-	}
-	questions, err := s.questionRepo.FindBySourceQuestionID(int64(id))
-	if err != nil {
-		return sourceQuestion, nil, err
-	}
-	return sourceQuestion, questions, nil
+func (s *sourceQuestionService) GetByID(c *gin.Context, id int) (*models.SourceQuestion, error) {
+	return s.repo.FindByID(id)
 }
 
 func (s *sourceQuestionService) Create(c *gin.Context, req *prot.SourceQuestionRequest) (*models.SourceQuestion, error) {
@@ -70,25 +61,6 @@ func (s *sourceQuestionService) Create(c *gin.Context, req *prot.SourceQuestionR
 	err := s.repo.Create(sourceQuestion)
 	if err != nil {
 		return nil, err
-	}
-
-	// Optional: link questions to this source question and set sort_position
-	if len(req.GetQuestions()) > 0 {
-		orders := make([]repositories.QuestionSortOrder, 0, len(req.GetQuestions()))
-		for _, q := range req.GetQuestions() {
-			if q.GetId() == 0 {
-				continue
-			}
-			orders = append(orders, repositories.QuestionSortOrder{
-				ID:           q.GetId(),
-				SortPosition: q.GetSortPosition(),
-			})
-		}
-		if len(orders) > 0 {
-			if err := s.questionRepo.UpdateSortPositionsForSource(sourceQuestion.ID, orders); err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	id := int(sourceQuestion.ID)
@@ -106,28 +78,6 @@ func (s *sourceQuestionService) Update(c *gin.Context, req *prot.SourceQuestionR
 	err := s.repo.Update(sourceQuestion)
 	if err != nil {
 		return nil, err
-	}
-
-	// PUT: questions là danh sách mới hoàn toàn — gỡ hết câu hỏi khỏi source question rồi gán lại theo danh sách truyền vào
-	if err := s.questionRepo.ClearQuestionsFromSource(req.Id); err != nil {
-		return nil, err
-	}
-	if len(req.GetQuestions()) > 0 {
-		orders := make([]repositories.QuestionSortOrder, 0, len(req.GetQuestions()))
-		for _, q := range req.GetQuestions() {
-			if q.GetId() == 0 {
-				continue
-			}
-			orders = append(orders, repositories.QuestionSortOrder{
-				ID:           q.GetId(),
-				SortPosition: q.GetSortPosition(),
-			})
-		}
-		if len(orders) > 0 {
-			if err := s.questionRepo.UpdateSortPositionsForSource(req.Id, orders); err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	id := int(sourceQuestion.ID)
@@ -155,4 +105,3 @@ func (s *sourceQuestionService) Restore(c *gin.Context, id int) (*models.SourceQ
 
 	return rource, nil
 }
-

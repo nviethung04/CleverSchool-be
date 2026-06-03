@@ -9,4 +9,3 @@ scorm-packages/*
 logs
 .DS_Store
 power_point
-node_modules

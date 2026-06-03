@@ -1,8 +1,8 @@
 package main
 
 import (
-	"be-cleverschool/database/db"
-	"be-cleverschool/models"
+	"be-lms/database/db"
+	"be-lms/models"
 	"fmt"
 	"log"
 	"math/rand"
@@ -372,4 +372,3 @@ func (s *Seeder) SeedFlashcards() {
 	fmt.Printf("   - Progress for %d students\n", len(students))
 	fmt.Printf("   - Multiple study sessions and activities\n")
 }
-

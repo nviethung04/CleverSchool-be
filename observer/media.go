@@ -1,7 +1,7 @@
 package observer
 
 import (
-	"be-cleverschool/models"
+	"be-lms/models"
 
 	"gorm.io/gorm"
 )
@@ -49,4 +49,3 @@ func (u *MediaObserver) AfterDelete(data interface{}, tx *gorm.DB) (err error) {
 	}
 	return nil
 }
-

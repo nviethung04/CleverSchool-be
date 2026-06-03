@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
+	"be-lms/prot"
+	"be-lms/services"
+	"be-lms/utils"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -32,4 +32,3 @@ func (ctl *SchoolDashboardController) GetSchoolSummary(c *gin.Context) {
 
 	utils.Respond(c, list, nil, "")
 }
-

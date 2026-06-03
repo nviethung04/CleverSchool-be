@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"be-cleverschool/dto"
-	"be-cleverschool/prot"
+	"be-lms/dto"
+	"be-lms/prot"
 )
 
 func DashboardTeacherHomeworkUnscoredCollection(homeworks []dto.DashboardTeacherHomeworkUnscored) []*prot.DashboardTeacherHomeworkUnscored {
@@ -15,7 +15,6 @@ func DashboardTeacherHomeworkUnscoredCollection(homeworks []dto.DashboardTeacher
 			LessonId:         h.LessonID,
 			StudentName:      h.StudentName,
 			CourseName:       h.CourseName,
-			ObjectTitle:      h.ObjectTitle,
 			SubjectName:      h.SubjectName,
 			HomeworkName:     h.HomeworkName,
 			LessonTitle:      h.LessonTitle,
@@ -30,4 +29,3 @@ func DashboardTeacherHomeworkUnscoredCollection(homeworks []dto.DashboardTeacher
 	}
 	return result
 }
-

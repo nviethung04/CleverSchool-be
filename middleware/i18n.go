@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"be-cleverschool/i18n"
+	"be-lms/i18n"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,4 +16,3 @@ func I18nMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"be-cleverschool/prot"
-	"be-cleverschool/requests"
+	"be-lms/prot"
+	"be-lms/requests"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,4 +41,3 @@ func (s *dashboardContestService) GetContestRoundList(c *gin.Context, req reques
 	// TODO: Implement logic to get contest round list for a user
 	return []*prot.DashboardContestRoundItem{}, 0, nil
 }
-

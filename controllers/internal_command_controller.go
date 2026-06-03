@@ -1,13 +1,9 @@
 package controllers
 
 import (
-	"be-cleverschool/command"
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/jobs"
-	"be-cleverschool/services"
-	"be-cleverschool/utils"
-	"fmt"
+	"be-lms/database/db"
+	"be-lms/jobs"
+	"be-lms/utils"
 	"strconv"
 	"time"
 
@@ -348,151 +344,6 @@ type DailyJobResponse struct {
 	JobType     string `json:"job_type"`
 }
 
-// SyncHomeworkUserQuestionsResponse response cho job sync homework_user_questions
-type SyncHomeworkUserQuestionsResponse struct {
-	Success     bool   `json:"success"`
-	Message     string `json:"message"`
-	ProcessedAt string `json:"processed_at"`
-	JobType     string `json:"job_type"`
-}
-
-// SyncHomeworkUserQuestionsRequest request body cho API sync homework_user_questions
-// Các field đều optional, nếu không truyền sẽ sync toàn bộ.
-type SyncHomeworkUserQuestionsRequest struct {
-	StartDate *string `json:"start_date"` // format: 2006-01-02
-	EndDate   *string `json:"end_date"`   // format: 2006-01-02
-}
-
-// SyncHomeworkUserQuestions dispatch job sync homework_user_questions từ các bảng homework_question_user_*
-// Job chạy async trong background, API không chờ job hoàn thành.
-func (c *InternalCommandController) SyncHomeworkUserQuestions(ctx *gin.Context) {
-	var req SyncHomeworkUserQuestionsRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil && err.Error() != "EOF" {
-		// Nếu body rỗng (EOF) thì cho phép, còn lại trả lỗi
-		utils.Respond(ctx, nil, err, "Dữ liệu request không hợp lệ")
-		return
-	}
-
-	var startDatePtr, endDatePtr *time.Time
-
-	if req.StartDate != nil && *req.StartDate != "" {
-		startDate, err := time.Parse("2006-01-02", *req.StartDate)
-		if err != nil {
-			utils.Respond(ctx, nil, err, "Format start_date không hợp lệ (cần: YYYY-MM-DD)")
-			return
-		}
-		startDatePtr = &startDate
-	}
-
-	if req.EndDate != nil && *req.EndDate != "" {
-		endDate, err := time.Parse("2006-01-02", *req.EndDate)
-		if err != nil {
-			utils.Respond(ctx, nil, err, "Format end_date không hợp lệ (cần: YYYY-MM-DD)")
-			return
-		}
-		endDatePtr = &endDate
-	}
-
-	// Validate: nếu cả hai đều có thì start_date không được sau end_date
-	if startDatePtr != nil && endDatePtr != nil && startDatePtr.After(*endDatePtr) {
-		utils.Respond(ctx, nil, nil, "start_date không thể sau end_date")
-		return
-	}
-
-	// Chạy job trong goroutine để không block request
-	go func() {
-		_, _, err := jobs.SyncHomeworkUserQuestionsJob(startDatePtr, endDatePtr)
-		if err != nil {
-			// TODO: thêm logging nếu cần
-		}
-	}()
-
-	response := SyncHomeworkUserQuestionsResponse{
-		Success:     true,
-		Message:     "Đã dispatch job SyncHomeworkUserQuestionsJob, job đang chạy nền",
-		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
-		JobType:     "sync_homework_user_questions",
-	}
-
-	utils.Respond(ctx, response, nil, "")
-}
-
-// RecalculateHomeworkUsersMetricsRequest request body cho API recalculate homework_users metrics
-type RecalculateHomeworkUsersMetricsRequest struct {
-	StartDate              *string `json:"start_date"`                // format: 2006-01-02, optional
-	EndDate                *string `json:"end_date"`                  // format: 2006-01-02, optional
-	OnlyHomeworkZeroScore  *bool   `json:"only_homework_zero_score"`  // optional, default false
-}
-
-// RecalculateHomeworkUsersMetricsResponse response cho job recalculate homework_users metrics
-type RecalculateHomeworkUsersMetricsResponse struct {
-	Success     bool   `json:"success"`
-	Message     string `json:"message"`
-	ProcessedAt string `json:"processed_at"`
-	JobType     string `json:"job_type"`
-}
-
-// RecalculateHomeworkUsersMetrics dispatch job tính lại metrics cho homework_users
-// Áp dụng logic y hệt như submit homework
-// Job chạy async trong background, API không chờ job hoàn thành.
-func (c *InternalCommandController) RecalculateHomeworkUsersMetrics(ctx *gin.Context) {
-	var req RecalculateHomeworkUsersMetricsRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil && err.Error() != "EOF" {
-		// Nếu body rỗng (EOF) thì cho phép, còn lại trả lỗi
-		utils.Respond(ctx, nil, err, "Dữ liệu request không hợp lệ")
-		return
-	}
-
-	var startDatePtr, endDatePtr *time.Time
-
-	if req.StartDate != nil && *req.StartDate != "" {
-		startDate, err := time.Parse("2006-01-02", *req.StartDate)
-		if err != nil {
-			utils.Respond(ctx, nil, err, "Format start_date không hợp lệ (cần: YYYY-MM-DD)")
-			return
-		}
-		startDatePtr = &startDate
-	}
-
-	if req.EndDate != nil && *req.EndDate != "" {
-		endDate, err := time.Parse("2006-01-02", *req.EndDate)
-		if err != nil {
-			utils.Respond(ctx, nil, err, "Format end_date không hợp lệ (cần: YYYY-MM-DD)")
-			return
-		}
-		endDatePtr = &endDate
-	}
-
-	// Validate: nếu có cả 2 thì start_date phải <= end_date
-	if startDatePtr != nil && endDatePtr != nil && startDatePtr.After(*endDatePtr) {
-		utils.Respond(ctx, nil, nil, "start_date không thể sau end_date")
-		return
-	}
-
-	onlyHomeworkZeroScore := false
-	if req.OnlyHomeworkZeroScore != nil {
-		onlyHomeworkZeroScore = *req.OnlyHomeworkZeroScore
-	}
-
-	// Chạy job trong goroutine để không block request
-	go func() {
-		_, _, err := jobs.RecalculateHomeworkUsersMetricsJob(startDatePtr, endDatePtr, onlyHomeworkZeroScore)
-		if err != nil {
-			// Log error nếu có, nhưng không ảnh hưởng đến response của API
-			config.Log.Errorf("RecalculateHomeworkUsersMetricsJob error: %v", err)
-		}
-	}()
-
-	response := RecalculateHomeworkUsersMetricsResponse{
-		Success:     true,
-		Message:     "Đã dispatch job RecalculateHomeworkUsersMetricsJob, job đang chạy nền",
-		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
-		JobType:     "recalculate_homework_users_metrics",
-	}
-
-	utils.Respond(ctx, response, nil, "")
-}
-
 // RunDailySchoolStatistics chạy daily school statistics job thủ công
 func (c *InternalCommandController) RunDailySchoolStatistics(ctx *gin.Context) {
 	// Bắt đầu đo thời gian
@@ -547,210 +398,35 @@ func (c *InternalCommandController) RunDailyCourseStatistics(ctx *gin.Context) {
 	utils.Respond(ctx, response, nil, "")
 }
 
-// RunAllDailyCourseStatistics dispatch các job daily và thống kê tuần cho course trong background
-func (c *InternalCommandController) RunAllDailyCourseStatistics(ctx *gin.Context) {
-	go func() {
-		// Chạy Daily Course Statistics Job
-		courseJob := jobs.NewDailyCourseStatisticsCronJob()
-		courseJob.Run()
-
-		weeksStartDate := time.Date(2025, 9, 8, 0, 0, 0, 0, time.UTC)
-		now := time.Now()
-
-		firstMonday := c.getStartOfWeek(weeksStartDate)
-		courseStatsJob := jobs.NewCourseStatisticsCronJob()
-
-		currentWeekStart := firstMonday
-		for {
-			weekStart := currentWeekStart
-			weekEnd := c.getEndOfWeek(currentWeekStart)
-			if weekEnd.After(now) {
-				weekEnd = now
-			}
-			if !weekEnd.Before(weekStart) {
-				courseStatsJob.RunForDateRange(weekStart, weekEnd)
-			}
-			nextWeekStart := currentWeekStart.AddDate(0, 0, 7)
-			if nextWeekStart.After(now) {
-				break
-			}
-			currentWeekStart = nextWeekStart
-		}
-
-		rangeStart := time.Date(2025, 9, 15, 0, 0, 0, 0, time.UTC)
-		if now.After(rangeStart) {
-			currentRangeWeek := rangeStart
-			for {
-				weekEnd := c.getEndOfWeek(currentRangeWeek)
-				if weekEnd.After(now) {
-					weekEnd = now
-				}
-				if !weekEnd.Before(rangeStart) {
-					courseStatsJob.RunForDateRange(rangeStart, weekEnd)
-				}
-				nextWeekStart := currentRangeWeek.AddDate(0, 0, 7)
-				if nextWeekStart.After(now) {
-					break
-				}
-				currentRangeWeek = nextWeekStart
-			}
-		}
-	}()
-
-	response := DailyJobResponse{
-		Success:     true,
-		Message:     "All Daily Course Statistics Jobs đã được dispatch và đang chạy trong background",
-		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
-		Duration:    "0s",
-		JobType:     "all_daily_course_statistics",
-	}
-	utils.Respond(ctx, response, nil, "")
-}
-
-// RunAllDailySchoolStatistics dispatch các job daily và thống kê tuần cho school trong background
-func (c *InternalCommandController) RunAllDailySchoolStatistics(ctx *gin.Context) {
-	go func() {
-		// Chạy Daily School Statistics Job
-		schoolJob := jobs.NewDailySchoolStatisticsCronJob()
-		schoolJob.Run()
-
-		weeksStartDate := time.Date(2025, 9, 8, 0, 0, 0, 0, time.UTC)
-		now := time.Now()
-
-		firstMonday := c.getStartOfWeek(weeksStartDate)
-		schoolStatsJob := jobs.NewSchoolStatisticsCronJob()
-
-		currentWeekStart := firstMonday
-		for {
-			weekStart := currentWeekStart
-			weekEnd := c.getEndOfWeek(currentWeekStart)
-			if weekEnd.After(now) {
-				weekEnd = now
-			}
-			if !weekEnd.Before(weekStart) {
-				schoolStatsJob.RunForDateRange(weekStart, weekEnd)
-			}
-			nextWeekStart := currentWeekStart.AddDate(0, 0, 7)
-			if nextWeekStart.After(now) {
-				break
-			}
-			currentWeekStart = nextWeekStart
-		}
-
-		rangeStart := time.Date(2025, 9, 15, 0, 0, 0, 0, time.UTC)
-		if now.After(rangeStart) {
-			currentRangeWeek := rangeStart
-			for {
-				weekEnd := c.getEndOfWeek(currentRangeWeek)
-				if weekEnd.After(now) {
-					weekEnd = now
-				}
-				if !weekEnd.Before(rangeStart) {
-					schoolStatsJob.RunForDateRange(rangeStart, weekEnd)
-				}
-				nextWeekStart := currentRangeWeek.AddDate(0, 0, 7)
-				if nextWeekStart.After(now) {
-					break
-				}
-				currentRangeWeek = nextWeekStart
-			}
-		}
-	}()
-
-	response := DailyJobResponse{
-		Success:     true,
-		Message:     "All Daily School Statistics Jobs đã được dispatch và đang chạy trong background",
-		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
-		Duration:    "0s",
-		JobType:     "all_daily_school_statistics",
-	}
-	utils.Respond(ctx, response, nil, "")
-}
-
-// getStartOfWeek lấy ngày đầu tuần (Thứ 2)
-func (c *InternalCommandController) getStartOfWeek(t time.Time) time.Time {
-	weekday := int(t.Weekday())
-	if weekday == 0 { // Chủ nhật
-		weekday = 7
-	}
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location()).AddDate(0, 0, -(weekday - 1))
-}
-
-// getEndOfWeek lấy ngày cuối tuần (Chủ nhật)
-func (c *InternalCommandController) getEndOfWeek(t time.Time) time.Time {
-	weekday := int(t.Weekday())
-	if weekday == 0 { // Chủ nhật
-		return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location())
-	}
-	return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 0, t.Location()).AddDate(0, 0, 7-weekday)
-}
-
-// SyncClassMainResponse response cho API sync class main
-type SyncClassMainResponse struct {
-	Success     bool   `json:"success"`
-	Message     string `json:"message"`
-	ProcessedAt string `json:"processed_at"`
-	Duration    string `json:"duration"`
-}
-
-// SyncClassMain chạy command đồng bộ classes_main từ classes
-func (c *InternalCommandController) SyncClassMain(ctx *gin.Context) {
+// RunAllDailyStatistics chạy cả 2 daily jobs
+func (c *InternalCommandController) RunAllDailyStatistics(ctx *gin.Context) {
 	// Bắt đầu đo thời gian
 	startTime := time.Now()
 
-	// Gọi command
-	command.SyncClassMainCommand()
-
-	// Tính thời gian xử lý
-	duration := time.Since(startTime)
-
-	// Tạo response
-	response := SyncClassMainResponse{
-		Success:     true,
-		Message:     "Đồng bộ classes_main thành công",
-		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
-		Duration:    duration.String(),
-	}
-
-	utils.Respond(ctx, response, nil, "")
-}
-
-// SyncAssessmentRefLessonResponse response cho sync assessment ref lesson
-type SyncAssessmentRefLessonResponse struct {
-	Success       bool   `json:"success"`
-	Message       string `json:"message"`
-	ProcessedAt   string `json:"processed_at"`
-	Duration      string `json:"duration"`
-	TotalProcessed int   `json:"total_processed"`
-	TotalInserted  int   `json:"total_inserted"`
-}
-
-// SyncAssessmentRefLesson chạy service đồng bộ assessment_ref_lessons
-// Với programID = 0 để xử lý tất cả
-func (c *InternalCommandController) SyncAssessmentRefLesson(ctx *gin.Context) {
-	// Bắt đầu đo thời gian
-	startTime := time.Now()
-
-	// Gọi service với programID = 0 (xử lý tất cả)
-	syncService := services.NewAssessmentRefLessonSyncService()
-	totalProcessed, totalInserted, err := syncService.SyncAssessmentRefLessons(0)
-
-	// Tính thời gian xử lý
-	duration := time.Since(startTime)
-
-	if err != nil {
-		utils.Respond(ctx, nil, err, "Đồng bộ assessment_ref_lessons thất bại")
+	// Chạy Daily School Statistics Job
+	schoolJob := jobs.NewDailySchoolStatisticsCronJob()
+	if err := schoolJob.Run(); err != nil {
+		utils.Respond(ctx, nil, err, "Lỗi khi chạy Daily School Statistics Job")
 		return
 	}
 
+	// Chạy Daily Course Statistics Job
+	courseJob := jobs.NewDailyCourseStatisticsCronJob()
+	if err := courseJob.Run(); err != nil {
+		utils.Respond(ctx, nil, err, "Lỗi khi chạy Daily Course Statistics Job")
+		return
+	}
+
+	// Tính thời gian xử lý
+	duration := time.Since(startTime)
+
 	// Tạo response
-	response := SyncAssessmentRefLessonResponse{
-		Success:        true,
-		Message:        fmt.Sprintf("Đồng bộ assessment_ref_lessons thành công: xử lý %d cặp, thêm %d records", totalProcessed, totalInserted),
-		ProcessedAt:    time.Now().Format("2006-01-02 15:04:05"),
-		Duration:       duration.String(),
-		TotalProcessed: totalProcessed,
-		TotalInserted:  totalInserted,
+	response := DailyJobResponse{
+		Success:     true,
+		Message:     "Tất cả Daily Statistics Jobs chạy thành công",
+		ProcessedAt: time.Now().Format("2006-01-02 15:04:05"),
+		Duration:    duration.String(),
+		JobType:     "all_daily_statistics",
 	}
 
 	utils.Respond(ctx, response, nil, "")
@@ -808,24 +484,10 @@ func (c *InternalCommandController) ListAvailableJobs(ctx *gin.Context) {
 			"body":        nil,
 		},
 		{
-			"name":        "daily-all-statistic-courses",
-			"description": "Chạy tất cả Daily Course Statistics Jobs",
+			"name":        "daily-all-statistics",
+			"description": "Chạy tất cả Daily Statistics Jobs",
 			"method":      "POST",
-			"endpoint":    "/api/internal/daily/all-statistic-courses",
-			"body":        nil,
-		},
-		{
-			"name":        "daily-all-statistic-schools",
-			"description": "Chạy tất cả Daily School Statistics Jobs",
-			"method":      "POST",
-			"endpoint":    "/api/internal/daily/all-statistic-schools",
-			"body":        nil,
-		},
-		{
-			"name":        "sync-class-main",
-			"description": "Đồng bộ classes_main từ classes (xử lý tên lớp và gắn class_main_id)",
-			"method":      "POST",
-			"endpoint":    "/api/internal/sync-class-main",
+			"endpoint":    "/api/internal/daily/all-statistics",
 			"body":        nil,
 		},
 		{
@@ -882,32 +544,6 @@ func (c *InternalCommandController) ClearDashboardSchoolsData(ctx *gin.Context) 
 }
 
 // ClearDashboardCoursesData xóa tất cả dữ liệu trong bảng dashboard_report_courses
-// SyncTeacherClassesResponse response cho job sync teacher classes
-type SyncTeacherClassesResponse struct {
-	Success     bool   `json:"success"`
-	Message     string `json:"message"`
-	ProcessedAt string `json:"processed_at"`
-	JobType     string `json:"job_type"`
-}
-
-// SyncTeacherClasses dispatch job sync teacher classes từ user_courses vào user_classes
-// Job chạy async trong background, API không chờ job hoàn thành.
-func (c *InternalCommandController) SyncTeacherClasses(ctx *gin.Context) {
-	// Chạy job trong goroutine để không block request
-	go func() {
-		jobs.SyncTeacherClassesJob()
-	}()
-
-	response := SyncTeacherClassesResponse{
-		Success:     true,
-		Message:     "Job sync teacher classes has been dispatched successfully",
-		ProcessedAt: time.Now().Format(time.RFC3339),
-		JobType:     "sync_teacher_classes",
-	}
-
-	utils.Respond(ctx, response, nil, "")
-}
-
 func (c *InternalCommandController) ClearDashboardCoursesData(ctx *gin.Context) {
 	startTime := time.Now()
 
@@ -933,4 +569,3 @@ func (c *InternalCommandController) ClearDashboardCoursesData(ctx *gin.Context) 
 
 	utils.Respond(ctx, response, nil, "")
 }
-

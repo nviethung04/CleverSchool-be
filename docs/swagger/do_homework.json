@@ -3,14 +3,20 @@
     "post": {
       "summary": "Submit homework",
       "description": "API để trigger tính điểm homework",
-      "tags": ["Do Homework"],
+      "tags": [
+        "Do Homework"
+      ],
       "security": [
         {
           "ApiKeyAuth": []
         }
       ],
-      "consumes": ["application/json"],
-      "produces": ["application/json"],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
       "parameters": [
         {
           "$ref": "#/parameters/AcceptHeader"
@@ -42,14 +48,20 @@
     "post": {
       "summary": "Skip homework",
       "description": "API để skip câu homework",
-      "tags": ["Do Homework"],
+      "tags": [
+        "Do Homework"
+      ],
       "security": [
         {
           "ApiKeyAuth": []
         }
       ],
-      "consumes": ["application/json"],
-      "produces": ["application/json"],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
       "parameters": [
         {
           "$ref": "#/parameters/AcceptHeader"
@@ -78,7 +90,9 @@
     "get": {
       "summary": "Check submit homework (skipped questions)",
       "description": "Trả về số lượng và danh sách id các câu bị skip. Phân biệt câu skip chưa làm lại và đã làm lại",
-      "tags": ["Do Homework"],
+      "tags": [
+        "Do Homework"
+      ],
       "security": [
         {
           "ApiKeyAuth": []
@@ -115,10 +129,15 @@
               "homework_id": 123,
               "user_id": 456,
               "skipped_count": 2,
-              "skipped_question_ids": [1111, 2222],
+              "skipped_question_ids": [
+                1111,
+                2222
+              ],
               "not_completed_count": 3,
               "skipped_but_redone_count": 1,
-              "skipped_but_redone_question_ids": [3333]
+              "skipped_but_redone_question_ids": [
+                3333
+              ]
             }
           }
         },
@@ -140,14 +159,20 @@
     "post": {
       "summary": "Post comment homework",
       "description": "API để nhận xét homework",
-      "tags": ["Do Homework"],
+      "tags": [
+        "Do Homework"
+      ],
       "security": [
         {
           "ApiKeyAuth": []
         }
       ],
-      "consumes": ["application/json"],
-      "produces": ["application/json"],
+      "consumes": [
+        "application/json"
+      ],
+      "produces": [
+        "application/json"
+      ],
       "parameters": [
         {
           "$ref": "#/parameters/AcceptHeader"
@@ -166,44 +191,6 @@
               "homework_id": 123,
               "student_id": 456,
               "content": "Nhận xét ..."
-            }
-          }
-        }
-      ],
-      "responses": {}
-    }
-  },
-  "api/study/save-score/teacher-evaluate": {
-    "post": {
-      "summary": "Teacher evaluate",
-      "description": "Teacher evaluate",
-      "tags": ["Do Homework"],
-      "security": [
-        {
-          "ApiKeyAuth": []
-        }
-      ],
-      "consumes": ["application/json"],
-      "produces": ["application/json"],
-      "parameters": [
-        {
-          "$ref": "#/parameters/AcceptHeader"
-        },
-        {
-          "$ref": "#/parameters/LocaleHeader"
-        },
-        {
-          "in": "body",
-          "name": "",
-          "description": "",
-          "required": false,
-          "schema": {
-            "type": "object",
-            "example": {
-              "object_id": 123,
-              "object_type": "homework",
-              "user_id": 456,
-              "rate": "pass"
             }
           }
         }

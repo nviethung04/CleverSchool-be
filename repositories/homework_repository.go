@@ -1,12 +1,10 @@
 package repositories
 
 import (
-	"be-cleverschool/config"
-	"be-cleverschool/database/db"
-	"be-cleverschool/dto"
-	"be-cleverschool/models"
-	"be-cleverschool/requests"
-	"errors"
+	"be-lms/database/db"
+	"be-lms/dto"
+	"be-lms/models"
+	"be-lms/requests"
 	"strings"
 	"time"
 
@@ -18,16 +16,12 @@ type HomeworkRepository interface {
 	GetAll() ([]models.Homework, error)
 	GetAllWithPaging(req *requests.GetHomeworkRequest, c *gin.Context) ([]models.Homework, int64, error)
 	GetByID(id int64, userID int64, c *gin.Context) (*dto.HomeworkDTO, error)
-	IsRandomQuestion(id int64) (bool, error)
-	GetStudentsDoing(req *requests.HomeworkStudentsDoingRequest) ([]dto.HomeworkStudentDoing, int64, error)
 	Create(hw *models.Homework) error
 	Update(hw *models.Homework) error
 	Delete(id int64, deletedBy int64) error
 	Assigned(ref models.HomeworkRefLesson) error
 	AssignedLesson(id int64) (*models.Homework, error)
-	GetTotalQuestionsFromHomeworks(homeworkID int64) (int64, error)
-
-	UpdateEvaluate(userId, homeworkId int64, score float64) error
+    GetTotalQuestionsFromHomeworks(homeworkID int64) (int64, error)
 }
 
 type homeworkRepository struct{}
@@ -110,82 +104,13 @@ func (r *homeworkRepository) GetByID(id int64, userID int64, c *gin.Context) (*d
 		Joins(`LEFT JOIN homework_users hu ON hu.homework_id = h.id AND hu.user_id = ?`, userID).
 		Joins(`LEFT JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id`).
 		Where("h.id = ? AND h.deleted_at IS NULL", id).
-		Group(`h.id, hu.questions_completed, hu.last_question_id_completed`).
-		Limit(1)
+		Group(`h.id, hu.questions_completed, hu.last_question_id_completed`)
 
 	if err := query.Scan(&homeworkDto).Error; err != nil {
 		return nil, err
 	}
 
 	return &homeworkDto, nil
-}
-
-func (r *homeworkRepository) IsRandomQuestion(id int64) (bool, error) {
-	var isRandom bool
-	err := db.ReplicaDB.Table("homeworks").
-		Select("is_random_question").
-		Where("id = ? AND deleted_at IS NULL", id).
-		Scan(&isRandom).Error
-	if err != nil {
-		return false, err
-	}
-	return isRandom, nil
-}
-
-func (r *homeworkRepository) GetStudentsDoing(req *requests.HomeworkStudentsDoingRequest) ([]dto.HomeworkStudentDoing, int64, error) {
-	if req == nil {
-		return nil, 0, errors.New("request is required")
-	}
-
-	baseQuery := db.ReplicaDB.Table("homework_users hu").
-		Joins("JOIN users u ON u.id = hu.user_id AND u.deleted_at IS NULL").
-		Joins("JOIN user_ref_roles urr ON urr.user_id = u.id").
-		Joins("LEFT JOIN schools s ON s.id = u.school_id AND s.deleted_at IS NULL").
-		Where("hu.homework_id = ?", req.HomeworkID).
-		Where("urr.role_id = ?", 3)
-
-	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
-		baseQuery = baseQuery.Where("(unaccent(u.name) ILIKE unaccent(?) OR unaccent(u.username) ILIKE unaccent(?))", "%"+keyword+"%", "%"+keyword+"%")
-	}
-
-	var total int64
-	if err := baseQuery.Distinct("hu.user_id").Count(&total).Error; err != nil {
-		return nil, 0, err
-	}
-
-	dataQuery := db.ReplicaDB.Table("homework_users hu").
-		Select(`
-			hu.homework_id,
-			hu.user_id,
-			u.username,
-			u.name,
-			COALESCE(s.name, '') AS school_name,
-			COALESCE(MAX(hu.updated_at), MAX(hu.created_at)) AS submitted_at`).
-		Joins("JOIN users u ON u.id = hu.user_id AND u.deleted_at IS NULL").
-		Joins("JOIN user_ref_roles urr ON urr.user_id = u.id").
-		Joins("LEFT JOIN schools s ON s.id = u.school_id AND s.deleted_at IS NULL").
-		Where("hu.homework_id = ?", req.HomeworkID).
-		Where("urr.role_id = ?", 3)
-
-	if keyword := strings.TrimSpace(req.Keyword); keyword != "" {
-		dataQuery = dataQuery.Where("(unaccent(u.name) ILIKE unaccent(?) OR unaccent(u.username) ILIKE unaccent(?))", "%"+keyword+"%", "%"+keyword+"%")
-	}
-
-	dataQuery = dataQuery.
-		Group("hu.homework_id, hu.user_id, u.name, u.username, s.name").
-		Order("submitted_at DESC, u.name ASC")
-
-	if req.Limit > 0 && req.Page > 0 {
-		offset := (req.Page - 1) * req.Limit
-		dataQuery = dataQuery.Limit(req.Limit).Offset(offset)
-	}
-
-	var results []dto.HomeworkStudentDoing
-	if err := dataQuery.Scan(&results).Error; err != nil {
-		return nil, 0, err
-	}
-
-	return results, total, nil
 }
 
 func (r *homeworkRepository) Create(hw *models.Homework) error {
@@ -238,9 +163,11 @@ func (r *homeworkRepository) Delete(id int64, deletedBy int64) error {
 	return db.MasterDB.Delete(&model).Error
 }
 
+
+
 func (r *homeworkRepository) Assigned(ref models.HomeworkRefLesson) error {
 	return db.MasterDB.Clauses(clause.OnConflict{
-		Columns: []clause.Column{
+		Columns:   []clause.Column{
 			{Name: "homework_id"},
 			{Name: "lesson_id"},
 			{Name: "course_id"},
@@ -266,31 +193,10 @@ func (r *homeworkRepository) AssignedLesson(id int64) (*models.Homework, error) 
 }
 
 func (r *homeworkRepository) GetTotalQuestionsFromHomeworks(homeworkID int64) (int64, error) {
-	var total int64
-	err := db.ReplicaDB.Table("homeworks").
-		Select("COALESCE(total_questions,0)").
-		Where("id = ?", homeworkID).
-		Scan(&total).Error
-	return total, err
+    var total int64
+    err := db.ReplicaDB.Table("homeworks").
+        Select("COALESCE(total_questions,0)").
+        Where("id = ?", homeworkID).
+        Scan(&total).Error
+    return total, err
 }
-
-func (r *homeworkRepository) UpdateEvaluate(userId, homeworkId int64, score float64) error {
-	result := db.MasterDB.Table("homework_users").
-		Where("user_id = ? AND homework_id = ?", userId, homeworkId).
-		Updates(map[string]interface{}{
-			"ratio":          score,
-			"status_scoring": 2,
-		})
-
-	if result.Error != nil {
-		config.Log.Errorf("Error updating evaluate: %v", result.Error)
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return errors.New("homework user not found")
-	}
-
-	return nil
-}
-

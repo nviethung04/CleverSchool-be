@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"be-cleverschool/models"
+	"be-lms/models"
 	"time"
 )
 
@@ -23,16 +23,11 @@ type DashboardCoursesResponse struct {
 	StudentsCompletedHomeworkSelectedWeek int64  `json:"students_completed_homework_selected_week"`
 	ActiveStudentsSelectedWeek          int64     `json:"active_students_selected_week"`
 	ActiveTeachersSelectedWeek          int64     `json:"active_teachers_selected_week"`
-	TotalHomeworks                  int64     `json:"total_homeworks"`                   // Tổng số homework trong khoảng thời gian selected
-	AssignedHomeworks               int64     `json:"assigned_homeworks"`               // Số homework đã giao trong khoảng thời gian selected
-	StudentsCompletedAllHomeworks   int64     `json:"students_completed_all_homeworks"` // Số học sinh đã hoàn thành tất cả homework được giao trong khoảng thời gian selected
-	StudentsDoingHomeworks          int64     `json:"students_doing_homeworks"`         // Số học sinh đang làm homework trong khoảng thời gian selected
-	StudentsNotStartedAnyHomework    int64     `json:"students_not_started_any_homework"` // Số học sinh chưa làm homework nào trong khoảng thời gian selected
-	StudentActiveNotStartedAnyHomework int64   `json:"student_active_not_started_any_homework"` // Số học sinh active nhưng chưa làm homework nào
-	HomeworkOver50PercentStudentComplete int64 `json:"homework_over_50_percent_student_complete"` // Số lượng homework có trên 50% học sinh active hoàn thành
+	TotalHomeworks                  int64     `json:"total_homeworks"`                   // Tổng số homework từ 15/9/2025 đến hiện tại
+	AssignedHomeworks               int64     `json:"assigned_homeworks"`               // Số homework đã giao từ 15/9/2025 đến hiện tại
+	CompletedHomeworks              int64     `json:"completed_homeworks"`              // Số homework đã hoàn thành từ 15/9/2025 đến hiện tại
 	StartDate                       time.Time `json:"start_date"`
 	EndDate                         time.Time `json:"end_date"`
 	CreatedAt                       time.Time `json:"created_at"`
 	UpdatedAt                       time.Time `json:"updated_at"`
 }
-

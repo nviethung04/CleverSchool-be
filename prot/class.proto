@@ -2,11 +2,10 @@ syntax = "proto3";
 
 package prot;
 
-option go_package = "be-cleverschool/prot";
+option go_package = "be-lms/prot";
 
 import "school.proto";
 import "grade.proto";
-import "faculty.proto";
 
 message TeacherInfo {
   string name = 1;
@@ -25,7 +24,6 @@ message ClassRequest {
   int32 max_students = 7;
   School school = 8;
   TeacherInfo teacher_info = 9;
-  int64 faculty_id = 10;
 }
 
 // Response cho 1 class đơn
@@ -43,10 +41,6 @@ message ClassResponse {
   string created_at = 11;
   string updated_at = 12;
   TeacherInfo teacher_info = 13;
-  int64 faculty_id = 14;
-  Faculty faculty = 15;
-  int64 class_main_id = 16;
-  string class_main_name = 17;
 }
 
 // Response trả về danh sách class
@@ -84,4 +78,3 @@ message ClassByUserResponse {
   repeated CourseByUser courses = 4;
   repeated StudentInClass students = 5;
 }
-

@@ -61,36 +61,6 @@
                 },
                 {
                     "in": "query",
-                    "name": "faculty_id",
-                    "description": "Lấy theo ID khoa",
-                    "required": false
-                },
-                {
-                    "in": "query",
-                    "name": "subject_id",
-                    "description": "Lấy theo ID môn học",
-                    "required": false
-                },
-                {
-                    "in": "query",
-                    "name": "program_id",
-                    "description": "Lấy theo ID chương trình học",
-                    "required": false
-                },
-                {
-                    "in": "query",
-                    "name": "not_participated",
-                    "description": "Lọc theo tính chất học sinh chưa tham gia chương trình học (false, true)",
-                    "required": false
-                },
-                {
-                    "in": "query",
-                    "name": "fail_the_subject",
-                    "description": "Lọc theo tính chất học sinh rớt chương trình học (false, true)",
-                    "required": false
-                },
-                {
-                    "in": "query",
                     "name": "province_code",
                     "description": "Lọc tỉnh thành",
                     "required": false
