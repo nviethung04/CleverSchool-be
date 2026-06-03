@@ -11,8 +11,9 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Install buf
-RUN curl -sSL "https://cdn-dev.xlms.vn/buf/buf-Linux-x86_64" --retry 5 --retry-delay 5 -o ./buf && \
-    chmod +x ./buf
+RUN curl -fL "https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64" --retry 5 --retry-delay 5 -o /usr/local/bin/buf && \
+    chmod +x /usr/local/bin/buf && \
+    buf --version
 
 # Copy buf config files
 COPY buf.yaml buf.gen.yaml ./
@@ -21,7 +22,7 @@ COPY buf.yaml buf.gen.yaml ./
 COPY . .
 
 # Generate protobuf files using buf
-RUN ./buf generate
+RUN buf generate
 
 # Build the application
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o myapp .
