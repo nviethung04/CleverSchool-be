@@ -1,2 +1,3 @@
-ALTER TABLE homework_users DROP COLUMN IF EXISTS star;
+ALTER TABLE IF EXISTS homework_users DROP COLUMN IF EXISTS star;
+
 

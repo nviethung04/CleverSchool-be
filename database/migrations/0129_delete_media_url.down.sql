@@ -1,71 +1,71 @@
-ALTER TABLE users\
+ALTER TABLE IF EXISTS users
 ADD COLUMN IF NOT EXISTS avatar TEXT;
 
-ALTER TABLE certificates
+ALTER TABLE IF EXISTS certificates
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE courses
+ALTER TABLE IF EXISTS courses
 ADD COLUMN IF NOT EXISTS image TEXT;
 
-ALTER TABLE degrees
+ALTER TABLE IF EXISTS degrees
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE exam_question_user_manual_scoring
+ALTER TABLE IF EXISTS exam_question_user_manual_scoring
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE exams
+ALTER TABLE IF EXISTS exams
 ADD COLUMN IF NOT EXISTS cover_image TEXT;
 
-ALTER TABLE homework_question_user_manual_scoring
+ALTER TABLE IF EXISTS homework_question_user_manual_scoring
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE homeworks
+ALTER TABLE IF EXISTS homeworks
 ADD COLUMN IF NOT EXISTS cover_image TEXT;
 
-ALTER TABLE lesson_plan_parts
+ALTER TABLE IF EXISTS lesson_plan_parts
 ADD COLUMN IF NOT EXISTS link TEXT;
 
-ALTER TABLE lesson_plans
+ALTER TABLE IF EXISTS lesson_plans
 ADD COLUMN IF NOT EXISTS cover_image TEXT;
 
-ALTER TABLE level_tests
+ALTER TABLE IF EXISTS level_tests
 ADD COLUMN IF NOT EXISTS cover_image TEXT;
 
-ALTER TABLE schools
+ALTER TABLE IF EXISTS schools
 ADD COLUMN IF NOT EXISTS logo TEXT;
 
-ALTER TABLE skills
+ALTER TABLE IF EXISTS skills
 ADD COLUMN IF NOT EXISTS image_url TEXT;
 
-ALTER TABLE tags
+ALTER TABLE IF EXISTS tags
 ADD COLUMN IF NOT EXISTS image_url TEXT;
 
-ALTER TABLE topics
+ALTER TABLE IF EXISTS topics
 ADD COLUMN IF NOT EXISTS image_url TEXT;
 
-ALTER TABLE questions
+ALTER TABLE IF EXISTS questions
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE answer_groups
+ALTER TABLE IF EXISTS answer_groups
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE answer_coordinates
+ALTER TABLE IF EXISTS answer_coordinates
 ADD COLUMN IF NOT EXISTS media_url TEXT;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE answer_positions
+ALTER TABLE IF EXISTS answer_positions
 ADD COLUMN IF NOT EXISTS media_url TEXT;
 
-ALTER TABLE answers
+ALTER TABLE IF EXISTS answers
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE group_answers
+ALTER TABLE IF EXISTS group_answers
 ADD COLUMN IF NOT EXISTS file_url TEXT;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 ADD COLUMN IF NOT EXISTS matching_file_url TEXT;
 
-ALTER TABLE lesson_plan_parts
+ALTER TABLE IF EXISTS lesson_plan_parts
 ADD COLUMN IF NOT EXISTS cover_image TEXT;

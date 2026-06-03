@@ -1,2 +1,3 @@
-ALTER TABLE homework_users DROP COLUMN IF EXISTS exp;
+ALTER TABLE IF EXISTS homework_users DROP COLUMN IF EXISTS exp;
+
 

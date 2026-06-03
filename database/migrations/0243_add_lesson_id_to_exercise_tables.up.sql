@@ -77,6 +77,7 @@ END $$;
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'exercise_users' AND column_name = 'lesson_id') THEN
-        ALTER TABLE exercise_users ADD COLUMN lesson_id bigint;
+        ALTER TABLE IF EXISTS exercise_users ADD COLUMN lesson_id bigint;
     END IF;
 END $$;
+

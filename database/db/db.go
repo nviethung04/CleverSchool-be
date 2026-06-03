@@ -192,6 +192,10 @@ func TestPostgresConnection() error {
 		return fmt.Errorf("master database not initialized")
 	}
 
+	if !MasterDB.Migrator().HasTable("users") {
+		return fmt.Errorf("users table does not exist; run database migrations before using the app")
+	}
+
 	err := MasterDB.Table("users").Count(&count).Error
 	if err != nil {
 		config.Log.Error("❌ Failed to count users on MasterDB:", err)
@@ -201,6 +205,11 @@ func TestPostgresConnection() error {
 
 	// Test ReplicaDB (nếu có)
 	if ReplicaDB != nil {
+		if !ReplicaDB.Migrator().HasTable("users") {
+			config.Log.Warn("⚠️ ReplicaDB users table does not exist, skipping replica check")
+			return nil
+		}
+
 		count = 0
 		err := ReplicaDB.Table("users").Count(&count).Error
 		if err != nil {
@@ -214,4 +223,3 @@ func TestPostgresConnection() error {
 
 	return nil
 }
-

@@ -1,92 +1,92 @@
-ALTER TABLE users
+ALTER TABLE IF EXISTS users
 DROP COLUMN IF EXISTS avatar_info;
 
-ALTER TABLE certificates
+ALTER TABLE IF EXISTS certificates
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE courses
+ALTER TABLE IF EXISTS courses
 DROP COLUMN IF EXISTS image_info;
 
-ALTER TABLE degrees
+ALTER TABLE IF EXISTS degrees
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE exam_question_user_manual_scoring
+ALTER TABLE IF EXISTS exam_question_user_manual_scoring
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE exams
+ALTER TABLE IF EXISTS exams
 DROP COLUMN IF EXISTS cover_image_info;
 
-ALTER TABLE homework_question_user_manual_scoring
+ALTER TABLE IF EXISTS homework_question_user_manual_scoring
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE homeworks
+ALTER TABLE IF EXISTS homeworks
 DROP COLUMN IF EXISTS cover_image_info;
 
-ALTER TABLE lesson_plan_parts
+ALTER TABLE IF EXISTS lesson_plan_parts
 DROP COLUMN IF EXISTS link_info;
 
-ALTER TABLE lesson_plans
+ALTER TABLE IF EXISTS lesson_plans
 DROP COLUMN IF EXISTS cover_image_info;
 
-ALTER TABLE level_tests
+ALTER TABLE IF EXISTS level_tests
 DROP COLUMN IF EXISTS cover_image_info;
 
-ALTER TABLE schools
+ALTER TABLE IF EXISTS schools
 DROP COLUMN IF EXISTS logo_info;
 
-ALTER TABLE skills
+ALTER TABLE IF EXISTS skills
 DROP COLUMN IF EXISTS image_info;
 
-ALTER TABLE tags
+ALTER TABLE IF EXISTS tags
 DROP COLUMN IF EXISTS image_info;
 
-ALTER TABLE topics
+ALTER TABLE IF EXISTS topics
 DROP COLUMN IF EXISTS image_info;
 
-ALTER TABLE questions
+ALTER TABLE IF EXISTS questions
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE answer_groups
+ALTER TABLE IF EXISTS answer_groups
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE answer_coordinates
+ALTER TABLE IF EXISTS answer_coordinates
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE answer_positions
+ALTER TABLE IF EXISTS answer_positions
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answers
+ALTER TABLE IF EXISTS answers
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE group_answers
+ALTER TABLE IF EXISTS group_answers
 DROP COLUMN IF EXISTS file_info;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 DROP COLUMN IF EXISTS matching_file_info;
 
-ALTER TABLE questions
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS questions
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answer_groups
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS answer_groups
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answer_coordinates
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS answer_coordinates
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answer_matchings
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS answer_matchings
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answer_positions
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS answer_positions
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answers
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS answers
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE group_answers
-ADD COLUMN media_info JSONB;
+ALTER TABLE IF EXISTS group_answers
+ADD COLUMN IF NOT EXISTS media_info JSONB;
 
-ALTER TABLE answer_matchings
-ADD COLUMN matching_media_info JSONB;
+ALTER TABLE IF EXISTS answer_matchings
+ADD COLUMN IF NOT EXISTS matching_media_info JSONB;

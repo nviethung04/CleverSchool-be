@@ -10,7 +10,8 @@ ALTER TABLE exams ADD COLUMN file_infos jsonb;
 ALTER TABLE exercises ADD COLUMN file_infos jsonb;
 ALTER TABLE contest_rounds ADD COLUMN file_infos jsonb;
 
-ALTER TABLE homework_users ADD COLUMN file_infos jsonb;
-ALTER TABLE exam_users ADD COLUMN file_infos jsonb;
-ALTER TABLE exercise_users ADD COLUMN file_infos jsonb;
-ALTER TABLE contest_round_users ADD COLUMN file_infos jsonb;
+ALTER TABLE IF EXISTS homework_users ADD COLUMN file_infos jsonb;
+ALTER TABLE IF EXISTS exam_users ADD COLUMN file_infos jsonb;
+ALTER TABLE IF EXISTS exercise_users ADD COLUMN file_infos jsonb;
+ALTER TABLE IF EXISTS contest_round_users ADD COLUMN file_infos jsonb;
+

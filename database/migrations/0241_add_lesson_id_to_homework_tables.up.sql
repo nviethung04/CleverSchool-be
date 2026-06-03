@@ -5,7 +5,7 @@
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'homework_users' AND column_name = 'lesson_id') THEN
-        ALTER TABLE homework_users ADD COLUMN lesson_id bigint;
+        ALTER TABLE IF EXISTS homework_users ADD COLUMN lesson_id bigint;
     END IF;
 END $$;
 
@@ -47,7 +47,7 @@ END $$;
 DO $$ 
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'homework_question_user_manual_scoring' AND column_name = 'lesson_id') THEN
-        ALTER TABLE homework_question_user_manual_scoring ADD COLUMN lesson_id bigint;
+        ALTER TABLE IF EXISTS homework_question_user_manual_scoring ADD COLUMN lesson_id bigint;
     END IF;
 END $$;
 
@@ -82,3 +82,4 @@ BEGIN
         ALTER TABLE homework_comments ADD COLUMN lesson_id bigint;
     END IF;
 END $$;
+

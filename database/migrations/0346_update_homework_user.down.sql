@@ -1,11 +1,12 @@
-ALTER TABLE homework_users
+ALTER TABLE IF EXISTS homework_users
     DROP COLUMN IF EXISTS rate;
 
-ALTER TABLE exam_users
+ALTER TABLE IF EXISTS exam_users
     DROP COLUMN IF EXISTS rate;
 
-ALTER TABLE exercise_users
+ALTER TABLE IF EXISTS exercise_users
     DROP COLUMN IF EXISTS rate;
 
-ALTER TABLE contest_round_users
+ALTER TABLE IF EXISTS contest_round_users
     DROP COLUMN IF EXISTS rate;
+

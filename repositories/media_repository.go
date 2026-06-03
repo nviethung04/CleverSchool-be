@@ -370,6 +370,11 @@ func (r *mediaRepository) ClearDuplicateMedia() error {
 }
 
 func (r *mediaRepository) CleanupOrphanedMedia() error {
+	if !db.MasterDB.Migrator().HasTable("medias") {
+		config.Log.Warn("medias table does not exist, skipping orphaned media cleanup")
+		return nil
+	}
+
 	// Step 1: Xóa các bản ghi đã bị soft-delete
 	deleteSoftDeletedSQL := `
 		DELETE FROM medias
@@ -465,4 +470,3 @@ WHERE m.type = 'folder'
 
 	return nil
 }
-

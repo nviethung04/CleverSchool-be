@@ -1,5 +1,6 @@
-ALTER TABLE homework_users
+ALTER TABLE IF EXISTS homework_users
 DROP COLUMN IF EXISTS score,
 DROP COLUMN IF EXISTS ratio;
+
 
 

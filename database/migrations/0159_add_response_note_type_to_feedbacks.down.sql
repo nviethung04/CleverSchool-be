@@ -1,7 +1,7 @@
 -- Migration Down: Remove response, note, type columns from feedbacks table
 -- Version: 0159
 
-ALTER TABLE feedbacks 
-DROP COLUMN response,
-DROP COLUMN note,
-DROP COLUMN type;
+ALTER TABLE IF EXISTS feedbacks 
+DROP COLUMN IF EXISTS response,
+DROP COLUMN IF EXISTS note,
+DROP COLUMN IF EXISTS type;

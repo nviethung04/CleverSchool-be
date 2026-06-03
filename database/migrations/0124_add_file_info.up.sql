@@ -1,92 +1,92 @@
-ALTER TABLE users
-ADD COLUMN avatar_info JSONB;
+ALTER TABLE IF EXISTS users
+ADD COLUMN IF NOT EXISTS avatar_info JSONB;
 
-ALTER TABLE certificates
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS certificates
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE courses
-ADD COLUMN image_info JSONB;
+ALTER TABLE IF EXISTS courses
+ADD COLUMN IF NOT EXISTS image_info JSONB;
 
-ALTER TABLE degrees
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS degrees
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE exam_question_user_manual_scoring
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS exam_question_user_manual_scoring
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE exams
-ADD COLUMN cover_image_info JSONB;
+ALTER TABLE IF EXISTS exams
+ADD COLUMN IF NOT EXISTS cover_image_info JSONB;
 
-ALTER TABLE homework_question_user_manual_scoring
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS homework_question_user_manual_scoring
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE homeworks
-ADD COLUMN cover_image_info JSONB;
+ALTER TABLE IF EXISTS homeworks
+ADD COLUMN IF NOT EXISTS cover_image_info JSONB;
 
-ALTER TABLE lesson_plan_parts
-ADD COLUMN link_info JSONB;
+ALTER TABLE IF EXISTS lesson_plan_parts
+ADD COLUMN IF NOT EXISTS link_info JSONB;
 
-ALTER TABLE lesson_plans
-ADD COLUMN cover_image_info JSONB;
+ALTER TABLE IF EXISTS lesson_plans
+ADD COLUMN IF NOT EXISTS cover_image_info JSONB;
 
-ALTER TABLE level_tests
-ADD COLUMN cover_image_info JSONB;
+ALTER TABLE IF EXISTS level_tests
+ADD COLUMN IF NOT EXISTS cover_image_info JSONB;
 
-ALTER TABLE schools
-ADD COLUMN logo_info JSONB;
+ALTER TABLE IF EXISTS schools
+ADD COLUMN IF NOT EXISTS logo_info JSONB;
 
-ALTER TABLE skills
-ADD COLUMN image_info JSONB;
+ALTER TABLE IF EXISTS skills
+ADD COLUMN IF NOT EXISTS image_info JSONB;
 
-ALTER TABLE tags
-ADD COLUMN image_info JSONB;
+ALTER TABLE IF EXISTS tags
+ADD COLUMN IF NOT EXISTS image_info JSONB;
 
-ALTER TABLE topics
-ADD COLUMN image_info JSONB;
+ALTER TABLE IF EXISTS topics
+ADD COLUMN IF NOT EXISTS image_info JSONB;
 
-ALTER TABLE questions
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS questions
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answer_groups
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS answer_groups
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answer_coordinates
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS answer_coordinates
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answer_matchings
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS answer_matchings
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answer_positions
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS answer_positions
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answers
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS answers
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE group_answers
-ADD COLUMN file_info JSONB;
+ALTER TABLE IF EXISTS group_answers
+ADD COLUMN IF NOT EXISTS file_info JSONB;
 
-ALTER TABLE answer_matchings
-ADD COLUMN matching_file_info JSONB;
+ALTER TABLE IF EXISTS answer_matchings
+ADD COLUMN IF NOT EXISTS matching_file_info JSONB;
 
-ALTER TABLE questions
+ALTER TABLE IF EXISTS questions
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_groups
+ALTER TABLE IF EXISTS answer_groups
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_coordinates
+ALTER TABLE IF EXISTS answer_coordinates
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_positions
+ALTER TABLE IF EXISTS answer_positions
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answers
+ALTER TABLE IF EXISTS answers
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE group_answers
+ALTER TABLE IF EXISTS group_answers
 DROP COLUMN IF EXISTS media_info;
 
-ALTER TABLE answer_matchings
+ALTER TABLE IF EXISTS answer_matchings
 DROP COLUMN IF EXISTS matching_media_info;
