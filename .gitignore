@@ -9,3 +9,8 @@ scorm-packages/*
 logs
 .DS_Store
 power_point
+AGENTS.md
+docs/architecture.md
+docs/requirement.md
+docs/database.md
+index.md
