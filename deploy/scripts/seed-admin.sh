@@ -29,4 +29,4 @@ docker run --rm \
   golang:1.24-alpine \
   sh -c "go run ./database/seeder -model Role"
 
-echo "Done. Login: admin / admin123 — đổi mật khẩu ngay sau khi đăng nhập."
+echo "Done. User admin đã seed — đổi mật khẩu mặc định ngay (xem docs/getting-started.md)."

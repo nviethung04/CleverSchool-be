@@ -9,6 +9,8 @@ Tài liệu này mô tả **việc anh cần làm** để:
 
 Frontend giữ trên **Vercel**; file này chỉ lo **BE + DB**.
 
+> **Bảo mật:** Không commit mật khẩu thật. File `.env` trên VPS tự tạo từ `env.*.template` (placeholder `change_me_*`). Secret đã lỡ push → **đổi hết** trên VPS và đánh dấu resolved trên GitGuardian.
+
 **VPS IP (của anh):** `160.250.4.181`
 
 | Nhánh Git | Môi trường | API | Thư mục VPS | Database |
@@ -219,9 +221,9 @@ FRONTEND_URL=https://viethung.uk
 ALLOW_ORIGINS=https://viethung.uk,http://localhost:3000
 POSTGRES_DB=lms_db_dev
 POSTGRES_USER=lms_user
-POSTGRES_PASSWORD=admin123
-REDIS_PASSWORD=admin123
-JWT_SECRET=CsDev_viethung_uk_JWT_2026_min32chars_xY3z
+POSTGRES_PASSWORD=change_me_dev_db
+REDIS_PASSWORD=change_me_dev_redis
+JWT_SECRET=change_me_dev_jwt_min_32_chars
 RUN_MIGRATIONS=true
 ENABLE_SWAGGER=true
 APP_DEBUG=false
@@ -252,9 +254,9 @@ FRONTEND_URL=https://staging.viethung.uk
 ALLOW_ORIGINS=https://staging.viethung.uk,http://localhost:3000
 POSTGRES_DB=lms_db_staging
 POSTGRES_USER=lms_user
-POSTGRES_PASSWORD=admin123
-REDIS_PASSWORD=admin123
-JWT_SECRET=CsStg_viethung_uk_JWT_2026_min32chars_bW7q
+POSTGRES_PASSWORD=change_me_staging_db
+REDIS_PASSWORD=change_me_staging_redis
+JWT_SECRET=change_me_staging_jwt_min_32_chars
 RUN_MIGRATIONS=true
 ENABLE_SWAGGER=false
 APP_DEBUG=false
@@ -326,7 +328,7 @@ cd /opt/cleverschool-dev/deploy && ./scripts/seed-admin.sh
 cd /opt/cleverschool-staging/deploy && ./scripts/seed-admin.sh
 ```
 
-Đăng nhập mặc định: `admin` / `admin123` — **đổi mật khẩu ngay** sau khi vào được.
+Sau seed: user `admin` — **đổi mật khẩu ngay** (mật khẩu seed chỉ dùng lần đầu, không ghi trong Git).
 
 ---
 
@@ -349,11 +351,11 @@ Chờ thấy log cấp certificate Let's Encrypt thành công (Ctrl+C thoát log
 ```bash
 curl -s https://api-dev.viethung.uk/api/login \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"<your-admin-password>"}'
 
 curl -s https://api-staging.viethung.uk/api/login \
   -X POST -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"admin","password":"<your-admin-password>"}'
 ```
 
 Kỳ vọng: JSON có `code: 200` và `token`.
@@ -499,6 +501,111 @@ Trừ khi:
 
 ---
 
+## Phần Z — Reset VPS sạch rồi deploy lại
+
+Dùng khi muốn **xóa hết** container, volume DB, thư mục `/opt/cleverschool-*` và làm lại từ đầu.
+
+**Không xóa:** Docker engine, SSH, DNS Cloudflare, firewall.
+
+**Có xóa:** Toàn bộ dữ liệu Postgres staging/dev trên VPS (volume).
+
+### Z1. Trên VPS — dọn sạch
+
+SSH vào VPS, chạy **một trong hai cách**:
+
+**Cách A — script trong repo** (sau khi đã clone hoặc copy script):
+
+```bash
+bash /opt/cleverschool-staging/deploy/scripts/vps-reset.sh
+# hoặc nếu chưa có repo: dán nội dung từ deploy/scripts/vps-reset.sh
+```
+
+**Cách B — lệnh tay (không cần file):**
+
+```bash
+cd /opt/cleverschool-staging/deploy 2>/dev/null && docker compose down -v --remove-orphans || true
+cd /opt/cleverschool-dev/deploy 2>/dev/null && docker compose down -v --remove-orphans || true
+cd /opt/cleverschool-proxy 2>/dev/null && docker compose down -v --remove-orphans || true
+
+docker rm -f cs-caddy csstaging-api csstaging-postgres csstaging-redis \
+  csdev-api csdev-postgres csdev-redis 2>/dev/null || true
+
+docker volume rm cleverschool_postgres_data cleverschool_redis_data \
+  cleverschool-proxy_caddy_data cleverschool-proxy_caddy_config 2>/dev/null || true
+
+docker network rm cleverschool-edge 2>/dev/null || true
+
+rm -rf /opt/cleverschool-dev /opt/cleverschool-staging /opt/cleverschool-proxy
+rm -rf /tmp/CleverSchool-be
+```
+
+Gõ `yes` nếu script hỏi xác nhận.
+
+### Z2. Đảm bảo code mới nhất trên GitHub
+
+Trên máy Windows (repo `CleverSchool/be`), push lên **`CleverSchool-be`** nhánh `staging` (có migration `0025`, tắt dashboard/S3 mặc định).
+
+### Z3. Deploy lại staging (khuyến nghị làm trước)
+
+```bash
+docker network create cleverschool-edge
+
+# Repo public:
+git clone -b staging https://github.com/nviethung04/CleverSchool-be.git /opt/cleverschool-staging
+
+# Repo private:
+# export GITHUB_TOKEN=ghp_xxxx
+# git clone -b staging "https://${GITHUB_TOKEN}@github.com/nviethung04/CleverSchool-be.git" /opt/cleverschool-staging
+
+cd /opt/cleverschool-staging/deploy
+cp env.staging.viethung.template .env
+nano .env
+# Sửa FRONTEND_URL, ALLOW_ORIGINS = URL Vercel thật
+# ENABLE_DASHBOARD_JOBS=false (mặc định trong template)
+# Không cần AWS_* cho MVP
+
+docker compose up -d --build
+docker compose logs api --tail 50
+chmod +x scripts/seed-admin.sh && ./scripts/seed-admin.sh
+
+mkdir -p /opt/cleverschool-proxy
+cp -r /opt/cleverschool-staging/deploy/proxy/* /opt/cleverschool-proxy/
+cd /opt/cleverschool-proxy && docker compose up -d
+```
+
+Hoặc một lệnh (sau reset, cần `GITHUB_TOKEN` nếu private):
+
+```bash
+export GITHUB_TOKEN=ghp_xxxx   # bỏ qua nếu public
+bash /opt/cleverschool-staging/deploy/scripts/vps-setup-staging.sh
+```
+
+### Z4. Kiểm tra
+
+```bash
+docker ps
+# csstaging-api, csstaging-postgres, csstaging-redis, cs-caddy
+
+curl -s https://api-staging.viethung.uk/api/login \
+  -X POST -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"<your-admin-password>"}'
+```
+
+### Z5. Dev (tùy chọn, sau staging ổn)
+
+Lặp lại A5/A6/A7 với `/opt/cleverschool-dev`, nhánh `develop`, `env.dev.viethung.template`.
+
+| Bước docs | Nội dung |
+|-----------|----------|
+| A1 | DNS (giữ nguyên nếu đã có) |
+| A2 | SSH key (giữ nguyên) |
+| A3 | Docker (đã cài thì bỏ qua) |
+| Z1 | Reset sạch |
+| Z3 | Clone + `.env` + compose + seed + Caddy |
+| A10–A11 | curl + Vercel env |
+
+---
+
 ## Phần E — Backup database
 
 **Dev:**
@@ -553,7 +660,7 @@ docker exec csstaging-postgres pg_dump -U lms_user lms_db_staging > ~/backup-sta
 - [ ] Workflow permissions Read and write
 - [ ] Secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `GHCR_PULL_TOKEN`
 - [ ] Push `develop` / `staging` → Actions xanh
-- [ ] Đổi mật khẩu `admin123`
+- [ ] Đổi mật khẩu admin sau seed
 
 ---
 
