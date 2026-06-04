@@ -2,6 +2,8 @@
 
 Hướng dẫn setup **greenfield** (DB mới, chưa production). Cập nhật: 2026-06-04.
 
+**Deploy VPS (Docker + CI/CD GitHub):** xem [deploy-vps.md](./deploy-vps.md).
+
 ## Yêu Cầu
 
 | Thành phần | Phiên bản khuyến nghị |

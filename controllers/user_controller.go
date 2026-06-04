@@ -120,15 +120,19 @@ func (ctl *UserController) GetStudentsByParent(c *gin.Context) {
 }
 
 func (uc *UserController) GetMyProfile(c *gin.Context) {
-	tokenStr := c.GetHeader("Token")
-	userID, err := utils.GetUserID(tokenStr)
-	if err != nil {
-		utils.Respond(c, nil, err, "")
+	userIDVal, ok := c.Get("userID")
+	if !ok {
+		utils.Respond(c, nil, fmt.Errorf(i18n.Localize("messages.user_not_authenticated")), "messages.user_not_authenticated", http.StatusUnauthorized)
 		return
 	}
-	user, err := uc.svc.GetByID(c, int(userID))
+	userID, ok := userIDVal.(int)
+	if !ok {
+		utils.Respond(c, nil, fmt.Errorf(i18n.Localize("messages.invalid_user_id")), "messages.invalid_user_id", http.StatusBadRequest)
+		return
+	}
+	user, err := uc.svc.GetByID(c, userID)
 	if err != nil {
-		utils.Respond(c, nil, err, "messages.data_existed", http.StatusNotFound)
+		utils.Respond(c, nil, err, "messages.user_not_found", http.StatusNotFound)
 		return
 	}
 
