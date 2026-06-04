@@ -1,0 +1,28 @@
+# Chạy trên VPS: cd /opt/cleverschool-proxy && docker compose up -d
+# Tạo network trước: docker network create cleverschool-edge
+
+name: cleverschool-proxy
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: cs-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+
+networks:
+  edge:
+    external: true
+    name: cleverschool-edge
+
+volumes:
+  caddy_data:
+  caddy_config:

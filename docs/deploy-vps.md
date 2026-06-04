@@ -14,9 +14,11 @@ Frontend giữ trên **Vercel**; file này chỉ lo **BE + DB**.
 | Nhánh Git | Môi trường | API | Thư mục VPS | Database |
 |-----------|------------|-----|-------------|----------|
 | `develop` | Dev | https://api-dev.viethung.uk | `/opt/cleverschool-dev` | `lms_db_dev` |
-| `pre` | Staging | https://api-staging.viethung.uk | `/opt/cleverschool-staging` | `lms_db_staging` |
+| `staging` (hoặc `pre`) | Staging | https://api-staging.viethung.uk | `/opt/cleverschool-staging` | `lms_db_staging` |
 
-Workflow CI/CD: `.github/workflows/deploy-api.yml` (thư mục **gốc** repo CleverSchool).
+Workflow CI/CD: `be/.github/workflows/deploy-api.yml` — push lên repo **`nviethung04/CleverSchool-be`** (nhánh `staging` / `develop`).
+
+> Repo folder `CleverSchool/` (cha) trỏ remote khác — **CI chạy trên repo BE**, không phải folder cha.
 
 ---
 
@@ -316,7 +318,7 @@ Sau khi lưu → **Redeploy** project Vercel.
 
 ## Phần B — Cấu hình CI/CD GitHub (một lần)
 
-Sau phần B, mỗi khi anh **push code BE** lên nhánh `develop` hoặc `pre`, GitHub tự:
+Sau phần B, mỗi khi anh **push code BE** lên nhánh `develop` hoặc `staging`, GitHub tự:
 
 1. Build image Docker API.
 2. Đẩy lên GitHub Container Registry (GHCR).
@@ -489,7 +491,7 @@ docker exec csstaging-postgres pg_dump -U lms_user lms_db_staging > ~/backup-sta
 
 - [ ] Workflow permissions Read and write
 - [ ] Secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `GHCR_PULL_TOKEN`
-- [ ] Push `develop` / `pre` → Actions xanh
+- [ ] Push `develop` / `staging` → Actions xanh
 - [ ] Đổi mật khẩu `admin123`
 
 ---

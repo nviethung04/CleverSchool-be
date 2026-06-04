@@ -1,0 +1,140 @@
+# Deploy BE lên VPS — repo CleverSchool-be
+# develop → api-dev.viethung.uk | staging → api-staging.viethung.uk
+
+name: Deploy API (dev / staging)
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+    paths:
+      - "**"
+      - "!**/*.md"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Môi trường deploy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+
+concurrency:
+  group: deploy-api-${{ github.event.inputs.target || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: cleverschool-api
+
+jobs:
+  resolve-env:
+    runs-on: ubuntu-latest
+    outputs:
+      env_slug: ${{ steps.env.outputs.env_slug }}
+      branch_tag: ${{ steps.env.outputs.branch_tag }}
+      deploy_path: ${{ steps.env.outputs.deploy_path }}
+    steps:
+      - id: env
+        run: |
+          TARGET="${{ github.event.inputs.target }}"
+          REF="${{ github.ref_name }}"
+          if [ -z "$TARGET" ]; then
+            if [ "$REF" = "develop" ]; then TARGET=dev
+            elif [ "$REF" = "staging" ] || [ "$REF" = "pre" ]; then TARGET=staging
+            else echo "Branch không hỗ trợ: $REF"; exit 1; fi
+          fi
+          DEV_PATH="${{ secrets.VPS_DEPLOY_PATH_DEV }}"
+          STAGING_PATH="${{ secrets.VPS_DEPLOY_PATH_STAGING }}"
+          [ -z "$DEV_PATH" ] && DEV_PATH=/opt/cleverschool-dev
+          [ -z "$STAGING_PATH" ] && STAGING_PATH=/opt/cleverschool-staging
+          case "$TARGET" in
+            dev)
+              echo "env_slug=dev" >> $GITHUB_OUTPUT
+              echo "branch_tag=develop" >> $GITHUB_OUTPUT
+              echo "deploy_path=${DEV_PATH}" >> $GITHUB_OUTPUT
+              ;;
+            staging)
+              echo "env_slug=staging" >> $GITHUB_OUTPUT
+              echo "branch_tag=staging" >> $GITHUB_OUTPUT
+              echo "deploy_path=${STAGING_PATH}" >> $GITHUB_OUTPUT
+              ;;
+            *) echo "Unknown target: $TARGET"; exit 1 ;;
+          esac
+
+  build-and-push:
+    needs: resolve-env
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-env.outputs.branch_tag }}-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ needs.resolve-env.outputs.branch_tag }}-latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: [resolve-env, build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy deploy files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          source: deploy/
+          target: ${{ needs.resolve-env.outputs.deploy_path }}
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ needs.resolve-env.outputs.deploy_path }}
+          BRANCH_TAG: ${{ needs.resolve-env.outputs.branch_tag }}
+          IMAGE_SHA: ${{ github.sha }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          envs: DEPLOY_PATH,BRANCH_TAG,IMAGE_SHA,REPO_OWNER
+          script: |
+            set -e
+            cd "${DEPLOY_PATH}/deploy"
+            if [ ! -f .env ]; then
+              echo "❌ Thiếu ${DEPLOY_PATH}/deploy/.env"
+              exit 1
+            fi
+            if [ -n "${{ secrets.GHCR_PULL_TOKEN }}" ]; then
+              echo "${{ secrets.GHCR_PULL_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            fi
+            export API_IMAGE=ghcr.io/${REPO_OWNER}/cleverschool-api:${BRANCH_TAG}-${IMAGE_SHA}
+            docker compose pull api
+            API_IMAGE="${API_IMAGE}" docker compose up -d --remove-orphans
+            docker compose ps
+            docker compose logs api --tail 50

@@ -1,0 +1,91 @@
+# Một môi trường (dev HOẶC staging) — chạy 2 bản copy ở 2 thư mục VPS khác nhau.
+# STACK_NAME trong .env phải khác nhau (csdev / csstaging).
+
+name: cleverschool
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${STACK_NAME:?STACK_NAME}-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-lms_db}
+      POSTGRES_USER: ${POSTGRES_USER:-lms_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-lms_user} -d ${POSTGRES_DB:-lms_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${STACK_NAME}-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?Set REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    image: ${API_IMAGE:-ghcr.io/cleverschool/cleverschool-api:latest}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: ${STACK_NAME}-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: "8080"
+      DB_MASTER_HOST: postgres
+      DB_MASTER_PORT: "5432"
+      DB_MASTER_USER: ${POSTGRES_USER:-lms_user}
+      DB_MASTER_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_MASTER_NAME: ${POSTGRES_DB:-lms_db}
+      DB_REPLICA_HOST: postgres
+      DB_REPLICA_PORT: "5432"
+      DB_REPLICA_USER: ${POSTGRES_USER:-lms_user}
+      DB_REPLICA_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_REPLICA_NAME: ${POSTGRES_DB:-lms_db}
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DB: "0"
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      ALLOW_ORIGINS: ${ALLOW_ORIGINS:-*}
+      API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN}
+      FRONTEND_URL: ${FRONTEND_URL:?Set FRONTEND_URL}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge
+
+networks:
+  internal:
+    driver: bridge
+  edge:
+    external: true
+    name: cleverschool-edge
+
+volumes:
+  postgres_data:
+  redis_data:

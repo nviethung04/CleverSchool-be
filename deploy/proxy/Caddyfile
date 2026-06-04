@@ -1,0 +1,10 @@
+# HTTPS reverse proxy — chạy một lần trên VPS (deploy/proxy)
+# Yêu cầu: DNS Cloudflare trỏ api-dev / api-staging → IP VPS, port 80/443 mở
+
+api-dev.viethung.uk {
+    reverse_proxy csdev-api:8080
+}
+
+api-staging.viethung.uk {
+    reverse_proxy csstaging-api:8080
+}
