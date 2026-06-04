@@ -162,9 +162,11 @@ Giống Cách 1, bước 5.
 
 ```bash
 cd be
-go run . migrate          # nếu chưa chạy
-go run ./database/seeder -model Role
+go run . migrate          # nếu chưa chạy (hiện tới version 23)
+go run ./database/seeder -model Role   # BẮT BUỘC — tạo admin + permissions
 ```
+
+Nếu bỏ qua bước seeder, login `admin`/`admin123` sẽ báo **Không tìm thấy tài khoản**.
 
 Seeder sẽ:
 
