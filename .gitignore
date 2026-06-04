@@ -14,3 +14,9 @@ docs/architecture.md
 docs/requirement.md
 docs/database.md
 index.md
+docs/database/CHANGELOG.md
+docs/database/design.md
+docs/database/migration-guide.md
+docs/database/maintenance.md
+docs/database/README.md
+docs/database/tables-reference.md

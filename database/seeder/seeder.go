@@ -416,39 +416,103 @@ func (s *Seeder) SeedRoles() {
 		return
 	}
 
-	roles := map[string]*models.Role{
-		"admin":   {},
-		"teacher": {},
-		"student": {},
+	adminRole, err := s.ensureRole(models.AdminRoleId, "Admin", models.PageAdmin)
+	if err != nil {
+		fmt.Println("Lỗi role Admin:", err)
+		return
 	}
-	for name := range roles {
-		var role models.Role
-		if err := db.MasterDB.Where("name = ?", name).First(&role).Error; err != nil {
-			role = models.Role{Name: name}
-			db.MasterDB.Create(&role)
-		}
-		roles[name] = &role
+	teacherRole, err := s.ensureRole(models.TeacherRoleId, "Teacher", models.PageTeacher)
+	if err != nil {
+		fmt.Println("Lỗi role Teacher:", err)
+		return
+	}
+	studentRole, err := s.ensureRole(models.StudentRoleId, "Student", models.PageStudent)
+	if err != nil {
+		fmt.Println("Lỗi role Student:", err)
+		return
 	}
 
-	var adminUser models.User
-	if err := db.MasterDB.Where("username = ?", "admin").First(&adminUser).Error; err != nil {
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-		adminUser = models.User{
-			Username: "admin",
-			// RoleID:   int(roles["admin"].ID),
-			Password: string(hashedPassword),
-			Status:   true,
-		}
-		db.MasterDB.Create(&adminUser)
+	adminUser, err := s.ensureAdminUser("admin", "admin123", "Quản trị hệ thống")
+	if err != nil {
+		fmt.Println("Lỗi tạo user admin:", err)
+		return
 	}
-	// else if adminUser.RoleID != int(roles["admin"].ID) {
-	// 	adminUser.RoleID = int(roles["admin"].ID)
-	// 	db.MasterDB.Save(&adminUser)
-	// }
+	if err := s.ensureUserRole(adminUser.ID, adminRole.ID); err != nil {
+		fmt.Println("Lỗi gán role admin:", err)
+		return
+	}
 
-	s.seedPermissions(config.GetPermissions(), roles["admin"])
-	s.seedPermissions(config.GetTeacherPermissions(), roles["teacher"])
-	s.seedPermissions(config.GetStudentPermissions(), roles["student"])
+	s.seedPermissions(config.GetPermissions(), adminRole)
+	s.seedPermissions(config.GetTeacherPermissions(), teacherRole)
+	s.seedPermissions(config.GetStudentPermissions(), studentRole)
+	s.seedPermissionString("internal.command", "system", "Lệnh nội bộ", adminRole)
+
+	fmt.Printf("✅ Seed roles & permissions xong. Đăng nhập: username=admin password=admin123 (user_id=%d, role_id=%d)\n",
+		adminUser.ID, adminRole.ID)
+}
+
+func (s *Seeder) ensureRole(id int64, name, defaultPageView string) (*models.Role, error) {
+	var role models.Role
+	err := db.MasterDB.First(&role, id).Error
+	if err == nil {
+		return &role, nil
+	}
+	role = models.Role{
+		ID:              id,
+		Name:            name,
+		DefaultPageView: defaultPageView,
+		Status:          true,
+	}
+	if err := db.MasterDB.Create(&role).Error; err != nil {
+		return nil, err
+	}
+	return &role, nil
+}
+
+func (s *Seeder) ensureAdminUser(username, password, displayName string) (*models.User, error) {
+	var user models.User
+	if err := db.MasterDB.Where("username = ?", username).First(&user).Error; err == nil {
+		return &user, nil
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user = models.User{
+		Username: username,
+		Name:     displayName,
+		Password: string(hashedPassword),
+		Status:   true,
+	}
+	// Không set school_id=0 (vi phạm FK); để NULL
+	if err := db.MasterDB.Select("Username", "Name", "Password", "Status").Create(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *Seeder) ensureUserRole(userID, roleID int64) error {
+	var ref models.UserRefRole
+	err := db.MasterDB.Where("user_id = ? AND role_id = ?", userID, roleID).First(&ref).Error
+	if err == nil {
+		return nil
+	}
+	return db.MasterDB.Create(&models.UserRefRole{UserId: userID, RoleId: roleID}).Error
+}
+
+func (s *Seeder) seedPermissionString(permission, group, name string, role *models.Role) {
+	var perm models.Permission
+	db.MasterDB.Where(models.Permission{Permission: permission}).
+		Assign(models.Permission{Group: group, Name: name}).
+		FirstOrCreate(&perm)
+
+	var rolePerm models.RolePermission
+	if err := db.MasterDB.Where("role_id = ? AND permission_id = ?", role.ID, perm.ID).First(&rolePerm).Error; err != nil {
+		db.MasterDB.Create(&models.RolePermission{
+			RoleID:       role.ID,
+			PermissionID: int64(perm.ID),
+		})
+	}
 }
 
 func (s *Seeder) seedPermissions(perms map[string]config.PermissionGroup, role *models.Role) {
