@@ -1,1 +1,0 @@
-ALTER TABLE public.feedbacks DROP COLUMN IF EXISTS status; 

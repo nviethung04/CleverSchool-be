@@ -1,1 +1,0 @@
-ALTER TABLE public.feedbacks ADD COLUMN IF NOT EXISTS status bigint DEFAULT 1; 

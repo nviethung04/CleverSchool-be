@@ -1,2 +1,0 @@
-ALTER TABLE lesson_plans
-ALTER COLUMN name TYPE VARCHAR(50);

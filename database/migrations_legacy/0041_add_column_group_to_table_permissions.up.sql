@@ -1,0 +1,2 @@
+ALTER TABLE permissions
+ADD COLUMN "group" TEXT DEFAULT NULL;

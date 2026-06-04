@@ -1,0 +1,2 @@
+ALTER TABLE degrees
+ADD COLUMN IF NOT EXISTS degree_code VARCHAR(25);

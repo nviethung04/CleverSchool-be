@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS h5p_scores;

@@ -1,2 +1,0 @@
-ALTER TABLE h5p_content_scores
-ALTER COLUMN time DROP NOT NULL;

@@ -1,8 +1,0 @@
-ALTER TABLE courses DROP COLUMN IF EXISTS clone_program_id;
-ALTER TABLE courses DROP COLUMN IF EXISTS clone_info;
-
-ALTER TABLE chapters DROP COLUMN IF EXISTS course_id;
-ALTER TABLE chapters DROP COLUMN IF EXISTS clone_info;
-
-ALTER TABLE lessons DROP COLUMN IF EXISTS clone_info;
-ALTER TABLE lessons DROP COLUMN IF EXISTS program_id;

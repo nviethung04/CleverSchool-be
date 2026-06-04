@@ -1,2 +1,0 @@
-ALTER TABLE courses
-ADD COLUMN "school_id" BIGINT DEFAULT NULL;

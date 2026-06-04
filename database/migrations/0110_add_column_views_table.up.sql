@@ -1,2 +1,0 @@
-ALTER TABLE lesson_plans
-ADD COLUMN views INTEGER DEFAULT 0;

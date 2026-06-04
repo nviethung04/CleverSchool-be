@@ -1,3 +1,0 @@
-ALTER TABLE activity_logs
-ADD COLUMN IF NOT EXISTS session_id TEXT,
-ADD COLUMN IF NOT EXISTS agent TEXT;

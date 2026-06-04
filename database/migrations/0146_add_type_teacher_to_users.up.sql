@@ -1,1 +1,0 @@
-ALTER TABLE public.users ADD COLUMN IF NOT EXISTS type_teacher smallint DEFAULT 0; 

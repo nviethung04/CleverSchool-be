@@ -1,2 +1,0 @@
-ALTER TABLE permissions
-ADD COLUMN IF NOT EXISTS is_display BOOLEAN DEFAULT true;

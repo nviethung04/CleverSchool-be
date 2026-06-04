@@ -1,3 +1,0 @@
-ALTER TABLE courses
-DROP COLUMN IF EXISTS student_count,
-DROP COLUMN IF EXISTS target;

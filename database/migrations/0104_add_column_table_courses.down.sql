@@ -1,7 +1,0 @@
-ALTER TABLE courses
-DROP COLUMN IF EXISTS start_date,
-DROP COLUMN IF EXISTS end_date;
-
-ALTER TABLE courses
-ALTER COLUMN duration TYPE TEXT
-USING duration::TEXT;

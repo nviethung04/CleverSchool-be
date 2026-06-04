@@ -1,0 +1,4 @@
+DROP TABLE IF EXISTS chat_message_reads CASCADE;
+DROP TABLE IF EXISTS chat_message_reactions CASCADE;
+DROP TABLE IF EXISTS message_medias CASCADE;
+DROP TABLE IF EXISTS chat_messages CASCADE;

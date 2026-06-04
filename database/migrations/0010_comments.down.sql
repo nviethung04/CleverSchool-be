@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS exercise_comments CASCADE;
+DROP TABLE IF EXISTS homework_comments CASCADE;
+DROP TABLE IF EXISTS exam_comments CASCADE;

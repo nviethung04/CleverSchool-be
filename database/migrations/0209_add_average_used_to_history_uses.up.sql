@@ -1,1 +1,0 @@
-ALTER TABLE history_uses ADD COLUMN average_used JSONB NOT NULL DEFAULT '{}'::JSONB;

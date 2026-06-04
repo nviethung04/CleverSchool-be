@@ -42,10 +42,11 @@ COPY --from=builder /app/database ./database
 COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/power_point ./power_point
 COPY --from=builder /app/i18n ./i18n
+COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
 # Make the binary executable
-RUN chmod +x ./myapp
+RUN chmod +x ./myapp ./docker-entrypoint.sh
 
 EXPOSE 8080
 
-CMD ["./myapp"]
+CMD ["./docker-entrypoint.sh"]

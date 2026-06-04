@@ -1,1 +1,0 @@
-ALTER TABLE public.feedbacks ADD COLUMN IF NOT EXISTS title text; 

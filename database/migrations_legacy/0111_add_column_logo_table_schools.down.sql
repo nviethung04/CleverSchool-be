@@ -1,0 +1,2 @@
+ALTER TABLE schools
+DROP COLUMN IF EXISTS logo;

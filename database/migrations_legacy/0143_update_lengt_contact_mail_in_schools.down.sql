@@ -1,0 +1,2 @@
+ALTER TABLE schools
+ALTER COLUMN contact_mail TYPE VARCHAR(20);

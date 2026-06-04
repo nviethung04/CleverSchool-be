@@ -1,0 +1,2 @@
+ALTER TABLE feedbacks DROP COLUMN IF EXISTS file_info;
+ALTER TABLE feedbacks DROP COLUMN IF EXISTS role_id;

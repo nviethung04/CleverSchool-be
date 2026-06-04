@@ -4,8 +4,33 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: lms-app
+    environment:
+      PORT: 8080
+      DB_MASTER_HOST: postgres
+      DB_MASTER_PORT: 5432
+      DB_MASTER_USER: lms_user
+      DB_MASTER_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
+      DB_MASTER_NAME: lms_db
+      DB_REPLICA_HOST: postgres
+      DB_REPLICA_PORT: 5432
+      DB_REPLICA_USER: lms_user
+      DB_REPLICA_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
+      DB_REPLICA_NAME: lms_db
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: 0lJc4VUTFmyV
+      REDIS_DB: 0
     ports:
       - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - lms-network
 
   postgres:
     image: postgres:15-alpine
@@ -21,6 +46,11 @@ services:
     restart: unless-stopped
     networks:
       - lms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lms_user -d lms_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
@@ -33,6 +63,11 @@ services:
     restart: unless-stopped
     networks:
       - lms-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "0lJc4VUTFmyV", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 networks:
   lms-network:

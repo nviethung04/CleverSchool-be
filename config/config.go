@@ -65,7 +65,20 @@ func LoadConfig() Config {
 	allowOrigins := []string{}
 	if allowOriginStr := os.Getenv("ALLOW_ORIGINS"); allowOriginStr != "" {
 		for _, origin := range strings.Split(allowOriginStr, ",") {
-			allowOrigins = append(allowOrigins, strings.TrimSpace(origin))
+			origin = strings.TrimSpace(origin)
+			if origin != "" {
+				allowOrigins = append(allowOrigins, origin)
+			}
+		}
+	}
+	if len(allowOrigins) == 0 {
+		allowOrigins = []string{
+			"http://localhost:3000",
+			"http://127.0.0.1:3000",
+			"http://localhost:3001",
+			"http://127.0.0.1:3001",
+			"http://localhost:5173",
+			"http://127.0.0.1:5173",
 		}
 	}
 

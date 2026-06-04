@@ -1,0 +1,2 @@
+ALTER TABLE degrees
+DROP COLUMN IF EXISTS degree_code;

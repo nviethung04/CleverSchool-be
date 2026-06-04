@@ -1,0 +1,2 @@
+ALTER TABLE degrees
+DROP COLUMN IF EXISTS file_url;

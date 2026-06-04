@@ -1,2 +1,0 @@
-DROP INDEX IF EXISTS idx_users_code;
-ALTER TABLE users DROP COLUMN IF EXISTS code;

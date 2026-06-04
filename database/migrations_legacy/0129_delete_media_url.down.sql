@@ -1,0 +1,71 @@
+ALTER TABLE users\
+ADD COLUMN IF NOT EXISTS avatar TEXT;
+
+ALTER TABLE certificates
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE courses
+ADD COLUMN IF NOT EXISTS image TEXT;
+
+ALTER TABLE degrees
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE exam_question_user_manual_scoring
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE exams
+ADD COLUMN IF NOT EXISTS cover_image TEXT;
+
+ALTER TABLE homework_question_user_manual_scoring
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE homeworks
+ADD COLUMN IF NOT EXISTS cover_image TEXT;
+
+ALTER TABLE lesson_plan_parts
+ADD COLUMN IF NOT EXISTS link TEXT;
+
+ALTER TABLE lesson_plans
+ADD COLUMN IF NOT EXISTS cover_image TEXT;
+
+ALTER TABLE level_tests
+ADD COLUMN IF NOT EXISTS cover_image TEXT;
+
+ALTER TABLE schools
+ADD COLUMN IF NOT EXISTS logo TEXT;
+
+ALTER TABLE skills
+ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+ALTER TABLE tags
+ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+ALTER TABLE topics
+ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+ALTER TABLE questions
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE answer_groups
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE answer_coordinates
+ADD COLUMN IF NOT EXISTS media_url TEXT;
+
+ALTER TABLE answer_matchings
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE answer_positions
+ADD COLUMN IF NOT EXISTS media_url TEXT;
+
+ALTER TABLE answers
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE group_answers
+ADD COLUMN IF NOT EXISTS file_url TEXT;
+
+ALTER TABLE answer_matchings
+ADD COLUMN IF NOT EXISTS matching_file_url TEXT;
+
+ALTER TABLE lesson_plan_parts
+ADD COLUMN IF NOT EXISTS cover_image TEXT;

@@ -1,0 +1,1 @@
+-- Drop chat_messages table and its indexes

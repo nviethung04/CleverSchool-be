@@ -1,2 +1,0 @@
-ALTER TABLE holidays
-DROP COLUMN IF EXISTS week_id;
