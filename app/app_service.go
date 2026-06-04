@@ -175,15 +175,22 @@ func RateLimit(r *gin.Engine) *gin.Engine {
 func CronJob() {
 	jobs.StartCleanupCronJob()
 	jobs.StartSyncMediaCronJob()
-	jobs.StartDashboardCacheCronJob()
 	jobs.StartHistoryUseCronJob()
 	jobs.StartSyncKeywordCronJob()
 	jobs.StartClearExportFilesCronJob()
 	jobs.StartDatabaseBackupCronJob()
-	jobs.StartS3CleanupCronJob()
 	jobs.StartHomeworkStatusScoringCronJob()
-	
-	// Daily Statistics Jobs - chạy lúc 1h sáng hàng ngày
-	jobs.StartDailySchoolStatisticsCronJob()
-	jobs.StartDailyCourseStatisticsCronJob()
+
+	// Dashboard background jobs (pre-cache + daily stats) — optional, not MVP-critical.
+	if config.DashboardJobsEnabled() {
+		jobs.StartDashboardCacheCronJob()
+		jobs.StartDailySchoolStatisticsCronJob()
+		jobs.StartDailyCourseStatisticsCronJob()
+	} else {
+		config.Log.Info("Dashboard background jobs disabled (set ENABLE_DASHBOARD_JOBS=true to enable)")
+	}
+
+	if config.S3Configured() {
+		jobs.StartS3CleanupCronJob()
+	}
 }

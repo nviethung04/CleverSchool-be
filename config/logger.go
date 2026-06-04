@@ -25,6 +25,10 @@ type S3Writer struct {
 }
 
 func (w *S3Writer) Write(p []byte) (n int, err error) {
+	if w.Client == nil || w.Bucket == "" {
+		return len(p), nil
+	}
+
 	// Nếu chạy local → ghi file trong local, không push S3
 	if w.Domain == "localhost" || w.Domain == "127.0.0.1" {
 		logDir := "./logs"
@@ -85,12 +89,12 @@ func (w *S3Writer) Write(p []byte) (n int, err error) {
 var Log *logrus.Logger
 
 func InitLogger() {
-    // set timezone VN
-    loc, err := time.LoadLocation("Asia/Ho_Chi_Minh")
-    if err != nil {
-        panic(err)
-    }
-    time.Local = loc
+	// set timezone VN
+	loc, err := time.LoadLocation("Asia/Ho_Chi_Minh")
+	if err != nil {
+		panic(err)
+	}
+	time.Local = loc
 
 	// Domain để đặt tên log
 	domain := os.Getenv("API_DOMAIN")
@@ -99,47 +103,43 @@ func InitLogger() {
 	}
 	domain = ExtractDomainName(domain)
 
-	var s3Client *s3.Client
-	if domain != "localhost" && domain != "127.0.0.1" {
-		// Load AWS config nếu không phải local
+	Log = logrus.New()
+
+	writers := []io.Writer{os.Stdout}
+	if S3Configured() {
 		awsCfg, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
 			panic(err)
 		}
-		s3Client = s3.NewFromConfig(awsCfg)
+		writers = append(writers, &S3Writer{
+			Client:    s3.NewFromConfig(awsCfg),
+			Bucket:    os.Getenv("AWS_BUCKET"),
+			KeyPrefix: "logs",
+			Domain:    domain,
+		})
 	}
 
-	// Custom writer
-	s3Writer := &S3Writer{
-		Client:    s3Client,
-		Bucket:    os.Getenv("AWS_BUCKET"),
-		KeyPrefix: "logs",
-		Domain:    domain,
-	}
-
-	Log = logrus.New()
-
-	// Ghi log ra stdout + writer (S3 hoặc local file)
-	Log.SetOutput(io.MultiWriter(os.Stdout, s3Writer))
+	Log.SetOutput(io.MultiWriter(writers...))
 
 	Log.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
-        TimestampFormat: "2006-01-02 15:04:05",
+		TimestampFormat: "2006-01-02 15:04:05",
 		DisableColors:   true,
 	})
 
 	Log.SetLevel(logrus.InfoLevel)
 
-	if domain == "localhost" || domain == "127.0.0.1" {
-		Log.Infof("📝 Logger initialized, writing to ./logs folder (local mode)")
+	if S3Configured() {
+		Log.Infof("Logger initialized (stdout + S3 bucket: %s)", os.Getenv("AWS_BUCKET"))
+	} else if domain == "localhost" || domain == "127.0.0.1" {
+		Log.Info("Logger initialized (stdout only; local — no S3)")
 	} else {
-		Log.Infof("🚀 Logger initialized, writing to S3 bucket: %s", os.Getenv("AWS_BUCKET"))
+		Log.Info("Logger initialized (stdout only; S3 not configured)")
+	}
 
-		// Thêm hook Discord nếu có webhook
-		discordWebhook := LoadConfig().DiscordHookUrl
-		if discordWebhook != "" {
-			Log.AddHook(NewAsyncDiscordHook(discordWebhook))
-		}
+	discordWebhook := LoadConfig().DiscordHookUrl
+	if discordWebhook != "" {
+		Log.AddHook(NewAsyncDiscordHook(discordWebhook))
 	}
 }
 

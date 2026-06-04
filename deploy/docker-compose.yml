@@ -39,6 +39,8 @@ services:
 
   api:
     image: ${API_IMAGE:-ghcr.io/cleverschool/cleverschool-api:latest}
+    # Build chỉ khi có source BE ở thư mục cha (../ = cùng cấp deploy/, có Dockerfile)
+    # Trên VPS chỉ có deploy/: dùng API_IMAGE từ GHCR, chạy: docker compose pull api && docker compose up -d
     build:
       context: ..
       dockerfile: Dockerfile

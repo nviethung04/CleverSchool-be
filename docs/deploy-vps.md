@@ -124,19 +124,78 @@ sudo chown -R $USER:$USER /opt/cleverschool-dev /opt/cleverschool-staging /opt/c
 
 ---
 
-### A5. Đưa file deploy lên VPS
+### A5. Clone repo lần đầu lên VPS (khuyến nghị)
 
-**Cách 1 — Clone repo (khuyến nghị lần đầu):**
+Cấu trúc **đúng** (clone cả repo, không chỉ `deploy/`):
 
-```bash
-cd /tmp
-git clone https://github.com/<tên-org-hoặc-user>/CleverSchool.git
-cp -r CleverSchool/deploy/* /opt/cleverschool-dev/deploy/
-cp -r CleverSchool/deploy/* /opt/cleverschool-staging/deploy/
-cp -r CleverSchool/deploy/proxy/* /opt/cleverschool-proxy/
+```text
+/opt/cleverschool-staging/
+├── Dockerfile
+├── go.mod, main.go, database/, ...
+└── deploy/
+    └── .env
 ```
 
-**Cách 2 — Để CI copy sau:** vẫn cần tạo `.env` thủ công trước lần deploy đầu (xem A6).
+GitHub **không** nhận mật khẩu tài khoản khi `git clone` — dùng **Personal Access Token** (PAT) hoặc repo **public**.
+
+#### Cách 1 — Clone một lệnh (repo private, có PAT)
+
+Trên VPS:
+
+```bash
+apt install -y git rsync
+export GITHUB_TOKEN=ghp_xxxxxxxx   # PAT, scope repo (private) hoặc public_repo
+
+git clone -b staging \
+  "https://${GITHUB_TOKEN}@github.com/nviethung04/CleverSchool-be.git" \
+  /opt/cleverschool-staging
+
+cd /opt/cleverschool-staging/deploy
+cp env.staging.viethung.template .env
+nano .env    # sửa mật khẩu nếu cần
+```
+
+#### Cách 2 — Repo public (không cần token)
+
+```bash
+git clone -b staging https://github.com/nviethung04/CleverSchool-be.git /opt/cleverschool-staging
+cd /opt/cleverschool-staging/deploy
+cp env.staging.viethung.template .env && nano .env
+```
+
+#### Cách 3 — Đã clone vào `/tmp` rồi (trường hợp của anh)
+
+Giữ file `.env` cũ, copy **cả repo** lên `/opt/cleverschool-staging`:
+
+```bash
+cp /opt/cleverschool-staging/deploy/.env /tmp/.env.staging.bak
+rsync -a /tmp/CleverSchool-be/ /opt/cleverschool-staging/
+cp /tmp/.env.staging.bak /opt/cleverschool-staging/deploy/.env
+ls /opt/cleverschool-staging/Dockerfile   # phải có file này
+```
+
+#### Sau khi clone xong
+
+```bash
+docker network create cleverschool-edge 2>/dev/null || true
+cd /opt/cleverschool-staging/deploy
+docker compose up -d --build
+docker compose logs api --tail 50
+chmod +x scripts/seed-admin.sh && ./scripts/seed-admin.sh
+```
+
+**Caddy** (đã chạy rồi thì bỏ qua):
+
+```bash
+cp -r /opt/cleverschool-staging/deploy/proxy/* /opt/cleverschool-proxy/
+cd /opt/cleverschool-proxy && docker compose up -d
+```
+
+#### Lần sau — không cần clone lại
+
+Push nhánh `staging` → GitHub Actions tự deploy (cần Secrets). Hoặc `git pull` trong `/opt/cleverschool-staging` rồi `docker compose up -d --build`.
+
+**SCP từ Windows** — chỉ khi không clone được; phải copy **cả source**, không chỉ `deploy/`.
 
 ---
 
@@ -466,6 +525,8 @@ docker exec csstaging-postgres pg_dump -U lms_user lms_db_staging > ~/backup-sta
 | Deploy fail: thiếu `.env` | Tạo `.env` trên VPS (A6) |
 | Pull image 401 | `GHCR_PULL_TOKEN` sai hoặc chưa `docker login ghcr.io` trên VPS |
 | Migration lỗi | `docker compose logs api`; kiểm tra `postgres` healthy |
+| Log `ch.program_id does not exist` | Pull code mới (migration `0025`); hoặc `ENABLE_DASHBOARD_JOBS=false` (mặc định) |
+| Log S3 / EC2 IMDS | Không cấu hình AWS trên VPS là bình thường — log chỉ stdout; không cần `AWS_*` cho MVP |
 | Nhánh tên `dev` thay vì `develop` | Sửa `branches:` trong `.github/workflows/deploy-api.yml` |
 
 ---

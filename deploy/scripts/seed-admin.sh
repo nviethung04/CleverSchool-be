@@ -9,9 +9,14 @@ if [ -f .env ]; then
   set +a
 fi
 COMPOSE="docker compose"
-NETWORK="${COMPOSE_PROJECT_NAME:-cleverschool}_internal"
+# Network do docker compose tạo (tên project trong docker-compose.yml: cleverschool)
+NETWORK="$(docker network ls --format '{{.Name}}' | grep 'cleverschool.*internal' | head -1)"
+if [ -z "$NETWORK" ]; then
+  echo "❌ Chưa thấy network Docker của stack. Chạy: docker compose up -d (trong thư mục deploy) trước."
+  exit 1
+fi
 
-echo "Seeding roles & admin (go run seeder)..."
+echo "Seeding roles & admin (go run seeder) via network ${NETWORK}..."
 docker run --rm \
   --network "${NETWORK}" \
   -v "$(cd .. && pwd)":/app \
