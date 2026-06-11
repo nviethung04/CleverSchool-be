@@ -188,34 +188,6 @@ Content-Type: application/json
 
 Response có `token` → gọi API kèm header: `Token: <token>`.
 
-### Seeder Demo MVP (dữ liệu test luồng chính)
-
-Sau `Role`, chạy thêm để có trường, khóa học, GV/HS, exam + homework đã giao:
-
-```bash
-cd be
-go run ./database/seeder -model Demo
-```
-
-**Trên VPS:**
-
-```bash
-cd /opt/cleverschool-staging/deploy
-chmod +x scripts/seed-demo.sh && ./scripts/seed-demo.sh
-```
-
-Tạo sẵn:
-
-| Thành phần | Giá trị |
-|------------|---------|
-| Trường | CleverSchool Demo (`CS-DEMO`) |
-| Khóa | Khóa Demo - Học kỳ 1 |
-| Bài học | Bài 1 - Hello (có exam + homework) |
-| `teacher1` / `demo123` | Giáo viên chính khóa |
-| `student1`, `student2` / `demo123` | Học sinh |
-
-Chạy lại an toàn — bỏ qua nếu trường `CS-DEMO` đã tồn tại.
-
 ### Seeder khác (tùy chọn)
 
 ```bash

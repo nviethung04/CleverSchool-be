@@ -4,7 +4,6 @@ import (
 	"be-lms/config"
 	"be-lms/database/db"
 	"be-lms/models"
-	redisperm "be-lms/redis"
 	"flag"
 	"fmt"
 	"log"
@@ -26,12 +25,6 @@ func main() {
 	// Connect Database
 	if err := db.ConnectPostgres(cfg); err != nil {
 		log.Fatal("❌ Database connection failed:", err)
-	}
-
-	if cfg.RedisEnabled {
-		if err := db.ConnectRedis(cfg); err != nil {
-			log.Println("⚠️ Redis không kết nối được — seeder vẫn chạy, bỏ qua xóa cache permission")
-		}
 	}
 
 	fmt.Println("🎉 Create fake data")
@@ -60,8 +53,6 @@ func main() {
 		seed.SeedFlashcards()
 	case "Lesson4Flashcard":
 		SeedLesson4Flashcards()
-	case "Demo":
-		seed.SeedDemoMVP()
 	default:
 		seed.SeedQuestions()
 		seed.SeedRoles()
@@ -455,14 +446,6 @@ func (s *Seeder) SeedRoles() {
 	s.seedPermissions(config.GetTeacherPermissions(), teacherRole)
 	s.seedPermissions(config.GetStudentPermissions(), studentRole)
 	s.seedPermissionString("internal.command", "system", "Lệnh nội bộ", adminRole)
-
-	if db.RedisClient != nil {
-		for _, roleID := range []int{int(models.AdminRoleId), int(models.TeacherRoleId), int(models.StudentRoleId)} {
-			_ = redisperm.NewRoleRedis(roleID).ClearRolePermissionsCache()
-		}
-	} else {
-		fmt.Println("ℹ️  Redis chưa bật — sau seed hãy restart API (hoặc bật REDIS_ENABLED) để nạp permission mới")
-	}
 
 	fmt.Printf("✅ Seed roles & permissions xong. Đăng nhập: username=admin password=admin123 (user_id=%d, role_id=%d)\n",
 		adminUser.ID, adminRole.ID)

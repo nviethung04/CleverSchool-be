@@ -45,12 +45,6 @@ func GetPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách môn học", "Tạo môn học", "Sửa môn học", "Xoá môn học", "Xem chi tiết môn học", "Khôi phục môn học"},
 			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
-		"programs": {
-			Group:        "Chương trình",
-			SortPosition: 65,
-			Names:        []string{"Xem danh sách chương trình", "Tạo chương trình", "Sửa chương trình", "Xoá chương trình", "Xem chi tiết chương trình", "Khôi phục chương trình"},
-			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
-		},
 		"courses": {
 			Group:        "Khóa học",
 			SortPosition: 7,
@@ -104,18 +98,6 @@ func GetPermissions() map[string]PermissionGroup {
 			SortPosition: 15,
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"exercises": {
-			Group:        "Bài luyện tập",
-			SortPosition: 145,
-			Names:        []string{"Xem danh sách bài luyện tập", "Tạo bài luyện tập", "Sửa bài luyện tập", "Xoá bài luyện tập", "Xem chi tiết bài luyện tập"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"grades": {
-			Group:        "Khối lớp",
-			SortPosition: 55,
-			Names:        []string{"Xem danh sách khối", "Tạo khối", "Sửa khối", "Xoá khối", "Xem chi tiết khối", "Khôi phục khối"},
-			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
 		"departments": {
 			Group:        "Phòng ban",
@@ -200,12 +182,6 @@ func GetTeacherPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách môn học", "Tạo môn học", "Sửa môn học", "Xoá môn học", "Xem chi tiết môn học", "Khôi phục môn học"},
 			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
-		"programs": {
-			Group:        "Chương trình",
-			SortPosition: 65,
-			Names:        []string{"Xem danh sách chương trình", "Tạo chương trình", "Sửa chương trình", "Xoá chương trình", "Xem chi tiết chương trình", "Khôi phục chương trình"},
-			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
-		},
 		"courses": {
 			Group:        "Khóa học",
 			SortPosition: 7,
@@ -259,18 +235,6 @@ func GetTeacherPermissions() map[string]PermissionGroup {
 			SortPosition: 15,
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"exercises": {
-			Group:        "Bài luyện tập",
-			SortPosition: 145,
-			Names:        []string{"Xem danh sách bài luyện tập", "Tạo bài luyện tập", "Sửa bài luyện tập", "Xoá bài luyện tập", "Xem chi tiết bài luyện tập"},
-			Actions:      []string{"index", "store", "update", "destroy", "show"},
-		},
-		"grades": {
-			Group:        "Khối lớp",
-			SortPosition: 55,
-			Names:        []string{"Xem danh sách khối", "Tạo khối", "Sửa khối", "Xoá khối", "Xem chi tiết khối", "Khôi phục khối"},
-			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
 		"departments": {
 			Group:        "Phòng ban",
@@ -354,12 +318,6 @@ func GetStudentPermissions() map[string]PermissionGroup {
 			Group:        "Môn học",
 			SortPosition: 6,
 			Names:        []string{"Xem danh sách môn học", "Tạo môn học", "Sửa môn học", "Xoá môn học", "Xem chi tiết môn học", "Khôi phục môn học"},
-			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
-		},
-		"programs": {
-			Group:        "Chương trình",
-			SortPosition: 65,
-			Names:        []string{"Xem danh sách chương trình", "Tạo chương trình", "Sửa chương trình", "Xoá chương trình", "Xem chi tiết chương trình", "Khôi phục chương trình"},
 			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
 		"courses": {
