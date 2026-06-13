@@ -70,6 +70,10 @@ services:
       API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN}
       FRONTEND_URL: ${FRONTEND_URL:?Set FRONTEND_URL}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+      APP_FULL_URL: ${APP_FULL_URL:-${API_DOMAIN}}
+    volumes:
+      - api_public:/app/public
+      - api_scorm:/app/scorm-packages
     expose:
       - "8080"
     depends_on:
@@ -91,3 +95,5 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  api_public:
+  api_scorm:

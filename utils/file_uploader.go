@@ -16,7 +16,6 @@ import (
 	"be-lms/config"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 )
@@ -227,14 +226,10 @@ func (fu *FileUploader) DeleteFile(filename string) error {
 	case "s3":
 		key := filepath.ToSlash(filepath.Join(fu.Path, filename))
 
-		cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
-			awsConfig.WithRegion(disk.Region),
-		)
+		client, err := config.NewS3Client(disk)
 		if err != nil {
 			return err
 		}
-
-		client := s3.NewFromConfig(cfg)
 
 		_, err = client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
 			Bucket: aws.String(disk.Bucket),
@@ -319,14 +314,10 @@ func s3Upload(file *multipart.FileHeader, key string, disk config.DiskConfig) (s
 		return "", err
 	}
 
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
-		awsConfig.WithRegion(disk.Region),
-	)
+	client, err := config.NewS3Client(disk)
 	if err != nil {
 		return "", err
 	}
-
-	client := s3.NewFromConfig(cfg)
 
 	ext := filepath.Ext(file.Filename)
 	mimeType := mime.TypeByExtension(ext)
@@ -334,7 +325,7 @@ func s3Upload(file *multipart.FileHeader, key string, disk config.DiskConfig) (s
 		mimeType = "application/octet-stream"
 	}
 
-	// Upload file lên S3
+	// Upload file lên S3 / R2
 	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:      aws.String(disk.Bucket),
 		Key:         aws.String(key),
@@ -351,14 +342,10 @@ func s3Upload(file *multipart.FileHeader, key string, disk config.DiskConfig) (s
 }
 
 func s3UploadFromBytes(fileData []byte, key string, disk config.DiskConfig) (string, error) {
-	cfg, err := awsConfig.LoadDefaultConfig(context.TODO(),
-		awsConfig.WithRegion(disk.Region),
-	)
+	client, err := config.NewS3Client(disk)
 	if err != nil {
 		return "", err
 	}
-
-	client := s3.NewFromConfig(cfg)
 
 	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket:      aws.String(disk.Bucket),
