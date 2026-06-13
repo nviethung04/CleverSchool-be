@@ -12,6 +12,7 @@ import (
 
 type DashboardListEntityRepository interface {
 	GetSchools(c *gin.Context,req *requests.DashboardSchoolListRequest) ([]dto.DashboardSchool, int64, error)
+	GetPrograms(c *gin.Context, schoolID int64, req *requests.DashboardProgramListRequest) ([]dto.DashboardProgram, int64, error)
 	GetCourses(c *gin.Context, userID int64, schoolID int64, onlyUserCourses bool, req *requests.DashboardCourseListRequest) ([]dto.DashboardCourse, int64, error)
 	GetTeachers(c *gin.Context, req *requests.DashboardTeacherListRequest) ([]dto.DashboardTeacher, int64, error)
 	GetSubjects(req *requests.DashboardSubjectListRequest) ([]dto.DashboardSubject, int64, error)
@@ -65,6 +66,48 @@ func (r *dashboardListEntityRepository) GetSchools(c *gin.Context, req *requests
 
 	err := query.Find(&schools).Error
 	return schools, totalCount, err
+}
+
+func (r *dashboardListEntityRepository) GetPrograms(c *gin.Context, schoolID int64, req *requests.DashboardProgramListRequest) ([]dto.DashboardProgram, int64, error) {
+	var programs []dto.DashboardProgram
+	var totalCount int64
+
+	baseRepo := base.NewBaseRepository[models.School]()
+	schoolIdByRole := baseRepo.GetAdminSchoolId(c)
+	if schoolIdByRole > 0 {
+		schoolID = int64(schoolIdByRole)
+	}
+
+	query := db.ReplicaDB.Table("programs").
+		Select("DISTINCT programs.id, programs.name").
+		Where("programs.deleted_at IS NULL")
+
+	if schoolID > 0 {
+		query = query.
+			Joins("JOIN courses ON courses.program_id = programs.id AND courses.deleted_at IS NULL").
+			Joins("JOIN course_schools ON course_schools.course_id = courses.id").
+			Where("course_schools.school_id = ?", schoolID)
+	}
+
+	if err := query.Count(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
+	if req.Limit > 0 && req.Page > 0 {
+		offset := (req.Page - 1) * req.Limit
+		query = query.Offset(offset).Limit(req.Limit)
+	}
+
+	if len(req.Sort) > 0 {
+		for field, order := range req.Sort {
+			query = query.Order(field + " " + order)
+		}
+	} else {
+		query = query.Order("programs.id ASC")
+	}
+
+	err := query.Find(&programs).Error
+	return programs, totalCount, err
 }
 
 func (r *dashboardListEntityRepository) GetCourses(c *gin.Context, userID int64, schoolID int64, onlyUserCourses bool, req *requests.DashboardCourseListRequest) ([]dto.DashboardCourse, int64, error) {

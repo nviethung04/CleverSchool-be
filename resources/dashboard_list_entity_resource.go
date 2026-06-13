@@ -39,6 +39,21 @@ func DashboardCourseListCollection(courses []dto.DashboardCourse) []*prot.Dashbo
 	return result
 }
 
+func DashboardProgramListResource(program dto.DashboardProgram) *prot.DashboardProgramList {
+	return &prot.DashboardProgramList{
+		Id:   program.ID,
+		Name: program.Name,
+	}
+}
+
+func DashboardProgramListCollection(programs []dto.DashboardProgram) []*prot.DashboardProgramList {
+	var result []*prot.DashboardProgramList
+	for _, program := range programs {
+		result = append(result, DashboardProgramListResource(program))
+	}
+	return result
+}
+
 func DashboardTeacherListResource(teacher dto.DashboardTeacher) *prot.DashboardTeacherList {
 	return &prot.DashboardTeacherList{
 		Id:   teacher.ID,

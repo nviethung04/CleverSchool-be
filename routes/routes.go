@@ -388,6 +388,7 @@ func InitRoutes(router *gin.Engine) {
 		dashboardRouter.GET("/exam-list", dashboardListEntityController.GetExams)
 		dashboardRouter.GET("/homework-list", dashboardListEntityController.GetHomeworks)
 		dashboardRouter.GET("/school-list", dashboardListEntityController.GetSchools)
+		dashboardRouter.GET("/program-list", dashboardListEntityController.GetPrograms)
 		dashboardRouter.GET("/course-list", dashboardListEntityController.GetCourses)
 		dashboardRouter.GET("/lesson-list", dashboardListEntityController.GetLessons)
 		dashboardRouter.GET("/teacher-list", dashboardListEntityController.GetTeachers)

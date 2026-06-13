@@ -14,6 +14,13 @@ type DashboardCourseListRequest struct {
 	ProgramID int64             `json:"program_id" form:"program_id"`
 }
 
+type DashboardProgramListRequest struct {
+	Page     int               `json:"page" form:"page"`
+	Limit    int               `json:"limit" form:"limit"`
+	Sort     map[string]string `json:"sort" form:"sort"`
+	SchoolID int64             `json:"school_id" form:"school_id"`
+}
+
 type DashboardTeacherListRequest struct {
 	Page     int               `json:"page" form:"page"`
 	Limit    int               `json:"limit" form:"limit"`

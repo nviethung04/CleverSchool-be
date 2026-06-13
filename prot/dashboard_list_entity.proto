@@ -30,6 +30,17 @@ message DashboardCourseListResponse {
   int64 total = 2;
 }
 
+// Dashboard Program List
+message DashboardProgramList {
+  int64 id = 1;
+  string name = 2;
+}
+
+message DashboardProgramListResponse {
+  repeated DashboardProgramList programs = 1;
+  int64 total = 2;
+}
+
 // Dashboard Teacher List
 message DashboardTeacherList {
   int64 id = 1;

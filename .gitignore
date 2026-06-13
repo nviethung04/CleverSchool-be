@@ -1,4 +1,5 @@
 .env
+deploy/bin/
 myapp
 public
 power_point/*

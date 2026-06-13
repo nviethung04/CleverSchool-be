@@ -13,6 +13,7 @@ import (
 
 type DashboardListEntityService interface {
 	GetSchools(c *gin.Context, req *requests.DashboardSchoolListRequest) (*prot.DashboardSchoolListResponse, error)
+	GetPrograms(c *gin.Context, req *requests.DashboardProgramListRequest) (*prot.DashboardProgramListResponse, error)
 	GetCourses(c *gin.Context, req *requests.DashboardCourseListRequest) (*prot.DashboardCourseListResponse, error)
 	GetTeachers(c *gin.Context, req *requests.DashboardTeacherListRequest) (*prot.DashboardTeacherListResponse, error)
 	GetSubjects(c *gin.Context, req *requests.DashboardSubjectListRequest) (*prot.DashboardSubjectListResponse, error)
@@ -40,6 +41,18 @@ func (s *dashboardListEntityService) GetSchools(c *gin.Context, req *requests.Da
 	return &prot.DashboardSchoolListResponse{
 		Schools: resources.DashboardSchoolListCollection(schools),
 		Total:   totalCount,
+	}, nil
+}
+
+func (s *dashboardListEntityService) GetPrograms(c *gin.Context, req *requests.DashboardProgramListRequest) (*prot.DashboardProgramListResponse, error) {
+	programs, totalCount, err := s.repo.GetPrograms(c, req.SchoolID, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &prot.DashboardProgramListResponse{
+		Programs: resources.DashboardProgramListCollection(programs),
+		Total:    totalCount,
 	}, nil
 }
 

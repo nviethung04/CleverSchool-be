@@ -41,6 +41,17 @@ func (ctl *DashboardListEntityController) GetCourses(c *gin.Context) {
 	utils.Respond(c, resp, err, "")
 }
 
+func (ctl *DashboardListEntityController) GetPrograms(c *gin.Context) {
+	var req requests.DashboardProgramListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		utils.Respond(c, nil, err, "")
+		return
+	}
+
+	resp, err := ctl.svc.GetPrograms(c, &req)
+	utils.Respond(c, resp, err, "")
+}
+
 func (ctl *DashboardListEntityController) GetTeachers(c *gin.Context) {
 	var req requests.DashboardTeacherListRequest
 	if err := c.ShouldBindQuery(&req); err != nil {

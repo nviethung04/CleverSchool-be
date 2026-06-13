@@ -16,6 +16,11 @@ type DashboardCourse struct {
 	ObjectTitle string `json:"object_title"`
 }
 
+type DashboardProgram struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
 type DashboardTeacher struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`

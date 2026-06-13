@@ -3,6 +3,7 @@ package utils
 import (
 	"be-lms/config"
 	"be-lms/i18n"
+	"be-lms/models"
 	"bytes"
 	"fmt"
 	"io"
@@ -59,7 +60,7 @@ func GetCurrentUserId(c *gin.Context) int {
 func GetCurrentRoleId(c *gin.Context) int {
 	idVal, ok := c.Get("roleID")
 	if !ok {
-		return 0
+		return resolveRoleIdFromContext(c, 0)
 	}
 
 	var id int
@@ -71,10 +72,64 @@ func GetCurrentRoleId(c *gin.Context) int {
 	case float64:
 		id = int(v)
 	default:
-		return 0
+		return resolveRoleIdFromContext(c, 0)
 	}
 
-	return id
+	return resolveRoleIdFromContext(c, id)
+}
+
+func isKnownRoleId(id int) bool {
+	return id == models.AdminRoleId ||
+		id == models.TeacherRoleId ||
+		id == models.StudentRoleId ||
+		id == models.SchoolRoleId ||
+		id == models.ReadOnlyRoleId
+}
+
+// resolveRoleIdFromContext maps JWT role_id to an effective role id.
+// Login stores DefaultPageID in role_id (often 0); role_ids holds the real role ids.
+func resolveRoleIdFromContext(c *gin.Context, roleID int) int {
+	if isKnownRoleId(roleID) {
+		return roleID
+	}
+
+	roleIDsVal, ok := c.Get("roleIDs")
+	if !ok {
+		return roleID
+	}
+
+	roleIDs, ok := roleIDsVal.([]int)
+	if !ok || len(roleIDs) == 0 {
+		return roleID
+	}
+
+	roleType, _ := c.Get("roleType")
+	roleTypeStr, _ := roleType.(string)
+
+	for _, rid := range roleIDs {
+		switch roleTypeStr {
+		case models.PageAdmin:
+			if rid == models.AdminRoleId || rid == models.SchoolRoleId || rid == models.ReadOnlyRoleId {
+				return rid
+			}
+		case models.PageTeacher:
+			if rid == models.TeacherRoleId {
+				return rid
+			}
+		case models.PageStudent:
+			if rid == models.StudentRoleId {
+				return rid
+			}
+		}
+	}
+
+	for _, rid := range roleIDs {
+		if isKnownRoleId(rid) {
+			return rid
+		}
+	}
+
+	return roleIDs[0]
 }
 func GetCurrentSchoolId(c *gin.Context) int {
 	idVal, ok := c.Get("schoolID")
