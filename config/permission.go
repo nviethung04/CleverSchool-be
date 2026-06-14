@@ -99,6 +99,30 @@ func GetPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
 		},
+		"programs": {
+			Group:        "Chương trình học",
+			SortPosition: 16,
+			Names:        []string{"Xem danh sách chương trình", "Tạo chương trình", "Sửa chương trình", "Xoá chương trình", "Xem chi tiết chương trình", "Khôi phục chương trình"},
+			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
+		},
+		"grades": {
+			Group:        "Khối lớp",
+			SortPosition: 17,
+			Names:        []string{"Xem danh sách khối", "Tạo khối", "Sửa khối", "Xoá khối", "Xem chi tiết khối", "Khôi phục khối"},
+			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
+		},
+		"exercises": {
+			Group:        "Bài tập",
+			SortPosition: 18,
+			Names:        []string{"Xem danh sách bài tập", "Tạo bài tập", "Sửa bài tập", "Xoá bài tập", "Xem chi tiết bài tập"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"medias": {
+			Group:        "Tệp tin",
+			SortPosition: 19,
+			Names:        []string{"Xem danh sách tệp tin", "Tạo tệp tin", "Sửa tệp tin", "Xoá tệp tin"},
+			Actions:      []string{"index", "store", "update", "destroy"},
+		},
 		"departments": {
 			Group:        "Phòng ban",
 			SortPosition: 15,
@@ -235,6 +259,30 @@ func GetTeacherPermissions() map[string]PermissionGroup {
 			SortPosition: 15,
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"programs": {
+			Group:        "Chương trình học",
+			SortPosition: 16,
+			Names:        []string{"Xem danh sách chương trình", "Tạo chương trình", "Sửa chương trình", "Xoá chương trình", "Xem chi tiết chương trình", "Khôi phục chương trình"},
+			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
+		},
+		"grades": {
+			Group:        "Khối lớp",
+			SortPosition: 17,
+			Names:        []string{"Xem danh sách khối", "Tạo khối", "Sửa khối", "Xoá khối", "Xem chi tiết khối", "Khôi phục khối"},
+			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
+		},
+		"exercises": {
+			Group:        "Bài tập",
+			SortPosition: 18,
+			Names:        []string{"Xem danh sách bài tập", "Tạo bài tập", "Sửa bài tập", "Xoá bài tập", "Xem chi tiết bài tập"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"medias": {
+			Group:        "Tệp tin",
+			SortPosition: 19,
+			Names:        []string{"Xem danh sách tệp tin", "Tạo tệp tin", "Sửa tệp tin", "Xoá tệp tin"},
+			Actions:      []string{"index", "store", "update", "destroy"},
 		},
 		"departments": {
 			Group:        "Phòng ban",
@@ -373,6 +421,12 @@ func GetStudentPermissions() map[string]PermissionGroup {
 			SortPosition: 15,
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"medias": {
+			Group:        "Tệp tin",
+			SortPosition: 16,
+			Names:        []string{"Sửa tệp tin"},
+			Actions:      []string{"update"},
 		},
 	}
 }

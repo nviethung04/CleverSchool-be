@@ -4,6 +4,7 @@ import (
 	"be-lms/config"
 	"be-lms/database/db"
 	"be-lms/models"
+	redisperm "be-lms/redis"
 	"flag"
 	"fmt"
 	"log"
@@ -25,6 +26,12 @@ func main() {
 	// Connect Database
 	if err := db.ConnectPostgres(cfg); err != nil {
 		log.Fatal("❌ Database connection failed:", err)
+	}
+
+	if cfg.RedisEnabled {
+		if err := db.ConnectRedis(cfg); err != nil {
+			log.Println("⚠️ Redis không kết nối được — seed vẫn chạy, nhớ xóa cache permission thủ công")
+		}
 	}
 
 	fmt.Println("🎉 Create fake data")
@@ -447,8 +454,23 @@ func (s *Seeder) SeedRoles() {
 	s.seedPermissions(config.GetStudentPermissions(), studentRole)
 	s.seedPermissionString("internal.command", "system", "Lệnh nội bộ", adminRole)
 
+	s.clearRolePermissionCache()
+
 	fmt.Printf("✅ Seed roles & permissions xong. Đăng nhập: username=admin password=admin123 (user_id=%d, role_id=%d)\n",
 		adminUser.ID, adminRole.ID)
+}
+
+func (s *Seeder) clearRolePermissionCache() {
+	if db.RedisClient == nil {
+		fmt.Println("ℹ️  Redis chưa bật — sau seed chạy: redis-cli DEL permissions:role:1 permissions:role:2 permissions:role:3")
+		return
+	}
+	for _, roleID := range []int{int(models.AdminRoleId), int(models.TeacherRoleId), int(models.StudentRoleId)} {
+		if err := redisperm.NewRoleRedis(roleID).ClearRolePermissionsCache(); err != nil {
+			fmt.Printf("⚠️ Không xóa được cache role %d: %v\n", roleID, err)
+		}
+	}
+	fmt.Println("✅ Đã làm mới cache permission trên Redis")
 }
 
 func (s *Seeder) ensureRole(id int64, name, defaultPageView string) (*models.Role, error) {
@@ -525,12 +547,14 @@ func (s *Seeder) seedPermissions(perms map[string]config.PermissionGroup, role *
 				name = val.Names[idx]
 			}
 
+			display := true
 			var perm models.Permission
 			db.MasterDB.Where(models.Permission{Permission: permissionStr}).
 				Assign(models.Permission{
 					Group:        val.Group,
 					Name:         name,
 					SortPosition: val.SortPosition,
+					IsDisplay:    &display,
 				}).
 				FirstOrCreate(&perm)
 

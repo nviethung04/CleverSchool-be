@@ -88,6 +88,10 @@ func (rr *RolePermissionRedis) SetPermissions() ([]string, error) {
 }
 
 func (rr *RolePermissionRedis) ClearRolePermissionsCache() error {
+	if db.RedisClient == nil {
+		return nil
+	}
+
 	key := rr.getPermissionsCacheKey()
 	ctx := context.Background()
 

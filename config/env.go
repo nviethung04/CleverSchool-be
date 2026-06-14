@@ -28,6 +28,17 @@ func S3Configured() bool {
 		os.Getenv("AWS_SECRET_ACCESS_KEY") != ""
 }
 
+// MediaDisk returns storage for uploads: MEDIA_DISK env, else s3 when configured, else public (local).
+func MediaDisk() string {
+	if d := strings.TrimSpace(os.Getenv("MEDIA_DISK")); d != "" {
+		return d
+	}
+	if S3Configured() {
+		return S3
+	}
+	return Public
+}
+
 // DashboardJobsEnabled turns on background dashboard pre-cache and daily statistics jobs.
 // Off by default — not required for login, courses, lessons, exams, or homework (MVP).
 func DashboardJobsEnabled() bool {

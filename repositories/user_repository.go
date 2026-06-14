@@ -107,6 +107,20 @@ func NewUserRepository() *userRepository {
 	return repo
 }
 
+// Update không ghi school_id=0 (vi phạm FK); giữ NULL hoặc giá trị hiện có trong DB.
+func (r *userRepository) Update(entity *models.User) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if entity.SchoolID == 0 {
+		if err := r.BeforeUpdate(entity); err != nil {
+			return err
+		}
+		return db.MasterDB.Omit("created_at", "created_by", "author_id", "SchoolID").Save(entity).Error
+	}
+	return r.BaseRepository.Update(entity)
+}
+
 func (r *userRepository) GetStudentsByParentID(parentID int) ([]models.User, error) {
 	var users []models.User
 	err := db.ReplicaDB.Preload("Roles").Where("parent_id = ?", parentID).Find(&users).Error

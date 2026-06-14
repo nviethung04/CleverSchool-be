@@ -11,9 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	Storage = config.S3
-)
+var Storage = config.MediaDisk()
 
 func (Media) TableName() string {
 	return "medias"
