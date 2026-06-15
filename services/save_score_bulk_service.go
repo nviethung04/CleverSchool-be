@@ -738,17 +738,6 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 		return nil, errors.New("answers is required")
 	}
 
-	// Kiểm tra tồn tại dữ liệu làm bài trong exercise_users
-	var existedCount int64
-	if err := db.ReplicaDB.Model(&models.ExerciseUser{}).
-		Where("exercise_id = ? AND user_id = ?", req.ExerciseId, userID).
-		Count(&existedCount).Error; err != nil {
-		return nil, err
-	}
-	if existedCount > 0 {
-		return nil, fmt.Errorf("dữ liệu làm bài đã tồn tại")
-	}
-
 	clonedQuestionsMap := map[string]repositories.ClonedQuestion{}
 	if s.serviceMC != nil {
 		if mc, ok := s.serviceMC.(interface{ GetClonedQuestionService() ClonedQuestionService }); ok {

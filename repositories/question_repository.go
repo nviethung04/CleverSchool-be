@@ -5,6 +5,7 @@ import (
 	"be-lms/models"
 	"be-lms/repositories/base"
 	"errors"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -36,22 +37,39 @@ func NewQuestionRepository() QuestionRepository {
 	}
 }
 
-type QuesstionScore struct {
-	QuestionID int64   `gorm:"column:question_id"`
-	Score      float64 `gorm:"column:score"`
+// Create omits source_question_id when 0 — FK requires NULL or valid source_questions.id.
+func (r *questionRepository) Create(entity *models.Question) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if err := r.BeforeCreate(entity); err != nil {
+		return err
+	}
+	omit := []string{"author_id"}
+	if entity.SourceQuestionId == 0 {
+		omit = append(omit, "SourceQuestionId")
+	}
+	return db.MasterDB.Omit(omit...).Create(entity).Error
 }
 
 func (r *questionRepository) UpdateOrCreate(question models.Question) (int64, error) {
 	if question.ID != 0 {
 		result := db.MasterDB.Model(&models.Question{}).Where("id = ?", question.ID).Updates(question)
 		return question.ID, result.Error
-	} else {
-		result := db.MasterDB.Create(&question)
-		return question.ID, result.Error
 	}
+
+	query := db.MasterDB.Omit("author_id")
+	if question.SourceQuestionId == 0 {
+		query = query.Omit("SourceQuestionId")
+	}
+	result := query.Create(&question)
+	return question.ID, result.Error
 }
 
-
+type QuesstionScore struct {
+	QuestionID int64   `gorm:"column:question_id"`
+	Score      float64 `gorm:"column:score"`
+}
 
 func (r *questionRepository) GetQuestionIdsAndScoresByLevelTestId(levelTestId int64) ([]QuesstionScore, error) {
 	var records []QuesstionScore

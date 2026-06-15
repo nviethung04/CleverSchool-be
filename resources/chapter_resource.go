@@ -137,6 +137,7 @@ func (r *ChapterResourceImpl) FormatModelChapter(chapter *prot.ChapterRequest) *
 
 	return &models.Chapter{
 		ID:          int64(chapter.Id),
+		CourseId:    int64(chapter.CourseId),
 		Title:       chapter.Title,
 		Description: chapter.Description,
 		ObjectTitle: chapter.ObjectTitle,

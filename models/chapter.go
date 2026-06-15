@@ -8,7 +8,8 @@ import (
 
 type Chapter struct {
 	ID           int64  `gorm:"primaryKey;autoIncrement" json:"id"`
-	ProgramId       int64     `gorm:"null" json:"program_id"`
+	CourseId     int64  `gorm:"column:course_id" json:"course_id"`
+	ProgramId    int64  `gorm:"null" json:"program_id"`
 	Title        string `gorm:"size:255;not null" json:"title"`
 	ObjectTitle            string    `gorm:"size:255;not null" json:"object_title"`
 	Description  string `gorm:"type:text;not null" json:"description"`

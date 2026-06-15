@@ -114,7 +114,11 @@ func (r *homeworkRepository) GetByID(id int64, userID int64, c *gin.Context) (*d
 }
 
 func (r *homeworkRepository) Create(hw *models.Homework) error {
-	return db.MasterDB.Create(hw).Error
+	query := db.MasterDB
+	if hw.ProgramId == 0 {
+		query = query.Omit("ProgramId")
+	}
+	return query.Create(hw).Error
 }
 
 func (r *homeworkRepository) Update(hw *models.Homework) error {

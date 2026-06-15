@@ -31,6 +31,22 @@ func NewChapterRepository() ChapterRepository {
 	return repo
 }
 
+func (r *chapterRepository) Create(entity *models.Chapter) error {
+	if entity == nil {
+		return errors.New("entity is nil")
+	}
+	if err := r.BeforeCreate(entity); err != nil {
+		return err
+	}
+
+	query := db.MasterDB.Omit("author_id")
+	if entity.CourseId == 0 {
+		query = query.Omit("CourseId")
+	}
+
+	return query.Create(entity).Error
+}
+
 func (r *chapterRepository) UpdateLessonChapterId(chapterId int64, lessonId int64) error {
 	return db.MasterDB.Model(&models.Lesson{}).
 		Where("id = ?", lessonId).

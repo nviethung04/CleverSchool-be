@@ -97,7 +97,11 @@ func (r *exerciseRepository) GetByID(id int64, c *gin.Context) (*models.Exercise
 }
 
 func (r *exerciseRepository) Create(exercise *models.Exercise) error {
-    return db.MasterDB.Create(exercise).Error
+	query := db.MasterDB
+	if exercise.ProgramId == 0 {
+		query = query.Omit("ProgramId")
+	}
+	return query.Create(exercise).Error
 }
 
 func (r *exerciseRepository) Update(exercise *models.Exercise) error {

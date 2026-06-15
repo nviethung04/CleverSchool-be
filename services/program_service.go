@@ -6,6 +6,7 @@ import (
 	"be-lms/repositories"
 	"be-lms/resources"
 	"be-lms/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -93,12 +94,24 @@ func (s *programService) Create(c *gin.Context, req *prot.ProgramRequest) (*mode
 }
 
 func (s *programService) Update(c *gin.Context, req *prot.ProgramRequest) (*models.Program, error) {
+	s.repo.SetContext(c)
+
+	existing, err := s.repo.FindByID(int(req.Id))
+	if err != nil {
+		return nil, err
+	}
+
 	programResource := resources.NewProgramResource()
 	program := programResource.FormatModelProgram(req)
 
-	s.repo.SetContext(c)
+	if req.SubjectId == 0 {
+		program.SubjectId = existing.SubjectId
+	}
+	if req.Image == "" || strings.HasPrefix(req.Image, "blob:") {
+		program.ImageInfo = existing.ImageInfo
+	}
 
-	err := s.repo.Update(program)
+	err = s.repo.Update(program)
 	if err != nil {
 		return nil, err
 	}

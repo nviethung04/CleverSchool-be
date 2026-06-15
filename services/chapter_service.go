@@ -1,6 +1,7 @@
 package services
 
 import (
+	"be-lms/database/db"
 	"be-lms/models"
 	"be-lms/prot"
 	"be-lms/repositories"
@@ -76,6 +77,16 @@ func (s *chapterService) Create(c *gin.Context, req *prot.ChapterRequest) (*mode
 		sortPosition, _ = s.repo.GetPositionByIdAndProgram(chapter.ProgramId, 0)
 	}
 	chapter.SortPosition = sortPosition
+
+	if chapter.CourseId == 0 && chapter.ProgramId != 0 {
+		var course models.Course
+		if err := db.ReplicaDB.
+			Where("program_id = ?", chapter.ProgramId).
+			Order("id ASC").
+			First(&course).Error; err == nil {
+			chapter.CourseId = course.ID
+		}
+	}
 
 	if err := s.repo.Create(chapter); err != nil {
 		return nil, err

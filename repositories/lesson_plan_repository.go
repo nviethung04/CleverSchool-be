@@ -110,7 +110,12 @@ func (r *lessonPlanRepository) GetByID(id int, c *gin.Context) (*models.LessonPl
 func (r *lessonPlanRepository) Create(lp *models.LessonPlan, lessonID int) error {
 	tx := db.MasterDB.Begin()
 
-	if err := tx.Omit("course_id").Create(lp).Error; err != nil {
+	query := tx.Omit("course_id")
+	if lp.ProgramId == 0 {
+		query = query.Omit("ProgramId")
+	}
+
+	if err := query.Create(lp).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -192,17 +197,12 @@ func (r *lessonPlanRepository) SyncUpdate(lp *models.LessonPlan) error {
 }
 
 func (r *lessonPlanRepository) Delete(id int, deletedBy int64) error {
-	model := models.LessonPlan{}
-	if err := db.MasterDB.First(&model, id).Error; err != nil {
+	if err := db.MasterDB.Model(&models.LessonPlan{}).
+		Where("id = ?", id).
+		Update("deleted_by", deletedBy).Error; err != nil {
 		return err
 	}
-
-	model.DeletedBy = deletedBy
-
-	if err := db.MasterDB.Save(&model).Error; err != nil {
-		return err
-	}
-	return db.MasterDB.Delete(&model).Error
+	return db.MasterDB.Delete(&models.LessonPlan{}, id).Error
 }
 
 func (r *lessonPlanRepository) DeleteLessonPlansLesson(lessonPlanID, lessonID int) error {

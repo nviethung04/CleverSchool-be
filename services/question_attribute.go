@@ -20,7 +20,9 @@ func (s *questionService) StoreAttribute(c *gin.Context, id int64, req *prot.Que
 			ParentAttributeID: &value.Id,
 		}
 
-		s.repo.UpdateOrCreateAttribute(attribute)
+		if err := s.repo.UpdateOrCreateAttribute(attribute); err != nil {
+			return err
+		}
 
 		attributeIds = append(attributeIds, value.Value.Id)
 	}

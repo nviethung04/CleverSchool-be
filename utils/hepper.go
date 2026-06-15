@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -352,21 +353,27 @@ func FormatNumberWithComma(n int) string {
 	return fmt.Sprintf("%d", n)
 }
 
+func NormalizeMediaPath(p string) string {
+	p = filepath.ToSlash(strings.TrimSpace(p))
+	return strings.TrimLeft(p, "/")
+}
+
 func StaticURL(path string, storage string) string {
-	// Returns integer if already an absolute URL
+	// Returns as-is if already an absolute URL
 	if path == "" || strings.Contains(path, "http") {
 		return path
 	}
 
-	storage = "s3"
+	path = NormalizeMediaPath(path)
 
-	// if strings.Contains(path, "power-point") {
-	// 	storage = config.Public
-	// } else {
-	// 	storage = "s3"
-	// }
+	if strings.Contains(path, "power-point") {
+		storage = config.Public
+	}
 
 	disk, ok := config.Disks[storage]
+	if !ok {
+		disk, ok = config.Disks[config.S3]
+	}
 	if !ok {
 		return path
 	}
@@ -376,9 +383,14 @@ func StaticURL(path string, storage string) string {
 		base = "/" + storage
 	}
 
-	fullURL := strings.TrimRight(base, "/") + "/" + strings.TrimLeft(path, "/")
+	segments := strings.Split(path, "/")
+	for i, segment := range segments {
+		segments[i] = url.PathEscape(segment)
+	}
+	encodedPath := strings.Join(segments, "/")
 
-	fullURL = strings.ReplaceAll(fullURL, "+", "%2B")
+	fullURL := strings.TrimRight(filepath.ToSlash(base), "/") + "/" + encodedPath
+
 	fullURL = strings.ReplaceAll(fullURL, "+", "%2B")
 	fullURL = strings.ReplaceAll(fullURL, "power-point", "power_point")
 
@@ -386,31 +398,37 @@ func StaticURL(path string, storage string) string {
 }
 
 func StripDomain(fullURL string, storage string) string {
-	appUrl := config.LoadConfig().AppUrl
+	fullURL = filepath.ToSlash(fullURL)
 	fullURL = strings.ReplaceAll(fullURL, "power_point", "power-point")
 
-	if strings.HasPrefix(fullURL, appUrl) {
-		trimmed := strings.TrimPrefix(fullURL, appUrl)
-		return strings.TrimPrefix(trimmed, "/")
+	appUrl := filepath.ToSlash(config.LoadConfig().AppUrl)
+	if appUrl != "" && strings.HasPrefix(fullURL, appUrl) {
+		return NormalizeMediaPath(strings.TrimPrefix(fullURL, appUrl))
 	}
 
-	disk, ok := config.Disks[storage]
-	if !ok {
-		config.Log.Info("StripDomain disk error")
-		return fullURL
+	if disk, ok := config.Disks[storage]; ok && disk.URL != "" {
+		if trimmed := trimDiskURLPrefix(fullURL, disk.URL); trimmed != fullURL {
+			return trimmed
+		}
 	}
 
-	base := disk.URL
-
-	if fullURL == "" || base == "" {
-		return fullURL
+	for _, disk := range config.Disks {
+		if disk.URL == "" {
+			continue
+		}
+		if trimmed := trimDiskURLPrefix(fullURL, disk.URL); trimmed != fullURL {
+			return trimmed
+		}
 	}
 
+	return NormalizeMediaPath(fullURL)
+}
+
+func trimDiskURLPrefix(fullURL, diskURL string) string {
+	base := filepath.ToSlash(strings.TrimRight(diskURL, "/"))
 	if strings.HasPrefix(fullURL, base) {
-		trimmed := strings.TrimPrefix(fullURL, base)
-		return strings.TrimPrefix(trimmed, "/")
+		return NormalizeMediaPath(strings.TrimPrefix(fullURL, base))
 	}
-
 	return fullURL
 }
 

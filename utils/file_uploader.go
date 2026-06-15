@@ -100,7 +100,7 @@ func (fu *FileUploader) Store(c *gin.Context) (*FileInfo, error) {
 		}
 
 		fullPath = filepath.Join("public", fullPath)
-		relative := strings.TrimPrefix(fullPath, disk.Root)
+		relative := filepath.ToSlash(strings.TrimPrefix(fullPath, disk.Root))
 		fileFullPath = filename
 		fileURL = strings.TrimRight(disk.URL, "/") + "/" + strings.TrimLeft(relative, "/")
 	case "scorm":
@@ -115,7 +115,7 @@ func (fu *FileUploader) Store(c *gin.Context) (*FileInfo, error) {
 		}
 
 		fullPath = filepath.Join("scorm", fullPath)
-		relative := strings.TrimPrefix(fullPath, disk.Root)
+		relative := filepath.ToSlash(strings.TrimPrefix(fullPath, disk.Root))
 		fileFullPath = filename
 		fileURL = strings.TrimRight(disk.URL, "/") + "/" + strings.TrimLeft(relative, "/")
 

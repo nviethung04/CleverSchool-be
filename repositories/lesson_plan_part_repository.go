@@ -68,7 +68,18 @@ func (r *lessonPlanPartRepository) GetByID(id int64, c *gin.Context) (*models.Le
 }
 
 func (r *lessonPlanPartRepository) Create(part *models.LessonPlanPart) error {
-	return db.MasterDB.Create(part).Error
+	query := db.MasterDB
+	omit := []string{}
+	if part.ProgramId == 0 {
+		omit = append(omit, "ProgramId")
+	}
+	if part.CourseID == 0 {
+		omit = append(omit, "CourseID")
+	}
+	if len(omit) > 0 {
+		query = query.Omit(omit...)
+	}
+	return query.Create(part).Error
 }
 
 func (r *lessonPlanPartRepository) Update(part *models.LessonPlanPart) error {
@@ -124,15 +135,10 @@ func (r *lessonPlanPartRepository) Update(part *models.LessonPlanPart) error {
 }
 
 func (r *lessonPlanPartRepository) Delete(id int64, deletedBy int64) error {
-	model := models.LessonPlanPart{}
-	if err := db.MasterDB.First(&model, id).Error; err != nil {
+	if err := db.MasterDB.Model(&models.LessonPlanPart{}).
+		Where("id = ?", id).
+		Update("deleted_by", deletedBy).Error; err != nil {
 		return err
 	}
-
-	model.DeletedBy = deletedBy
-
-	if err := db.MasterDB.Save(&model).Error; err != nil {
-		return err
-	}
-	return db.MasterDB.Delete(&model).Error
+	return db.MasterDB.Delete(&models.LessonPlanPart{}, id).Error
 }

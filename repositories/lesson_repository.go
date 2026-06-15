@@ -80,6 +80,22 @@ func NewLessonRepository() LessonRepository {
 	return repo
 }
 
+func (r *lessonRepository) Create(entity *models.Lesson) error {
+	if entity == nil {
+		return errors.New("entity is nil")
+	}
+	if err := r.BeforeCreate(entity); err != nil {
+		return err
+	}
+
+	query := db.MasterDB.Omit("author_id")
+	if entity.ChapterID == 0 {
+		query = query.Omit("ChapterID")
+	}
+
+	return query.Create(entity).Error
+}
+
 func (r *lessonRepository) UpdateOrCreateDependency(dependency models.LessonDependency) error {
 	var existing models.LessonDependency
 	err := db.MasterDB.

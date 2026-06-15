@@ -6,6 +6,7 @@ import (
 	"be-lms/repositories"
 	"be-lms/utils"
 	"sort"
+	"strings"
 )
 
 type ProgramResource interface {
@@ -70,6 +71,7 @@ func (r *ProgramResourceImpl) FormatProgram(program *models.Program) *prot.Progr
 
 	return &prot.Program{
 		Id:              int64(program.ID),
+		SubjectId:       program.SubjectId,
 		Name:            program.Name,
 		Description:     program.Description,
 		Courses:         courseResource.FormatCourses(courses),
@@ -89,7 +91,10 @@ func (r *ProgramResourceImpl) FormatModelProgram(program *prot.ProgramRequest) *
 		return nil
 	}
 
-	imageUrl := utils.StripDomain(program.Image, models.Storage)
+	imageUrl := ""
+	if program.Image != "" && !strings.HasPrefix(program.Image, "blob:") {
+		imageUrl = utils.NormalizeMediaPath(utils.StripDomain(program.Image, models.Storage))
+	}
 
 	mediaRepo := repositories.NewMediaRepository()
 	imageInfo := mediaRepo.GetMediaInfo(imageUrl, models.Storage)

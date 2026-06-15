@@ -94,7 +94,11 @@ func (r *examRepository) GetByID(id int64, c *gin.Context) (*models.Exam, error)
 }
 
 func (r *examRepository) Create(exam *models.Exam) error {
-	return db.MasterDB.Create(exam).Error
+	query := db.MasterDB
+	if exam.ProgramId == 0 {
+		query = query.Omit("ProgramId")
+	}
+	return query.Create(exam).Error
 }
 
 func (r *examRepository) Update(exam *models.Exam) error {

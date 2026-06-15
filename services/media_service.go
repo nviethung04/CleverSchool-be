@@ -90,7 +90,7 @@ func (s *mediaService) UploadFile(c *gin.Context) (*prot.File, error) {
 		}
 	}
 
-	stripped := utils.StripDomain(info.Url, models.Storage)
+	stripped := utils.NormalizeMediaPath(utils.StripDomain(info.Url, models.Storage))
 	fileUrl := &stripped
 
 	// B5: Save media

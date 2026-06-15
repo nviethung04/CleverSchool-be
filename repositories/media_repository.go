@@ -100,7 +100,14 @@ func (r *mediaRepository) FindFolderByFilePathAndParentMaster(filePath string, p
 	return &media, nil
 }
 
+func normalizeStaticURL(url string) string {
+	url = strings.ReplaceAll(strings.TrimSpace(url), "\\", "/")
+	return strings.TrimLeft(url, "/")
+}
+
 func (r *mediaRepository) GetMediaInfo(url string, disk string) models.MediaInfo {
+	url = normalizeStaticURL(url)
+
 	mediaInfo := models.MediaInfo{
 		Path: url,
 		Disk: models.Storage,

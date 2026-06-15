@@ -5,6 +5,7 @@ import (
 	"be-lms/models"
 	"be-lms/repositories/base"
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -32,6 +33,22 @@ func NewProgramRepository() ProgramRepository {
 	return &programRepository{
 		BaseRepository: base.NewBaseRepository[models.Program](),
 	}
+}
+
+func (r *programRepository) Update(entity *models.Program) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if err := r.BeforeUpdate(entity); err != nil {
+		return err
+	}
+
+	omit := []string{"created_at", "created_by", "author_id"}
+	if entity.SubjectId == 0 {
+		omit = append(omit, "SubjectId")
+	}
+
+	return db.MasterDB.Omit(omit...).Save(entity).Error
 }
 
 func (r *programRepository) FindCourseByProgramID(id int) models.Course {
