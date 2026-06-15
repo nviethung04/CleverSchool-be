@@ -20,6 +20,10 @@ func NewLessonPlanPartResource() LessonPlanPartResource {
 	return &LessonPlanPartResourceImpl{}
 }
 
+func mediaDisk(disk string) string {
+	return models.ResolveStorageDisk(disk)
+}
+
 func (r *LessonPlanPartResourceImpl) FormatLessonPlanPart(part *models.LessonPlanPart) *prot.LessonPlanPart {
 	if part == nil {
 		return nil
@@ -34,12 +38,12 @@ func (r *LessonPlanPartResourceImpl) FormatLessonPlanPart(part *models.LessonPla
 		Title:        part.Title,
 		Tag:          part.Tag,
 		ObjectTitle:	part.ObjectTitle,
-		CoverImage:   utils.StaticURL(part.CoverImageInfo.Path, models.Storage),
+		CoverImage:   utils.StaticURL(part.CoverImageInfo.Path, mediaDisk(part.CoverImageInfo.Disk)),
 		SortPosition: int32(part.SortPosition),
 		Time:         part.Time,
 		IsClasswork:  part.IsClasswork,
 		FileType:     part.FileType,
-		Link:         utils.StaticURL(part.LinkInfo.Path, models.Storage),
+		Link:         utils.StaticURL(part.LinkInfo.Path, mediaDisk(part.LinkInfo.Disk)),
 		LinkType:     part.LinkType,
 		GuideTeacher: part.GuideTeacher,
 		GuideStudent: part.GuideStudent,

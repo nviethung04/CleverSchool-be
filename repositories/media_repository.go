@@ -126,6 +126,9 @@ func (r *mediaRepository) GetMediaInfo(url string, disk string) models.MediaInfo
 
 	mediaInfo.Id = media.ID
 	mediaInfo.Path = *media.StaticURL
+	if media.DiskName != nil && *media.DiskName != "" {
+		mediaInfo.Disk = *media.DiskName
+	}
 
 	return mediaInfo
 }

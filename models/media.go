@@ -11,7 +11,26 @@ import (
 	"gorm.io/gorm"
 )
 
-var Storage = config.MediaDisk()
+// Storage is the active media disk (public local or s3/R2). Set via InitStorage after .env load.
+var Storage string
+
+func InitStorage() {
+	Storage = config.MediaDisk()
+}
+
+func StorageDisk() string {
+	if Storage != "" {
+		return Storage
+	}
+	return config.MediaDisk()
+}
+
+func ResolveStorageDisk(preferred string) string {
+	if preferred != "" {
+		return preferred
+	}
+	return StorageDisk()
+}
 
 func (Media) TableName() string {
 	return "medias"

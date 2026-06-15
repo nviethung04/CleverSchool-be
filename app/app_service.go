@@ -7,6 +7,7 @@ import (
 	"be-lms/i18n"
 	"be-lms/jobs"
 	"be-lms/middleware"
+	"be-lms/models"
 	"be-lms/redis"
 	"be-lms/routes"
 	"be-lms/utils"
@@ -35,10 +36,11 @@ func RunAppServer() {
 
 	cfg := config.LoadConfig()
 	config.InitDisks()
+	models.InitStorage()
 	config.InitLogger()
 
 	config.Log.Warn("🚀 Ứng dụng đang khởi động...")
-	config.Log.Warnf("🔧 App Debug Mode: %v", cfg.AppDebug)
+	config.Log.Warnf("📦 Media disk: %s", models.Storage)
 	config.Log.Warnf("🌐 Port: %s", cfg.Port)
 
 	// Set logging level based on LOG_LEVEL environment variable
