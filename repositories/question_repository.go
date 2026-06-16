@@ -71,21 +71,18 @@ func (r *questionRepository) Update(entity *models.Question) error {
 func (r *questionRepository) Delete(id int) error {
 	var model models.Question
 
-	if err := db.MasterDB.First(&model, id).Error; err != nil {
-		return err
-	}
-
 	if err := r.BeforeDelete(id, &model); err != nil {
 		return err
 	}
 
-	omit := questionOmitZeroSourceID(model.SourceQuestionId, []string{"author_id"})
-	if err := db.MasterDB.Omit(omit...).Save(&model).Error; err != nil {
+	// Chỉ gán deleted_by rồi soft delete — không Save() toàn bộ model (tránh ghi source_question_id=0 vi phạm FK).
+	if err := db.MasterDB.Model(&models.Question{}).
+		Where("id = ?", id).
+		Update("deleted_by", model.DeletedBy).Error; err != nil {
 		return err
 	}
 
-	model.ID = int64(id)
-	return db.MasterDB.Delete(&model).Error
+	return db.MasterDB.Delete(&models.Question{}, id).Error
 }
 
 func (r *questionRepository) UpdateOrCreate(question models.Question) (int64, error) {
