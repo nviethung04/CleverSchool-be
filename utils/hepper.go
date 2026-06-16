@@ -441,7 +441,25 @@ func ToPtrSlice[T any](in []T) []*T {
 }
 
 func ParseDate(dateStr string) (time.Time, error) {
-	return time.Parse("2006-01-02", dateStr)
+	dateStr = strings.TrimSpace(dateStr)
+	if dateStr == "" {
+		return time.Time{}, fmt.Errorf("empty date")
+	}
+
+	layouts := []string{
+		"2006-01-02",
+		time.RFC3339,
+		time.RFC3339Nano,
+		"2006-01-02T15:04:05Z07:00",
+		"2006-01-02 15:04:05",
+	}
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, dateStr); err == nil {
+			return t, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("invalid date: %s", dateStr)
 }
 
 func BoolOrFalse(b *bool) bool {

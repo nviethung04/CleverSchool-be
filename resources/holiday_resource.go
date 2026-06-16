@@ -3,6 +3,7 @@ package resources
 import (
 	"be-lms/models"
 	"be-lms/prot"
+	"be-lms/utils"
 	"time"
 )
 
@@ -25,8 +26,8 @@ func (r *HolidayResourceImpl) FormatHoliday(holiday *models.Holiday) *prot.Holid
 		Id:          holiday.ID,
 		Name:        holiday.Name,
 		Description: holiday.Description,
-		StartDate:   holiday.StartDate.Format("2006-01-02"),
-		EndDate:     holiday.EndDate.Format("2006-01-02"),
+		StartDate:   formatHolidayDate(holiday.StartDate),
+		EndDate:     formatHolidayDate(holiday.EndDate),
 		Type:        holiday.Type,
 		Status:      holiday.Status,
 		SortOrder:   int32(holiday.SortOrder),
@@ -54,15 +55,18 @@ func (r *HolidayResourceImpl) FormatModelHoliday(request *prot.HolidayRequest) *
 		SortOrder:   int(request.SortOrder),
 	}
 
-	// Parse dates
+	if request.WeekId != 0 {
+		holidayWeek.WeekId = request.WeekId
+	}
+
 	if request.StartDate != "" {
-		if startDate, err := time.Parse("2006-01-02", request.StartDate); err == nil {
+		if startDate, err := utils.ParseDate(request.StartDate); err == nil {
 			holidayWeek.StartDate = startDate
 		}
 	}
 
 	if request.EndDate != "" {
-		if endDate, err := time.Parse("2006-01-02", request.EndDate); err == nil {
+		if endDate, err := utils.ParseDate(request.EndDate); err == nil {
 			holidayWeek.EndDate = endDate
 		}
 	}
@@ -78,21 +82,30 @@ func (r *HolidayResourceImpl) ProtToModel(request *prot.Holiday) *models.Holiday
 		Type:        request.Type,
 		Status:      request.Status,
 		SortOrder:   int(request.SortOrder),
-		WeekId:   request.WeekId,
 	}
 
-	// Parse dates
+	if request.WeekId != 0 {
+		holidayWeek.WeekId = request.WeekId
+	}
+
 	if request.StartDate != "" {
-		if startDate, err := time.Parse("2006-01-02", request.StartDate); err == nil {
+		if startDate, err := utils.ParseDate(request.StartDate); err == nil {
 			holidayWeek.StartDate = startDate
 		}
 	}
 
 	if request.EndDate != "" {
-		if endDate, err := time.Parse("2006-01-02", request.EndDate); err == nil {
+		if endDate, err := utils.ParseDate(request.EndDate); err == nil {
 			holidayWeek.EndDate = endDate
 		}
 	}
 
 	return holidayWeek
+}
+
+func formatHolidayDate(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format("2006-01-02")
 }

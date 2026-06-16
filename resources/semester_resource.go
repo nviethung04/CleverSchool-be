@@ -3,6 +3,7 @@ package resources
 import (
 	"be-lms/models"
 	"be-lms/prot"
+	"be-lms/utils"
 	"time"
 )
 
@@ -30,8 +31,8 @@ func (r *SemesterResourceImpl) FormatSemester(semester *models.Semester) *prot.S
 		Id:          semester.ID,
 		Name:        semester.Name,
 		Description: semester.Description,
-		StartDate:   semester.StartDate.Format("2006-01-02"),
-		EndDate:     semester.EndDate.Format("2006-01-02"),
+		StartDate:   formatSemesterDate(semester.StartDate),
+		EndDate:     formatSemesterDate(semester.EndDate),
 		StartWeekId:   semester.StartWeekId,
 		EndWeekId:   semester.EndWeekId,
 		Status:      semester.Status,
@@ -69,21 +70,20 @@ func (r *SemesterResourceImpl) FormatModelSemester(request *prot.SemesterRequest
 		semester.EndWeekId = request.EndWeekId
 	}
 
-	// Parse dates
 	if request.StartDate != "" {
-		if startDate, err := time.Parse("2006-01-02", request.StartDate); err == nil {
+		if startDate, err := utils.ParseDate(request.StartDate); err == nil {
 			semester.StartDate = startDate
 		}
 	}
 
 	if request.EndDate != "" {
-		if endDate, err := time.Parse("2006-01-02", request.EndDate); err == nil {
+		if endDate, err := utils.ParseDate(request.EndDate); err == nil {
 			semester.EndDate = endDate
 		}
 	}
 
 	if request.BeginDate != "" {
-		if beginDate, err := time.Parse("2006-01-02", request.BeginDate); err == nil {
+		if beginDate, err := utils.ParseDate(request.BeginDate); err == nil {
 			semester.BeginDate = beginDate
 		}
 	} else {
@@ -91,4 +91,11 @@ func (r *SemesterResourceImpl) FormatModelSemester(request *prot.SemesterRequest
 	}
 
 	return semester
+}
+
+func formatSemesterDate(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format("2006-01-02")
 }

@@ -105,6 +105,7 @@ func (s *semesterService) Create(c *gin.Context, req *prot.SemesterRequest) (*mo
 		}
 		semester.EndDate = endWeek.EndDate
 	}
+	alignSemesterDates(semester)
 
 	s.repo.SetContext(c)
 
@@ -151,6 +152,7 @@ func (s *semesterService) Update(c *gin.Context, req *prot.SemesterRequest) (*mo
 		}
 		semester.EndDate = endWeek.EndDate
 	}
+	alignSemesterDates(semester)
 
 	s.repo.SetContext(c)
 
@@ -233,20 +235,50 @@ func (s *semesterService) ApplyFilter(c *gin.Context, filter map[string]interfac
 }
 
 func (s *semesterService) StoreHolidays(c *gin.Context, id int64, req *prot.SemesterRequest) error {
+	holidayResource := resources.NewHolidayResource()
+	weekRepo := repositories.NewWeekRepository()
 	holidayIds := make([]int64, 0, len(req.Holidays))
 
 	for _, value := range req.Holidays {
-		holiday := models.SemesterRefHoliday{
-			SemesterId: id,
-			HolidayId:    value.Id,
+		holidayProto := value
+		if holidayProto == nil {
+			continue
 		}
 
-		s.repo.UpdateOrCreateHoliday(holiday)
+		if holidayProto.WeekId != 0 {
+			week, err := weekRepo.FindByID(int(holidayProto.WeekId))
+			if err != nil {
+				return err
+			}
+			holidayProto.StartDate = week.StartDate.Format("2006-01-02")
+			holidayProto.EndDate = week.EndDate.Format("2006-01-02")
+			holidayProto.Type = "week"
+		}
 
-		holidayIds = append(holidayIds, value.Id)
+		holidayModel := holidayResource.ProtToModel(holidayProto)
+		created, err := s.repo.UpdateOrCreate(*holidayModel)
+		if err != nil {
+			return err
+		}
+
+		if err := s.repo.UpdateOrCreateHoliday(models.SemesterRefHoliday{
+			SemesterId: id,
+			HolidayId:  created.ID,
+		}); err != nil {
+			return err
+		}
+
+		holidayIds = append(holidayIds, created.ID)
 	}
 
 	s.repo.DeleteOldHolidays(id, holidayIds)
 
 	return nil
+}
+
+// alignSemesterDates sets begin_date from start_date when weeks supply dates but begin_date was not sent.
+func alignSemesterDates(semester *models.Semester) {
+	if semester.BeginDate.IsZero() && !semester.StartDate.IsZero() {
+		semester.BeginDate = semester.StartDate
+	}
 }

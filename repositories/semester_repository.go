@@ -91,9 +91,15 @@ func (r *semesterRepository) GetIdsByUserID(userID int) ([]int, error) {
 }
 
 func (r *semesterRepository) UpdateOrCreate(holiday models.Holiday) (*models.Holiday, error) {
+	omit := []string{}
+	if holiday.WeekId == 0 {
+		omit = append(omit, "WeekId")
+	}
+
 	if holiday.ID > 0 {
 		err := db.MasterDB.Model(&models.Holiday{}).
 			Where("id = ?", holiday.ID).
+			Omit(omit...).
 			Updates(&holiday).Error
 		if err != nil {
 			return nil, err
@@ -101,7 +107,7 @@ func (r *semesterRepository) UpdateOrCreate(holiday models.Holiday) (*models.Hol
 		return &holiday, nil
 	}
 
-	err := db.MasterDB.Create(&holiday).Error
+	err := db.MasterDB.Omit(omit...).Create(&holiday).Error
 	if err != nil {
 		return nil, err
 	}
