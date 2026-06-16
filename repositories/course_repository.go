@@ -44,6 +44,58 @@ func NewCourseRepository() CourseRepository {
 	return repo
 }
 
+func omitZeroCourseFKs(course *models.Course, omit []string) []string {
+	if course == nil {
+		return omit
+	}
+	// courses.subject_id / courses.program_id are nullable in DB, but 0 violates FK.
+	if course.SubjectId == 0 {
+		omit = append(omit, "SubjectId")
+	}
+	if course.ProgramId == 0 {
+		omit = append(omit, "ProgramId")
+	}
+	return omit
+}
+
+// Override BaseRepository.Create to avoid writing subject_id/program_id = 0 (FK requires NULL or valid id).
+func (r *courseRepository) Create(entity *models.Course) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if err := r.BeforeCreate(entity); err != nil {
+		return err
+	}
+	omit := omitZeroCourseFKs(entity, []string{"author_id"})
+	return db.MasterDB.Omit(omit...).Create(entity).Error
+}
+
+// Override BaseRepository.Update to avoid writing subject_id/program_id = 0 (FK requires NULL or valid id).
+func (r *courseRepository) Update(entity *models.Course) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if err := r.BeforeUpdate(entity); err != nil {
+		return err
+	}
+	omit := omitZeroCourseFKs(entity, []string{"created_at", "created_by", "author_id"})
+	return db.MasterDB.Omit(omit...).Save(entity).Error
+}
+
+// Override BaseRepository.Delete to avoid Save() overwriting nullable FK fields with 0.
+func (r *courseRepository) Delete(id int) error {
+	var model models.Course
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+	if err := db.MasterDB.Model(&models.Course{}).
+		Where("id = ?", id).
+		Update("deleted_by", model.DeletedBy).Error; err != nil {
+		return err
+	}
+	return db.MasterDB.Delete(&models.Course{}, id).Error
+}
+
 func DeleteOldChapters(courseId int64, chapterIds []int64) error {
 	if len(chapterIds) > 0 {
 		if err := db.MasterDB.Where("id NOT IN (?) AND course_id = ?", chapterIds, courseId).Delete(&models.Chapter{}).Error; err != nil {
