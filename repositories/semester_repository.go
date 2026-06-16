@@ -30,6 +30,48 @@ func NewSemesterRepository() SemesterRepository {
 	}
 }
 
+// Override BaseRepository.Create: omit week FK columns when 0 (FK requires NULL or valid weeks.id).
+func (r *semesterRepository) Create(entity *models.Semester) error {
+	if entity == nil {
+		return errors.New("entity is nil")
+	}
+
+	if err := r.BeforeCreate(entity); err != nil {
+		return err
+	}
+
+	omit := []string{"author_id"}
+	if entity.StartWeekId == 0 {
+		omit = append(omit, "StartWeekId")
+	}
+	if entity.EndWeekId == 0 {
+		omit = append(omit, "EndWeekId")
+	}
+
+	return db.MasterDB.Omit(omit...).Create(entity).Error
+}
+
+// Override BaseRepository.Update: avoid writing start_week_id/end_week_id=0 (would violate FK).
+func (r *semesterRepository) Update(entity *models.Semester) error {
+	if entity == nil {
+		return errors.New("entity is nil")
+	}
+
+	if err := r.BeforeUpdate(entity); err != nil {
+		return err
+	}
+
+	omit := []string{"created_at", "created_by", "author_id"}
+	if entity.StartWeekId == 0 {
+		omit = append(omit, "StartWeekId")
+	}
+	if entity.EndWeekId == 0 {
+		omit = append(omit, "EndWeekId")
+	}
+
+	return db.MasterDB.Omit(omit...).Save(entity).Error
+}
+
 func (r *semesterRepository) GetIdsByUserID(userID int) ([]int, error) {
 	var semesterIDs []int
 
