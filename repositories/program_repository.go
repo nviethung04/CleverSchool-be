@@ -73,8 +73,11 @@ func (r *programRepository) DeleteProgram(programId int) error {
 
 	// Lấy danh sách lesson_id theo program
 	var lessonIDs []int64
-	if err := tx.Table("lessons").Where("program_id = ?", programId).
-		Pluck("id", &lessonIDs).Error; err != nil {
+	// NOTE: lessons không có cột program_id. program_id nằm ở chapters, lessons trỏ tới chapters bằng chapter_id.
+	if err := tx.Table("lessons").
+		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
+		Where("chapters.program_id = ?", programId).
+		Pluck("lessons.id", &lessonIDs).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -96,7 +99,6 @@ func (r *programRepository) DeleteProgram(programId int) error {
 		`DELETE FROM exams WHERE program_id = ?`,
 		`DELETE FROM lesson_plan_parts WHERE program_id = ?`,
 		`DELETE FROM lesson_plans WHERE program_id = ?`,
-		`DELETE FROM lessons WHERE program_id = ?`,
 		`DELETE FROM chapters WHERE program_id = ?`,
 		`DELETE FROM courses WHERE program_id = ?`,
 	}
@@ -106,6 +108,16 @@ func (r *programRepository) DeleteProgram(programId int) error {
 			tx.Rollback()
 			return err
 		}
+	}
+
+	// lessons: delete theo chapters.program_id (vì lessons không có program_id)
+	if err := tx.Exec(`
+		DELETE FROM lessons
+		USING chapters
+		WHERE lessons.chapter_id = chapters.id
+		  AND chapters.program_id = ?`, programId).Error; err != nil {
+		tx.Rollback()
+		return err
 	}
 
 	return tx.Commit().Error
