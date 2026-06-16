@@ -154,17 +154,12 @@ func (r *homeworkRepository) Update(hw *models.Homework) error {
 }
 
 func (r *homeworkRepository) Delete(id int64, deletedBy int64) error {
-	model := models.Homework{}
-	if err := db.MasterDB.First(&model, id).Error; err != nil {
+	if err := db.MasterDB.Model(&models.Homework{}).
+		Where("id = ?", id).
+		Update("deleted_by", deletedBy).Error; err != nil {
 		return err
 	}
-
-	model.DeletedBy = deletedBy
-
-	if err := db.MasterDB.Save(&model).Error; err != nil {
-		return err
-	}
-	return db.MasterDB.Delete(&model).Error
+	return db.MasterDB.Delete(&models.Homework{}, id).Error
 }
 
 

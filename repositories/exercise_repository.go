@@ -138,17 +138,12 @@ func (r *exerciseRepository) Update(exercise *models.Exercise) error {
 }
 
 func (r *exerciseRepository) Delete(id int64, deletedBy int64) error {
-    model := models.Exercise{}
-    if err := db.MasterDB.First(&model, id).Error; err != nil {
+    if err := db.MasterDB.Model(&models.Exercise{}).
+        Where("id = ?", id).
+        Update("deleted_by", deletedBy).Error; err != nil {
         return err
     }
-
-    model.DeletedBy = deletedBy
-
-    if err := db.MasterDB.Save(&model).Error; err != nil {
-        return err
-    }
-    return db.MasterDB.Delete(&model).Error
+    return db.MasterDB.Delete(&models.Exercise{}, id).Error
 }
 
 func (r *exerciseRepository) GetTotalQuestions(exerciseID int64) (int32, error) {

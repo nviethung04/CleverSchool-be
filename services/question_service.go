@@ -239,6 +239,9 @@ func (s *questionService) Update(c *gin.Context, req *prot.Question) (*models.Qu
 	updateQuestion := questionResource.FormatModelQuestion(req)
 
 	updateQuestion.ID = question.ID
+	if req.SubjectId == 0 {
+		updateQuestion.SubjectId = question.SubjectId
+	}
 
 	err = s.repo.Update(updateQuestion)
 	if err != nil {
@@ -718,6 +721,12 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 			return questions, 0, hasCloned
 		}
 
+		if clonedQuestionNeedsOptionsRefresh(question) {
+			if refreshed, refreshErr := refreshQuestionOptionsFromDB(question.Id); refreshErr == nil && refreshed != nil {
+				question = refreshed
+			}
+		}
+
 		question = questionResource.FormatByRole(question, int64(utils.GetCurrentRoleId(c)))
 		question = questionResource.FormatStaticURL(question)
 		question = questionResource.FormatMediaUrls(question)
@@ -919,4 +928,48 @@ func (s *questionService) GetQuestionIdAndKey(assignmentID int64, assignmentType
 	}
 
 	return questionIDs, filterKey, nil
+}
+
+func clonedQuestionNeedsOptionsRefresh(question *prot.Question) bool {
+	if question == nil {
+		return false
+	}
+
+	opts := question.Options
+	switch question.Type {
+	case models.QuestionTypeMultipleChoice, models.QuestionTypeFillInBlanks,
+		models.QuestionTypeOrdering, models.QuestionTypeDragDrop:
+		return opts == nil || len(opts.Answers) == 0
+	case models.QuestionTypeMatching:
+		return opts == nil || len(opts.Sources) == 0 || len(opts.Targets) == 0
+	case models.QuestionTypeCategory:
+		return opts == nil || len(opts.Categories) == 0 || len(opts.Items) == 0
+	case models.QuestionTypeLabeling:
+		return opts == nil || len(opts.Labels) == 0
+	default:
+		return false
+	}
+}
+
+func refreshQuestionOptionsFromDB(questionID int64) (*prot.Question, error) {
+	questionRepo := repositories.NewQuestionRepository()
+	questionRepo.SetPreload([]string{
+		"Answers",
+		"AnswerPositions",
+		"AnswerGroups",
+		"AnswerGroups.Group",
+		"AnswerCoordinates",
+		"AnswerMatchings",
+		"RefAttributes",
+		"RefAttributes.Attribute",
+		"RefAttributes.ParentAttribute",
+	})
+
+	question, err := questionRepo.FindByID(int(questionID))
+	if err != nil {
+		return nil, err
+	}
+
+	questionResource := resources.NewQuestionResource()
+	return questionResource.FormatQuestion(question), nil
 }

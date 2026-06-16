@@ -480,18 +480,33 @@ func (s *questionRelationService) CreateOrUpdateCloneQuestion(c *gin.Context, as
 		}
 
 		list := make([]*prot.Question, 0, len(existingRawQuestions))
+		freshMap := make(map[int64]*models.Question, len(questions))
+		for i := range questions {
+			q := &questions[i]
+			if score, ok := scoreMap[q.ID]; ok && score > 0 {
+				q.Point = score
+			}
+			freshMap[q.ID] = q
+		}
+
 		for _, q := range existingRawQuestions {
 			question, err := questionResource.ParseProtQuestionFromJSON(q)
 			if err != nil {
 				config.Log.Error("parse question error:", err.Error())
-				return nil
+				return err
 			}
 			if !idMap[int(question.Id)] || req.IsReset {
 				continue
 			}
 
-			question = questionResource.FormatStripDomain(question)
-			list = append(list, question)
+			if fresh, ok := freshMap[question.Id]; ok {
+				formatted := questionResource.FormatQuestion(fresh)
+				formatted = questionResource.FormatStripDomain(formatted)
+				list = append(list, formatted)
+			} else {
+				question = questionResource.FormatStripDomain(question)
+				list = append(list, question)
+			}
 		}
 
 		existingMap := make(map[int64]bool)

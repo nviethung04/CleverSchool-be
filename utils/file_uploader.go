@@ -46,7 +46,7 @@ func NewFileUploader(path, request string) *FileUploader {
 		MaxSizeMB: 512000,
 		AllowMime: map[string][]string{
 			"h5p":   {"h5p"},
-			"image": {"jpeg", "png", "jpg", "gif"},
+			"image": {"jpeg", "png", "jpg", "gif", "webp", "svg", "bmp"},
 			"video": {"avi", "mov", "wmv", "mp4", "3gp", "flv"},
 			"audio": {"mp3", "wav", "aac", "ogg", "flac", "m4a"},
 			"file":  {"avi", "mov", "wmv", "mp4", "3gp", "flv", "pdf", "txt", "csv", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "zip", "rar", "7z", "webm", "html", "htm"},
@@ -361,16 +361,29 @@ func s3UploadFromBytes(fileData []byte, key string, disk config.DiskConfig) (str
 }
 
 func (fu *FileUploader) validateFile(file *multipart.FileHeader) bool {
-	ext := strings.ToLower(filepath.Ext(file.Filename))
+	if file.Size <= 0 {
+		return false
+	}
 	sizeMB := file.Size / 1024 / 1024
+	if sizeMB > fu.MaxSizeMB {
+		return false
+	}
 
+	ext := strings.ToLower(strings.TrimPrefix(filepath.Ext(file.Filename), "."))
 	for _, allowed := range fu.AllowMime {
 		for _, e := range allowed {
-			if strings.Contains(ext, e) && sizeMB <= fu.MaxSizeMB {
+			if ext == e || strings.Contains(ext, e) {
 				return true
 			}
 		}
 	}
+
+	// Fallback when browser omits extension (e.g. blob re-upload, clipboard paste).
+	contentType := strings.ToLower(file.Header.Get("Content-Type"))
+	if strings.HasPrefix(contentType, "image/") {
+		return true
+	}
+
 	return false
 }
 

@@ -37,6 +37,13 @@ func NewQuestionRepository() QuestionRepository {
 	}
 }
 
+func questionOmitZeroSourceID(sourceQuestionID int64, omit []string) []string {
+	if sourceQuestionID == 0 {
+		return append(omit, "SourceQuestionId")
+	}
+	return omit
+}
+
 // Create omits source_question_id when 0 — FK requires NULL or valid source_questions.id.
 func (r *questionRepository) Create(entity *models.Question) error {
 	if entity == nil {
@@ -45,16 +52,49 @@ func (r *questionRepository) Create(entity *models.Question) error {
 	if err := r.BeforeCreate(entity); err != nil {
 		return err
 	}
-	omit := []string{"author_id"}
-	if entity.SourceQuestionId == 0 {
-		omit = append(omit, "SourceQuestionId")
-	}
+	omit := questionOmitZeroSourceID(entity.SourceQuestionId, []string{"author_id"})
 	return db.MasterDB.Omit(omit...).Create(entity).Error
+}
+
+func (r *questionRepository) Update(entity *models.Question) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if err := r.BeforeUpdate(entity); err != nil {
+		return err
+	}
+	omit := []string{"created_at", "created_by", "author_id"}
+	omit = questionOmitZeroSourceID(entity.SourceQuestionId, omit)
+	return db.MasterDB.Omit(omit...).Save(entity).Error
+}
+
+func (r *questionRepository) Delete(id int) error {
+	var model models.Question
+
+	if err := db.MasterDB.First(&model, id).Error; err != nil {
+		return err
+	}
+
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+
+	omit := questionOmitZeroSourceID(model.SourceQuestionId, []string{"author_id"})
+	if err := db.MasterDB.Omit(omit...).Save(&model).Error; err != nil {
+		return err
+	}
+
+	model.ID = int64(id)
+	return db.MasterDB.Delete(&model).Error
 }
 
 func (r *questionRepository) UpdateOrCreate(question models.Question) (int64, error) {
 	if question.ID != 0 {
-		result := db.MasterDB.Model(&models.Question{}).Where("id = ?", question.ID).Updates(question)
+		query := db.MasterDB.Model(&models.Question{}).Where("id = ?", question.ID)
+		if question.SourceQuestionId == 0 {
+			query = query.Omit("SourceQuestionId")
+		}
+		result := query.Updates(question)
 		return question.ID, result.Error
 	}
 

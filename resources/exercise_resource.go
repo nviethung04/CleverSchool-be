@@ -87,6 +87,9 @@ func (r *ExerciseResourceImpl) FormatModelExercise(exercise *prot.ExerciseReques
 	}
 	mediaRepo := repositories.NewMediaRepository()
 
+	coverImageUrl := utils.StripDomain(exercise.CoverImage, models.Storage)
+	coverImageInfo := mediaRepo.GetMediaInfo(coverImageUrl, models.Storage)
+
 	deadlineTime := time.Unix(exercise.Deadline, 0)
 
 	fileInfos := make([]models.MediaDetail, 0, len(exercise.QuestionFiles))
@@ -114,13 +117,14 @@ func (r *ExerciseResourceImpl) FormatModelExercise(exercise *prot.ExerciseReques
 	}
 
 	return &models.Exercise{
-		ID:             exercise.Id,
-		Name:           exercise.Name,
-		Status:         int16(exercise.Status),
-		TimeLimit:      exercise.TimeLimit,
-		MaxScore:       float64(exercise.MaxScore),
-		Description:    exercise.Description,
-		Deadline:       deadlineTime,
+		ID:               exercise.Id,
+		Name:             exercise.Name,
+		Status:           int16(exercise.Status),
+		TimeLimit:        exercise.TimeLimit,
+		MaxScore:         float64(exercise.MaxScore),
+		Description:      exercise.Description,
+		CoverImageInfo:   coverImageInfo,
+		Deadline:         deadlineTime,
 		TotalQuestions: int32(exercise.TotalQuestions),
 		ObjectTitle:    exercise.ObjectTitle,
 		IsRandomQuestion: exercise.IsRandomQuestion,
