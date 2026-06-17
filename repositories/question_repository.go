@@ -18,6 +18,7 @@ type QuestionRepository interface {
 	GetQuestionIdsAndScoresByLessonPlanPartId(lessonPlanPartkId int64) ([]QuesstionScore, error)
 	GetQuestionIdsAndScoresByLevelTestId(examId int64) ([]QuesstionScore, error)
 	UpdateOrCreateAttribute(attribute models.QuestionRefAttribute) error
+	ReplaceAttributes(questionId int64, attributes []models.QuestionRefAttribute) error
 	DeleteOldAttribute(questionId int64, attributeIds []int64) error
 
 	GetHomeworkIDsByQuestionID(questionId int64) ([]int64, error)
@@ -258,6 +259,18 @@ func (r *questionRepository) UpdateOrCreateAttribute(attribute models.QuestionRe
 	existing.ParentAttributeID = attribute.ParentAttributeID
 
 	return db.MasterDB.Save(&existing).Error
+}
+
+func (r *questionRepository) ReplaceAttributes(questionId int64, attributes []models.QuestionRefAttribute) error {
+	return db.MasterDB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("question_id = ?", questionId).Delete(&models.QuestionRefAttribute{}).Error; err != nil {
+			return err
+		}
+		if len(attributes) == 0 {
+			return nil
+		}
+		return tx.Create(&attributes).Error
+	})
 }
 
 func (r *questionRepository) DeleteOldAttribute(questionId int64, attributeIds []int64) error {

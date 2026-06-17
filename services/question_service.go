@@ -175,7 +175,9 @@ func (s *questionService) Create(c *gin.Context, req *prot.Question) (*models.Qu
 	if err := s.StoreAttribute(c, questionID, req); err != nil {
 		return nil, err
 	}
-	s.SyncKeywords(c, int64(questionID))
+	if err := s.syncKeywordsFromRequest(questionID, req); err != nil {
+		return nil, err
+	}
 
 	s.repo.SetPreload([]string{
 		"Answers",
@@ -256,7 +258,9 @@ func (s *questionService) Update(c *gin.Context, req *prot.Question) (*models.Qu
 	if err := s.StoreAttribute(c, questionID, req); err != nil {
 		return nil, err
 	}
-	s.SyncKeywords(c, int64(id))
+	if err := s.syncKeywordsFromRequest(questionID, req); err != nil {
+		return nil, err
+	}
 
 	newQuestion, _ := s.repo.FindNewByID(id)
 

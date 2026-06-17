@@ -11,25 +11,17 @@ import (
 )
 
 func (s *questionService) StoreAttribute(c *gin.Context, id int64, req *prot.Question) error {
-	attributeIds := make([]int64, 0, len(req.Attributes))
+	attributes := make([]models.QuestionRefAttribute, 0, len(req.Attributes))
 
 	for _, value := range req.Attributes {
-		attribute := models.QuestionRefAttribute{
+		attributes = append(attributes, models.QuestionRefAttribute{
 			QuestionID:        id,
 			AttributeID:       value.Value.Id,
 			ParentAttributeID: &value.Id,
-		}
-
-		if err := s.repo.UpdateOrCreateAttribute(attribute); err != nil {
-			return err
-		}
-
-		attributeIds = append(attributeIds, value.Value.Id)
+		})
 	}
 
-	s.repo.DeleteOldAttribute(id, attributeIds)
-
-	return nil
+	return s.repo.ReplaceAttributes(id, attributes)
 }
 
 func (s *questionService) SaveAttributes(questionID int64, row []string, attributes []models.QuestionAttribute, col int) error {
