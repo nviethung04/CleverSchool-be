@@ -58,7 +58,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "fill_in_blanks":
@@ -122,7 +124,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "ordering":
@@ -182,7 +186,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "matching":
@@ -280,7 +286,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "drag_drop":
@@ -348,7 +356,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "labeling":
@@ -433,7 +443,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "category":
@@ -532,7 +544,9 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 			return err
 		}
 
-		repositories.StoreAnswers(modelsAnswers)
+		if err := repositories.StoreAnswers(modelsAnswers); err != nil {
+			return err
+		}
 
 		return nil
 	case "writing":
