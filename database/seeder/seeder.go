@@ -115,7 +115,25 @@ func (s *Seeder) SeedWeeksForYear(year int) {
 }
 
 func (s *Seeder) SeedQuestionAttributes() {
-	subjectId := int64(1)
+	var subjectId int64
+	if err := db.MasterDB.Table("subjects").
+		Where("deleted_at IS NULL").
+		Order("id ASC").
+		Limit(1).
+		Pluck("id", &subjectId).Error; err != nil || subjectId == 0 {
+		log.Println("⚠️ Skip QuestionAttribute seed: no subjects in database")
+		return
+	}
+
+	var existing int64
+	db.MasterDB.Model(&models.QuestionAttribute{}).
+		Where("subject_id = ? AND name = ? AND COALESCE(parent_id, 0) = 0", subjectId, "Kỹ năng").
+		Count(&existing)
+	if existing > 0 {
+		log.Println("ℹ️ Question attributes already seeded — skipping")
+		return
+	}
+
 	attributes := []models.QuestionAttribute{
 		{
 			ParentID:  nil,

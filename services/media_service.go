@@ -647,7 +647,7 @@ func CreateFolderByPath(path string, repo repositories.MediaRepository) (*models
 			currentPath = strings.Trim(fmt.Sprintf("%s/%s", currentFolder.FullPath, p), "/")
 		}
 
-		folder, err := repo.FindByPath(currentPath, FileDiskStorage)
+		folder, err := repo.FindByPathMaster(currentPath, FileDiskStorage)
 		if err == nil {
 			parentIDPtr = &folder.ID
 			currentFolder = folder

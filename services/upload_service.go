@@ -139,58 +139,14 @@ func (s *uploadService) UploadComplete(c *gin.Context) (*dto.CompleteResponse, e
 		}, err
 	}
 
-	diskName := config.Public // disk name, ví dụ "public"
-	parentZero := int64(0)
-
 	mediaRepo := repositories.NewMediaRepository()
 
-	// Lấy folder root
-	parentRootFolder, err := mediaRepo.FindFolderByFilePathAndParent("", parentZero, diskName)
-	if err == nil && parentRootFolder != nil && parentRootFolder.ID != 0 {
-		parentZero = parentRootFolder.ID
-	}
+	folderPath := strings.TrimPrefix(filepath.Dir(req.Key), "public/")
+	folderPath = strings.Trim(folderPath, "/")
 
-	current := parentRootFolder
-	currentFullPath := parentRootFolder.FullPath
-
-	// Tạo folder theo key nếu chưa tồn tại
-	keyParts := strings.Split(req.Key, "/")
-	for index, part := range keyParts {
-		if part == "public" || index == len(keyParts)-1 {
-			continue
-		}
-		nextFullPath := strings.Trim(currentFullPath+"/"+part, "/")
-
-		existing, _ := mediaRepo.FindFolderByFilePathAndParent(part, current.ID, diskName)
-		if existing != nil && existing.ID != 0 {
-			current = existing
-			currentFullPath = nextFullPath
-			continue
-		}
-
-		existing, _ = mediaRepo.FindByPath(nextFullPath, diskName)
-		if existing != nil && existing.ID != 0 {
-			current = existing
-			currentFullPath = nextFullPath
-			continue
-		}
-
-		zero := int64(0)
-		folderNode := &models.Media{
-			ParentID: &current.ID,
-			FileName: "",
-			FilePath: part,
-			FullPath: nextFullPath,
-			FileSize: &zero,
-			DiskName: &diskName,
-			Type:     "folder",
-		}
-		mediaRepo.UpdateOrCreate(folderNode)
-		current, _ = mediaRepo.FindFolderByFilePathAndParent(part, current.ID, diskName)
-		if current == nil {
-			current = folderNode
-		}
-		currentFullPath = nextFullPath
+	current, err := CreateFolderByPath(folderPath, mediaRepo)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ensure media folders: %w", err)
 	}
 
 	fileSize := req.Size

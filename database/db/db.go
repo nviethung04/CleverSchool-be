@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -13,6 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -22,11 +24,22 @@ var (
 	Ctx         = context.Background()
 )
 
+func gormConfig() *gorm.Config {
+	return &gorm.Config{
+		Logger: logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  false,
+		}),
+	}
+}
+
 func ConnectPostgres(cfg config.Config) error {
 	var err error
 
 	// Connect Postgres Master
-	MasterDB, err = gorm.Open(postgres.Open(cfg.DBMasterURL), &gorm.Config{})
+	MasterDB, err = gorm.Open(postgres.Open(cfg.DBMasterURL), gormConfig())
 	if err != nil {
 		log.Println("Failed to connect to master database:", err)
 		return err
@@ -43,7 +56,7 @@ func ConnectPostgres(cfg config.Config) error {
 
 	// Connect Postgres Replica nếu có
 	if cfg.DBReplicaURL != "" {
-		ReplicaDB, err = gorm.Open(postgres.Open(cfg.DBReplicaURL), &gorm.Config{})
+		ReplicaDB, err = gorm.Open(postgres.Open(cfg.DBReplicaURL), gormConfig())
 		if err != nil {
 			log.Println("Failed to connect to replica database:", err)
 			return err
@@ -57,6 +70,8 @@ func ConnectPostgres(cfg config.Config) error {
 		replicaSql.SetMaxIdleConns(5)
 		replicaSql.SetConnMaxLifetime(time.Minute * 10)
 		log.Println("Connected to replica database")
+	} else {
+		ReplicaDB = MasterDB
 	}
 
 	return nil
