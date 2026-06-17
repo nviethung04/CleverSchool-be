@@ -123,9 +123,12 @@ func (r *CourseResourceImpl) FormatCourseDetail(course *models.Course) *prot.Cou
 		impl.LessonSchedules = r.LessonSchedules
 	}
 
-	chapters := make([]*models.Chapter, 0, len(course.Program.Chapters))
-	for i := range course.Program.Chapters {
-		chapters = append(chapters, &course.Program.Chapters[i])
+	chapters := make([]*models.Chapter, 0)
+	if course.ProgramId != 0 && len(course.Program.Chapters) > 0 {
+		chapters = make([]*models.Chapter, 0, len(course.Program.Chapters))
+		for i := range course.Program.Chapters {
+			chapters = append(chapters, &course.Program.Chapters[i])
+		}
 	}
 
 	sort.Slice(chapters, func(i, j int) bool {

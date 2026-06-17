@@ -107,6 +107,20 @@ func NewUserRepository() *userRepository {
 	return repo
 }
 
+// Create không ghi school_id=0 (vi phạm FK users_school_id_fkey).
+func (r *userRepository) Create(entity *models.User) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if entity.SchoolID == 0 {
+		if err := r.BeforeCreate(entity); err != nil {
+			return err
+		}
+		return db.MasterDB.Omit("author_id", "SchoolID").Create(entity).Error
+	}
+	return r.BaseRepository.Create(entity)
+}
+
 // Update không ghi school_id=0 (vi phạm FK); giữ NULL hoặc giá trị hiện có trong DB.
 func (r *userRepository) Update(entity *models.User) error {
 	if entity == nil {
