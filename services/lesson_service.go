@@ -105,6 +105,7 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		"Exams",
 		"Homeworks:deleted_at IS NULL",
 		"Exercises",
+		"Assessments:deleted_at IS NULL",
 		"LessonPlans",
 		"Schedules",
 		"Schedules.Week",
@@ -112,6 +113,7 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
+		"Assessments.AssessmentRefLessons",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -208,10 +210,14 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 	completeLessonPlanIds := s.CompletionLessonPlanIds(c, 0, 0, lesson.ID)
 	courseId, _ := strconv.Atoi(c.Query("course_id"))
 
+	flashcardService := NewFlashcardService()
+	lessonVocabularies, _ := flashcardService.GetLessonVocabularies(lesson.ID, nil)
+
 	if impl, ok := lessonResource.(*resources.LessonResourceImpl); ok {
 		impl.CompleteLessonIds = completeLessonIds
 		impl.CompleteLessonPlanIds = completeLessonPlanIds
 		impl.CourseId = int64(courseId)
+		impl.Flashcard = lessonVocabularies
 	}
 
 	formattedLesson := lessonResource.FormatLesson(lesson)
@@ -246,6 +252,7 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 	s.StoreExams(c, int64(id), 0, req)
 	s.StoreHomeworks(c, int64(id), 0, req)
 	s.StoreExercises(c, int64(id), 0, req)
+	s.StoreAssessments(c, int64(id), 0, req)
 	s.StoreLessonPlans(c, int64(id), 0, req)
 	// s.StoreSchedules(c, int64(id), req)
 
@@ -260,6 +267,7 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams",
 		"Homeworks:deleted_at IS NULL",
 		"Exercises",
+		"Assessments:deleted_at IS NULL",
 		"LessonPlans",
 		"Schedules",
 		"Schedules.Week",
@@ -267,6 +275,7 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
+		"Assessments.AssessmentRefLessons",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -338,6 +347,9 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 	if err := s.StoreExercises(c, int64(id), 0, req); err != nil {
 		return nil, err
 	}
+	if err := s.StoreAssessments(c, int64(id), 0, req); err != nil {
+		return nil, err
+	}
 	// s.StoreSchedules(c, int64(id), req)
 
 	s.repo.SetPreload([]string{
@@ -351,6 +363,7 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams",
 		"Homeworks:deleted_at IS NULL",
 		"Exercises",
+		"Assessments:deleted_at IS NULL",
 		"LessonPlans",
 		"Schedules",
 		"Schedules.Week",
@@ -358,6 +371,7 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 		"Exams.ExamRefLessons",
 		"Homeworks.HomeworkRefLessons",
 		"Exercises.ExerciseRefLessons",
+		"Assessments.AssessmentRefLessons",
 	})
 
 	s.repo.SetAlias(map[string]string{
@@ -521,6 +535,27 @@ func (s *lessonService) StoreHomeworks(c *gin.Context, id, courseId int64, req *
 	}
 
 	err := s.repo.UpdateHomeworkRefLesson(id, courseId, homeworkIds)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *lessonService) StoreAssessments(c *gin.Context, id, courseId int64, req *prot.LessonRequest) error {
+	assessmentIdMap := make(map[int64]struct{})
+	assessmentIds := []int64{}
+
+	for _, assessment := range req.Assessments {
+		if assessment.Id != 0 {
+			if _, exists := assessmentIdMap[assessment.Id]; !exists {
+				assessmentIdMap[assessment.Id] = struct{}{}
+				assessmentIds = append(assessmentIds, assessment.Id)
+			}
+		}
+	}
+
+	err := s.repo.UpdateAssessmentRefLesson(id, courseId, assessmentIds)
 	if err != nil {
 		return err
 	}

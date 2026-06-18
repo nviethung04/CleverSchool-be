@@ -128,7 +128,7 @@ func (s *FlashcardService) AddVocabulariesToLesson(lessonID int64, req prot.AddV
 func (s *FlashcardService) SyncLessonVocabularies(lessonID int64, vocabularyIDs []int64) error {
 	tx := s.db.Begin()
 
-	if err := tx.Where("lesson_id = ?", lessonID).Delete(&models.LessonVocabulary{}).Error; err != nil {
+	if err := tx.Unscoped().Where("lesson_id = ?", lessonID).Delete(&models.LessonVocabulary{}).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("failed to clear lesson vocabularies: %w", err)
 	}

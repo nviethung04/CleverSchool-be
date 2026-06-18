@@ -103,6 +103,7 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 	exams := r.GetExams(lesson)
 	homeworks := r.GetHomeworks(lesson)
 	exercises := r.GetExercises(lesson)
+	assessments := r.GetAssessments(lesson)
 
 	lessonPlans := make([]*prot.LessonPlanInfo, 0, len(lesson.LessonPlans))
 	seen := make(map[int64]bool)
@@ -265,6 +266,7 @@ func (r *LessonResourceImpl) FormatLesson(lesson *models.Lesson) *prot.Lesson {
 		Exams:        exams,
 		Homeworks:    homeworks,
 		Exercises:    exercises,
+		Assessments:  assessments,
 		LessonPlans:  lessonPlans,
 		Schedules:    schedules,
 		Author:       &author,
@@ -380,6 +382,65 @@ func (r *LessonResourceImpl) GetHomeworks(lesson *models.Lesson) []*prot.Homewor
 	}
 
 	return homeworks
+}
+
+func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.AssessmentInfo {
+	assessmentsMap := make(map[int64]*prot.AssessmentInfo)
+
+	for _, attr := range lesson.Assessments {
+		for _, ref := range attr.AssessmentRefLessons {
+			if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == 0 {
+				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
+					Id:          attr.ID,
+					Name:        attr.Name,
+					Description: attr.Description,
+					Type:        attr.Type,
+					IsProgram:   true,
+				}
+				break
+			}
+		}
+	}
+
+	if r.CourseId != 0 {
+		for _, attr := range lesson.Assessments {
+			var hasCourseRef bool
+
+			for _, ref := range attr.AssessmentRefLessons {
+				if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == r.CourseId {
+					hasCourseRef = true
+					break
+				}
+			}
+
+			if !hasCourseRef {
+				continue
+			}
+
+			if _, ok := assessmentsMap[attr.ID]; !ok {
+				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
+					Id:          attr.ID,
+					Name:        attr.Name,
+					Description: attr.Description,
+					Type:        attr.Type,
+					IsProgram:   false,
+				}
+			}
+		}
+	}
+
+	ids := make([]int64, 0, len(assessmentsMap))
+	for id := range assessmentsMap {
+		ids = append(ids, id)
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+
+	assessments := make([]*prot.AssessmentInfo, 0, len(ids))
+	for _, id := range ids {
+		assessments = append(assessments, assessmentsMap[id])
+	}
+
+	return assessments
 }
 
 func (r *LessonResourceImpl) GetExercises(lesson *models.Lesson) []*prot.ExerciseInfo {

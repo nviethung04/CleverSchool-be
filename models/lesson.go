@@ -26,6 +26,7 @@ type Lesson struct {
 	Exams []Exam     `gorm:"many2many:exam_ref_lessons"`
 	Homeworks []Homework     `gorm:"many2many:homework_ref_lessons;joinForeignKey:lesson_id;joinReferences:homework_id" json:"homeworks_default"`
 	Exercises []Exercise     `gorm:"many2many:exercise_ref_lessons"`
+	Assessments []Assessment `gorm:"many2many:assessment_ref_lessons"`
 	LessonPlans []LessonPlan     `gorm:"many2many:lesson_plan_ref_lessons"`
 	Schedules   []LessonSchedule `gorm:"foreignKey:LessonID"`
 

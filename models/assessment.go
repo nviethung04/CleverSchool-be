@@ -46,6 +46,8 @@ type Assessment struct {
 	AssessmentCriteriaIds      AssessmentCriteriaIDs `gorm:"type:jsonb;default:'[]'" json:"assessment_criteria_ids"`
 	FileInfos                  MediaInfos            `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
 	Subject                    *Subject              `gorm:"foreignKey:SubjectId"`
+	Lessons                    []Lesson              `gorm:"many2many:assessment_ref_lessons"`
+	AssessmentRefLessons       []AssessmentRefLesson `gorm:"foreignKey:AssessmentId"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`

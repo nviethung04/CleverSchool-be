@@ -49,6 +49,7 @@ type LessonRepository interface {
 	UpdateHomeworkRefLesson(lessonId, courseId int64, homeworkIds []int64) error
 	UpdateExamRefLesson(lessonId, courseId int64, examIds []int64) error
 	UpdateExerciseRefLesson(lessonId, courseId int64, exerciseIds []int64) error
+	UpdateAssessmentRefLesson(lessonId, courseId int64, assessmentIds []int64) error
 	CreateHomeworkRefLesson(lessonId int64, homeworkId int64) error
 	CreateExamRefLesson(lessonId int64, examId int64) error
 	CreateExerciseRefLesson(lessonId int64, exerciseId int64) error
@@ -910,6 +911,84 @@ func (r *lessonRepository) UpdateHomeworkRefLesson(lessonId, courseId int64, hom
 			ref.AssignedAt = old.AssignedAt
 		}
 
+		refs = append(refs, ref)
+	}
+
+	createQuery := tx
+	if courseId == 0 {
+		createQuery = tx.Omit("CourseId")
+	}
+	if err := createQuery.Create(&refs).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+func (r *lessonRepository) UpdateAssessmentRefLesson(lessonId, courseId int64, assessmentIds []int64) error {
+	tx := db.MasterDB.Begin()
+
+	var oldRefs []models.AssessmentRefLesson
+	if courseId == 0 {
+		if err := tx.Where("lesson_id = ? AND (course_id IS NULL OR course_id = 0)", lessonId).
+			Find(&oldRefs).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	} else {
+		if err := tx.Where("lesson_id = ? AND course_id = ?", lessonId, courseId).
+			Find(&oldRefs).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		var programRefs []models.AssessmentRefLesson
+		if err := tx.Where("lesson_id = ? AND (course_id IS NULL OR course_id = 0)", lessonId).
+			Find(&programRefs).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		idSet := make(map[int64]struct{}, len(assessmentIds))
+		for _, id := range assessmentIds {
+			idSet[id] = struct{}{}
+		}
+		for _, ref := range programRefs {
+			if _, ok := idSet[ref.AssessmentId]; !ok {
+				assessmentIds = append(assessmentIds, ref.AssessmentId)
+				idSet[ref.AssessmentId] = struct{}{}
+			}
+		}
+	}
+
+	if courseId == 0 {
+		if err := tx.Where("lesson_id = ? AND (course_id IS NULL OR course_id = 0)", lessonId).
+			Delete(&models.AssessmentRefLesson{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	} else {
+		if err := tx.Where("lesson_id = ? AND course_id = ?", lessonId, courseId).
+			Delete(&models.AssessmentRefLesson{}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	if len(assessmentIds) == 0 {
+		return tx.Commit().Error
+	}
+
+	var refs []models.AssessmentRefLesson
+	for _, assessmentId := range assessmentIds {
+		ref := models.AssessmentRefLesson{
+			LessonId:     lessonId,
+			AssessmentId: assessmentId,
+		}
+		if courseId > 0 {
+			ref.CourseId = courseId
+		}
 		refs = append(refs, ref)
 	}
 

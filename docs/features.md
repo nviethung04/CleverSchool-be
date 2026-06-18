@@ -61,15 +61,14 @@ Query: `course_id` (bắt buộc).
 
 | Method | Path | Permission | Mô tả |
 |--------|------|------------|-------|
-| PUT | `/api/manage/lessons/:id` | `lessons.update` | Cập nhật metadata + gắn exam / homework / exercise / lesson_plan ở **mức chương trình** (`course_id = 0` trong bảng `*_ref_lessons`). Query `course_id` trên PUT **không** đổi chỗ lưu nội dung mẫu (2026-06-18) |
+| PUT | `/api/manage/lessons/:id` | `lessons.update` | Cập nhật metadata + gắn exam / homework / exercise / **assessment** / lesson_plan ở **mức chương trình** (`course_id IS NULL` trong bảng `*_ref_lessons`). Query `course_id` trên PUT **không** đổi chỗ lưu nội dung mẫu (2026-06-18) |
 | PUT | `/api/manage/flashcard/lessons/:lessonId/vocabularies` | (flashcard) | **Đồng bộ** toàn bộ từ vựng của bài học — body `{ vocabulary_ids: number[] }`. FE gọi sau khi lưu form bài học |
 
 **Mô hình dữ liệu**
 
 - Chương + bài học thuộc **chương trình** (`chapters.program_id`). Khóa học chỉ tham chiếu `program_id` — không clone riêng từng bài khi sửa CT.
-- Liên kết bài tập/KT/LT: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
-- Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên.
-- **Assessment** (`assessments`): bảng riêng migration 0040 — **chưa** có quan hệ `lesson ↔ assessment` trên `PUT /lessons` (form FE hiển thị nhưng BE chưa lưu).
+- Liên kết bài tập/KT/LT/đánh giá: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`, `assessment_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
+- Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên. Body field `assessments` (số nhiều) trên `PUT /lessons`.
 
 Code: `be/services/lesson_service.go` (`Update`), `be/repositories/lesson_repository.go`, `be/services/flashcard_service.go` (`SyncLessonVocabularies`).
 
@@ -97,6 +96,7 @@ FE: `fe/components/lesson-form.tsx`, `fe/lib/api/lessons.ts` (`syncLessonVocabul
 | **0040–0041** | Bảng `assessments` + permissions | POST `/api/manage/assessments` |
 | **0042** | `user_courses`: `main_teacher`, `is_current`, `start_time`, `end_time` | GET course users, sắp xếp GV chính |
 | **0043–0044** | Bảng `settings` + permissions | GET/POST settings, đọc by-key |
+| **0045** | `assessment_ref_lessons` — liên kết assessment ↔ lesson | `PUT /lessons` field `assessments`; GET lesson trả `assessments` |
 | *(course)* | `course_ref_semesters` composite PK; model GORM | POST tạo khóa không lỗi `RETURNING id` |
 
 Chi tiết cột: [database/tables-reference.md](./database/tables-reference.md).  
@@ -161,7 +161,8 @@ Core hiển thị: Tổng quan, Người dùng, Trường, Môn học, Chương 
 | React controlled→uncontrolled (program edit) | `form.cover` undefined + input Link | Bỏ Link; `cover ?? ""` khi load |
 | POST course `RETURNING id` trên `course_ref_semesters` | Model PK sai | Composite PK trên model |
 | Lưu bài học “thành công” nhưng mất exam/homework/exercise | PUT kèm `course_id` → ghi ref theo khóa; xem lại không có `course_id` | BE luôn lưu ref ở `course_id=0`; FE không gửi `course_id` khi `UpdateLesson` |
-| Từ vựng không lưu sau sửa bài học | `PUT /lessons` không xử lý vocab | `PUT /flashcard/lessons/:id/vocabularies` + FE `syncLessonVocabularies` |
+| Từ vựng không lưu sau sửa bài học | `PUT /lessons` không xử lý vocab | `PUT /flashcard/lessons/:id/vocabularies` + FE `syncLessonVocabularies` (kể cả mảng rỗng để xóa hết) |
+| Assessment không lưu trên form bài học | Thiếu bảng ref + FE gửi sai field `assessment` | Migration 0045 `assessment_ref_lessons`; BE/FE dùng `assessments` |
 | PUT lesson 500 `column "dependency_id" does not exist` | GORM dùng sai tên cột | DB: `dependency_lesson_id`; model + repository đã map đúng |
 | PUT lesson 500 duplicate `lesson_plan_ref_lessons` | Insert lại link đã tồn tại | `UpdateLessonPlan` skip nếu đã có `(lesson_plan_id, lesson_id)` |
 | PUT lesson 500 `homework_ref_lessons_course_id_fkey` | Ghi `course_id = 0` vi phạm FK `courses` | Mức CT: `Omit("CourseId")` → NULL trong DB |

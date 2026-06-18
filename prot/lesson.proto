@@ -77,6 +77,14 @@ message ExerciseInfo {
   bool is_program = 11;
 }
 
+message AssessmentInfo {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  bool is_program = 5;
+}
+
 message AuthorInfo {
   int64 id = 1;
   string name = 2;
@@ -138,6 +146,7 @@ message Lesson {
   string created_at = 23;
   string updated_at = 24;
   CourseInfo course = 25;
+  repeated AssessmentInfo assessments = 26;
 }
 
 message GetLessonRequest {
@@ -169,6 +178,7 @@ message LessonRequest {
   repeated LessonScheduleInfo schedules = 15;
   int32 views = 16;
   string object_title = 17;
+  repeated AssessmentInfo assessments = 18;
 }
 
 message LessonIDRequest {

@@ -669,6 +669,82 @@ func (x *ExerciseInfo) GetIsProgram() bool {
 	return false
 }
 
+type AssessmentInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	IsProgram     bool                   `protobuf:"varint,5,opt,name=is_program,json=isProgram,proto3" json:"is_program,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssessmentInfo) Reset() {
+	*x = AssessmentInfo{}
+	mi := &file_lesson_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssessmentInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssessmentInfo) ProtoMessage() {}
+
+func (x *AssessmentInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_lesson_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssessmentInfo.ProtoReflect.Descriptor instead.
+func (*AssessmentInfo) Descriptor() ([]byte, []int) {
+	return file_lesson_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *AssessmentInfo) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AssessmentInfo) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AssessmentInfo) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *AssessmentInfo) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *AssessmentInfo) GetIsProgram() bool {
+	if x != nil {
+		return x.IsProgram
+	}
+	return false
+}
+
 type AuthorInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -682,7 +758,7 @@ type AuthorInfo struct {
 
 func (x *AuthorInfo) Reset() {
 	*x = AuthorInfo{}
-	mi := &file_lesson_proto_msgTypes[8]
+	mi := &file_lesson_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -694,7 +770,7 @@ func (x *AuthorInfo) String() string {
 func (*AuthorInfo) ProtoMessage() {}
 
 func (x *AuthorInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[8]
+	mi := &file_lesson_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -707,7 +783,7 @@ func (x *AuthorInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthorInfo.ProtoReflect.Descriptor instead.
 func (*AuthorInfo) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{8}
+	return file_lesson_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *AuthorInfo) GetId() int64 {
@@ -762,7 +838,7 @@ type LessonPlanInfo struct {
 
 func (x *LessonPlanInfo) Reset() {
 	*x = LessonPlanInfo{}
-	mi := &file_lesson_proto_msgTypes[9]
+	mi := &file_lesson_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -774,7 +850,7 @@ func (x *LessonPlanInfo) String() string {
 func (*LessonPlanInfo) ProtoMessage() {}
 
 func (x *LessonPlanInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[9]
+	mi := &file_lesson_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -787,7 +863,7 @@ func (x *LessonPlanInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonPlanInfo.ProtoReflect.Descriptor instead.
 func (*LessonPlanInfo) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{9}
+	return file_lesson_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *LessonPlanInfo) GetId() int64 {
@@ -867,7 +943,7 @@ type LessonScheduleInfo struct {
 
 func (x *LessonScheduleInfo) Reset() {
 	*x = LessonScheduleInfo{}
-	mi := &file_lesson_proto_msgTypes[10]
+	mi := &file_lesson_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -879,7 +955,7 @@ func (x *LessonScheduleInfo) String() string {
 func (*LessonScheduleInfo) ProtoMessage() {}
 
 func (x *LessonScheduleInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[10]
+	mi := &file_lesson_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -892,7 +968,7 @@ func (x *LessonScheduleInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonScheduleInfo.ProtoReflect.Descriptor instead.
 func (*LessonScheduleInfo) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{10}
+	return file_lesson_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LessonScheduleInfo) GetId() int64 {
@@ -948,7 +1024,7 @@ type LessonProgramInfo struct {
 
 func (x *LessonProgramInfo) Reset() {
 	*x = LessonProgramInfo{}
-	mi := &file_lesson_proto_msgTypes[11]
+	mi := &file_lesson_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -960,7 +1036,7 @@ func (x *LessonProgramInfo) String() string {
 func (*LessonProgramInfo) ProtoMessage() {}
 
 func (x *LessonProgramInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[11]
+	mi := &file_lesson_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -973,7 +1049,7 @@ func (x *LessonProgramInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonProgramInfo.ProtoReflect.Descriptor instead.
 func (*LessonProgramInfo) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{11}
+	return file_lesson_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *LessonProgramInfo) GetId() int64 {
@@ -1024,13 +1100,14 @@ type Lesson struct {
 	CreatedAt       string                 `protobuf:"bytes,23,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt       string                 `protobuf:"bytes,24,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Course          *CourseInfo            `protobuf:"bytes,25,opt,name=course,proto3" json:"course,omitempty"`
+	Assessments     []*AssessmentInfo      `protobuf:"bytes,26,rep,name=assessments,proto3" json:"assessments,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *Lesson) Reset() {
 	*x = Lesson{}
-	mi := &file_lesson_proto_msgTypes[12]
+	mi := &file_lesson_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1042,7 +1119,7 @@ func (x *Lesson) String() string {
 func (*Lesson) ProtoMessage() {}
 
 func (x *Lesson) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[12]
+	mi := &file_lesson_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1055,7 +1132,7 @@ func (x *Lesson) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Lesson.ProtoReflect.Descriptor instead.
 func (*Lesson) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{12}
+	return file_lesson_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *Lesson) GetId() int64 {
@@ -1233,6 +1310,13 @@ func (x *Lesson) GetCourse() *CourseInfo {
 	return nil
 }
 
+func (x *Lesson) GetAssessments() []*AssessmentInfo {
+	if x != nil {
+		return x.Assessments
+	}
+	return nil
+}
+
 type GetLessonRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1242,7 +1326,7 @@ type GetLessonRequest struct {
 
 func (x *GetLessonRequest) Reset() {
 	*x = GetLessonRequest{}
-	mi := &file_lesson_proto_msgTypes[13]
+	mi := &file_lesson_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1254,7 +1338,7 @@ func (x *GetLessonRequest) String() string {
 func (*GetLessonRequest) ProtoMessage() {}
 
 func (x *GetLessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[13]
+	mi := &file_lesson_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1267,7 +1351,7 @@ func (x *GetLessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLessonRequest.ProtoReflect.Descriptor instead.
 func (*GetLessonRequest) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{13}
+	return file_lesson_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetLessonRequest) GetId() int64 {
@@ -1287,7 +1371,7 @@ type LessonResponse struct {
 
 func (x *LessonResponse) Reset() {
 	*x = LessonResponse{}
-	mi := &file_lesson_proto_msgTypes[14]
+	mi := &file_lesson_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +1383,7 @@ func (x *LessonResponse) String() string {
 func (*LessonResponse) ProtoMessage() {}
 
 func (x *LessonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[14]
+	mi := &file_lesson_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +1396,7 @@ func (x *LessonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonResponse.ProtoReflect.Descriptor instead.
 func (*LessonResponse) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{14}
+	return file_lesson_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *LessonResponse) GetLesson() *Lesson {
@@ -1337,7 +1421,7 @@ type ListLessonsRequest struct {
 
 func (x *ListLessonsRequest) Reset() {
 	*x = ListLessonsRequest{}
-	mi := &file_lesson_proto_msgTypes[15]
+	mi := &file_lesson_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1349,7 +1433,7 @@ func (x *ListLessonsRequest) String() string {
 func (*ListLessonsRequest) ProtoMessage() {}
 
 func (x *ListLessonsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[15]
+	mi := &file_lesson_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1362,7 +1446,7 @@ func (x *ListLessonsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListLessonsRequest.ProtoReflect.Descriptor instead.
 func (*ListLessonsRequest) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{15}
+	return file_lesson_proto_rawDescGZIP(), []int{16}
 }
 
 type LessonRequest struct {
@@ -1384,13 +1468,14 @@ type LessonRequest struct {
 	Schedules     []*LessonScheduleInfo  `protobuf:"bytes,15,rep,name=schedules,proto3" json:"schedules,omitempty"`
 	Views         int32                  `protobuf:"varint,16,opt,name=views,proto3" json:"views,omitempty"`
 	ObjectTitle   string                 `protobuf:"bytes,17,opt,name=object_title,json=objectTitle,proto3" json:"object_title,omitempty"`
+	Assessments   []*AssessmentInfo      `protobuf:"bytes,18,rep,name=assessments,proto3" json:"assessments,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *LessonRequest) Reset() {
 	*x = LessonRequest{}
-	mi := &file_lesson_proto_msgTypes[16]
+	mi := &file_lesson_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1402,7 +1487,7 @@ func (x *LessonRequest) String() string {
 func (*LessonRequest) ProtoMessage() {}
 
 func (x *LessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[16]
+	mi := &file_lesson_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1415,7 +1500,7 @@ func (x *LessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonRequest.ProtoReflect.Descriptor instead.
 func (*LessonRequest) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{16}
+	return file_lesson_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *LessonRequest) GetId() int64 {
@@ -1537,6 +1622,13 @@ func (x *LessonRequest) GetObjectTitle() string {
 	return ""
 }
 
+func (x *LessonRequest) GetAssessments() []*AssessmentInfo {
+	if x != nil {
+		return x.Assessments
+	}
+	return nil
+}
+
 type LessonIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1546,7 +1638,7 @@ type LessonIDRequest struct {
 
 func (x *LessonIDRequest) Reset() {
 	*x = LessonIDRequest{}
-	mi := &file_lesson_proto_msgTypes[17]
+	mi := &file_lesson_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1558,7 +1650,7 @@ func (x *LessonIDRequest) String() string {
 func (*LessonIDRequest) ProtoMessage() {}
 
 func (x *LessonIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[17]
+	mi := &file_lesson_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1571,7 +1663,7 @@ func (x *LessonIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonIDRequest.ProtoReflect.Descriptor instead.
 func (*LessonIDRequest) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{17}
+	return file_lesson_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *LessonIDRequest) GetId() int64 {
@@ -1591,7 +1683,7 @@ type LessonsResponse struct {
 
 func (x *LessonsResponse) Reset() {
 	*x = LessonsResponse{}
-	mi := &file_lesson_proto_msgTypes[18]
+	mi := &file_lesson_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1603,7 +1695,7 @@ func (x *LessonsResponse) String() string {
 func (*LessonsResponse) ProtoMessage() {}
 
 func (x *LessonsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[18]
+	mi := &file_lesson_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1616,7 +1708,7 @@ func (x *LessonsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonsResponse.ProtoReflect.Descriptor instead.
 func (*LessonsResponse) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{18}
+	return file_lesson_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *LessonsResponse) GetLessons() []*Lesson {
@@ -1642,7 +1734,7 @@ type Lessons struct {
 
 func (x *Lessons) Reset() {
 	*x = Lessons{}
-	mi := &file_lesson_proto_msgTypes[19]
+	mi := &file_lesson_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1654,7 +1746,7 @@ func (x *Lessons) String() string {
 func (*Lessons) ProtoMessage() {}
 
 func (x *Lessons) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[19]
+	mi := &file_lesson_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1667,7 +1759,7 @@ func (x *Lessons) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Lessons.ProtoReflect.Descriptor instead.
 func (*Lessons) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{19}
+	return file_lesson_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Lessons) GetLessons() []*Lesson {
@@ -1689,7 +1781,7 @@ type LessonCompletion struct {
 
 func (x *LessonCompletion) Reset() {
 	*x = LessonCompletion{}
-	mi := &file_lesson_proto_msgTypes[20]
+	mi := &file_lesson_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1701,7 +1793,7 @@ func (x *LessonCompletion) String() string {
 func (*LessonCompletion) ProtoMessage() {}
 
 func (x *LessonCompletion) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[20]
+	mi := &file_lesson_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1714,7 +1806,7 @@ func (x *LessonCompletion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LessonCompletion.ProtoReflect.Descriptor instead.
 func (*LessonCompletion) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{20}
+	return file_lesson_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LessonCompletion) GetId() int64 {
@@ -1758,7 +1850,7 @@ type AssignedLesson struct {
 
 func (x *AssignedLesson) Reset() {
 	*x = AssignedLesson{}
-	mi := &file_lesson_proto_msgTypes[21]
+	mi := &file_lesson_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1770,7 +1862,7 @@ func (x *AssignedLesson) String() string {
 func (*AssignedLesson) ProtoMessage() {}
 
 func (x *AssignedLesson) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[21]
+	mi := &file_lesson_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1783,7 +1875,7 @@ func (x *AssignedLesson) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignedLesson.ProtoReflect.Descriptor instead.
 func (*AssignedLesson) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{21}
+	return file_lesson_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *AssignedLesson) GetId() int64 {
@@ -1830,7 +1922,7 @@ type AssignedLessons struct {
 
 func (x *AssignedLessons) Reset() {
 	*x = AssignedLessons{}
-	mi := &file_lesson_proto_msgTypes[22]
+	mi := &file_lesson_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1842,7 +1934,7 @@ func (x *AssignedLessons) String() string {
 func (*AssignedLessons) ProtoMessage() {}
 
 func (x *AssignedLessons) ProtoReflect() protoreflect.Message {
-	mi := &file_lesson_proto_msgTypes[22]
+	mi := &file_lesson_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1855,7 +1947,7 @@ func (x *AssignedLessons) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssignedLessons.ProtoReflect.Descriptor instead.
 func (*AssignedLessons) Descriptor() ([]byte, []int) {
-	return file_lesson_proto_rawDescGZIP(), []int{22}
+	return file_lesson_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *AssignedLessons) GetLessons() []*AssignedLesson {
@@ -1939,7 +2031,14 @@ const file_lesson_proto_rawDesc = "" +
 	"\fobject_title\x18\n" +
 	" \x01(\tR\vobjectTitle\x12\x1d\n" +
 	"\n" +
-	"is_program\x18\v \x01(\bR\tisProgram\"\x85\x01\n" +
+	"is_program\x18\v \x01(\bR\tisProgram\"\x89\x01\n" +
+	"\x0eAssessmentInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
+	"\n" +
+	"is_program\x18\x05 \x01(\bR\tisProgram\"\x85\x01\n" +
 	"\n" +
 	"AuthorInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
@@ -1971,7 +2070,7 @@ const file_lesson_proto_rawDesc = "" +
 	"\x11LessonProgramInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\"\xe0\a\n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\"\x98\b\n" +
 	"\x06Lesson\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -2001,13 +2100,14 @@ const file_lesson_proto_rawDesc = "" +
 	"created_at\x18\x17 \x01(\tR\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\x18 \x01(\tR\tupdatedAt\x12(\n" +
-	"\x06course\x18\x19 \x01(\v2\x10.prot.CourseInfoR\x06course\"\"\n" +
+	"\x06course\x18\x19 \x01(\v2\x10.prot.CourseInfoR\x06course\x126\n" +
+	"\vassessments\x18\x1a \x03(\v2\x14.prot.AssessmentInfoR\vassessments\"\"\n" +
 	"\x10GetLessonRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"P\n" +
 	"\x0eLessonResponse\x12$\n" +
 	"\x06lesson\x18\x01 \x01(\v2\f.prot.LessonR\x06lesson\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\x14\n" +
-	"\x12ListLessonsRequest\"\xa0\x05\n" +
+	"\x12ListLessonsRequest\"\xd8\x05\n" +
 	"\rLessonRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -2026,7 +2126,8 @@ const file_lesson_proto_rawDesc = "" +
 	"\flesson_plans\x18\x0e \x03(\v2\x14.prot.LessonPlanInfoR\vlessonPlans\x126\n" +
 	"\tschedules\x18\x0f \x03(\v2\x18.prot.LessonScheduleInfoR\tschedules\x12\x14\n" +
 	"\x05views\x18\x10 \x01(\x05R\x05views\x12!\n" +
-	"\fobject_title\x18\x11 \x01(\tR\vobjectTitle\"!\n" +
+	"\fobject_title\x18\x11 \x01(\tR\vobjectTitle\x126\n" +
+	"\vassessments\x18\x12 \x03(\v2\x14.prot.AssessmentInfoR\vassessments\"!\n" +
 	"\x0fLessonIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"Z\n" +
 	"\x0fLessonsResponse\x12&\n" +
@@ -2064,7 +2165,7 @@ func file_lesson_proto_rawDescGZIP() []byte {
 	return file_lesson_proto_rawDescData
 }
 
-var file_lesson_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_lesson_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_lesson_proto_goTypes = []any{
 	(*ChapterInfo)(nil),        // 0: prot.ChapterInfo
 	(*TagInfo)(nil),            // 1: prot.TagInfo
@@ -2074,60 +2175,63 @@ var file_lesson_proto_goTypes = []any{
 	(*ExamInfo)(nil),           // 5: prot.ExamInfo
 	(*HomeworkInfo)(nil),       // 6: prot.HomeworkInfo
 	(*ExerciseInfo)(nil),       // 7: prot.ExerciseInfo
-	(*AuthorInfo)(nil),         // 8: prot.AuthorInfo
-	(*LessonPlanInfo)(nil),     // 9: prot.LessonPlanInfo
-	(*LessonScheduleInfo)(nil), // 10: prot.LessonScheduleInfo
-	(*LessonProgramInfo)(nil),  // 11: prot.LessonProgramInfo
-	(*Lesson)(nil),             // 12: prot.Lesson
-	(*GetLessonRequest)(nil),   // 13: prot.GetLessonRequest
-	(*LessonResponse)(nil),     // 14: prot.LessonResponse
-	(*ListLessonsRequest)(nil), // 15: prot.ListLessonsRequest
-	(*LessonRequest)(nil),      // 16: prot.LessonRequest
-	(*LessonIDRequest)(nil),    // 17: prot.LessonIDRequest
-	(*LessonsResponse)(nil),    // 18: prot.LessonsResponse
-	(*Lessons)(nil),            // 19: prot.Lessons
-	(*LessonCompletion)(nil),   // 20: prot.LessonCompletion
-	(*AssignedLesson)(nil),     // 21: prot.AssignedLesson
-	(*AssignedLessons)(nil),    // 22: prot.AssignedLessons
-	(*WeekInfo)(nil),           // 23: prot.WeekInfo
-	(*Vocabulary)(nil),         // 24: prot.Vocabulary
-	(*CourseInfo)(nil),         // 25: prot.CourseInfo
+	(*AssessmentInfo)(nil),     // 8: prot.AssessmentInfo
+	(*AuthorInfo)(nil),         // 9: prot.AuthorInfo
+	(*LessonPlanInfo)(nil),     // 10: prot.LessonPlanInfo
+	(*LessonScheduleInfo)(nil), // 11: prot.LessonScheduleInfo
+	(*LessonProgramInfo)(nil),  // 12: prot.LessonProgramInfo
+	(*Lesson)(nil),             // 13: prot.Lesson
+	(*GetLessonRequest)(nil),   // 14: prot.GetLessonRequest
+	(*LessonResponse)(nil),     // 15: prot.LessonResponse
+	(*ListLessonsRequest)(nil), // 16: prot.ListLessonsRequest
+	(*LessonRequest)(nil),      // 17: prot.LessonRequest
+	(*LessonIDRequest)(nil),    // 18: prot.LessonIDRequest
+	(*LessonsResponse)(nil),    // 19: prot.LessonsResponse
+	(*Lessons)(nil),            // 20: prot.Lessons
+	(*LessonCompletion)(nil),   // 21: prot.LessonCompletion
+	(*AssignedLesson)(nil),     // 22: prot.AssignedLesson
+	(*AssignedLessons)(nil),    // 23: prot.AssignedLessons
+	(*WeekInfo)(nil),           // 24: prot.WeekInfo
+	(*Vocabulary)(nil),         // 25: prot.Vocabulary
+	(*CourseInfo)(nil),         // 26: prot.CourseInfo
 }
 var file_lesson_proto_depIdxs = []int32{
-	23, // 0: prot.LessonScheduleInfo.week:type_name -> prot.WeekInfo
+	24, // 0: prot.LessonScheduleInfo.week:type_name -> prot.WeekInfo
 	0,  // 1: prot.Lesson.chapter:type_name -> prot.ChapterInfo
 	4,  // 2: prot.Lesson.dependencies:type_name -> prot.LessonInfo
 	1,  // 3: prot.Lesson.tags:type_name -> prot.TagInfo
 	2,  // 4: prot.Lesson.topics:type_name -> prot.TopicInfo
 	3,  // 5: prot.Lesson.skills:type_name -> prot.SkillInfo
-	8,  // 6: prot.Lesson.author:type_name -> prot.AuthorInfo
+	9,  // 6: prot.Lesson.author:type_name -> prot.AuthorInfo
 	5,  // 7: prot.Lesson.exams:type_name -> prot.ExamInfo
 	6,  // 8: prot.Lesson.homeworks:type_name -> prot.HomeworkInfo
 	7,  // 9: prot.Lesson.exercises:type_name -> prot.ExerciseInfo
-	9,  // 10: prot.Lesson.lesson_plans:type_name -> prot.LessonPlanInfo
-	10, // 11: prot.Lesson.schedules:type_name -> prot.LessonScheduleInfo
-	11, // 12: prot.Lesson.program:type_name -> prot.LessonProgramInfo
-	24, // 13: prot.Lesson.vocabularies:type_name -> prot.Vocabulary
-	25, // 14: prot.Lesson.course:type_name -> prot.CourseInfo
-	12, // 15: prot.LessonResponse.lesson:type_name -> prot.Lesson
-	0,  // 16: prot.LessonRequest.chapter:type_name -> prot.ChapterInfo
-	4,  // 17: prot.LessonRequest.dependencies:type_name -> prot.LessonInfo
-	1,  // 18: prot.LessonRequest.tags:type_name -> prot.TagInfo
-	2,  // 19: prot.LessonRequest.topics:type_name -> prot.TopicInfo
-	3,  // 20: prot.LessonRequest.skills:type_name -> prot.SkillInfo
-	5,  // 21: prot.LessonRequest.exams:type_name -> prot.ExamInfo
-	6,  // 22: prot.LessonRequest.homeworks:type_name -> prot.HomeworkInfo
-	7,  // 23: prot.LessonRequest.exercises:type_name -> prot.ExerciseInfo
-	9,  // 24: prot.LessonRequest.lesson_plans:type_name -> prot.LessonPlanInfo
-	10, // 25: prot.LessonRequest.schedules:type_name -> prot.LessonScheduleInfo
-	12, // 26: prot.LessonsResponse.lessons:type_name -> prot.Lesson
-	12, // 27: prot.Lessons.lessons:type_name -> prot.Lesson
-	21, // 28: prot.AssignedLessons.lessons:type_name -> prot.AssignedLesson
-	29, // [29:29] is the sub-list for method output_type
-	29, // [29:29] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	10, // 10: prot.Lesson.lesson_plans:type_name -> prot.LessonPlanInfo
+	11, // 11: prot.Lesson.schedules:type_name -> prot.LessonScheduleInfo
+	12, // 12: prot.Lesson.program:type_name -> prot.LessonProgramInfo
+	25, // 13: prot.Lesson.vocabularies:type_name -> prot.Vocabulary
+	26, // 14: prot.Lesson.course:type_name -> prot.CourseInfo
+	8,  // 15: prot.Lesson.assessments:type_name -> prot.AssessmentInfo
+	13, // 16: prot.LessonResponse.lesson:type_name -> prot.Lesson
+	0,  // 17: prot.LessonRequest.chapter:type_name -> prot.ChapterInfo
+	4,  // 18: prot.LessonRequest.dependencies:type_name -> prot.LessonInfo
+	1,  // 19: prot.LessonRequest.tags:type_name -> prot.TagInfo
+	2,  // 20: prot.LessonRequest.topics:type_name -> prot.TopicInfo
+	3,  // 21: prot.LessonRequest.skills:type_name -> prot.SkillInfo
+	5,  // 22: prot.LessonRequest.exams:type_name -> prot.ExamInfo
+	6,  // 23: prot.LessonRequest.homeworks:type_name -> prot.HomeworkInfo
+	7,  // 24: prot.LessonRequest.exercises:type_name -> prot.ExerciseInfo
+	10, // 25: prot.LessonRequest.lesson_plans:type_name -> prot.LessonPlanInfo
+	11, // 26: prot.LessonRequest.schedules:type_name -> prot.LessonScheduleInfo
+	8,  // 27: prot.LessonRequest.assessments:type_name -> prot.AssessmentInfo
+	13, // 28: prot.LessonsResponse.lessons:type_name -> prot.Lesson
+	13, // 29: prot.Lessons.lessons:type_name -> prot.Lesson
+	22, // 30: prot.AssignedLessons.lessons:type_name -> prot.AssignedLesson
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_lesson_proto_init() }
@@ -2144,7 +2248,7 @@ func file_lesson_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_lesson_proto_rawDesc), len(file_lesson_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   23,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
