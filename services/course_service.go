@@ -32,6 +32,8 @@ type CourseService interface {
 	AddUsers(c *gin.Context, id int64) ([]models.User, error)
 	GetScore(c *gin.Context, id int64) (*prot.ScoreByCourse, error)
 	CopySchedule(id, targetCourseId, programId int64) dto.CopyScheduleResponse
+	GetCourseFamily(c *gin.Context, courseID int64) (*prot.CourseFamilyResponse, error)
+	SyncAllFamilyCourses(c *gin.Context, courseID int64) error
 }
 
 type courseService struct {

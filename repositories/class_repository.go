@@ -6,6 +6,7 @@ import (
 	"be-lms/models"
 	"be-lms/repositories/base"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
@@ -31,6 +32,34 @@ func NewClassRepository() ClassRepository {
 	return &classRepository{
 		BaseRepository: base.NewBaseRepository[models.Class](),
 	}
+}
+
+// Create không ghi grade_id=0 (vi phạm FK classes_grade_id_fkey).
+func (r *classRepository) Create(entity *models.Class) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if entity.GradeId == 0 {
+		if err := r.BeforeCreate(entity); err != nil {
+			return err
+		}
+		return db.MasterDB.Omit("author_id", "GradeId").Create(entity).Error
+	}
+	return r.BaseRepository.Create(entity)
+}
+
+// Update không ghi grade_id=0 (vi phạm FK); giữ NULL hoặc giá trị hiện có trong DB.
+func (r *classRepository) Update(entity *models.Class) error {
+	if entity == nil {
+		return fmt.Errorf("entity is nil")
+	}
+	if entity.GradeId == 0 {
+		if err := r.BeforeUpdate(entity); err != nil {
+			return err
+		}
+		return db.MasterDB.Omit("created_at", "created_by", "author_id", "GradeId").Save(entity).Error
+	}
+	return r.BaseRepository.Update(entity)
 }
 
 func (r *classRepository) GetUsers(classId int64, roleId int64) ([]models.User, error) {

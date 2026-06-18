@@ -53,6 +53,9 @@ func main() {
 		case "daily-course-statistics":
 			command.DailyCourseStatisticsCommand()
 			return
+		case "refresh-permissions":
+			command.RefreshPermissionsCacheCommand()
+			return
 		}
 	}
 

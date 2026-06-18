@@ -450,6 +450,8 @@ Hoặc chạy tay: **Actions → Deploy API → Run workflow** → chọn `dev` 
 
 ## Phần C — Hàng ngày (khi có code mới)
 
+**Checklist đầy đủ (tránh lệch code local / VPS / Vercel):** [vps-release-checklist.md](./vps-release-checklist.md)
+
 ### Dev
 
 ```bash
@@ -462,6 +464,10 @@ git push origin develop
 
 → GitHub Actions deploy **dev** → `https://api-dev.viethung.uk`
 
+Sau Actions **xanh**: CI chạy `deploy/scripts/post-deploy-check.sh` (migration version + refresh-permissions). Nếu fail, SSH và xem [vps-release-checklist.md](./vps-release-checklist.md) §5.
+
+**Đổi FE:** push `fe/` lên Vercel + kiểm tra `NEXT_PUBLIC_API_BASE_URL` trỏ đúng `api-dev`.
+
 ### Staging
 
 ```bash
@@ -471,6 +477,8 @@ git push origin pre
 ```
 
 → GitHub Actions deploy **staging** → `https://api-staging.viethung.uk`
+
+**Đổi FE:** redeploy Vercel staging với `NEXT_PUBLIC_API_BASE_URL=https://api-staging.viethung.uk/api`.
 
 ### Anh không cần SSH thủ công mỗi lần
 
@@ -631,7 +639,10 @@ docker exec csstaging-postgres pg_dump -U lms_user lms_db_staging > ~/backup-sta
 | Actions không chạy | Push nhầm nhánh; hoặc chỉ đổi `fe/` (workflow chỉ theo dõi `be/`, `deploy/`) |
 | Deploy fail: thiếu `.env` | Tạo `.env` trên VPS (A6) |
 | Pull image 401 | `GHCR_PULL_TOKEN` sai hoặc chưa `docker login ghcr.io` trên VPS |
-| Migration lỗi | `docker compose logs api`; kiểm tra `postgres` healthy |
+| Migration lỗi | `docker compose logs api`; kiểm tra `postgres` healthy; [vps-release-checklist.md](./vps-release-checklist.md) §5 |
+| Migration version lệch (local 44, VPS cũ) | Push BE + Actions xanh; hoặc `docker compose pull api && up -d`; chạy `scripts/post-deploy-check.sh` |
+| 403 assessments/settings sau deploy | `docker exec <stack>-api ./myapp refresh-permissions`; hoặc `./scripts/seed-admin.sh` |
+| FE 404 API mới nhưng Postman OK | Vercel chưa deploy FE mới hoặc sai `NEXT_PUBLIC_API_BASE_URL` |
 | Log `ch.program_id does not exist` | Pull code mới (migration `0025`); hoặc `ENABLE_DASHBOARD_JOBS=false` (mặc định) |
 | Log S3 / EC2 IMDS | Không cấu hình AWS trên VPS là bình thường — log chỉ stdout; không cần `AWS_*` cho MVP |
 | Nhánh tên `dev` thay vì `develop` | Sửa `branches:` trong `.github/workflows/deploy-api.yml` |
@@ -673,6 +684,9 @@ docker exec csstaging-postgres pg_dump -U lms_user lms_db_staging > ~/backup-sta
 | `deploy/env.staging.example` | Mẫu `.env` staging |
 | `deploy/proxy/` | Caddy HTTPS |
 | `deploy/scripts/seed-admin.sh` | Tạo user admin |
+| `deploy/scripts/post-deploy-check.sh` | Sau deploy: version migration, refresh-permissions, smoke |
+| `deploy/EXPECTED_MIGRATION_VERSION` | Version DB phải khớp image (cập nhật khi thêm migration) |
+| `docs/vps-release-checklist.md` | Đồng bộ local ↔ VPS ↔ Vercel |
 | `.github/workflows/deploy-api.yml` | CI/CD tự động |
 
 ---

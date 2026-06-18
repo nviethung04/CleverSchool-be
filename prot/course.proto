@@ -150,3 +150,19 @@ message ResyncScheduleRequest {
 message ResyncScheduleResponse {
   string message = 1;
 }
+
+message CourseFamilyItem {
+  int64 id = 1;
+  string name = 2;
+  string object_title = 3;
+  string school_name = 4;
+}
+
+message CourseFamilyResponse {
+  CourseFamilyItem parent = 1;
+  repeated CourseFamilyItem children = 2;
+}
+
+message SyncAllFamilyRequest {
+  int64 course_id = 1;
+}

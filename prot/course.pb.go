@@ -1357,6 +1357,170 @@ func (x *ResyncScheduleResponse) GetMessage() string {
 	return ""
 }
 
+type CourseFamilyItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ObjectTitle   string                 `protobuf:"bytes,3,opt,name=object_title,json=objectTitle,proto3" json:"object_title,omitempty"`
+	SchoolName    string                 `protobuf:"bytes,4,opt,name=school_name,json=schoolName,proto3" json:"school_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CourseFamilyItem) Reset() {
+	*x = CourseFamilyItem{}
+	mi := &file_course_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CourseFamilyItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CourseFamilyItem) ProtoMessage() {}
+
+func (x *CourseFamilyItem) ProtoReflect() protoreflect.Message {
+	mi := &file_course_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CourseFamilyItem.ProtoReflect.Descriptor instead.
+func (*CourseFamilyItem) Descriptor() ([]byte, []int) {
+	return file_course_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CourseFamilyItem) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CourseFamilyItem) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CourseFamilyItem) GetObjectTitle() string {
+	if x != nil {
+		return x.ObjectTitle
+	}
+	return ""
+}
+
+func (x *CourseFamilyItem) GetSchoolName() string {
+	if x != nil {
+		return x.SchoolName
+	}
+	return ""
+}
+
+type CourseFamilyResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Parent        *CourseFamilyItem      `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
+	Children      []*CourseFamilyItem    `protobuf:"bytes,2,rep,name=children,proto3" json:"children,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CourseFamilyResponse) Reset() {
+	*x = CourseFamilyResponse{}
+	mi := &file_course_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CourseFamilyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CourseFamilyResponse) ProtoMessage() {}
+
+func (x *CourseFamilyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_course_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CourseFamilyResponse.ProtoReflect.Descriptor instead.
+func (*CourseFamilyResponse) Descriptor() ([]byte, []int) {
+	return file_course_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CourseFamilyResponse) GetParent() *CourseFamilyItem {
+	if x != nil {
+		return x.Parent
+	}
+	return nil
+}
+
+func (x *CourseFamilyResponse) GetChildren() []*CourseFamilyItem {
+	if x != nil {
+		return x.Children
+	}
+	return nil
+}
+
+type SyncAllFamilyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CourseId      int64                  `protobuf:"varint,1,opt,name=course_id,json=courseId,proto3" json:"course_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SyncAllFamilyRequest) Reset() {
+	*x = SyncAllFamilyRequest{}
+	mi := &file_course_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SyncAllFamilyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SyncAllFamilyRequest) ProtoMessage() {}
+
+func (x *SyncAllFamilyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_course_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SyncAllFamilyRequest.ProtoReflect.Descriptor instead.
+func (*SyncAllFamilyRequest) Descriptor() ([]byte, []int) {
+	return file_course_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *SyncAllFamilyRequest) GetCourseId() int64 {
+	if x != nil {
+		return x.CourseId
+	}
+	return 0
+}
+
 var File_course_proto protoreflect.FileDescriptor
 
 const file_course_proto_rawDesc = "" +
@@ -1489,7 +1653,18 @@ const file_course_proto_rawDesc = "" +
 	"\n" +
 	"course_ids\x18\x02 \x03(\x03R\tcourseIds\"2\n" +
 	"\x16ResyncScheduleResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessageB\rZ\vbe-lms/protb\x06proto3"
+	"\amessage\x18\x01 \x01(\tR\amessage\"z\n" +
+	"\x10CourseFamilyItem\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
+	"\fobject_title\x18\x03 \x01(\tR\vobjectTitle\x12\x1f\n" +
+	"\vschool_name\x18\x04 \x01(\tR\n" +
+	"schoolName\"z\n" +
+	"\x14CourseFamilyResponse\x12.\n" +
+	"\x06parent\x18\x01 \x01(\v2\x16.prot.CourseFamilyItemR\x06parent\x122\n" +
+	"\bchildren\x18\x02 \x03(\v2\x16.prot.CourseFamilyItemR\bchildren\"3\n" +
+	"\x14SyncAllFamilyRequest\x12\x1b\n" +
+	"\tcourse_id\x18\x01 \x01(\x03R\bcourseIdB\rZ\vbe-lms/protb\x06proto3"
 
 var (
 	file_course_proto_rawDescOnce sync.Once
@@ -1503,7 +1678,7 @@ func file_course_proto_rawDescGZIP() []byte {
 	return file_course_proto_rawDescData
 }
 
-var file_course_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_course_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_course_proto_goTypes = []any{
 	(*SchooInfo)(nil),              // 0: prot.SchooInfo
 	(*CourseTeacherInfo)(nil),      // 1: prot.CourseTeacherInfo
@@ -1521,31 +1696,36 @@ var file_course_proto_goTypes = []any{
 	(*SyncCourses)(nil),            // 13: prot.SyncCourses
 	(*ResyncScheduleRequest)(nil),  // 14: prot.ResyncScheduleRequest
 	(*ResyncScheduleResponse)(nil), // 15: prot.ResyncScheduleResponse
-	(*Subject)(nil),                // 16: prot.Subject
-	(*Chapter)(nil),                // 17: prot.Chapter
-	(*StudyShiftInfo)(nil),         // 18: prot.StudyShiftInfo
-	(*SemesterInfo)(nil),           // 19: prot.SemesterInfo
+	(*CourseFamilyItem)(nil),       // 16: prot.CourseFamilyItem
+	(*CourseFamilyResponse)(nil),   // 17: prot.CourseFamilyResponse
+	(*SyncAllFamilyRequest)(nil),   // 18: prot.SyncAllFamilyRequest
+	(*Subject)(nil),                // 19: prot.Subject
+	(*Chapter)(nil),                // 20: prot.Chapter
+	(*StudyShiftInfo)(nil),         // 21: prot.StudyShiftInfo
+	(*SemesterInfo)(nil),           // 22: prot.SemesterInfo
 }
 var file_course_proto_depIdxs = []int32{
-	16, // 0: prot.Course.subject:type_name -> prot.Subject
-	17, // 1: prot.Course.chapters:type_name -> prot.Chapter
+	19, // 0: prot.Course.subject:type_name -> prot.Subject
+	20, // 1: prot.Course.chapters:type_name -> prot.Chapter
 	0,  // 2: prot.Course.school:type_name -> prot.SchooInfo
-	18, // 3: prot.Course.study_shifts:type_name -> prot.StudyShiftInfo
+	21, // 3: prot.Course.study_shifts:type_name -> prot.StudyShiftInfo
 	1,  // 4: prot.Course.teacher:type_name -> prot.CourseTeacherInfo
-	19, // 5: prot.Course.semesters:type_name -> prot.SemesterInfo
+	22, // 5: prot.Course.semesters:type_name -> prot.SemesterInfo
 	2,  // 6: prot.Course.program:type_name -> prot.ProgramInfo
 	3,  // 7: prot.CourseResponse.course:type_name -> prot.Course
-	17, // 8: prot.CourseRequest.chapters:type_name -> prot.Chapter
+	20, // 8: prot.CourseRequest.chapters:type_name -> prot.Chapter
 	0,  // 9: prot.CourseRequest.school:type_name -> prot.SchooInfo
-	18, // 10: prot.CourseRequest.study_shifts:type_name -> prot.StudyShiftInfo
-	19, // 11: prot.CourseRequest.semesters:type_name -> prot.SemesterInfo
+	21, // 10: prot.CourseRequest.study_shifts:type_name -> prot.StudyShiftInfo
+	22, // 11: prot.CourseRequest.semesters:type_name -> prot.SemesterInfo
 	3,  // 12: prot.CoursesResponse.courses:type_name -> prot.Course
 	10, // 13: prot.ScoreByCourse.exam_results:type_name -> prot.ExamResult
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	16, // 14: prot.CourseFamilyResponse.parent:type_name -> prot.CourseFamilyItem
+	16, // 15: prot.CourseFamilyResponse.children:type_name -> prot.CourseFamilyItem
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_course_proto_init() }
@@ -1563,7 +1743,7 @@ func file_course_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_course_proto_rawDesc), len(file_course_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

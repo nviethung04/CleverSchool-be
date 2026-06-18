@@ -142,6 +142,40 @@ func (cc *CourseController) ResyncSchedule(c *gin.Context) {
 	}, nil, "")
 }
 
+func (cc *CourseController) GetCourseFamily(c *gin.Context) {
+	courseID, err := strconv.ParseInt(c.Query("course_id"), 10, 64)
+	if err != nil || courseID <= 0 {
+		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		return
+	}
+
+	family, err := cc.service.GetCourseFamily(c, courseID)
+	if err != nil {
+		utils.Respond(c, nil, err, "messages.error_get_data", 404)
+		return
+	}
+
+	utils.Respond(c, family, nil, "")
+}
+
+func (cc *CourseController) SyncAllFamilyCourses(c *gin.Context) {
+	req, err, message := utils.GetBody[*prot.SyncAllFamilyRequest](c, func() *prot.SyncAllFamilyRequest {
+		return &prot.SyncAllFamilyRequest{}
+	})
+	if err != nil {
+		utils.Respond(c, nil, err, message)
+		return
+	}
+	if req.CourseId <= 0 {
+		utils.Respond(c, nil, err, "messages.id_invalid", 400)
+		return
+	}
+
+	if err := cc.service.SyncAllFamilyCourses(c, req.CourseId); err != nil {
+		utils.Respond(c, nil, err, "messages.create_data")
+	}
+}
+
 func (cc *CourseController) RespondList(c *gin.Context, items []models.Course, totalCount int64, err error) {
 	var coursePtrs []*models.Course
 	for i := range items {

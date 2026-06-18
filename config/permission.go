@@ -99,6 +99,18 @@ func GetPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
 		},
+		"assessments": {
+			Group:        "Bài kiểm tra đánh giá",
+			SortPosition: 15,
+			Names:        []string{"Xem danh sách bài kiểm tra đánh giá", "Tạo bài kiểm tra đánh giá", "Sửa bài kiểm tra đánh giá", "Xoá bài kiểm tra đánh giá", "Xem chi tiết bài kiểm tra đánh giá"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"settings": {
+			Group:        "Cài đặt hệ thống",
+			SortPosition: 22,
+			Names:        []string{"Xem danh sách cài đặt", "Tạo cài đặt", "Sửa cài đặt", "Xoá cài đặt", "Xem chi tiết cài đặt"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
 		"programs": {
 			Group:        "Chương trình học",
 			SortPosition: 16,
@@ -258,6 +270,18 @@ func GetTeacherPermissions() map[string]PermissionGroup {
 			Group:        "Bài tập về nhà",
 			SortPosition: 15,
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"assessments": {
+			Group:        "Bài kiểm tra đánh giá",
+			SortPosition: 15,
+			Names:        []string{"Xem danh sách bài kiểm tra đánh giá", "Tạo bài kiểm tra đánh giá", "Sửa bài kiểm tra đánh giá", "Xoá bài kiểm tra đánh giá", "Xem chi tiết bài kiểm tra đánh giá"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"settings": {
+			Group:        "Cài đặt hệ thống",
+			SortPosition: 22,
+			Names:        []string{"Xem danh sách cài đặt", "Tạo cài đặt", "Sửa cài đặt", "Xoá cài đặt", "Xem chi tiết cài đặt"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
 		},
 		"programs": {

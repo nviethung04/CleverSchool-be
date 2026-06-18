@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package prot;
+
+option go_package = "be-lms/prot";
+
+message AssessmentFileInfo {
+  int64 id = 1;
+  string disk = 2;
+  string path = 3;
+}
+
+message Assessment {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  int64 program_id = 5;
+  int64 subject_id = 6;
+  string created_at = 7;
+  int64 created_by = 8;
+  string updated_at = 9;
+  int64 updated_by = 10;
+  int64 assessment_criteria_group_id = 11;
+  int64 study_report_criteria_id = 12;
+  repeated int64 assessment_criteria_ids = 13;
+  repeated AssessmentFileInfo file_infos = 14;
+  repeated string files = 15;
+}
+
+message AssessmentRequest {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  int64 program_id = 5;
+  int64 subject_id = 6;
+  int64 assessment_criteria_group_id = 7;
+  int64 study_report_criteria_id = 8;
+  repeated int64 assessment_criteria_ids = 9;
+  repeated AssessmentFileInfo file_infos = 10;
+  repeated string files = 11;
+}
+
+message AssessmentsResponse {
+  repeated Assessment assessments = 1;
+  int64 total = 2;
+}

@@ -381,6 +381,18 @@ func NewGradeController() *controllers.GradeController {
 	return controllers.NewGradeController(service)
 }
 
+func NewAssessmentController() *controllers.AssessmentController {
+	repo := repositories.NewAssessmentRepository()
+	service := services.NewAssessmentService(repo)
+	return controllers.NewAssessmentController(service)
+}
+
+func NewSettingController() *controllers.SettingController {
+	repo := repositories.NewSettingRepository()
+	service := services.NewSettingService(repo)
+	return controllers.NewSettingController(service)
+}
+
 func NewDashboardListEntityController() *controllers.DashboardListEntityController {
 	return controllers.NewDashboardListEntityController()
 }

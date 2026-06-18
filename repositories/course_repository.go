@@ -30,6 +30,8 @@ type CourseRepository interface {
 	GetExamUsers(userId int64, courseId int64) ([]models.ExamUser, error)
 	StoreSemester(courseId int64, semesterIds []int64) error
 	GetCloneIds(courseId int64) []int64
+	GetCloneParentID(courseId int64) int64
+	FindCoursesByIDs(ids []int64) ([]models.Course, error)
 }
 
 type courseRepository struct {
@@ -475,4 +477,28 @@ func (r *courseRepository) GetCloneIds(courseId int64) []int64 {
 		return nil
 	}
 	return ids
+}
+
+func (r *courseRepository) GetCloneParentID(courseId int64) int64 {
+	var parentID int64
+	err := db.MasterDB.
+		Raw(`SELECT COALESCE(NULLIF(clone_info->>'clone_id', '')::bigint, 0)
+			FROM courses WHERE id = ? AND deleted_at IS NULL`, courseId).
+		Scan(&parentID).Error
+	if err != nil {
+		return 0
+	}
+	return parentID
+}
+
+func (r *courseRepository) FindCoursesByIDs(ids []int64) ([]models.Course, error) {
+	if len(ids) == 0 {
+		return []models.Course{}, nil
+	}
+	var courses []models.Course
+	err := db.MasterDB.
+		Preload("Schools").
+		Where("id IN ? AND deleted_at IS NULL", ids).
+		Find(&courses).Error
+	return courses, err
 }

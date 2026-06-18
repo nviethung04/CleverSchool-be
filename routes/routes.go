@@ -50,6 +50,9 @@ func InitRoutes(router *gin.Engine) {
 	userController := NewUserController()
 	api.GET("/student-parent/:parent_id", userController.GetStudentsByParent)
 
+	settingController := NewSettingController()
+	api.GET("/manage/settings/by-key/:key", settingController.GetByKey)
+
 	managementRouter := api.Group("/manage")
 	managementRouter.Use(middleware.AuthMiddleware(authRepo))
 	{
@@ -87,6 +90,8 @@ func InitRoutes(router *gin.Engine) {
 		lessonScheduleController := NewLessonScheduleController()
 
 		gradeController := NewGradeController()
+		assessmentController := NewAssessmentController()
+		settingController := NewSettingController()
 
 		// Semester controller
 		semesterController := NewSemesterController()
@@ -112,6 +117,8 @@ func InitRoutes(router *gin.Engine) {
 		RegisterModuleRoute(managementRouter, "exams", []string{"index", "show", "store", "update", "destroy"}, examController)
 		RegisterModuleRoute(managementRouter, "exercises", []string{"index", "show", "store", "update", "destroy"}, exerciseController)
 		RegisterModuleRoute(managementRouter, "homeworks", []string{"index", "show", "store", "update", "destroy"}, homeworkController)
+		RegisterModuleRoute(managementRouter, "assessments", []string{"index", "show", "store", "update", "destroy"}, assessmentController)
+		RegisterModuleRoute(managementRouter, "settings", []string{"index", "show", "store", "update", "destroy"}, settingController)
 		RegisterModuleRoute(managementRouter, "contests", []string{"index", "show", "store", "update", "destroy", "restore"}, contestController)
 		RegisterModuleRoute(managementRouter, "contest-rounds", []string{"index", "show", "store", "update", "destroy", "restore"}, contestRoundController)
 
@@ -239,6 +246,8 @@ func InitRoutes(router *gin.Engine) {
 		managementRouter.PUT("/courses/:id/users", middleware.RoleMiddleware("courses.update"), courseController.AddUsers)
 		managementRouter.GET("/courses/:id/score", middleware.RoleMiddleware("courses.show"), courseController.GetScore)
 		managementRouter.POST("/courses/resync-schedules", middleware.RoleMiddleware("courses.update"), courseController.ResyncSchedule)
+		managementRouter.GET("/course-schedule/family", middleware.RoleMiddleware("courses.show"), courseController.GetCourseFamily)
+		managementRouter.POST("/course-schedule/sync-all-family", middleware.RoleMiddleware("courses.update"), courseController.SyncAllFamilyCourses)
 
 		managementRouter.GET("/classes/:id/users", middleware.RoleMiddleware("classes.show"), classController.GetUsers)
 		managementRouter.POST("/classes/:id/users", middleware.RoleMiddleware("classes.update"), classController.StoreUsers)

@@ -245,6 +245,40 @@ func (adapter *GradeResourceAdapter) FormatItem(item *models.Grade) *prot.Grade 
 	return adapter.resource.FormatGrade(item)
 }
 
+// Assessment
+type AssessmentResourceAdapter struct {
+	resource resources.AssessmentResource
+}
+
+func NewAssessmentResourceAdapter(resource resources.AssessmentResource) *AssessmentResourceAdapter {
+	return &AssessmentResourceAdapter{resource: resource}
+}
+
+func (adapter *AssessmentResourceAdapter) FormatItems(items []*models.Assessment) []*prot.Assessment {
+	return adapter.resource.FormatAssessments(items)
+}
+
+func (adapter *AssessmentResourceAdapter) FormatItem(item *models.Assessment) *prot.Assessment {
+	return adapter.resource.FormatAssessment(item)
+}
+
+// Setting
+type SettingResourceAdapter struct {
+	resource resources.SettingResource
+}
+
+func NewSettingResourceAdapter(resource resources.SettingResource) *SettingResourceAdapter {
+	return &SettingResourceAdapter{resource: resource}
+}
+
+func (adapter *SettingResourceAdapter) FormatItems(items []*models.Setting) []*prot.Setting {
+	return adapter.resource.FormatSettings(items)
+}
+
+func (adapter *SettingResourceAdapter) FormatItem(item *models.Setting) *prot.Setting {
+	return adapter.resource.FormatSetting(item)
+}
+
 // QuestionAttribute
 type QuestionAttributeResourceAdapter struct {
 	resource resources.QuestionAttributeResource

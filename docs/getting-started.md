@@ -46,7 +46,7 @@ Kiểm tra log:
 docker compose logs app
 ```
 
-Kỳ vọng: migration lên version **21**, không `dirty`.
+Kỳ vọng: migration lên version trong `be/deploy/EXPECTED_MIGRATION_VERSION` (hiện **44**), không `dirty`.
 
 ### Bước 4 — Kiểm tra API
 
@@ -164,8 +164,10 @@ Giống Cách 1, bước 5.
 
 ```bash
 cd be
-go run . migrate          # nếu chưa chạy (hiện tới version 23)
-go run ./database/seeder -model Role   # BẮT BUỘC — tạo admin + permissions
+go run . migrate          # nếu chưa chạy (tới version trong deploy/EXPECTED_MIGRATION_VERSION)
+go run . migrate:version
+go run . refresh-permissions   # sau migration có permission mới hoặc sau deploy VPS
+go run ./database/seeder -model Role   # BẮT BUỘC lần đầu — hoặc khi đổi config/permission.go mà không có migration seed
 ```
 
 Nếu bỏ qua bước seeder, login `admin`/`admin123` sẽ báo **Không tìm thấy tài khoản**.
@@ -221,6 +223,7 @@ Chạy không flag → seed câu hỏi mẫu + Role (mặc định cũ).
 |------|--------|
 | `go run . migrate` | Chạy migration |
 | `go run . migrate:version` | Xem version |
+| `go run . refresh-permissions` | Xóa cache permission Redis (sau deploy / migration quyền) |
 | `go run . migrate:force N` | Sửa dirty (cẩn thận) |
 | `make gen-proto` | Sinh protobuf (nếu đổi `.proto`) |
 | `docker compose down -v` | Xóa container + volume DB (reset hoàn toàn) |
@@ -230,6 +233,8 @@ Chạy không flag → seed câu hỏi mẫu + Role (mặc định cũ).
 ## Tài Liệu Liên Quan
 
 - [features.md](./features.md) — chức năng hệ thống  
+- [vps-release-checklist.md](./vps-release-checklist.md) — **đồng bộ VPS / Vercel sau mỗi release**  
+- [deploy-vps.md](./deploy-vps.md) — setup VPS + CI/CD  
 - [database/migration-guide.md](./database/migration-guide.md) — chi tiết migration  
 - [index.md](../index.md) — cửa vào docs backend  
 
