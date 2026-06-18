@@ -280,8 +280,6 @@ func (s *lessonService) Create(c *gin.Context, req *prot.LessonRequest) (*models
 }
 
 func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models.Lesson, error) {
-	courseId, _ := strconv.Atoi(c.Query("course_id"))
-
 	oldLesson, _ := s.repo.FindNewByID(int(req.Id))
 
 	if req.Chapter == nil {
@@ -303,28 +301,43 @@ func (s *lessonService) Update(c *gin.Context, req *prot.LessonRequest) (*models
 
 	id := int(lesson.ID)
 
-	if courseId == 0 {
-		var sortPosition int
-		if lesson.ChapterID > 0 {
-			sortPosition, _  = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, req.Id)
-		}
-		lesson.SortPosition = sortPosition
+	var sortPosition int
+	if lesson.ChapterID > 0 {
+		sortPosition, _ = s.repo.GetPositionByIdAndChapter(req.Chapter.Id, req.Id)
+	}
+	lesson.SortPosition = sortPosition
 
-		err := s.repo.Update(lesson)
-		if err != nil {
-			return nil, err
-		}
-
-		s.StoreDependencies(c, int64(id), req)
-		s.StoreTags(c, int64(id), req)
-		s.StoreTopics(c, int64(id), req)
-		s.StoreSkills(c, int64(id), req)
-		s.StoreLessonPlans(c, int64(id), int64(courseId), req)
+	if err := s.repo.Update(lesson); err != nil {
+		return nil, err
 	}
 
-	s.StoreExams(c, int64(id), int64(courseId), req)
-	s.StoreHomeworks(c, int64(id), int64(courseId), req)
-	s.StoreExercises(c, int64(id), int64(courseId), req)
+	if err := s.StoreDependencies(c, int64(id), req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreTags(c, int64(id), req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreTopics(c, int64(id), req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreSkills(c, int64(id), req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreLessonPlans(c, int64(id), 0, req); err != nil {
+		return nil, err
+	}
+
+	// Lesson content (exams, homeworks, exercises) is stored at program level (course_id = 0).
+	// Course-specific assignment uses dedicated /lessons/:id/exams-by-course APIs.
+	if err := s.StoreExams(c, int64(id), 0, req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreHomeworks(c, int64(id), 0, req); err != nil {
+		return nil, err
+	}
+	if err := s.StoreExercises(c, int64(id), 0, req); err != nil {
+		return nil, err
+	}
 	// s.StoreSchedules(c, int64(id), req)
 
 	s.repo.SetPreload([]string{

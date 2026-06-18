@@ -234,6 +234,7 @@ Chạy không flag → seed câu hỏi mẫu + Role (mặc định cũ).
 
 - [features.md](./features.md) — chức năng hệ thống  
 - [vps-release-checklist.md](./vps-release-checklist.md) — **đồng bộ VPS / Vercel sau mỗi release**  
+- [../fe/docs/user-guide.md](../fe/docs/user-guide.md) — **luồng sử dụng** Admin / GV / HS  
 - [deploy-vps.md](./deploy-vps.md) — setup VPS + CI/CD  
 - [database/migration-guide.md](./database/migration-guide.md) — chi tiết migration  
 - [index.md](../index.md) — cửa vào docs backend  

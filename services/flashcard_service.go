@@ -124,6 +124,34 @@ func (s *FlashcardService) AddVocabulariesToLesson(lessonID int64, req prot.AddV
 	return nil
 }
 
+// SyncLessonVocabularies replaces all vocabulary links for a lesson.
+func (s *FlashcardService) SyncLessonVocabularies(lessonID int64, vocabularyIDs []int64) error {
+	tx := s.db.Begin()
+
+	if err := tx.Where("lesson_id = ?", lessonID).Delete(&models.LessonVocabulary{}).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to clear lesson vocabularies: %w", err)
+	}
+
+	for i, vocabID := range vocabularyIDs {
+		if vocabID <= 0 {
+			continue
+		}
+		lessonVocab := models.LessonVocabulary{
+			LessonID:     lessonID,
+			VocabularyID: vocabID,
+			SortOrder:    i + 1,
+			IsRequired:   true,
+		}
+		if err := tx.Create(&lessonVocab).Error; err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to sync vocabulary %d to lesson: %w", vocabID, err)
+		}
+	}
+
+	return tx.Commit().Error
+}
+
 // GetLessonVocabularies retrieves all vocabularies for a lesson
 func (s *FlashcardService) GetLessonVocabularies(lessonID int64, studentID *int64) (*dto.FlashcardLessonDTO, error) {
 	var lesson models.Lesson

@@ -270,6 +270,7 @@ func InitRoutes(router *gin.Engine) {
 		// Lesson vocabulary routes
 		managementRouter.GET("/flashcard/lessons/:lessonId/vocabularies", flashcardController.GetLessonFlashcards)
 		managementRouter.POST("/flashcard/lessons/:lessonId/vocabularies", flashcardController.AddVocabulariesToLesson)
+		managementRouter.PUT("/flashcard/lessons/:lessonId/vocabularies", flashcardController.SyncLessonVocabularies)
 
 		// Study session routes
 		managementRouter.POST("/flashcard/sessions", flashcardController.StartFlashcardSession)

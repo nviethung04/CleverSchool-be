@@ -17,7 +17,7 @@ type Lesson struct {
 	Views        int    `json:"views"`
 
 	Chapter      Chapter  `gorm:"foreignKey:ChapterID"`
-	Dependencies []Lesson `gorm:"many2many:lesson_dependencies"`
+	Dependencies []Lesson `gorm:"many2many:lesson_dependencies;joinForeignKey:lesson_id;joinReferences:dependency_lesson_id"`
 	Skills       []Skill  `gorm:"many2many:lesson_ref_skills"`
 	Tags         []Tag    `gorm:"many2many:lesson_ref_tags"`
 	Topics       []Topic  `gorm:"many2many:lesson_ref_topics"`

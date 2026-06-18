@@ -2,7 +2,7 @@
 
 Danh mục chức năng backend và điểm nối frontend. **Mỗi thay đổi API, schema hoặc hành vi nghiệp vụ phải cập nhật file này** (xem `be/AGENTS.md`).
 
-Cập nhật: **2026-06-16**
+Cập nhật: **2026-06-18**
 
 ---
 
@@ -57,7 +57,25 @@ Code: `be/services/course_family_service.go`, `be/routes/routes.go`.
 
 Query: `course_id` (bắt buộc).
 
-### 3.2 Settings — đọc công khai theo key
+### 3.4 Bài học — cập nhật nội dung & từ vựng
+
+| Method | Path | Permission | Mô tả |
+|--------|------|------------|-------|
+| PUT | `/api/manage/lessons/:id` | `lessons.update` | Cập nhật metadata + gắn exam / homework / exercise / lesson_plan ở **mức chương trình** (`course_id = 0` trong bảng `*_ref_lessons`). Query `course_id` trên PUT **không** đổi chỗ lưu nội dung mẫu (2026-06-18) |
+| PUT | `/api/manage/flashcard/lessons/:lessonId/vocabularies` | (flashcard) | **Đồng bộ** toàn bộ từ vựng của bài học — body `{ vocabulary_ids: number[] }`. FE gọi sau khi lưu form bài học |
+
+**Mô hình dữ liệu**
+
+- Chương + bài học thuộc **chương trình** (`chapters.program_id`). Khóa học chỉ tham chiếu `program_id` — không clone riêng từng bài khi sửa CT.
+- Liên kết bài tập/KT/LT: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
+- Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên.
+- **Assessment** (`assessments`): bảng riêng migration 0040 — **chưa** có quan hệ `lesson ↔ assessment` trên `PUT /lessons` (form FE hiển thị nhưng BE chưa lưu).
+
+Code: `be/services/lesson_service.go` (`Update`), `be/repositories/lesson_repository.go`, `be/services/flashcard_service.go` (`SyncLessonVocabularies`).
+
+FE: `fe/components/lesson-form.tsx`, `fe/lib/api/lessons.ts` (`syncLessonVocabularies`).
+
+---
 
 | Method | Path | Auth | Mô tả |
 |--------|------|------|-------|
@@ -131,7 +149,7 @@ Core hiển thị: Tổng quan, Người dùng, Trường, Môn học, Chương 
 
 ---
 
-## 8. Lỗi đã xử lý (2026-06-16)
+## 8. Lỗi đã xử lý (2026-06-16 – 2026-06-18)
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |
 |-------------|-------------|------------|
@@ -142,3 +160,9 @@ Core hiển thị: Tổng quan, Người dùng, Trường, Môn học, Chương 
 | GET course-schedule/family 404 | Chưa có route | `course_family_service` |
 | React controlled→uncontrolled (program edit) | `form.cover` undefined + input Link | Bỏ Link; `cover ?? ""` khi load |
 | POST course `RETURNING id` trên `course_ref_semesters` | Model PK sai | Composite PK trên model |
+| Lưu bài học “thành công” nhưng mất exam/homework/exercise | PUT kèm `course_id` → ghi ref theo khóa; xem lại không có `course_id` | BE luôn lưu ref ở `course_id=0`; FE không gửi `course_id` khi `UpdateLesson` |
+| Từ vựng không lưu sau sửa bài học | `PUT /lessons` không xử lý vocab | `PUT /flashcard/lessons/:id/vocabularies` + FE `syncLessonVocabularies` |
+| PUT lesson 500 `column "dependency_id" does not exist` | GORM dùng sai tên cột | DB: `dependency_lesson_id`; model + repository đã map đúng |
+| PUT lesson 500 duplicate `lesson_plan_ref_lessons` | Insert lại link đã tồn tại | `UpdateLessonPlan` skip nếu đã có `(lesson_plan_id, lesson_id)` |
+| PUT lesson 500 `homework_ref_lessons_course_id_fkey` | Ghi `course_id = 0` vi phạm FK `courses` | Mức CT: `Omit("CourseId")` → NULL trong DB |
+| `NOT IN (NULL)` khi xóa ref lesson rỗng | `DeleteOld*` với mảng ID rỗng | Chỉ thêm `NOT IN` khi `len(ids) > 0` |

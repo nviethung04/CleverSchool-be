@@ -144,6 +144,29 @@ func (c *FlashcardController) AddVocabulariesToLesson(ctx *gin.Context) {
 	utils.JSONResponse(ctx, http.StatusCreated, "Vocabularies added to lesson successfully", nil)
 }
 
+func (c *FlashcardController) SyncLessonVocabularies(ctx *gin.Context) {
+	lessonID, err := strconv.ParseInt(ctx.Param("lessonId"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, http.StatusBadRequest, "Invalid lesson ID")
+		return
+	}
+
+	req, err, message := utils.GetBody[*prot.AddVocabularyToLessonRequest](ctx, func() *prot.AddVocabularyToLessonRequest {
+		return &prot.AddVocabularyToLessonRequest{}
+	})
+	if err != nil {
+		utils.Respond(ctx, nil, err, message)
+		return
+	}
+
+	if err := c.flashcardService.SyncLessonVocabularies(lessonID, req.VocabularyIds); err != nil {
+		utils.ErrorResponse(ctx, http.StatusInternalServerError, "Failed to sync lesson vocabularies", err.Error())
+		return
+	}
+
+	utils.JSONResponse(ctx, http.StatusOK, "Lesson vocabularies synced successfully", nil)
+}
+
 func (c *FlashcardController) StartFlashcardSession(ctx *gin.Context) {
 	req, err, messageError := utils.GetBody[*prot.StartFlashcardSessionRequest](ctx, func() *prot.StartFlashcardSessionRequest {
 		return &prot.StartFlashcardSessionRequest{}

@@ -99,7 +99,7 @@ func (r *lessonRepository) Create(entity *models.Lesson) error {
 func (r *lessonRepository) UpdateOrCreateDependency(dependency models.LessonDependency) error {
 	var existing models.LessonDependency
 	err := db.MasterDB.
-		Where("lesson_id = ? AND dependency_id = ?", dependency.LessonID, dependency.DependencyID).
+		Where("lesson_id = ? AND dependency_lesson_id = ?", dependency.LessonID, dependency.DependencyID).
 		First(&existing).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -110,9 +110,11 @@ func (r *lessonRepository) UpdateOrCreateDependency(dependency models.LessonDepe
 }
 
 func (r *lessonRepository) DeleteOldDependency(lessonId int64, dependencyIds []int64) error {
-	return db.MasterDB.
-		Where("lesson_id = ? AND dependency_id NOT IN ?", lessonId, dependencyIds).
-		Delete(&models.LessonDependency{}).Error
+	query := db.MasterDB.Where("lesson_id = ?", lessonId)
+	if len(dependencyIds) > 0 {
+		query = query.Where("dependency_lesson_id NOT IN ?", dependencyIds)
+	}
+	return query.Delete(&models.LessonDependency{}).Error
 }
 
 func (r *lessonRepository) UpdateOrCreateSkill(skill models.LessonRefSkill) error {
@@ -128,9 +130,11 @@ func (r *lessonRepository) UpdateOrCreateSkill(skill models.LessonRefSkill) erro
 }
 
 func (r *lessonRepository) DeleteOldSkill(lessonId int64, skillIds []int64) error {
-	return db.MasterDB.
-		Where("lesson_id = ? AND skill_id NOT IN ?", lessonId, skillIds).
-		Delete(&models.LessonRefSkill{}).Error
+	query := db.MasterDB.Where("lesson_id = ?", lessonId)
+	if len(skillIds) > 0 {
+		query = query.Where("skill_id NOT IN ?", skillIds)
+	}
+	return query.Delete(&models.LessonRefSkill{}).Error
 }
 
 func (r *lessonRepository) DropHomeworkByLessonId(lessonId int64, homeworkIds []int64) error {
@@ -167,9 +171,11 @@ func (r *lessonRepository) UpdateOrCreateTopic(topic models.LessonRefTopic) erro
 }
 
 func (r *lessonRepository) DeleteOldTopic(lessonId int64, topicIds []int64) error {
-	return db.MasterDB.
-		Where("lesson_id = ? AND topic_id NOT IN ?", lessonId, topicIds).
-		Delete(&models.LessonRefTopic{}).Error
+	query := db.MasterDB.Where("lesson_id = ?", lessonId)
+	if len(topicIds) > 0 {
+		query = query.Where("topic_id NOT IN ?", topicIds)
+	}
+	return query.Delete(&models.LessonRefTopic{}).Error
 }
 
 func (r *lessonRepository) UpdateOrCreateTag(tag models.LessonRefTag) error {
@@ -185,9 +191,11 @@ func (r *lessonRepository) UpdateOrCreateTag(tag models.LessonRefTag) error {
 }
 
 func (r *lessonRepository) DeleteOldTag(lessonId int64, tagIds []int64) error {
-	return db.MasterDB.
-		Where("lesson_id = ? AND tag_id NOT IN ?", lessonId, tagIds).
-		Delete(&models.LessonRefTag{}).Error
+	query := db.MasterDB.Where("lesson_id = ?", lessonId)
+	if len(tagIds) > 0 {
+		query = query.Where("tag_id NOT IN ?", tagIds)
+	}
+	return query.Delete(&models.LessonRefTag{}).Error
 }
 
 func (r *lessonRepository) UpdateExamByLessonId(lessonId int64, examId int64) error {
@@ -703,8 +711,6 @@ func (r *lessonRepository) UpdateExerciseRefLesson(lessonId, courseId int64, exe
 		}
 		if courseId > 0 {
 			ref.CourseId = courseId
-		} else {
-			ref.CourseId = 0
 		}
 
 		if old, ok := oldMap[exerciseId]; ok {
@@ -715,7 +721,11 @@ func (r *lessonRepository) UpdateExerciseRefLesson(lessonId, courseId int64, exe
 		refs = append(refs, ref)
 	}
 
-	if err := tx.Create(&refs).Error; err != nil {
+	createQuery := tx
+	if courseId == 0 {
+		createQuery = tx.Omit("CourseId")
+	}
+	if err := createQuery.Create(&refs).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -797,8 +807,6 @@ func (r *lessonRepository) UpdateExamRefLesson(lessonId, courseId int64, examIds
 		}
 		if courseId > 0 {
 			ref.CourseId = courseId
-		} else {
-			ref.CourseId = 0
 		}
 
 		if old, ok := oldMap[examId]; ok {
@@ -809,7 +817,11 @@ func (r *lessonRepository) UpdateExamRefLesson(lessonId, courseId int64, examIds
 		refs = append(refs, ref)
 	}
 
-	if err := tx.Create(&refs).Error; err != nil {
+	createQuery := tx
+	if courseId == 0 {
+		createQuery = tx.Omit("CourseId")
+	}
+	if err := createQuery.Create(&refs).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -891,8 +903,6 @@ func (r *lessonRepository) UpdateHomeworkRefLesson(lessonId, courseId int64, hom
 		}
 		if courseId > 0 {
 			ref.CourseId = courseId
-		} else {
-			ref.CourseId = 0
 		}
 
 		if old, ok := oldMap[homeworkId]; ok {
@@ -903,7 +913,11 @@ func (r *lessonRepository) UpdateHomeworkRefLesson(lessonId, courseId int64, hom
 		refs = append(refs, ref)
 	}
 
-	if err := tx.Create(&refs).Error; err != nil {
+	createQuery := tx
+	if courseId == 0 {
+		createQuery = tx.Omit("CourseId")
+	}
+	if err := createQuery.Create(&refs).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -1295,13 +1309,20 @@ func (r *lessonRepository) UpdateLessonPlan(lessonId int64, lessonPlanId int64) 
 		return nil
 	}
 
+	var existing models.LessonPlanRefLesson
+	err := db.MasterDB.
+		Where("lesson_plan_id = ? AND lesson_id = ?", lessonPlanId, lessonId).
+		First(&existing).Error
+	if err == nil {
+		return nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+
 	ref := models.LessonPlanRefLesson{
 		LessonPlanId: lessonPlanId,
 		LessonId:     lessonId,
 	}
-	if err := db.MasterDB.Create(&ref).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return db.MasterDB.Omit("CourseId").Create(&ref).Error
 }
