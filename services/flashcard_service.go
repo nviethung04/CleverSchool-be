@@ -206,11 +206,22 @@ func (s *FlashcardService) GetLessonVocabularies(lessonID int64, studentID *int6
 // ========== Flashcard Session Management ==========
 
 // StartFlashcardSession starts a new flashcard session
-func (s *FlashcardService) StartFlashcardSession(studentID int64, req prot.StartFlashcardSessionRequest) (map[string]interface{}, error) {
+func (s *FlashcardService) StartFlashcardSession(studentID int64, req prot.StartFlashcardSessionRequest, forceNew bool) (map[string]interface{}, error) {
 	// Step 1: Check if there's an active session for this lesson
 	var existingSession models.FlashcardSession
 	existingSessionFound := s.db.Where("student_id = ? AND lesson_id = ? AND completed_at IS NULL", studentID, req.LessonId).
 		Order("created_at DESC").First(&existingSession).Error == nil
+
+	if existingSessionFound && forceNew {
+		now := time.Now()
+		if err := s.db.Model(&existingSession).Updates(map[string]interface{}{
+			"completed_at": &now,
+			"updated_at":   now,
+		}).Error; err != nil {
+			return nil, fmt.Errorf("failed to close existing session: %w", err)
+		}
+		existingSessionFound = false
+	}
 
 	if existingSessionFound {
 		// Resume existing session
@@ -345,21 +356,96 @@ func (s *FlashcardService) GetAllVocabularies(filters map[string]interface{}) ([
 
 // RecordFlashcardActivity records a flashcard activity
 func (s *FlashcardService) RecordFlashcardActivity(sessionID int64, vocabularyID int64, req prot.RecordFlashcardActivityRequest) error {
-	pronunciationScore := float64(req.PronunciationScore.Value)
-	activity := models.FlashcardActivity{
-		SessionID:          sessionID,
-		VocabularyID:       vocabularyID,
-		ActivityType:       req.ActivityType,
-		Response:           req.Response,
-		ResponseTime:       int(req.ResponseTime),
-		PronunciationScore: &pronunciationScore,
+	var session models.FlashcardSession
+	if err := s.db.Where("id = ?", sessionID).First(&session).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("session not found")
+		}
+		return fmt.Errorf("failed to find session: %w", err)
 	}
 
-	return s.db.Create(&activity).Error
+	response := req.Response
+	if response == "" {
+		switch req.ActivityType {
+		case "mark_known":
+			response = "known"
+		case "mark_unknown":
+			response = "unknown"
+		}
+	}
+
+	activity := models.FlashcardActivity{
+		SessionID:    sessionID,
+		VocabularyID: vocabularyID,
+		ActivityType: req.ActivityType,
+		Response:     response,
+		ResponseTime: int(req.ResponseTime),
+	}
+
+	if req.PronunciationScore != nil {
+		score := req.PronunciationScore.Value
+		activity.PronunciationScore = &score
+	}
+
+	if err := s.db.Create(&activity).Error; err != nil {
+		return err
+	}
+
+	if req.ActivityType == "mark_known" || req.ActivityType == "mark_unknown" {
+		isKnown := req.ActivityType == "mark_known"
+		status := "learning"
+		if isKnown {
+			status = "known"
+		}
+		// Progress update is best-effort; activity + session stats must still succeed.
+		_ = s.updateVocabularyProgressForLesson(
+			session.StudentID,
+			session.LessonID,
+			vocabularyID,
+			prot.UpdateVocabularyProgressRequest{IsKnown: isKnown, Status: status},
+		)
+	}
+
+	return s.syncSessionStatsFromActivities(&session)
+}
+
+func (s *FlashcardService) syncSessionStatsFromActivities(session *models.FlashcardSession) error {
+	type row struct {
+		VocabularyID int64
+		ActivityType string
+	}
+	var rows []row
+	if err := s.db.Model(&models.FlashcardActivity{}).
+		Select("vocabulary_id, activity_type").
+		Where("session_id = ? AND activity_type IN ?", session.ID, []string{"mark_known", "mark_unknown", "view", "flip"}).
+		Find(&rows).Error; err != nil {
+		return err
+	}
+
+	studiedSet := make(map[int64]struct{})
+	knownSet := make(map[int64]struct{})
+	for _, r := range rows {
+		studiedSet[r.VocabularyID] = struct{}{}
+		if r.ActivityType == "mark_known" {
+			knownSet[r.VocabularyID] = struct{}{}
+		}
+	}
+
+	session.CompletedCards = len(studiedSet)
+	session.KnownCards = len(knownSet)
+	return s.db.Model(session).Updates(map[string]interface{}{
+		"completed_cards": session.CompletedCards,
+		"known_cards":     session.KnownCards,
+		"updated_at":      time.Now(),
+	}).Error
 }
 
 // UpdateVocabularyProgress updates student's progress with a vocabulary
 func (s *FlashcardService) UpdateVocabularyProgress(studentID, vocabularyID int64, req prot.UpdateVocabularyProgressRequest) error {
+	return s.updateVocabularyProgressForLesson(studentID, 0, vocabularyID, req)
+}
+
+func (s *FlashcardService) updateVocabularyProgressForLesson(studentID, lessonID, vocabularyID int64, req prot.UpdateVocabularyProgressRequest) error {
 	// First, check if vocabulary exists
 	var vocabulary models.Vocabulary
 	if err := s.db.First(&vocabulary, vocabularyID).Error; err != nil {
@@ -369,20 +455,35 @@ func (s *FlashcardService) UpdateVocabularyProgress(studentID, vocabularyID int6
 		return fmt.Errorf("failed to find vocabulary: %w", err)
 	}
 
-	// Get lesson ID from lesson_vocabularies table
-	var lessonVocab models.LessonVocabulary
-	if err := s.db.Where("vocabulary_id = ?", vocabularyID).First(&lessonVocab).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("vocabulary not assigned to any lesson")
+	resolvedLessonID := lessonID
+	if resolvedLessonID == 0 {
+		var lessonVocab models.LessonVocabulary
+		if err := s.db.Where("vocabulary_id = ?", vocabularyID).First(&lessonVocab).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("vocabulary not assigned to any lesson")
+			}
+			return fmt.Errorf("failed to find lesson vocabulary: %w", err)
 		}
-		return fmt.Errorf("failed to find lesson vocabulary: %w", err)
+		resolvedLessonID = lessonVocab.LessonID
+	} else {
+		var count int64
+		if err := s.db.Model(&models.LessonVocabulary{}).
+			Where("vocabulary_id = ? AND lesson_id = ?", vocabularyID, resolvedLessonID).
+			Count(&count).Error; err != nil {
+			return fmt.Errorf("failed to verify lesson vocabulary: %w", err)
+		}
+		if count == 0 {
+			return fmt.Errorf("vocabulary not assigned to this lesson")
+		}
 	}
 
 	var progress models.StudentVocabularyProgress
 
 	// Find existing progress record
-	result := s.db.Where("student_id = ? AND vocabulary_id = ?", studentID, vocabularyID).
-		First(&progress)
+	result := s.db.Where(
+		"student_id = ? AND vocabulary_id = ? AND lesson_id = ?",
+		studentID, vocabularyID, resolvedLessonID,
+	).First(&progress)
 
 	now := time.Now()
 
@@ -391,7 +492,7 @@ func (s *FlashcardService) UpdateVocabularyProgress(studentID, vocabularyID int6
 		progress = models.StudentVocabularyProgress{
 			StudentID:     studentID,
 			VocabularyID:  vocabularyID,
-			LessonID:      lessonVocab.LessonID,
+			LessonID:      resolvedLessonID,
 			Status:        req.Status,
 			IsKnown:       req.IsKnown,
 			StudyCount:    1,
@@ -542,19 +643,41 @@ func (s *FlashcardService) CompleteFlashcardSession(sessionID, userID int64, req
 	if req.StudyDuration > 0 {
 		session.StudyDuration = int(req.StudyDuration) // for backward compatibility
 	}
-	session.SessionScore = req.AverageScore
-	if req.SessionScore > 0 {
-		session.SessionScore = req.SessionScore // for backward compatibility
+
+	if session.TotalCards == 0 {
+		var total int64
+		s.db.Model(&models.LessonVocabulary{}).Where("lesson_id = ?", session.LessonID).Count(&total)
+		session.TotalCards = int(total)
 	}
+
+	if req.WordsStudied > 0 {
+		session.CompletedCards = int(req.WordsStudied)
+	} else if err := s.syncSessionStatsFromActivities(&session); err != nil {
+		return nil, fmt.Errorf("failed to sync session stats: %w", err)
+	}
+
+	if req.WordsKnown > 0 {
+		session.KnownCards = int(req.WordsKnown)
+	} else if err := s.syncSessionStatsFromActivities(&session); err != nil {
+		return nil, fmt.Errorf("failed to sync known cards: %w", err)
+	}
+
+	if req.CompletionRate > 0 {
+		session.SessionScore = req.CompletionRate * 100
+	} else if req.AverageScore > 0 {
+		session.SessionScore = req.AverageScore
+	} else if req.SessionScore > 0 {
+		session.SessionScore = req.SessionScore
+	} else if session.TotalCards > 0 {
+		session.SessionScore = float64(session.CompletedCards) / float64(session.TotalCards) * 100
+	}
+
 	session.CompletedAt = &now
 	session.UpdatedAt = now
 
 	if err := s.db.Save(&session).Error; err != nil {
 		return nil, fmt.Errorf("failed to complete session: %w", err)
 	}
-
-	// Update lesson progress if needed
-	// TODO: Add lesson progress update logic here
 
 	return s.mapSessionToDTO(&session), nil
 }

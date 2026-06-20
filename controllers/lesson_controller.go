@@ -68,9 +68,13 @@ func (lc *LessonController) Completion(c *gin.Context) {
 		return
 	}
 
-	lessonCompletion, err, _ := utils.GetBody[*prot.LessonCompletion](c, func() *prot.LessonCompletion {
+	lessonCompletion, err, message := utils.GetBody[*prot.LessonCompletion](c, func() *prot.LessonCompletion {
 		return &prot.LessonCompletion{}
 	})
+	if err != nil {
+		utils.Respond(c, nil, err, message, 400)
+		return
+	}
 
 	lessonCompletion.Id = int64(id)
 	lessonCompletion.StudentId = int64(utils.GetCurrentUserId(c))

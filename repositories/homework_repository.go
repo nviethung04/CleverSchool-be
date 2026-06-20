@@ -5,11 +5,12 @@ import (
 	"be-lms/dto"
 	"be-lms/models"
 	"be-lms/requests"
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
+	"gorm.io/gorm"
 )
 
 type HomeworkRepository interface {
@@ -165,17 +166,41 @@ func (r *homeworkRepository) Delete(id int64, deletedBy int64) error {
 
 
 func (r *homeworkRepository) Assigned(ref models.HomeworkRefLesson) error {
-	return db.MasterDB.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{
-			{Name: "homework_id"},
-			{Name: "lesson_id"},
-			{Name: "course_id"},
-		},
-		DoUpdates: clause.Assignments(map[string]interface{}{
-			"assigned_by": ref.AssignedBy,
-			"assigned_at": ref.AssignedAt,
-		}),
-	}).Create(&ref).Error
+	isAssign := ref.AssignedBy != nil && *ref.AssignedBy > 0
+
+	var existing models.HomeworkRefLesson
+	query := db.MasterDB.Where(
+		"lesson_id = ? AND homework_id = ?",
+		ref.LessonId, ref.HomeworkId,
+	)
+	if ref.CourseId == 0 {
+		query = query.Where("course_id IS NULL OR course_id = 0")
+	} else {
+		query = query.Where("course_id = ?", ref.CourseId)
+	}
+	err := query.First(&existing).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		if !isAssign {
+			return nil
+		}
+		return db.MasterDB.Create(&ref).Error
+	}
+	if err != nil {
+		return err
+	}
+
+	if !isAssign {
+		return db.MasterDB.Exec(
+			"UPDATE homework_ref_lessons SET assigned_by = NULL, assigned_at = NULL WHERE id = ?",
+			existing.ID,
+		).Error
+	}
+
+	return db.MasterDB.Model(&existing).Updates(map[string]interface{}{
+		"assigned_by": ref.AssignedBy,
+		"assigned_at": ref.AssignedAt,
+	}).Error
 }
 
 func (r *homeworkRepository) AssignedLesson(id int64) (*models.Homework, error) {

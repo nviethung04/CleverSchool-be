@@ -183,7 +183,9 @@ func (c *FlashcardController) StartFlashcardSession(ctx *gin.Context) {
 		return
 	}
 
-	session, err := c.flashcardService.StartFlashcardSession(studentID, *req)
+	forceNew := ctx.Query("force_new") == "true" || ctx.Query("force_new") == "1"
+
+	session, err := c.flashcardService.StartFlashcardSession(studentID, *req, forceNew)
 	if err != nil {
 		utils.ErrorResponse(ctx, http.StatusInternalServerError, "Failed to start session", err.Error())
 		return

@@ -315,6 +315,7 @@ func (r *LessonResourceImpl) GetHomeworks(lesson *models.Lesson) []*prot.Homewor
 	for _, attr := range lesson.Homeworks {
 		for _, ref := range attr.HomeworkRefLessons {
 			if ref.LessonId == lesson.ID && ref.HomeworkId == attr.ID && ref.CourseId == 0 {
+				isProgramAssigned := ref.AssignedBy != nil && *ref.AssignedBy > 0
 				homeworksMap[attr.ID] = &prot.HomeworkInfo{
 					Id:                 attr.ID,
 					Name:               attr.Name,
@@ -323,7 +324,7 @@ func (r *LessonResourceImpl) GetHomeworks(lesson *models.Lesson) []*prot.Homewor
 					QuestionsCompleted: r.homeworkCompletedMap[attr.ID],
 					TotalQuestions:     r.homeworkTotalQuestions[attr.ID],
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:         false,
+					IsAssigned:         r.CourseId == 0 && isProgramAssigned,
 					IsProgram:          true,
 				}
 				break
@@ -449,6 +450,7 @@ func (r *LessonResourceImpl) GetExercises(lesson *models.Lesson) []*prot.Exercis
 	for _, attr := range lesson.Exercises {
 		for _, ref := range attr.ExerciseRefLessons {
 			if ref.LessonId == lesson.ID && ref.ExerciseId == attr.ID && ref.CourseId == 0 {
+				isProgramAssigned := ref.AssignedBy != nil && *ref.AssignedBy > 0
 				exercisesMap[attr.ID] = &prot.ExerciseInfo{
 					Id:                 attr.ID,
 					Name:               attr.Name,
@@ -457,7 +459,7 @@ func (r *LessonResourceImpl) GetExercises(lesson *models.Lesson) []*prot.Exercis
 					IsCompleted:    r.exerciseCompletionMap[attr.ID],
 					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:         false,
+					IsAssigned:         r.CourseId == 0 && isProgramAssigned,
 					IsProgram:          true,
 					TimeLimit:      int32(attr.TimeLimit),
 				}
@@ -526,15 +528,16 @@ func (r *LessonResourceImpl) GetExams(lesson *models.Lesson) []*prot.ExamInfo {
 	for _, attr := range lesson.Exams {
 		for _, ref := range attr.ExamRefLessons {
 			if ref.LessonId == lesson.ID && ref.ExamId == attr.ID && ref.CourseId == 0 {
+				isProgramAssigned := ref.AssignedBy != nil && *ref.AssignedBy > 0
 				examsMap[attr.ID] = &prot.ExamInfo{
 					Id:                 attr.ID,
 					Name:               attr.Name,
 					Description:        attr.Description,
 					ObjectTitle:        attr.ObjectTitle,
-					IsCompleted:    r.exerciseCompletionMap[attr.ID],
-					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
+					IsCompleted:    r.examCompletionMap[attr.ID],
+					TotalQuestions: r.examTotalQuestions[attr.ID],
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
-					IsAssigned:         false,
+					IsAssigned:         r.CourseId == 0 && isProgramAssigned,
 					IsProgram:          true,
 					TimeLimit:      int32(attr.TimeLimit),
 				}
@@ -572,8 +575,8 @@ func (r *LessonResourceImpl) GetExams(lesson *models.Lesson) []*prot.ExamInfo {
 					Name:               attr.Name,
 					Description:        attr.Description,
 					ObjectTitle:        attr.ObjectTitle,
-					IsCompleted:    r.exerciseCompletionMap[attr.ID],
-					TotalQuestions: r.exerciseTotalQuestions[attr.ID],
+					IsCompleted:    r.examCompletionMap[attr.ID],
+					TotalQuestions: r.examTotalQuestions[attr.ID],
 					CreatedAt:          attr.CreatedAt.Format("2006-01-02"),
 					IsAssigned:         isAssigned,
 					IsProgram:          false,

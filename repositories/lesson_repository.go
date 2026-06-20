@@ -435,10 +435,10 @@ func (r *lessonRepository) UpdatePositionById(chapterId, id, position int) error
 func (r *lessonRepository) Completion(lessonCompletion *prot.LessonCompletion) (*prot.LessonCompletion, error) {
 	var existing models.LessonCompletion
 
-	err := db.ReplicaDB.Where("lesson_id = ? AND student_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).First(&existing).Error
+	err := db.ReplicaDB.Where("lesson_id = ? AND user_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).First(&existing).Error
 
 	if lessonCompletion.IsComplete {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			newCompletion := models.LessonCompletion{
 				LessonID:    lessonCompletion.Id,
 				StudentID:   lessonCompletion.StudentId,
@@ -455,16 +455,16 @@ func (r *lessonRepository) Completion(lessonCompletion *prot.LessonCompletion) (
 
 		lessonCompletion.CompletionAt = existing.CompletedAt.Format("2006-01-02")
 		return lessonCompletion, nil
-	} else {
-		if err == nil {
-			if err := db.MasterDB.Where("lesson_id = ? AND student_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).Delete(&existing).Error; err != nil {
-				return nil, err
-			}
-		} else if err != gorm.ErrRecordNotFound {
+	}
+
+	if err == nil {
+		if err := db.MasterDB.Where("lesson_id = ? AND user_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).Delete(&models.LessonCompletion{}).Error; err != nil {
 			return nil, err
 		}
-		return lessonCompletion, nil
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
 	}
+	return lessonCompletion, nil
 }
 
 func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, chapterId int64) []int64 {
@@ -505,7 +505,7 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 	if len(lessonIds) == 0 {
 		var completions []models.LessonCompletion
 		err := db.ReplicaDB.
-			Where("student_id = ?", studentId).
+			Where("user_id = ?", studentId).
 			Find(&completions).Error
 
 		if err != nil {
@@ -522,7 +522,7 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 
 	var completions []models.LessonCompletion
 	err := db.ReplicaDB.
-		Where("student_id = ? AND lesson_id IN ?", studentId, lessonIds).
+		Where("user_id = ? AND lesson_id IN ?", studentId, lessonIds).
 		Find(&completions).Error
 
 	if err != nil {

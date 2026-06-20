@@ -4,10 +4,11 @@ import (
 	"be-lms/database/db"
 	"be-lms/models"
 	"be-lms/requests"
+	"errors"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/clause"
+	"gorm.io/gorm"
 )
 
 type ExerciseRepository interface {
@@ -176,17 +177,41 @@ func (r *exerciseRepository) GetTotalQuestionsMap(exerciseIDs []int64) (map[int6
 }
 
 func (r *exerciseRepository) Assigned(ref models.ExerciseRefLesson) error {
-	return db.MasterDB.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{
-			{Name: "exercise_id"},
-			{Name: "lesson_id"},
-			{Name: "course_id"},
-		},
-		DoUpdates: clause.Assignments(map[string]interface{}{
-			"assigned_by": ref.AssignedBy,
-			"assigned_at": ref.AssignedAt,
-		}),
-	}).Create(&ref).Error
+	isAssign := ref.AssignedBy != nil && *ref.AssignedBy > 0
+
+	var existing models.ExerciseRefLesson
+	query := db.MasterDB.Where(
+		"lesson_id = ? AND exercise_id = ?",
+		ref.LessonId, ref.ExerciseId,
+	)
+	if ref.CourseId == 0 {
+		query = query.Where("course_id IS NULL OR course_id = 0")
+	} else {
+		query = query.Where("course_id = ?", ref.CourseId)
+	}
+	err := query.First(&existing).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		if !isAssign {
+			return nil
+		}
+		return db.MasterDB.Create(&ref).Error
+	}
+	if err != nil {
+		return err
+	}
+
+	if !isAssign {
+		return db.MasterDB.Exec(
+			"UPDATE exercise_ref_lessons SET assigned_by = NULL, assigned_at = NULL WHERE id = ?",
+			existing.ID,
+		).Error
+	}
+
+	return db.MasterDB.Model(&existing).Updates(map[string]interface{}{
+		"assigned_by": ref.AssignedBy,
+		"assigned_at": ref.AssignedAt,
+	}).Error
 }
 
 func (r *exerciseRepository) AssignedLesson(id int64) (*models.Exercise, error) {

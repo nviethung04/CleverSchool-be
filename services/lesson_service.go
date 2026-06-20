@@ -122,7 +122,7 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 	})
 
 	s.repo.SetContext(c)
-	lesson, err := s.repo.FindByID(id)
+	lesson, err := s.repo.FindNewByID(id)
 	if err != nil {
 		return nil, err
 	}
