@@ -18,6 +18,7 @@ type DashboardListEntityRepository interface {
 	GetSubjects(req *requests.DashboardSubjectListRequest) ([]dto.DashboardSubject, int64, error)
 	GetExams(userID int64, onlyUserExams bool, req *requests.DashboardExamListRequest) ([]dto.DashboardExam, int64, error)
 	GetHomeworks(userID int64, onlyUserHomeworks bool, req *requests.DashboardHomeworkListRequest) ([]dto.DashboardHomework, int64, error)
+	GetExercises(userID int64, onlyUserExercises bool, req *requests.DashboardHomeworkListRequest) ([]dto.DashboardExercise, int64, error)
 	GetLessons(userID int64, onlyUserLessons bool, req *requests.DashboardLessonListRequest) ([]dto.DashboardLesson, int64, error)
 }
 
@@ -419,6 +420,84 @@ func (r *dashboardListEntityRepository) GetHomeworks(userID int64, onlyUserHomew
 
 	err := query.Find(&homeworks).Error
 	return homeworks, totalCount, err
+}
+
+func (r *dashboardListEntityRepository) GetExercises(userID int64, onlyUserExercises bool, req *requests.DashboardHomeworkListRequest) ([]dto.DashboardExercise, int64, error) {
+	var exercises []dto.DashboardExercise
+	var totalCount int64
+
+	countQuery := db.ReplicaDB.Table("exercises").
+		Select("COUNT(DISTINCT exercises.id)").
+		Joins("LEFT JOIN exercise_ref_lessons erl ON erl.exercise_id = exercises.id").
+		Joins("LEFT JOIN lessons ON erl.lesson_id = lessons.id").
+		Joins("LEFT JOIN chapters ON lessons.chapter_id = chapters.id").
+		Joins("LEFT JOIN courses ON courses.program_id = chapters.program_id").
+		Joins("LEFT JOIN subjects ON courses.subject_id = subjects.id").
+		Joins("LEFT JOIN user_courses ON courses.id = user_courses.course_id").
+		Where("exercises.deleted_at IS NULL")
+
+	if req.CourseID > 0 {
+		countQuery = countQuery.Where("courses.id = ?", req.CourseID)
+	}
+	if req.SubjectID > 0 {
+		countQuery = countQuery.Where("subjects.id = ?", req.SubjectID)
+	}
+	if req.LessonID > 0 {
+		countQuery = countQuery.Where("lessons.id = ?", req.LessonID)
+	}
+	if req.IsAssigned != nil {
+		if *req.IsAssigned {
+			countQuery = countQuery.Where("erl.assigned_at IS NOT NULL")
+		} else {
+			countQuery = countQuery.Where("erl.assigned_at IS NULL")
+		}
+	}
+	if onlyUserExercises && userID > 0 {
+		countQuery = countQuery.Where("user_courses.user_id = ?", userID)
+	}
+
+	if err := countQuery.Scan(&totalCount).Error; err != nil {
+		return nil, 0, err
+	}
+
+	query := db.ReplicaDB.Table("exercises").
+		Select("DISTINCT ON (exercises.id) exercises.id, exercises.name, courses.id as course_id, subjects.id as subject_id, courses.name as course_name, subjects.name as subject_name, erl.lesson_id, lessons.title as lesson_title, erl.assigned_at").
+		Joins("LEFT JOIN exercise_ref_lessons erl ON erl.exercise_id = exercises.id").
+		Joins("LEFT JOIN lessons ON erl.lesson_id = lessons.id").
+		Joins("LEFT JOIN chapters ON lessons.chapter_id = chapters.id").
+		Joins("LEFT JOIN courses ON courses.program_id = chapters.program_id").
+		Joins("LEFT JOIN subjects ON courses.subject_id = subjects.id").
+		Joins("LEFT JOIN user_courses ON courses.id = user_courses.course_id").
+		Where("exercises.deleted_at IS NULL")
+
+	if req.CourseID > 0 {
+		query = query.Where("courses.id = ?", req.CourseID)
+	}
+	if req.SubjectID > 0 {
+		query = query.Where("subjects.id = ?", req.SubjectID)
+	}
+	if req.LessonID > 0 {
+		query = query.Where("lessons.id = ?", req.LessonID)
+	}
+	if req.IsAssigned != nil {
+		if *req.IsAssigned {
+			query = query.Where("erl.assigned_at IS NOT NULL")
+		} else {
+			query = query.Where("erl.assigned_at IS NULL")
+		}
+	}
+	if onlyUserExercises && userID > 0 {
+		query = query.Where("user_courses.user_id = ?", userID)
+	}
+
+	if req.Limit > 0 && req.Page > 0 {
+		offset := (req.Page - 1) * req.Limit
+		query = query.Offset(offset).Limit(req.Limit)
+	}
+	query = query.Order("exercises.id ASC")
+
+	err := query.Find(&exercises).Error
+	return exercises, totalCount, err
 }
 
 func (r *dashboardListEntityRepository) GetLessons(userID int64, onlyUserLessons bool, req *requests.DashboardLessonListRequest) ([]dto.DashboardLesson, int64, error) {

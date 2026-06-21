@@ -324,6 +324,6 @@ func (r *getExerciseAnswersRepository) GetUnscoredManualQuestions(exerciseID, us
 
 func (r *getExerciseAnswersRepository) GetExerciseComment(exerciseID, userID int64) (string, error) {
     var content string
-    err := db.ReplicaDB.Table("exercise_comments").Select("content").Where("exercises_id = ? AND student_id = ?", exerciseID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
+    err := db.ReplicaDB.Table("exercise_comments").Select("content").Where("exercise_id = ? AND student_id = ?", exerciseID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
     return content, err
 }

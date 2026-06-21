@@ -388,15 +388,20 @@ func InitRoutes(router *gin.Engine) {
 	{
 		dashboardStudentExamController := NewDashboardStudentExamController()
 		dashboardStudentHomeworkController := NewDashboardStudentHomeworkController()
+		dashboardStudentExerciseController := NewDashboardStudentExerciseController()
 		dashboardStudentExamListController := NewDashboardStudentExamListController()
 		dashboardStudentHomeworkListController := NewDashboardStudentHomeworkListController()
+		dashboardStudentExerciseListController := NewDashboardStudentExerciseListController()
 		dashboardListEntityController := NewDashboardListEntityController()
 		dashboardRouter.GET("/student/exam", middleware.AuthMiddleware(authRepo), dashboardStudentExamController.GetStudentExamStats)
 		dashboardRouter.GET("/student/homework", middleware.AuthMiddleware(authRepo), dashboardStudentHomeworkController.GetStudentHomeworkStats)
+		dashboardRouter.GET("/student/exercise", middleware.AuthMiddleware(authRepo), dashboardStudentExerciseController.GetStudentExerciseStats)
 		dashboardRouter.GET("/student/exam-list", dashboardStudentExamListController.GetStudentExamList)
 		dashboardRouter.GET("/student/homework-list", dashboardStudentHomeworkListController.GetStudentHomeworkList)
+		dashboardRouter.GET("/student/exercise-list", dashboardStudentExerciseListController.GetStudentExerciseList)
 		dashboardRouter.GET("/exam-list", dashboardListEntityController.GetExams)
 		dashboardRouter.GET("/homework-list", dashboardListEntityController.GetHomeworks)
+		dashboardRouter.GET("/exercise-list", dashboardListEntityController.GetExercises)
 		dashboardRouter.GET("/school-list", dashboardListEntityController.GetSchools)
 		dashboardRouter.GET("/program-list", dashboardListEntityController.GetPrograms)
 		dashboardRouter.GET("/course-list", dashboardListEntityController.GetCourses)
@@ -409,13 +414,18 @@ func InitRoutes(router *gin.Engine) {
 		dashboardRouter.GET("/teacher/exam-unscored", NewDashboardTeacherExamUnscoredController().DashboardTeacherExamUnscored)
 		dashboardRouter.GET("/teacher/exam-overview", NewDashboardTeacherExamOverviewController().DashboardTeacherExamOverview)
 
-		// Dashboard Teacher Homework routes
-		dashboardRouter.GET("/teacher/homework/:homework_id", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStudent)
-		dashboardRouter.GET("/teacher/homework", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStats)
+		// Dashboard Teacher Homework routes — static paths before /:homework_id
+		dashboardRouter.GET("/teacher/homework/list-homeworks", controllers.NewDashboardTeacherHomeworkListController().GetStudentHomeworkList)
 		dashboardRouter.GET("/teacher/homework-overview", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkOverview)
 		dashboardRouter.GET("/teacher/homework-overview-grade", controllers.NewDashboardTeacherHomeworkOverviewController().DashboardTeacherHomeworkOverview)
 		dashboardRouter.GET("/teacher/homework-unscored", NewDashboardTeacherHomeworkUnscoredController().DashboardTeacherHomeworkUnscored)
 		dashboardRouter.GET("/teacher/homework-scored", NewDashboardTeacherHomeworkScoredController().DashboardTeacherHomeworkScored)
+		dashboardRouter.GET("/teacher/homework/:homework_id", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStudent)
+		dashboardRouter.GET("/teacher/homework", NewDashboardTeacherHomeworkStudentController().DashboardTeacherHomeworkStats)
+
+		// Dashboard Teacher Exercise routes
+		dashboardRouter.GET("/teacher/exercise/list-exercises", controllers.NewDashboardTeacherExerciseListController().GetStudentExerciseList)
+		dashboardRouter.GET("/teacher/exercise", controllers.NewDashboardTeacherExerciseStudentController().GetStudentStats)
 
 		// Dashboard Exam Ranking routes
 		dashboardRouter.GET("/exam/ranking", NewDashboardExamRankingController().GetExamRanking)

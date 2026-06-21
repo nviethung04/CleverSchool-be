@@ -369,6 +369,18 @@ func NewDashboardStudentHomeworkListController() *controllers.DashboardStudentHo
 	return controllers.NewDashboardStudentHomeworkListController(service)
 }
 
+func NewDashboardStudentExerciseController() *controllers.DashboardStudentExerciseController {
+	repo := repositories.NewDashboardStudentExerciseRepository()
+	service := services.NewDashboardStudentExerciseService(repo)
+	return controllers.NewDashboardStudentExerciseController(service)
+}
+
+func NewDashboardStudentExerciseListController() *controllers.DashboardStudentExerciseListController {
+	repo := repositories.NewDashboardStudentExerciseListRepository()
+	service := services.NewDashboardStudentExerciseListService(repo)
+	return controllers.NewDashboardStudentExerciseListController(service)
+}
+
 func NewFeedbackController() *controllers.FeedbackController {
 	repo := repositories.NewFeedbackRepository()
 	service := services.NewFeedbackService(repo)

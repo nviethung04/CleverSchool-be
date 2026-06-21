@@ -7,6 +7,7 @@ import (
 	"be-lms/requests"
 	"be-lms/resources"
 	"be-lms/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ type DashboardListEntityService interface {
 	GetSubjects(c *gin.Context, req *requests.DashboardSubjectListRequest) (*prot.DashboardSubjectListResponse, error)
 	GetExams(c *gin.Context, req *requests.DashboardExamListRequest) (*prot.DashboardExamListResponse, error)
 	GetHomeworks(c *gin.Context, req *requests.DashboardHomeworkListRequest) (*prot.DashboardHomeworkListResponse, error)
+	GetExercises(c *gin.Context, req *requests.DashboardHomeworkListRequest) (map[string]interface{}, error)
 	GetLessons(c *gin.Context, req *requests.DashboardLessonListRequest) (*prot.DashboardLessonListResponse, error)
 }
 
@@ -137,6 +139,41 @@ func (s *dashboardListEntityService) GetHomeworks(c *gin.Context, req *requests.
 	return &prot.DashboardHomeworkListResponse{
 		Homeworks: resources.DashboardHomeworkListCollection(homeworks),
 		Total:     totalCount,
+	}, nil
+}
+
+func (s *dashboardListEntityService) GetExercises(c *gin.Context, req *requests.DashboardHomeworkListRequest) (map[string]interface{}, error) {
+	roleID := utils.GetCurrentRoleId(c)
+	userID := utils.GetCurrentUserId(c)
+
+	onlyUserExercises := false
+	if roleID == 2 && userID > 0 {
+		onlyUserExercises = true
+	}
+
+	exercises, totalCount, err := s.repo.GetExercises(int64(userID), onlyUserExercises, req)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]map[string]interface{}, 0, len(exercises))
+	for _, e := range exercises {
+		item := map[string]interface{}{
+			"id":           strconv.FormatInt(e.ID, 10),
+			"name":         e.Name,
+			"course_id":    e.CourseID,
+			"subject_id":   e.SubjectID,
+			"course_name":  e.CourseName,
+			"subject_name": e.SubjectName,
+			"lesson_id":    e.LessonID,
+			"lesson_title": e.LessonTitle,
+		}
+		items = append(items, item)
+	}
+
+	return map[string]interface{}{
+		"exercises": items,
+		"total":     totalCount,
 	}, nil
 }
 

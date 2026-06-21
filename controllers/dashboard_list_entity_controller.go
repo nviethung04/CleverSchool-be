@@ -5,6 +5,7 @@ import (
 	"be-lms/requests"
 	"be-lms/services"
 	"be-lms/utils"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -94,6 +95,27 @@ func (ctl *DashboardListEntityController) GetHomeworks(c *gin.Context) {
 
 	resp, err := ctl.svc.GetHomeworks(c, &req)
 	utils.Respond(c, resp, err, "")
+}
+
+func (ctl *DashboardListEntityController) GetExercises(c *gin.Context) {
+	var req requests.DashboardHomeworkListRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		utils.Respond(c, nil, err, "")
+		return
+	}
+
+	data, err := ctl.svc.GetExercises(c, &req)
+	if err != nil {
+		utils.Respond(c, nil, err, "")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    200,
+		"message": "success",
+		"data":    data,
+		"error":   "",
+	})
 }
 
 func (ctl *DashboardListEntityController) GetLessons(c *gin.Context) {

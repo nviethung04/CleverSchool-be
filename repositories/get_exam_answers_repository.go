@@ -324,6 +324,6 @@ func (r *getExamAnswersRepository) GetUnscoredManualQuestions(examID, userID int
 
 func (r *getExamAnswersRepository) GetExamComment(examID, userID int64) (string, error) {
 	var content string
-	err := db.ReplicaDB.Table("exam_comments").Select("content").Where("exams_id = ? AND student_id = ?", examID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
+	err := db.ReplicaDB.Table("exam_comments").Select("content").Where("exam_id = ? AND student_id = ?", examID, userID).Order("created_at desc").Limit(1).Scan(&content).Error
 	return content, err
 }

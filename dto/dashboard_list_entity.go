@@ -50,6 +50,18 @@ type DashboardHomework struct {
 	AssignedAt   *time.Time `json:"assigned_at,omitempty"`
 }
 
+type DashboardExercise struct {
+	ID          int64      `json:"id"`
+	Name        string     `json:"name"`
+	CourseID    int64      `json:"course_id"`
+	SubjectID   int64      `json:"subject_id"`
+	CourseName  string     `json:"course_name"`
+	SubjectName string     `json:"subject_name"`
+	LessonID    int64      `json:"lesson_id"`
+	LessonTitle string     `json:"lesson_title"`
+	AssignedAt  *time.Time `json:"assigned_at,omitempty"`
+}
+
 type DashboardLesson struct {
 	ID          int64  `json:"id"`
 	Title       string `json:"title"`

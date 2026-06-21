@@ -5,6 +5,8 @@ import (
 	"be-lms/dto"
 	"be-lms/models"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type ExamStudentRepository interface {
@@ -30,54 +32,62 @@ func NewExamStudentRepository() ExamStudentRepository {
 }
 
 func (r *examStudentRepository) GetExamStudentsByExamID(examID int64, courseID int64, limit, offset int) ([]dto.ExamStudentItem, int64, error) {
-	var result []dto.ExamStudentItem
 	var total int64
 
-	countQuery := db.ReplicaDB.Table("exams").
-		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = exams.id").
-		Joins("JOIN lessons ON lessons.id = erl.lesson_id AND lessons.deleted_at IS NULL").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id AND chapters.deleted_at IS NULL").
-		Joins("JOIN courses ON courses.program_id = chapters.program_id AND courses.deleted_at IS NULL").
-		Joins("JOIN user_courses ON user_courses.course_id = courses.id").
-		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
-		Joins("JOIN users ON users.id = user_courses.user_id AND urr.role_id = 3 AND users.deleted_at IS NULL").
-		Where("exams.id = ? AND exams.deleted_at IS NULL", examID)
-
-	if courseID > 0 {
-		countQuery = countQuery.Where("erl.course_id = ?", courseID)
+	type examStudentRow struct {
+		UserID        int64            `gorm:"column:user_id"`
+		Name          string           `gorm:"column:name"`
+		Username      string           `gorm:"column:username"`
+		AvatarInfo    models.MediaInfo `gorm:"column:avatar_info"`
+		IsSubmitted   bool             `gorm:"column:is_submitted"`
+		SubmittedAt   int64            `gorm:"column:submitted_at"`
+		Duration      int64            `gorm:"column:duration"`
+		UnscoredCount int32            `gorm:"column:unscored_count"`
+		Score         float64          `gorm:"column:score"`
+		Ratio         float64          `gorm:"column:ratio"`
+		CourseID      int64            `gorm:"column:course_id"`
 	}
+
+	buildQuery := func() *gorm.DB {
+		q := db.ReplicaDB.Table("users").
+			Joins("JOIN user_courses ON user_courses.user_id = users.id").
+			Joins("JOIN courses ON courses.id = user_courses.course_id AND courses.deleted_at IS NULL").
+			Joins("JOIN chapters ON chapters.program_id = courses.program_id AND chapters.deleted_at IS NULL").
+			Joins("JOIN lessons ON lessons.chapter_id = chapters.id AND lessons.deleted_at IS NULL").
+			Joins("JOIN exam_ref_lessons erl ON erl.lesson_id = lessons.id").
+			Joins("JOIN exams ON exams.id = erl.exam_id AND exams.deleted_at IS NULL").
+			Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
+			Where("exams.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL", examID)
+		if courseID > 0 {
+			q = q.Where("erl.course_id = ?", courseID).
+				Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0").
+				Where("user_courses.course_id = ?", courseID)
+		}
+		return q
+	}
+
+	countQuery := buildQuery()
 	if err := countQuery.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	query := db.ReplicaDB.Table("exams").
+	var rows []examStudentRow
+	query := buildQuery().
 		Select(`users.id as user_id, users.name, users.username, users.avatar_info,
 			CASE WHEN exam_users.id IS NULL THEN false ELSE true END as is_submitted,
-			CAST(extract(epoch from exam_users.created_at) AS BIGINT) as submitted_at,
-			exam_users.time as duration,
+			COALESCE(CAST(extract(epoch from exam_users.created_at) AS BIGINT), 0) as submitted_at,
+			COALESCE(exam_users."time", 0) as duration,
 			COALESCE(unscored.count, 0) as unscored_count,
-			exam_users.score as score,
-			exam_users.ratio as ratio,
+			COALESCE(exam_users.score, 0) as score,
+			COALESCE(exam_users.ratio, 0) as ratio,
 			erl.course_id as course_id`).
-		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = exams.id").
-		Joins("JOIN lessons ON lessons.id = erl.lesson_id AND lessons.deleted_at IS NULL").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id AND chapters.deleted_at IS NULL").
-		Joins("JOIN courses ON courses.program_id = chapters.program_id AND courses.deleted_at IS NULL").
-		Joins("JOIN user_courses ON user_courses.course_id = courses.id").
-		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
-		Joins("JOIN users ON users.id = user_courses.user_id AND urr.role_id = 3 AND users.deleted_at IS NULL").
 		Joins("LEFT JOIN exam_users ON exam_users.exam_id = exams.id AND exam_users.user_id = users.id").
 		Joins(`LEFT JOIN (
 			SELECT exam_id, user_id, COUNT(*) as count
 			FROM exam_question_user_manual_scoring
 			WHERE is_scored = false
 			GROUP BY exam_id, user_id
-		) as unscored ON unscored.exam_id = exams.id AND unscored.user_id = users.id`).
-		Where("exams.id = ? AND exams.deleted_at IS NULL", examID)
-
-	if courseID > 0 {
-		query = query.Where("erl.course_id = ?", courseID)
-	}
+		) as unscored ON unscored.exam_id = exams.id AND unscored.user_id = users.id`)
 
 	if limit > 0 {
 		query = query.Limit(limit)
@@ -86,8 +96,25 @@ func (r *examStudentRepository) GetExamStudentsByExamID(examID int64, courseID i
 		query = query.Offset(offset)
 	}
 
-	if err := query.Scan(&result).Error; err != nil {
+	if err := query.Scan(&rows).Error; err != nil {
 		return nil, 0, err
+	}
+
+	result := make([]dto.ExamStudentItem, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, dto.ExamStudentItem{
+			UserID:        row.UserID,
+			Name:          row.Name,
+			Username:      row.Username,
+			Avatar:        row.AvatarInfo.Path,
+			IsSubmitted:   row.IsSubmitted,
+			SubmittedAt:   row.SubmittedAt,
+			Duration:      row.Duration,
+			UnscoredCount: row.UnscoredCount,
+			Score:         row.Score,
+			Ratio:         row.Ratio,
+			CourseID:      row.CourseID,
+		})
 	}
 	return result, total, nil
 }
@@ -450,7 +477,7 @@ func (r *examStudentRepository) GetExamComment(examID, studentID int64) (string,
 	var content string
 	err := db.ReplicaDB.Table("exam_comments").
 		Select("content").
-		Where("exams_id = ? AND student_id = ?", examID, studentID).
+		Where("exam_id = ? AND student_id = ?", examID, studentID).
 		Order("created_at desc").
 		Limit(1).
 		Scan(&content).Error
