@@ -40,6 +40,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudents(req *requests.Da
 		Where("users.deleted_at IS NULL").
 		Where("homeworks.deleted_at IS NULL").
 		Where("hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0").
+		Where("(hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = user_courses.course_id)").
 		Where("user_courses.course_id = ?", req.CourseID)
 
 	// Add homework_id filter if provided
@@ -63,6 +64,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudents(req *requests.Da
 		Where("users.deleted_at IS NULL").
 		Where("homeworks.deleted_at IS NULL").
 		Where("hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0").
+		Where("(hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = user_courses.course_id)").
 		Where("user_courses.course_id = ?", req.CourseID)
 
 	// Add homework_id filter if provided
@@ -124,7 +126,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 			Joins("JOIN lessons l ON l.chapter_id = ch.id").
 			Joins("JOIN homework_ref_lessons hrl ON hrl.lesson_id = l.id").
 			Joins("JOIN homeworks h ON h.id = hrl.homework_id").
-			Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND l.id = ?", req.LessonID)
+			Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND l.id = ?", req.LessonID)
 	}
 
 	if err := countQuery.Distinct("uc.user_id").Count(&totalCount).Error; err != nil {
@@ -146,7 +148,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 			Joins("JOIN lessons l ON l.chapter_id = ch.id").
 			Joins("JOIN homework_ref_lessons hrl ON hrl.lesson_id = l.id").
 			Joins("JOIN homeworks h ON h.id = hrl.homework_id").
-			Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND l.id = ?", req.LessonID)
+			Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND l.id = ?", req.LessonID)
 	}
 
 	// Apply sorting (now u.name is in SELECT list)
@@ -202,7 +204,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 		Joins("JOIN lessons l ON l.chapter_id = ch.id").
 		Joins("JOIN homework_ref_lessons hrl ON hrl.lesson_id = l.id").
 		Joins("JOIN homeworks h ON h.id = hrl.homework_id").
-		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND uc.course_id = ?", req.CourseID).
+		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND uc.course_id = ?", req.CourseID).
 		Where("uc.user_id IN (?)", userIDs)
 	
 	if req.LessonID > 0 {
@@ -230,7 +232,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 		Joins("JOIN lessons l ON l.chapter_id = ch.id").
 		Joins("JOIN homework_ref_lessons hrl ON hrl.lesson_id = l.id").
 		Joins("JOIN homeworks h ON h.id = hrl.homework_id").
-		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND hrl.assigned_at IS NOT NULL AND uc.course_id = ?", req.CourseID).
+		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND hrl.assigned_at IS NOT NULL AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND uc.course_id = ?", req.CourseID).
 		Where("uc.user_id IN (?)", userIDs)
 	
 	if req.LessonID > 0 {
@@ -260,7 +262,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
 		Joins("JOIN courses c ON c.program_id = ch.program_id").
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = hu.user_id").
-		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND uc.course_id = ?", req.CourseID).
+		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND uc.course_id = ?", req.CourseID).
 		Where("hu.user_id IN (?)", userIDs).
 		Where("hu.questions_completed < h.total_questions")
 	
@@ -290,7 +292,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
 		Joins("JOIN courses c ON c.program_id = ch.program_id").
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = hu.user_id").
-		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND uc.course_id = ?", req.CourseID).
+		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND uc.course_id = ?", req.CourseID).
 		Where("hu.user_id IN (?)", userIDs).
 		Where("hu.questions_completed >= h.total_questions")
 	
@@ -320,7 +322,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetStudentStats(req *request
 		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
 		Joins("JOIN courses c ON c.program_id = ch.program_id").
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = hu.user_id").
-		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND uc.course_id = ?", req.CourseID).
+		Where("h.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id) AND uc.course_id = ?", req.CourseID).
 		Where("hu.user_id IN (?)", userIDs).
 		Where("hu.ratio IS NOT NULL")
 	
@@ -366,7 +368,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetHomeworkOverview(req *req
 		Joins("JOIN homeworks ON hrl.homework_id = homeworks.id").
 		Joins("JOIN users ON user_courses.user_id = users.id").
 		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
-		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL", req.HomeworkID)
+		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = user_courses.course_id)", req.HomeworkID)
 
 	// Add lesson_id filter if provided
 	if req.LessonID > 0 {
@@ -396,7 +398,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetHomeworkOverview(req *req
 		Joins("JOIN user_courses ON user_courses.course_id = courses.id AND user_courses.user_id = homework_users.user_id").
 		Joins("JOIN users ON homework_users.user_id = users.id").
 		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
-		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL AND homework_users.questions_completed < homeworks.total_questions", req.HomeworkID)
+		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = user_courses.course_id) AND homework_users.questions_completed < homeworks.total_questions", req.HomeworkID)
 
 	// Add lesson_id filter if provided
 	if req.LessonID > 0 {
@@ -426,7 +428,7 @@ func (r *dashboardTeacherHomeworkStudentRepository) GetHomeworkOverview(req *req
 		Joins("JOIN user_courses ON user_courses.course_id = courses.id AND user_courses.user_id = homework_users.user_id").
 		Joins("JOIN users ON homework_users.user_id = users.id").
 		Joins("JOIN user_ref_roles urr ON urr.user_id = users.id").
-		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL AND homework_users.questions_completed >= homeworks.total_questions", req.HomeworkID)
+		Where("homeworks.id = ? AND urr.role_id = 3 AND users.deleted_at IS NULL AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = user_courses.course_id) AND homework_users.questions_completed >= homeworks.total_questions", req.HomeworkID)
 
 	// Add lesson_id filter if provided
 	if req.LessonID > 0 {

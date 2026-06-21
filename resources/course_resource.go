@@ -33,6 +33,26 @@ func NewCourseResource() CourseResource {
 	}
 }
 
+func ResolveCourseState(course models.Course) string {
+	now := time.Now()
+	start := time.Date(
+		course.StartDate.Year(), course.StartDate.Month(), course.StartDate.Day(),
+		0, 0, 0, 0, course.StartDate.Location(),
+	)
+	end := time.Date(
+		course.EndDate.Year(), course.EndDate.Month(), course.EndDate.Day(),
+		23, 59, 59, 0, course.EndDate.Location(),
+	)
+
+	if now.Before(start) {
+		return "coming"
+	}
+	if now.After(end) {
+		return "finished"
+	}
+	return "active"
+}
+
 func (r *CourseResourceImpl) FormatCourse(course *models.Course) *prot.Course {
 	if course == nil {
 		return nil
@@ -103,7 +123,7 @@ func (r *CourseResourceImpl) FormatCourse(course *models.Course) *prot.Course {
 		School:          schoolInfo,
 		Program:		 programInfo,
 		Progress:        fmt.Sprintf("%d%%", GetProgress(*course)),
-		State:			 course.State,
+		State:			 ResolveCourseState(*course),
 		CreatedAt:       course.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:       course.UpdatedAt.Format("2006-01-02 15:04:05"),
 		CopyScheduleSuccess: r.CopyScheduleResponse.CopyScheduleSuccess,
@@ -237,7 +257,7 @@ func (r *CourseResourceImpl) FormatCourseDetail(course *models.Course) *prot.Cou
 		Teacher:         teacherInfo,
 		StudyShifts:     studyShifts,
 		Semesters:       semesters,
-		State:			 course.State,
+		State:			 ResolveCourseState(*course),
 		Progress:        fmt.Sprintf("%d%%", GetProgress(*course)),
 		CreatedAt:       course.CreatedAt.Format("2006-01-02 15:04:05"),
 		UpdatedAt:       course.UpdatedAt.Format("2006-01-02 15:04:05"),

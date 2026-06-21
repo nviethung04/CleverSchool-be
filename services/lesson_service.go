@@ -206,9 +206,10 @@ func (s *lessonService) GetByID(c *gin.Context, id int) (*prot.Lesson, error) {
 		exerciseCompletionMap, exerciseTotalQuestions,
 	)
 
-	completeLessonIds := s.CompletionLessonIds(c, 0, 0)
-	completeLessonPlanIds := s.CompletionLessonPlanIds(c, 0, 0, lesson.ID)
 	courseId, _ := strconv.Atoi(c.Query("course_id"))
+
+	completeLessonIds := s.CompletionLessonIds(c, int64(courseId), 0)
+	completeLessonPlanIds := s.CompletionLessonPlanIds(c, int64(courseId), 0, lesson.ID)
 
 	flashcardService := NewFlashcardService()
 	lessonVocabularies, _ := flashcardService.GetLessonVocabularies(lesson.ID, nil)

@@ -111,9 +111,9 @@ func (lc *LessonController) RespondList(c *gin.Context, lessons []models.Lesson,
 }
 
 func (lc *LessonController) RespondDetail(c *gin.Context, lesson *models.Lesson) {
-	completeLessonIds := lc.service.CompletionLessonIds(c, 0, 0)
-	lessonResource := resources.NewLessonResource()
 	courseId, _ := strconv.Atoi(c.Query("course_id"))
+	completeLessonIds := lc.service.CompletionLessonIds(c, int64(courseId), 0)
+	lessonResource := resources.NewLessonResource()
 
 	// Get vocabularies for this lesson
 	flashcardService := services.NewFlashcardService()

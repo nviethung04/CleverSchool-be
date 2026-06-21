@@ -435,7 +435,7 @@ func (r *lessonRepository) UpdatePositionById(chapterId, id, position int) error
 func (r *lessonRepository) Completion(lessonCompletion *prot.LessonCompletion) (*prot.LessonCompletion, error) {
 	var existing models.LessonCompletion
 
-	err := db.ReplicaDB.Where("lesson_id = ? AND user_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).First(&existing).Error
+	err := db.MasterDB.Where("lesson_id = ? AND user_id = ?", lessonCompletion.Id, lessonCompletion.StudentId).First(&existing).Error
 
 	if lessonCompletion.IsComplete {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -472,7 +472,7 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 
 	if chapterId > 0 {
 		var lessons []models.Lesson
-		if err := db.ReplicaDB.
+		if err := db.MasterDB.
 			Where("chapter_id = ?", chapterId).
 			Find(&lessons).Error; err == nil {
 			for _, l := range lessons {
@@ -480,23 +480,34 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 			}
 		}
 	} else if courseId > 0 {
-		var chapters []models.Chapter
-		if err := db.ReplicaDB.
-			Where("course_id = ?", courseId).
-			Find(&chapters).Error; err == nil {
-			var chapterIDs []int64
-			for _, ch := range chapters {
-				chapterIDs = append(chapterIDs, ch.ID)
-			}
+		var chapterIDs []int64
 
+		var course models.Course
+		if err := db.MasterDB.Select("program_id").Where("id = ?", courseId).First(&course).Error; err == nil && course.ProgramId > 0 {
+			var chapters []models.Chapter
+			if err := db.MasterDB.Where("program_id = ?", course.ProgramId).Find(&chapters).Error; err == nil {
+				for _, ch := range chapters {
+					chapterIDs = append(chapterIDs, ch.ID)
+				}
+			}
+		}
+
+		if len(chapterIDs) == 0 {
+			var chapters []models.Chapter
+			if err := db.MasterDB.Where("course_id = ?", courseId).Find(&chapters).Error; err == nil {
+				for _, ch := range chapters {
+					chapterIDs = append(chapterIDs, ch.ID)
+				}
+			}
+		}
+
+		if len(chapterIDs) > 0 {
 			var lessons []models.Lesson
-			if len(chapterIDs) > 0 {
-				if err := db.ReplicaDB.
-					Where("chapter_id IN ?", chapterIDs).
-					Find(&lessons).Error; err == nil {
-					for _, l := range lessons {
-						lessonIds = append(lessonIds, l.ID)
-					}
+			if err := db.MasterDB.
+				Where("chapter_id IN ?", chapterIDs).
+				Find(&lessons).Error; err == nil {
+				for _, l := range lessons {
+					lessonIds = append(lessonIds, l.ID)
 				}
 			}
 		}
@@ -504,7 +515,7 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 
 	if len(lessonIds) == 0 {
 		var completions []models.LessonCompletion
-		err := db.ReplicaDB.
+		err := db.MasterDB.
 			Where("user_id = ?", studentId).
 			Find(&completions).Error
 
@@ -521,7 +532,7 @@ func (r *lessonRepository) CompletionLessonIds(studentId int64, courseId int64, 
 	}
 
 	var completions []models.LessonCompletion
-	err := db.ReplicaDB.
+	err := db.MasterDB.
 		Where("user_id = ? AND lesson_id IN ?", studentId, lessonIds).
 		Find(&completions).Error
 

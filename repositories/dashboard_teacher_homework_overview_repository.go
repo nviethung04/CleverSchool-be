@@ -58,7 +58,8 @@ func (r *dashboardTeacherHomeworkOverviewRepository) GetOverview(userID int64, o
 		// Filter theo course_id nếu có - chỉ lấy học sinh thuộc course đó
 		if req.CourseID > 0 {
 			query = query.Joins("LEFT JOIN user_courses uc ON uc.user_id = hu.user_id AND uc.course_id = ?", req.CourseID).
-				Where("uc.course_id IS NOT NULL")
+				Where("uc.course_id IS NOT NULL").
+				Where("(hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = uc.course_id)")
 		}
 
 		// Nếu chỉ lấy homework cùng khóa (role_id = 2 hoặc 3)
