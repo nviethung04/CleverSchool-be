@@ -370,6 +370,7 @@ func InitRoutes(router *gin.Engine) {
 		studyRouter.POST("/exercise-comment", exerciseCommentCtl.PostExerciseComment)
 		studyRouter.POST("/homework-comment", homeworkCommentCtl.PostHomeworkComment)
 		studyRouter.GET("/exercise-students", exerciseStudentController.GetExerciseStudents)
+		studyRouter.POST("/exercise-reset", exerciseStudentController.ResetExerciseAttempt)
 
 		examCourseController := NewExamCourseController()
 		studyRouter.GET("/exam-courses", examCourseController.GetExamCourseDetail)

@@ -738,6 +738,11 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 		return nil, errors.New("answers is required")
 	}
 
+	lessonID := req.LessonId
+	if lessonID == 0 {
+		return nil, errors.New("lesson_id is required")
+	}
+
 	clonedQuestionsMap := map[string]repositories.ClonedQuestion{}
 	if s.serviceMC != nil {
 		if mc, ok := s.serviceMC.(interface{ GetClonedQuestionService() ClonedQuestionService }); ok {
@@ -793,6 +798,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqMC := &prot.SaveScoreMultipleChoiceRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				AnswerIds:  ids,
 			}
@@ -821,6 +827,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqFB := &prot.SaveScoreFillInBlankRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -854,6 +861,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqP := &prot.SaveScorePositionRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -887,6 +895,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqD := &prot.SaveScorePositionRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -920,6 +929,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqM := &prot.SaveScoreMatchingRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -953,6 +963,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqL := &prot.SaveScoreLabelingRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -986,6 +997,7 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 
 			reqG := &prot.SaveScoreGroupRequest{
 				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
 				QuestionId: answer.QuestionId,
 				Answers:    m,
 			}
@@ -1014,8 +1026,19 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 			fileUrl := utils.StripDomain(fileURL, models.Storage)
 			mediaRepo := repositories.NewMediaRepository()
 			fileInfo := mediaRepo.GetMediaInfo(fileUrl, models.Storage)
-			if err := db.MasterDB.Table("exercise_question_user_manual_scoring").
-				Create(map[string]interface{}{"exercise_id": req.ExerciseId, "user_id": userID, "question_id": answer.QuestionId, "answer": answerContent, "file_info": fileInfo, "is_scored": false}).Error; err != nil {
+			reqManual := &prot.SaveAnswerManualRequest{
+				ExerciseId: req.ExerciseId,
+				LessonId:   lessonID,
+				QuestionId: answer.QuestionId,
+				Answer:     answerContent,
+				FileUrl:    fileUrl,
+				FileInfo: &prot.FileInfo{
+					Id:   fileInfo.Id,
+					Path: fileInfo.Path,
+					Disk: fileInfo.Disk,
+				},
+			}
+			if err := s.serviceMS.SaveExerciseManualScoringService(*reqManual, userID); err != nil {
 				return nil, err
 			}
 			response.Manual = append(response.Manual, &prot.SaveScoreResponseManual{QuestionId: answer.QuestionId, Answer: answerContent, FileUrl: fileURL, IsSaved: true})
@@ -1027,7 +1050,14 @@ func (s *saveScoreBulkService) SaveScoreBulkExercise(req *prot.SaveScoreBulkRequ
 	}
 
 	// Save exercise_users + ratio
-	exerciseUser := &models.ExerciseUser{ExerciseID: req.ExerciseId, UserID: userID, Score: &response.TotalScore, Time: &req.Time, HasManualScoring: hasManualScoring}
+	exerciseUser := &models.ExerciseUser{
+		ExerciseID:       req.ExerciseId,
+		LessonID:         lessonID,
+		UserID:           userID,
+		Score:            &response.TotalScore,
+		Time:             &req.Time,
+		HasManualScoring: hasManualScoring,
+	}
 	if err := s.examUserService.SaveExerciseUser(exerciseUser); err != nil {
 		return nil, err
 	}
@@ -1464,7 +1494,7 @@ func (s *saveScoreBulkService) SaveBulkWrite(req *prot.SaveScoreBulkRequest, use
 
 	fileInfos := make([]models.MediaDetail, 0)
 
-	for _, file := range req.Files{
+	for _, file := range req.Files {
 		fileUrl := utils.StripDomain(file.Url, models.Storage)
 		fileInfo := mediaRepo.GetMediaInfo(fileUrl, models.Storage)
 		fileInfos = append(fileInfos, models.MediaDetail{
@@ -1486,7 +1516,7 @@ func (s *saveScoreBulkService) SaveBulkWrite(req *prot.SaveScoreBulkRequest, use
 	for _, file := range req.Files {
 		files = append(files, &prot.BulkFile{
 			Type: file.Type,
-			Url: utils.StaticURL(file.Url, models.Storage),
+			Url:  utils.StaticURL(file.Url, models.Storage),
 		})
 	}
 
@@ -1494,45 +1524,48 @@ func (s *saveScoreBulkService) SaveBulkWrite(req *prot.SaveScoreBulkRequest, use
 	case models.ClonedQuestionTypeExam:
 		examUserRepo := repositories.NewExamUserRepository()
 		err = examUserRepo.UpdateOrCreate(&models.ExamUser{
-			ExamID: req.ExamId,
-			UserID: userID,
-			LessonID: req.LessonId,
-			FileInfos: fileInfos,
+			ExamID:           req.ExamId,
+			UserID:           userID,
+			LessonID:         req.LessonId,
+			FileInfos:        fileInfos,
 			HasManualScoring: hasManualScoring,
-			Score: &score,
-			Ratio: &ratio,
+			Score:            &score,
+			Ratio:            &ratio,
 		})
 	case models.ClonedQuestionTypeHomework:
 		homeworkUserRepo := repositories.NewHomeworkUserRepository()
 		err = homeworkUserRepo.UpdateOrCreate(&models.HomeworkUser{
-			HomeworkID: req.HomeworkId,
-			UserID: userID,
-			LessonID: req.LessonId,
-			FileInfos: fileInfos,
+			HomeworkID:       req.HomeworkId,
+			UserID:           userID,
+			LessonID:         req.LessonId,
+			FileInfos:        fileInfos,
 			HasManualScoring: hasManualScoring,
-			Score: score,
-			Ratio: ratio,
+			Score:            score,
+			Ratio:            ratio,
 		})
 	case models.ClonedQuestionTypeExercise:
-		homeworkUserRepo := repositories.NewHomeworkUserRepository()
-		err = homeworkUserRepo.UpdateOrCreate(&models.HomeworkUser{
-			HomeworkID: req.ExerciseId,
-			UserID: userID,
-			LessonID: req.LessonId,
-			FileInfos: fileInfos,
+		if req.LessonId == 0 {
+			return nil, errors.New("lesson_id is required")
+		}
+		exerciseUserRepo := repositories.NewExerciseUserRepository()
+		err = exerciseUserRepo.UpdateOrCreate(&models.ExerciseUser{
+			ExerciseID:       req.ExerciseId,
+			UserID:           userID,
+			LessonID:         req.LessonId,
+			FileInfos:        fileInfos,
 			HasManualScoring: hasManualScoring,
-			Score: score,
-			Ratio: ratio,
+			Score:            &score,
+			Ratio:            &ratio,
 		})
 	case models.ClonedQuestionTypeContestRound:
 		homeworkUserRepo := repositories.NewContestScoreRepository()
 		err = homeworkUserRepo.UpdateOrCreateContestRoundUser(&models.ContestRoundUser{
-			ContestRoundId: req.ContestRoundId,
-			UserId: userID,
-			FileInfos: fileInfos,
+			ContestRoundId:   req.ContestRoundId,
+			UserId:           userID,
+			FileInfos:        fileInfos,
 			HasManualScoring: hasManualScoring,
-			Score: score,
-			Ratio: ratio,
+			Score:            score,
+			Ratio:            ratio,
 		})
 	default:
 		err = fmt.Errorf("unsupported question type: %v", typeQuestion)
@@ -1550,7 +1583,7 @@ func (s *saveScoreBulkService) SaveBulkWrite(req *prot.SaveScoreBulkRequest, use
 			Manual:           make([]*prot.SaveScoreResponseManual, 0),
 			ContestRoundId:   req.ContestRoundId,
 			ContestRoundName: "", // Will be filled later if needed
-			Files: files,
+			Files:            files,
 		}
 
 		return response, nil

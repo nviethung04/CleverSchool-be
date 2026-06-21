@@ -389,7 +389,7 @@ func ActivityLoggerMiddleware() gin.HandlerFunc {
 		var respBody datatypes.JSON
 
 		if statusCode != http.StatusOK || (statusCode == http.StatusOK && pathUrl == "/api/login") {
-			respBody = datatypes.JSON([]byte(blw.body.String()))
+			respBody = toValidJSON(blw.body.Bytes())
 		} else {
 			respBody = datatypes.JSON([]byte{}) // hoặc nil nếu field cho phép NULL
 		}
@@ -414,10 +414,12 @@ func ActivityLoggerMiddleware() gin.HandlerFunc {
 			// Ignore body/query log for sensitive paths
 			if (pathUrl != "/api/login" && pathUrl != "/api/change-password") || statusCode != http.StatusOK {
 				if len(requestBodyBytes) > 0 {
-					logEntry.RequestBody = datatypes.JSON(requestBodyBytes)
+					logEntry.RequestBody = toValidJSON(requestBodyBytes)
 				}
 				if queryParams != "" {
-					logEntry.QueryParams = datatypes.JSON([]byte(`"` + queryParams + `"`))
+					if qp, err := json.Marshal(queryParams); err == nil {
+						logEntry.QueryParams = datatypes.JSON(qp)
+					}
 				}
 			} else if statusCode == http.StatusOK && pathUrl == "/api/login" {
 				var resp LoginResponse
@@ -439,7 +441,7 @@ func ActivityLoggerMiddleware() gin.HandlerFunc {
 
 			// Write attributes if any
 			if method == "PUT" && len(attributeData) > 0 {
-				logEntry.Attribute = datatypes.JSON(attributeData)
+				logEntry.Attribute = toValidJSON(attributeData)
 			}
 
 			// Save to DB using monthly table strategy
@@ -455,4 +457,19 @@ func GenerateSessionId(ip, userAgent string) string {
 	raw := fmt.Sprintf("%s|%s", ip, userAgent)
 	hash := sha256.Sum256([]byte(raw))
 	return hex.EncodeToString(hash[:])
+}
+
+// toValidJSON đảm bảo dữ liệu ghi vào cột JSONB hợp lệ (tránh SQLSTATE 22P02).
+func toValidJSON(raw []byte) datatypes.JSON {
+	if len(raw) == 0 {
+		return nil
+	}
+	if json.Valid(raw) {
+		return datatypes.JSON(raw)
+	}
+	wrapped, err := json.Marshal(string(raw))
+	if err != nil {
+		return nil
+	}
+	return datatypes.JSON(wrapped)
 }

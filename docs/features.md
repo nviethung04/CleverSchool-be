@@ -102,6 +102,13 @@ Code: `be/repositories/dashboard_teacher_homework_list_repository.go`, FE: `fe/a
 
 FE: tab **Bài luyện tập** → `exercise-tab.tsx`; tab **Bài kiểm tra** → `exam-tab.tsx` (`/teacher/reports?tab=exercise|exam`).
 
+**Quy ước thống kê (2026-06-22):**
+
+- **Luyện tập:** *Hoàn thành* = có bản ghi `exercise_users` (đã nộp); *Đang làm* = có câu trả lời nhưng chưa nộp. Không lọc theo `lesson_id` trên `exercise_users` / `exercise_question_users`.
+- **Kiểm tra:** Xếp hạng lấy `AVG(exam_users.ratio)` qua subquery — chỉ bài đã giao (`exam_ref_lessons.assigned_by > 0`, `course_id` khớp hoặc NULL/0). Biểu đồ phân bố đếm **lượt nộp bài** theo khoảng điểm %. FE hiển thị điểm dạng `%` (làm tròn). Bộ lọc ngày: tùy chọn; cuối ngày tính đến 23:59:59.
+
+Code: `be/repositories/dashboard_teacher_exercise_student_repository.go`, `dashboard_exam_ranking_repository.go`, FE `exam-tab.tsx`.
+
 ### 3.3 Bài học — cập nhật nội dung & từ vựng
 
 | Method | Path | Permission | Mô tả |
@@ -125,12 +132,14 @@ FE: `fe/components/lesson-form.tsx`, `fe/lib/api/lessons.ts` (`syncLessonVocabul
 |--------|------|-------|-------|
 | GET | `/api/study/exam-students` | `exam_id`, `course_id?`, `page`, `limit` | Danh sách HS + trạng thái nộp/chấm bài kiểm tra. **Khi có `course_id`:** chỉ HS thuộc khóa đó và bài đã giao (`assigned_by > 0`) |
 | GET | `/api/study/exercise-students` | `exercise_id`, `course_id?`, … | Tương tự cho luyện tập |
+| POST | `/api/study/exercise-reset` | body: `exercise_id`, `user_id`, `lesson_id?` (optional, không lọc xóa) | GV reset lượt làm: xóa **mọi** `exercise_users` + đáp án + nhận xét của HS cho bài đó |
 | GET | `/api/study/homework-students` | `homework_id`, `course_id?` | Danh sách HS + tiến độ bài luyện tập |
 | GET | `/api/study/teacher/homework-answers` | `homework_id`, `user_id` | Chi tiết đáp án + điểm 1 HS (luyện tập) |
 | GET | `/api/study/teacher/exam-answers` | `exam_id`, `user_id` | Chi tiết bài làm 1 HS (GV chấm Writing/Speaking) |
 | POST | `/api/study/save-score/manual-scoring` | body: `exam_id`, `user_id`, `score_list` | Lưu điểm chấm tay |
+| POST | `/api/study/save-score/bulk` | body: `exercise_id` **+ `lesson_id`**, `time`, `list_answers[]` | HS nộp bài luyện tập (trắc nghiệm). `lesson_id` bắt buộc — ghi `exercise_users` và đáp án theo bài học |
 
-**Lưu đáp án HS (migration 0009):** `homework_users` / `exam_users` / `exercise_users` (tổng điểm, trạng thái); chi tiết từng câu: `*_question_users`, `*_question_user_fill_in_blanks`, …, `*_question_user_manual_scoring` (Writing/Speaking).
+**Lưu đáp án HS (migration 0009):** `homework_users` / `exam_users` / `exercise_users` (tổng điểm, trạng thái); chi tiết từng câu: `*_question_users`, `*_question_user_fill_in_blanks`, …, `*_question_user_manual_scoring` (Writing/Speaking). Bài luyện tập: join báo cáo GV theo `(exercise_id, user_id, lesson_id)`.
 
 FE luồng chấm: `/teacher/lessons/[id]` → tab Luyện tập / Kiểm tra → **Chấm bài** → danh sách HS → bấm HS → trang đáp án (`.../homework|exam|exercise/[id]/student/[studentId]`).
 

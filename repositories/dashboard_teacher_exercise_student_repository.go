@@ -16,7 +16,6 @@ func NewDashboardTeacherExerciseStudentRepository() DashboardTeacherExerciseStud
 	return &dashboardTeacherExerciseStudentRepository{}
 }
 
-const exerciseQCSub = `(SELECT COUNT(DISTINCT equ.question_id) FROM exercise_question_users equ WHERE equ.exercise_id = e.id AND equ.user_id = eu.user_id AND equ.lesson_id = l.id)`
 
 func (r *dashboardTeacherExerciseStudentRepository) GetStudentStats(req *requests.DashboardTeacherExerciseStudentStatsRequest) ([]dto.DashboardTeacherExerciseStudentStats, int64, error) {
 	type StudentInfo struct {
@@ -115,23 +114,27 @@ func (r *dashboardTeacherExerciseStudentRepository) GetStudentStats(req *request
 		}
 	}
 
-	// in progress
+	// in progress: có câu trả lời nhưng chưa có bản ghi exercise_users (chưa nộp)
 	var inProgressRows []countRow
-	inProgressQ := db.ReplicaDB.Table("exercise_users eu").
-		Select("eu.user_id, COUNT(DISTINCT eu.exercise_id) as count").
-		Joins("JOIN exercises e ON e.id = eu.exercise_id").
-		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id AND erl.lesson_id = eu.lesson_id").
-		Joins("JOIN lessons l ON l.id = erl.lesson_id").
-		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
-		Joins("JOIN courses c ON c.program_id = ch.program_id").
-		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = eu.user_id").
-		Where(assignedFilter, req.CourseID).
-		Where("eu.user_id IN ?", userIDs).
-		Where(exerciseQCSub + " > 0 AND " + exerciseQCSub + " < e.total_questions")
+	inProgressQ := db.ReplicaDB.Table("exercise_question_users equ").
+		Select("equ.user_id, COUNT(DISTINCT equ.exercise_id) as count").
+		Joins("JOIN exercises e ON e.id = equ.exercise_id AND e.deleted_at IS NULL").
+		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id").
+		Joins("JOIN lessons l ON l.id = erl.lesson_id AND l.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
+		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL AND c.id = ?", req.CourseID).
+		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = equ.user_id").
+		Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0").
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = uc.course_id)").
+		Where("equ.user_id IN ?", userIDs).
+		Where(`NOT EXISTS (
+			SELECT 1 FROM exercise_users eu
+			WHERE eu.exercise_id = e.id AND eu.user_id = equ.user_id
+		)`)
 	if req.LessonID > 0 {
 		inProgressQ = inProgressQ.Where("l.id = ?", req.LessonID)
 	}
-	if err := inProgressQ.Group("eu.user_id").Find(&inProgressRows).Error; err != nil {
+	if err := inProgressQ.Group("equ.user_id").Find(&inProgressRows).Error; err != nil {
 		return nil, 0, err
 	}
 	for _, row := range inProgressRows {
@@ -140,19 +143,18 @@ func (r *dashboardTeacherExerciseStudentRepository) GetStudentStats(req *request
 		}
 	}
 
-	// completed
+	// completed: đã nộp (có exercise_users) cho bài được giao trong khóa
 	var completedRows []countRow
 	completedQ := db.ReplicaDB.Table("exercise_users eu").
 		Select("eu.user_id, COUNT(DISTINCT eu.exercise_id) as count").
-		Joins("JOIN exercises e ON e.id = eu.exercise_id").
-		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id AND erl.lesson_id = eu.lesson_id").
-		Joins("JOIN lessons l ON l.id = erl.lesson_id").
-		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
-		Joins("JOIN courses c ON c.program_id = ch.program_id").
+		Joins("JOIN exercises e ON e.id = eu.exercise_id AND e.deleted_at IS NULL").
+		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id").
+		Joins("JOIN lessons l ON l.id = erl.lesson_id AND l.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
+		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL AND c.id = ?", req.CourseID).
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = eu.user_id").
 		Where(assignedFilter, req.CourseID).
-		Where("eu.user_id IN ?", userIDs).
-		Where("(" + exerciseQCSub + " >= e.total_questions OR (e.total_questions = 0 AND eu.id IS NOT NULL))")
+		Where("eu.user_id IN ?", userIDs)
 	if req.LessonID > 0 {
 		completedQ = completedQ.Where("l.id = ?", req.LessonID)
 	}
@@ -173,11 +175,11 @@ func (r *dashboardTeacherExerciseStudentRepository) GetStudentStats(req *request
 	var avgRows []avgRow
 	avgQ := db.ReplicaDB.Table("exercise_users eu").
 		Select("eu.user_id, AVG(eu.ratio) as avg_ratio").
-		Joins("JOIN exercises e ON e.id = eu.exercise_id").
-		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id AND erl.lesson_id = eu.lesson_id").
-		Joins("JOIN lessons l ON l.id = erl.lesson_id").
-		Joins("JOIN chapters ch ON ch.id = l.chapter_id").
-		Joins("JOIN courses c ON c.program_id = ch.program_id").
+		Joins("JOIN exercises e ON e.id = eu.exercise_id AND e.deleted_at IS NULL").
+		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id").
+		Joins("JOIN lessons l ON l.id = erl.lesson_id AND l.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
+		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL AND c.id = ?", req.CourseID).
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = eu.user_id").
 		Where(assignedFilter, req.CourseID).
 		Where("eu.user_id IN ?", userIDs).

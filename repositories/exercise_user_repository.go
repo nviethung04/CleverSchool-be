@@ -126,9 +126,9 @@ func (r *exerciseUserRepository) UpdateExerciseUserScore(exerciseID, userID int6
 }
 
 func (r *exerciseUserRepository) GetCorrectCountByTable(table string, exerciseID, userID int64) (map[int64]int, error) {
-	rows := make([]struct{
+	rows := make([]struct {
 		QuestionID int64
-		Count int
+		Count      int
 	}, 0)
 	err := db.ReplicaDB.Table(table).
 		Select("question_id, COUNT(*) as count").
@@ -146,9 +146,9 @@ func (r *exerciseUserRepository) GetCorrectCountByTable(table string, exerciseID
 }
 
 func (r *exerciseUserRepository) GetAnswerCountByTable(table string, exerciseID, userID int64) (map[int64]int, error) {
-	rows := make([]struct{
+	rows := make([]struct {
 		QuestionID int64
-		Count int
+		Count      int
 	}, 0)
 	err := db.ReplicaDB.Table(table).
 		Select("question_id, COUNT(*) as count").
@@ -166,9 +166,9 @@ func (r *exerciseUserRepository) GetAnswerCountByTable(table string, exerciseID,
 }
 
 func (r *exerciseUserRepository) GetManualScoringByExercise(exerciseID, userID int64) (map[int64]float64, error) {
-	rows := make([]struct{
+	rows := make([]struct {
 		QuestionID int64
-		Score float64
+		Score      float64
 	}, 0)
 	err := db.ReplicaDB.Table("exercise_question_user_manual_scoring").
 		Select("question_id, score").
@@ -227,7 +227,7 @@ func (r *exerciseUserRepository) UpdateOrCreate(exerciseUser *models.ExerciseUse
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// Chưa có => tạo mới
-			if err := db.ReplicaDB.Create(exerciseUser).Error; err != nil {
+			if err := db.MasterDB.Create(exerciseUser).Error; err != nil {
 				return fmt.Errorf("failed to create exercise user: %w", err)
 			}
 			return nil
@@ -236,14 +236,14 @@ func (r *exerciseUserRepository) UpdateOrCreate(exerciseUser *models.ExerciseUse
 		return fmt.Errorf("failed to query exercise user: %w", err)
 	}
 
-	// Có rồi => update FileInfos
-	err = db.ReplicaDB.Model(&existing).
+	// Có rồi => update
+	err = db.MasterDB.Model(&existing).
 		Updates(map[string]interface{}{
-			"file_infos":  exerciseUser.FileInfos,
-			"has_manual_scoring":  exerciseUser.HasManualScoring,
-			"score":       exerciseUser.Score,
-			"ratio":       exerciseUser.Ratio,
-			"updated_at":  time.Now(),
+			"file_infos":         exerciseUser.FileInfos,
+			"has_manual_scoring": exerciseUser.HasManualScoring,
+			"score":              exerciseUser.Score,
+			"ratio":              exerciseUser.Ratio,
+			"updated_at":         time.Now(),
 		}).Error
 	if err != nil {
 		return fmt.Errorf("failed to update exercise user: %w", err)

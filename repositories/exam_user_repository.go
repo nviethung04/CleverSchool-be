@@ -84,12 +84,16 @@ func (r *examUserRepository) SaveExerciseUser(exerciseUser *models.ExerciseUser)
 
 	// Nếu đã có bản ghi thì cập nhật
 	if existingExerciseUser.ID != 0 {
-		return db.MasterDB.Model(&existingExerciseUser).Updates(map[string]interface{}{
+		updates := map[string]interface{}{
 			"score":              exerciseUser.Score,
 			"time":               exerciseUser.Time,
 			"has_manual_scoring": exerciseUser.HasManualScoring,
 			"updated_at":         time.Now().UTC(),
-		}).Error
+		}
+		if exerciseUser.LessonID > 0 {
+			updates["lesson_id"] = exerciseUser.LessonID
+		}
+		return db.MasterDB.Model(&existingExerciseUser).Updates(updates).Error
 	}
 
 	// Nếu chưa có bản ghi thì tạo mới
@@ -193,7 +197,6 @@ func (r *examUserRepository) UpdateExamUserScore(examID, userID int64, score flo
 }
 
 //Xử lý chấm điểm theo tỉ lệ
-
 
 func (r *examUserRepository) GetCorrectCountByTable(table string, examID, userID int64) (map[int64]int, error) {
 	result := make(map[int64]int)
@@ -348,65 +351,65 @@ func (r *examUserRepository) UpdateExerciseUserScore(exerciseID, userID int64, s
 }
 
 func (r *examUserRepository) GetCorrectCountByTableExercise(table string, exerciseID, userID int64) (map[int64]int, error) {
-    result := make(map[int64]int)
-    rows, err := db.ReplicaDB.Table(table).
-        Select("question_id, COUNT(*)").
-        Where("exercise_id = ? AND user_id = ? AND is_correct = true", exerciseID, userID).
-        Group("question_id").
-        Rows()
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var qid int64
-        var cnt int
-        if err := rows.Scan(&qid, &cnt); err == nil {
-            result[qid] = cnt
-        }
-    }
-    return result, nil
+	result := make(map[int64]int)
+	rows, err := db.ReplicaDB.Table(table).
+		Select("question_id, COUNT(*)").
+		Where("exercise_id = ? AND user_id = ? AND is_correct = true", exerciseID, userID).
+		Group("question_id").
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var qid int64
+		var cnt int
+		if err := rows.Scan(&qid, &cnt); err == nil {
+			result[qid] = cnt
+		}
+	}
+	return result, nil
 }
 
 func (r *examUserRepository) GetManualScoringByExercise(exerciseID, userID int64) (map[int64]float64, error) {
-    result := make(map[int64]float64)
-    rows, err := db.ReplicaDB.Table("exercise_question_user_manual_scoring").
-        Select("question_id, score").
-        Where("exercise_id = ? AND user_id = ?", exerciseID, userID).
-        Rows()
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var qid int64
-        var score float64
-        if err := rows.Scan(&qid, &score); err == nil {
-            result[qid] = score
-        }
-    }
-    return result, nil
+	result := make(map[int64]float64)
+	rows, err := db.ReplicaDB.Table("exercise_question_user_manual_scoring").
+		Select("question_id, score").
+		Where("exercise_id = ? AND user_id = ?", exerciseID, userID).
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var qid int64
+		var score float64
+		if err := rows.Scan(&qid, &score); err == nil {
+			result[qid] = score
+		}
+	}
+	return result, nil
 }
 
 func (r *examUserRepository) GetAnswerCountByTableExercise(table string, exerciseID, userID int64) (map[int64]int, error) {
-    result := make(map[int64]int)
-    rows, err := db.ReplicaDB.Table(table).
-        Select("question_id, COUNT(*)").
-        Where("exercise_id = ? AND user_id = ?", exerciseID, userID).
-        Group("question_id").
-        Rows()
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
-    for rows.Next() {
-        var qid int64
-        var cnt int
-        if err := rows.Scan(&qid, &cnt); err == nil {
-            result[qid] = cnt
-        }
-    }
-    return result, nil
+	result := make(map[int64]int)
+	rows, err := db.ReplicaDB.Table(table).
+		Select("question_id, COUNT(*)").
+		Where("exercise_id = ? AND user_id = ?", exerciseID, userID).
+		Group("question_id").
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var qid int64
+		var cnt int
+		if err := rows.Scan(&qid, &cnt); err == nil {
+			result[qid] = cnt
+		}
+	}
+	return result, nil
 }
 
 func (r *examUserRepository) UpdateExerciseUserRatio(exerciseID, userID int64, ratio float64) error {
@@ -430,13 +433,19 @@ func (r *examUserRepository) UpdateExerciseUserRatio(exerciseID, userID int64, r
 			}).Error
 	} else {
 		// Bản ghi chưa tồn tại, tạo mới
-		return db.MasterDB.Create(&models.ExerciseUser{
+		var existing models.ExerciseUser
+		_ = db.MasterDB.Where("exercise_id = ? AND user_id = ?", exerciseID, userID).First(&existing).Error
+		createRow := &models.ExerciseUser{
 			ExerciseID: exerciseID,
 			UserID:     userID,
 			Ratio:      &ratio,
 			CreatedAt:  now,
 			UpdatedAt:  now,
-		}).Error
+		}
+		if existing.LessonID > 0 {
+			createRow.LessonID = existing.LessonID
+		}
+		return db.MasterDB.Create(createRow).Error
 	}
 }
 
@@ -466,11 +475,11 @@ func (r *examUserRepository) UpdateOrCreate(examUser *models.ExamUser) error {
 	// Có rồi => update FileInfos
 	err = db.ReplicaDB.Model(&existing).
 		Updates(map[string]interface{}{
-			"file_infos":  examUser.FileInfos,
-			"has_manual_scoring":  examUser.HasManualScoring,
-			"score":       examUser.Score,
-			"ratio":       examUser.Ratio,
-			"updated_at":  time.Now(),
+			"file_infos":         examUser.FileInfos,
+			"has_manual_scoring": examUser.HasManualScoring,
+			"score":              examUser.Score,
+			"ratio":              examUser.Ratio,
+			"updated_at":         time.Now(),
 		}).Error
 	if err != nil {
 		return fmt.Errorf("failed to update exam user: %w", err)

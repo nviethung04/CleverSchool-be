@@ -9,28 +9,40 @@ import (
 )
 
 type ExerciseStudentController struct {
-    service services.ExerciseStudentService
+	service services.ExerciseStudentService
 }
 
 func NewExerciseStudentController(service services.ExerciseStudentService) *ExerciseStudentController {
-    return &ExerciseStudentController{service: service}
+	return &ExerciseStudentController{service: service}
 }
 
 func (ctrl *ExerciseStudentController) GetExerciseStudents(c *gin.Context) {
-    var req requests.ExerciseStudentRequest
-    if err := c.ShouldBindQuery(&req); err != nil {
-        c.JSON(400, gin.H{"error": "invalid params"})
-        return
-    }
-    if req.ExerciseID == 0 {
-        c.JSON(400, gin.H{"error": "exercise_id required"})
-        return
-    }
-    if req.Limit == 0 { req.Limit = 20 }
-    if req.Page == 0 { req.Page = 1 }
+	var req requests.ExerciseStudentRequest
+	if err := c.ShouldBindQuery(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid params"})
+		return
+	}
+	if req.ExerciseID == 0 {
+		c.JSON(400, gin.H{"error": "exercise_id required"})
+		return
+	}
+	if req.Limit == 0 {
+		req.Limit = 20
+	}
+	if req.Page == 0 {
+		req.Page = 1
+	}
 
-    resp, err := ctrl.service.GetExerciseStudentsByExerciseIDService(req.ExerciseID, req.CourseID, req.Limit, req.Page)
-    utils.Respond(c, resp, err, "")
+	resp, err := ctrl.service.GetExerciseStudentsByExerciseIDService(req.ExerciseID, req.CourseID, req.Limit, req.Page)
+	utils.Respond(c, resp, err, "")
 }
 
-
+func (ctrl *ExerciseStudentController) ResetExerciseAttempt(c *gin.Context) {
+	var req requests.ResetExerciseAttemptRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Respond(c, nil, err, "messages.input_invalid", 400)
+		return
+	}
+	err := ctrl.service.ResetExerciseAttemptService(req.ExerciseID, req.UserID, req.LessonID)
+	utils.Respond(c, gin.H{"success": true}, err, "messages.success")
+}

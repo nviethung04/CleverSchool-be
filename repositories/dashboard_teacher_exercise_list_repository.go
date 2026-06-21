@@ -46,7 +46,7 @@ func (r *dashboardTeacherExerciseListRepository) applyExerciseListFilters(query 
 }
 
 func (r *dashboardTeacherExerciseListRepository) buildExerciseListQuery(req *requests.DashboardTeacherExerciseListRequest) *gorm.DB {
-	qcSub := `(SELECT COUNT(DISTINCT equ.question_id) FROM exercise_question_users equ WHERE equ.exercise_id = e.id AND equ.user_id = uc.user_id AND equ.lesson_id = l.id)`
+	qcSub := `(SELECT COUNT(DISTINCT equ.question_id) FROM exercise_question_users equ WHERE equ.exercise_id = e.id AND equ.user_id = uc.user_id)`
 
 	q := db.ReplicaDB.Table("exercise_ref_lessons erl").
 		Select(`
@@ -67,7 +67,7 @@ func (r *dashboardTeacherExerciseListRepository) buildExerciseListQuery(req *req
 		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
 		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL AND c.id = ?", req.CourseID).
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = ?", req.StudentID).
-		Joins("LEFT JOIN exercise_users eu ON eu.exercise_id = e.id AND eu.user_id = uc.user_id AND eu.lesson_id = l.id").
+		Joins("LEFT JOIN exercise_users eu ON eu.exercise_id = e.id AND eu.user_id = uc.user_id").
 		Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0").
 		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = ?)", req.CourseID)
 
