@@ -73,3 +73,19 @@ func (ctl *ExerciseController) AssignedLesson(c *gin.Context) {
 
 	utils.Respond(c, lessons, err, "")
 }
+
+// GetByID override để xử lý permission denied cho học sinh
+func (ctl *ExerciseController) GetByID(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	item, err := ctl.svc.GetByID(c, id)
+	if err != nil {
+		if err.Error() == "don't have permission to access this exercise" {
+			utils.Respond(c, nil, err, "don't have permission to access this exercise", http.StatusUnauthorized)
+			return
+		}
+		utils.Respond(c, nil, err, "messages.error_get_data", http.StatusNotFound)
+		return
+	}
+
+	utils.Respond(c, item, err, "")
+}

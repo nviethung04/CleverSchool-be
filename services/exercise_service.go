@@ -55,12 +55,53 @@ func (s *exerciseService) GetAll(c *gin.Context) ([]models.Exercise, int64, erro
 }
 
 func (s *exerciseService) GetByID(c *gin.Context, id int) (*prot.Exercise, error) {
-    item, err := s.repo.GetByID(int64(id), c)
-    if err != nil {
-        return nil, err
-    }
-    res := resources.NewExerciseResource()
-    return res.FormatExercise(item), nil
+	tokenStr := c.GetHeader("Token")
+	userID, err := utils.GetUserID(tokenStr)
+	if err != nil {
+		utils.Respond(c, nil, err, "")
+		return nil, nil
+	}
+
+	roleID := utils.GetCurrentRoleId(c)
+	if roleID == 3 {
+		hasAccess, err := s.checkStudentExerciseAccess(userID, int64(id))
+		if err != nil {
+			return nil, err
+		}
+		if !hasAccess {
+			return nil, fmt.Errorf("don't have permission to access this exercise")
+		}
+	}
+
+	item, err := s.repo.GetByID(int64(id), c)
+	if err != nil {
+		return nil, err
+	}
+	res := resources.NewExerciseResource()
+	return res.FormatExercise(item), nil
+}
+
+func (s *exerciseService) checkStudentExerciseAccess(userID, exerciseID int64) (bool, error) {
+	var count int64
+	err := db.ReplicaDB.Table("user_courses uc").
+		Joins("JOIN exercise_ref_lessons erl ON uc.course_id = erl.course_id").
+		Where("uc.user_id = ? AND erl.exercise_id = ? AND erl.course_id IS NOT NULL", userID, exerciseID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	if count > 0 {
+		return true, nil
+	}
+
+	err = db.ReplicaDB.Table("user_courses uc").
+		Joins("JOIN courses c ON c.id = uc.course_id AND c.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.program_id = c.program_id AND ch.deleted_at IS NULL").
+		Joins("JOIN lessons l ON l.chapter_id = ch.id AND l.deleted_at IS NULL").
+		Joins("JOIN exercise_ref_lessons erl ON erl.lesson_id = l.id AND erl.exercise_id = ? AND erl.course_id IS NULL", exerciseID).
+		Where("uc.user_id = ?", userID).
+		Count(&count).Error
+	return count > 0, err
 }
 
 func (s *exerciseService) Create(c *gin.Context, req *prot.ExerciseRequest) (*models.Exercise, error) {

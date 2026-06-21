@@ -446,6 +446,12 @@ func GetStudentPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách bài tập về nhà", "Tạo bài tập về nhà", "Sửa bài tập về nhà", "Xoá bài tập về nhà", "Xem chi tiết bài tập về nhà"},
 			Actions:      []string{"index", "store", "update", "destroy", "show"},
 		},
+		"exercises": {
+			Group:        "Bài tập",
+			SortPosition: 18,
+			Names:        []string{"Xem danh sách bài tập", "Tạo bài tập", "Sửa bài tập", "Xoá bài tập", "Xem chi tiết bài tập"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
 		"medias": {
 			Group:        "Tệp tin",
 			SortPosition: 16,

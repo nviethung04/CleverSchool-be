@@ -115,6 +115,8 @@ func runMigrate() {
 		fmt.Println("ℹ️ No new migrations were applied.")
 	} else {
 		fmt.Printf("📌 Migrated from version %d → %d\n", currentVer, newVer)
+		fmt.Println("🔄 Refreshing permissions cache after migration...")
+		command.RefreshPermissionsCacheCommand()
 	}
 }
 
