@@ -135,6 +135,20 @@ func (r *userRepository) Update(entity *models.User) error {
 	return r.BaseRepository.Update(entity)
 }
 
+// Delete không Save() toàn bộ model — tránh ghi school_id=0 (vi phạm FK users_school_id_fkey).
+func (r *userRepository) Delete(id int) error {
+	var model models.User
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+	if err := db.MasterDB.Model(&models.User{}).
+		Where("id = ?", id).
+		Update("deleted_by", model.DeletedBy).Error; err != nil {
+		return err
+	}
+	return db.MasterDB.Delete(&models.User{}, id).Error
+}
+
 func (r *userRepository) GetStudentsByParentID(parentID int) ([]models.User, error) {
 	var users []models.User
 	err := db.ReplicaDB.Preload("Roles").Where("parent_id = ?", parentID).Find(&users).Error
