@@ -381,6 +381,20 @@ func NewDashboardStudentExerciseListController() *controllers.DashboardStudentEx
 	return controllers.NewDashboardStudentExerciseListController(service)
 }
 
+func NewDashboardStudentAssessmentController() *controllers.DashboardStudentAssessmentController {
+	repo := repositories.NewDashboardStudentAssessmentRepository()
+	scoringRepo := repositories.NewAssessmentScoringRepository()
+	scoringSvc := services.NewAssessmentScoringService(scoringRepo)
+	service := services.NewDashboardStudentAssessmentService(repo, scoringRepo, scoringSvc)
+	return controllers.NewDashboardStudentAssessmentController(service)
+}
+
+func NewAssessmentScoringController() *controllers.AssessmentScoringController {
+	repo := repositories.NewAssessmentScoringRepository()
+	svc := services.NewAssessmentScoringService(repo)
+	return controllers.NewAssessmentScoringController(svc)
+}
+
 func NewFeedbackController() *controllers.FeedbackController {
 	repo := repositories.NewFeedbackRepository()
 	service := services.NewFeedbackService(repo)

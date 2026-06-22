@@ -45,6 +45,9 @@ func InitRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	authRepo := repositories.NewAuthRepository()
 
+	apiAssessmentScoringController := NewAssessmentScoringController()
+	api.POST("/assessments/save-score/bulk", middleware.AuthMiddleware(authRepo), apiAssessmentScoringController.SaveScoresBulk)
+
 	//api.POST("/refresh", authController.Register)
 
 	userController := NewUserController()
@@ -119,6 +122,26 @@ func InitRoutes(router *gin.Engine) {
 		RegisterModuleRoute(managementRouter, "homeworks", []string{"index", "show", "store", "update", "destroy"}, homeworkController)
 		RegisterModuleRoute(managementRouter, "assessments", []string{"index", "show", "store", "update", "destroy"}, assessmentController)
 		RegisterModuleRoute(managementRouter, "settings", []string{"index", "show", "store", "update", "destroy"}, settingController)
+
+		assessmentScoringController := NewAssessmentScoringController()
+		managementRouter.GET("/publish-assessments", assessmentScoringController.GetPublish)
+		managementRouter.PUT("/publish-assessments", assessmentScoringController.SetPublish)
+		managementRouter.PUT("/publish-study-report", assessmentScoringController.SetStudyReportPublish)
+		managementRouter.POST("/assessment-criteria-group/with-criteria", assessmentScoringController.CreateCriteriaGroup)
+		managementRouter.PUT("/assessment-criteria-group/with-criteria/:id", assessmentScoringController.UpdateCriteriaGroup)
+		managementRouter.GET("/assessment-criteria-groups", assessmentScoringController.ListCriteriaGroups)
+		managementRouter.GET("/assessment-criteria-groups/:id", assessmentScoringController.GetCriteriaGroup)
+		managementRouter.DELETE("/assessment-criteria-groups/:id", assessmentScoringController.DeleteCriteriaGroup)
+		managementRouter.GET("/study-report-criterias", assessmentScoringController.ListStudyReportCriterias)
+		managementRouter.GET("/study-report-criterias/:id", assessmentScoringController.GetStudyReportCriteria)
+		managementRouter.POST("/study-report-criterias", assessmentScoringController.CreateStudyReportCriteria)
+		managementRouter.PUT("/study-report-criterias/:id", assessmentScoringController.UpdateStudyReportCriteria)
+		managementRouter.DELETE("/study-report-criterias/:id", assessmentScoringController.DeleteStudyReportCriteria)
+		managementRouter.GET("/study-reports/evaluates/:course_id", assessmentScoringController.GetStudyReportEvaluates)
+		managementRouter.GET("/study-reports", assessmentScoringController.ListStudyReports)
+		managementRouter.GET("/study-reports/:id", assessmentScoringController.GetStudyReportDetail)
+		managementRouter.POST("/study-reports", assessmentScoringController.CreateStudyReport)
+		managementRouter.PUT("/study-reports/:id", assessmentScoringController.UpdateStudyReport)
 		RegisterModuleRoute(managementRouter, "contests", []string{"index", "show", "store", "update", "destroy", "restore"}, contestController)
 		RegisterModuleRoute(managementRouter, "contest-rounds", []string{"index", "show", "store", "update", "destroy", "restore"}, contestRoundController)
 
@@ -382,6 +405,9 @@ func InitRoutes(router *gin.Engine) {
 
 		examCommentController := NewExamCommentController()
 		studyRouter.POST("/exam-comment", examCommentController.PostExamComment)
+
+		assessmentScoringStudyController := NewAssessmentScoringController()
+		studyRouter.POST("/assessment-submit", assessmentScoringStudyController.StudentSubmit)
 	}
 
 	dashboardRouter := api.Group("/dashboard")
@@ -393,13 +419,18 @@ func InitRoutes(router *gin.Engine) {
 		dashboardStudentExamListController := NewDashboardStudentExamListController()
 		dashboardStudentHomeworkListController := NewDashboardStudentHomeworkListController()
 		dashboardStudentExerciseListController := NewDashboardStudentExerciseListController()
+		dashboardStudentAssessmentController := NewDashboardStudentAssessmentController()
 		dashboardListEntityController := NewDashboardListEntityController()
+		dashboardAssessmentScoringController := NewAssessmentScoringController()
 		dashboardRouter.GET("/student/exam", middleware.AuthMiddleware(authRepo), dashboardStudentExamController.GetStudentExamStats)
 		dashboardRouter.GET("/student/homework", middleware.AuthMiddleware(authRepo), dashboardStudentHomeworkController.GetStudentHomeworkStats)
 		dashboardRouter.GET("/student/exercise", middleware.AuthMiddleware(authRepo), dashboardStudentExerciseController.GetStudentExerciseStats)
 		dashboardRouter.GET("/student/exam-list", dashboardStudentExamListController.GetStudentExamList)
 		dashboardRouter.GET("/student/homework-list", dashboardStudentHomeworkListController.GetStudentHomeworkList)
 		dashboardRouter.GET("/student/exercise-list", dashboardStudentExerciseListController.GetStudentExerciseList)
+		dashboardRouter.GET("/student/assessment-list", dashboardStudentAssessmentController.GetStudentAssessmentList)
+		dashboardRouter.GET("/student/assessments", dashboardStudentAssessmentController.GetStudentAssessments)
+		dashboardRouter.GET("/teacher/assessment/students", dashboardAssessmentScoringController.GetTeacherStudents)
 		dashboardRouter.GET("/exam-list", dashboardListEntityController.GetExams)
 		dashboardRouter.GET("/homework-list", dashboardListEntityController.GetHomeworks)
 		dashboardRouter.GET("/exercise-list", dashboardListEntityController.GetExercises)

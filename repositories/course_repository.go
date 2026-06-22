@@ -374,12 +374,15 @@ func (r *courseRepository) GetExams(courseId int64) ([]models.Exam, error) {
 	var exams []models.Exam
 
 	err := db.ReplicaDB.Model(&models.Exam{}).
+		Select("DISTINCT exams.*").
 		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = exams.id").
-		Joins("JOIN lessons ON lessons.id = erl.lesson_id").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
-		Joins("JOIN courses ON courses.program_id = chapters.program_id").
+		Joins("JOIN lessons ON lessons.id = erl.lesson_id AND lessons.deleted_at IS NULL").
+		Joins("JOIN chapters ON chapters.id = lessons.chapter_id AND chapters.deleted_at IS NULL").
+		Joins("JOIN courses ON courses.program_id = chapters.program_id AND courses.deleted_at IS NULL").
 		Where("courses.id = ? AND exams.deleted_at IS NULL", courseId).
-		Preload("Lessons"). // Ensure "Lessons" relation is set in Exam model
+		Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0").
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = courses.id)").
+		Preload("Lessons").
 		Find(&exams).Error
 
 	if err != nil {
@@ -393,12 +396,14 @@ func (r *courseRepository) GetExamUsers(userId int64, courseId int64) ([]models.
 	var examUsers []models.ExamUser
 
 	err := db.ReplicaDB.Model(&models.ExamUser{}).
-		Joins("JOIN exams ON exams.id = exam_users.exam_id").
+		Joins("JOIN exams ON exams.id = exam_users.exam_id AND exams.deleted_at IS NULL").
 		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = exams.id").
-		Joins("JOIN lessons ON lessons.id = erl.lesson_id").
-		Joins("JOIN chapters ON chapters.id = lessons.chapter_id").
-		Joins("JOIN courses ON courses.program_id = chapters.program_id").
+		Joins("JOIN lessons ON lessons.id = erl.lesson_id AND lessons.deleted_at IS NULL").
+		Joins("JOIN chapters ON chapters.id = lessons.chapter_id AND chapters.deleted_at IS NULL").
+		Joins("JOIN courses ON courses.program_id = chapters.program_id AND courses.deleted_at IS NULL").
 		Where("exam_users.user_id = ? AND courses.id = ?", userId, courseId).
+		Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0").
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = courses.id)").
 		Find(&examUsers).Error
 
 	if err != nil {

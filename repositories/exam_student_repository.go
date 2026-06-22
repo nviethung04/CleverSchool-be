@@ -185,20 +185,15 @@ func (r *examStudentRepository) GetExamByStudentRepo(userID, weekID int64, limit
 	var total int64
 	db.ReplicaDB.Table("user_courses").Where("user_id = ?", userID).Count(&total)
 
-	// 2. Lấy lessons theo từng course trong tuần
+	// 2. Lấy lessons theo từng course (ưu tiên lịch tuần; fallback chương trình / bài đã giao)
 	var result []dto.GetExamByStudentCourseDTO
+	weekIDs := []int64{}
+	if weekID > 0 {
+		weekIDs = append(weekIDs, weekID)
+	}
 	for _, c := range courses {
-		var lessons []struct {
-			ID          int64
-			Title       string
-			Description string
-			Status      bool
-		}
-		lessonQuery := db.ReplicaDB.Table("lessons").
-			Select("lessons.id, lessons.title, lessons.description, lessons.status").
-			Joins("JOIN lesson_schedules ON lesson_schedules.lesson_id = lessons.id").
-			Where("lesson_schedules.course_id = ? AND lesson_schedules.week_id = ? AND lessons.deleted_at IS NULL", c.ID, weekID)
-		if err := lessonQuery.Scan(&lessons).Error; err != nil {
+		lessons, err := r.getAssignedLessonsForCourse(c.ID, weekIDs)
+		if err != nil {
 			return nil, 0, err
 		}
 		var lessonDTOs []dto.GetExamByStudentLessonDTO
@@ -286,51 +281,21 @@ func (r *examStudentRepository) GetExamByStudentRepoWithDate(userID, weekID, cou
 	var total int64
 	totalQuery.Count(&total)
 
-	// Lấy lessons theo từng course trong tuần
+	// Lấy lessons theo từng course (ưu tiên lịch tuần; fallback bài đã giao qua *_ref_lessons)
 	var result []dto.GetExamByStudentCourseDTO
 	for _, c := range courses {
-		var lessons []struct {
-			ID          int64
-			Title       string
-			Description string
-			Status      bool
-		}
-		lessonQuery := db.ReplicaDB.Table("lessons").
-			Select("lessons.id, lessons.title, lessons.description, lessons.status").
-			Joins("JOIN lesson_schedules ON lesson_schedules.lesson_id = lessons.id").
-			Where("lesson_schedules.course_id = ? AND lessons.deleted_at IS NULL", c.ID)
-
-		if len(weekIDs) > 0 {
-			lessonQuery = lessonQuery.Where("lesson_schedules.week_id IN ?", weekIDs)
-		}
-
-		if err := lessonQuery.Scan(&lessons).Error; err != nil {
+		lessons, err := r.getAssignedLessonsForCourse(c.ID, weekIDs)
+		if err != nil {
 			return nil, 0, err
 		}
 
 		var lessonDTOs []dto.GetExamByStudentLessonDTO
 		for _, l := range lessons {
-			// Lấy exams theo lesson qua bảng trung gian exam_ref_lessons
-			var exams []dto.GetExamByStudentExamDTO
-			err := db.ReplicaDB.Table("exams AS e").
-				Select("e.id, e.name, e.status::int as status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline").
-				Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
-				Where("erl.lesson_id = ? AND e.deleted_at IS NULL", l.ID).
-				Where("erl.course_id = ?", courseID).
-				Where("erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND e.deleted_at IS NULL").
-				Order("e.id ASC").
-				Scan(&exams).Error
-
-			if err != nil {
-				return nil, 0, err
-			}
-
 			lessonDTOs = append(lessonDTOs, dto.GetExamByStudentLessonDTO{
 				ID:          l.ID,
 				Title:       l.Title,
 				Description: l.Description,
 				Status:      l.Status,
-				Exams:       exams,
 			})
 		}
 
@@ -351,11 +316,73 @@ func (r *examStudentRepository) GetExamByStudentRepoWithDate(userID, weekID, cou
 	return result, total, nil
 }
 
+type examStudentLessonRow struct {
+	ID          int64
+	Title       string
+	Description string
+	Status      bool
+}
+
+func (r *examStudentRepository) getAssignedLessonsForCourse(courseID int64, weekIDs []int64) ([]examStudentLessonRow, error) {
+	var lessons []examStudentLessonRow
+
+	if len(weekIDs) > 0 {
+		q := db.ReplicaDB.Table("lessons").
+			Select("DISTINCT lessons.id, lessons.title, lessons.description, lessons.status").
+			Joins("JOIN lesson_schedules ON lesson_schedules.lesson_id = lessons.id").
+			Where("lesson_schedules.course_id = ? AND lessons.deleted_at IS NULL", courseID).
+			Where("lesson_schedules.week_id IN ?", weekIDs)
+		if err := q.Scan(&lessons).Error; err != nil {
+			return nil, err
+		}
+		if len(lessons) > 0 {
+			return lessons, nil
+		}
+	}
+
+	// Tất cả bài học thuộc chương trình khóa (program_id hoặc chapter.course_id legacy)
+	err := db.ReplicaDB.Table("lessons l").
+		Select("DISTINCT l.id, l.title, l.description, l.status").
+		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
+		Joins("JOIN courses c ON c.deleted_at IS NULL AND (c.program_id = ch.program_id OR ch.course_id = c.id)").
+		Where("c.id = ? AND l.deleted_at IS NULL", courseID).
+		Order("l.id ASC").
+		Scan(&lessons).Error
+	if err != nil {
+		return nil, err
+	}
+	if len(lessons) > 0 {
+		return lessons, nil
+	}
+
+	// Fallback: bài học có bài đã giao qua *_ref_lessons (khi không map được chương trình)
+	err = db.ReplicaDB.Table("lessons l").
+		Select("DISTINCT l.id, l.title, l.description, l.status").
+		Where("l.deleted_at IS NULL").
+		Where(`l.id IN (
+			SELECT hrl.lesson_id FROM homework_ref_lessons hrl
+			WHERE hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0
+			  AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = ?)
+			UNION
+			SELECT erl.lesson_id FROM exam_ref_lessons erl
+			WHERE erl.assigned_by IS NOT NULL AND erl.assigned_by > 0
+			  AND (erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = ?)
+			UNION
+			SELECT xrl.lesson_id FROM exercise_ref_lessons xrl
+			WHERE xrl.assigned_by IS NOT NULL AND xrl.assigned_by > 0
+			  AND (xrl.course_id IS NULL OR xrl.course_id = 0 OR xrl.course_id = ?)
+		)`, courseID, courseID, courseID).
+		Order("l.id ASC").
+		Scan(&lessons).Error
+	return lessons, err
+}
+
 func (r *examStudentRepository) GetExamsByLesson(lessonID, userID, courseID int64, exams *[]dto.GetExamByStudentExamQuery) error {
 	return db.ReplicaDB.Table("exams AS e").
 		Select("e.id, e.name, e.status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline").
 		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = e.id").
-		Where("erl.lesson_id = ? AND erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND e.deleted_at IS NULL AND erl.course_id = ?", lessonID, courseID).
+		Where("erl.lesson_id = ? AND erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND e.deleted_at IS NULL", lessonID).
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = ?)", courseID).
 		Order("e.id ASC").
 		Scan(exams).Error
 }
@@ -392,7 +419,7 @@ func (r *examStudentRepository) GetHomeworksByLesson(lessonID, userID, courseID 
 			COALESCE(hq.total_question, 0) as total_question,
 			COALESCE(hu.questions_completed, 0) as question_completed,
 			COALESCE(hu.last_question_id_completed, 0) as last_question_id_completed`).
-		Joins(`JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id AND hrl.lesson_id = ? AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND hrl.course_id = ?`, lessonID, courseID).
+		Joins(`JOIN homework_ref_lessons hrl ON hrl.homework_id = h.id AND hrl.lesson_id = ? AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0 AND (hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = ?)`, lessonID, courseID).
 		Joins(`LEFT JOIN (
 			SELECT assignment_id as homework_id, jsonb_array_length(questions) as total_question
 			FROM cloned_questions
@@ -432,7 +459,7 @@ func (r *examStudentRepository) GetExercisesByLesson(lessonID, userID, courseID 
 	}
 	err := db.ReplicaDB.Table("exercises e").
 		Select("e.id, e.name, e.status, e.description, e.cover_image_info, CAST(extract(epoch from e.deadline) AS BIGINT) as deadline").
-		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id AND erl.lesson_id = ? AND erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND erl.course_id = ?", lessonID, courseID).
+		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = e.id AND erl.lesson_id = ? AND erl.assigned_by IS NOT NULL AND erl.assigned_by > 0 AND (erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = ?)", lessonID, courseID).
 		Where("e.deleted_at IS NULL").
 		Order("e.id ASC").
 		Scan(&rows).Error

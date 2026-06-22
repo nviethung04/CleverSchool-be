@@ -57,25 +57,55 @@ Code: `be/services/course_family_service.go`, `be/routes/routes.go`.
 
 Query: `course_id` (bắt buộc).
 
-### 3.2 Dashboard học sinh — bài luyện tập (exercise)
+### 3.2 Dashboard học sinh — bài tập về nhà (homework / BTVN)
 
-Tab **Bài luyện tập** trên FE `/progress-report` (học sinh) gọi API **exercise**, không dùng homework (BTVN).
+Tab **Bài tập về nhà** trên FE `/progress-report` (học sinh) gọi API **homework** (BTVN), không dùng exercise (luyện tập trong bài học).
 
 | Method | Path | Auth | Mô tả |
 |--------|------|------|-------|
-| GET | `/api/dashboard/student/exercise` | Token | Tổng quan + biểu đồ theo tuần: bài giao / đã làm, tỉ lệ đúng, câu hoàn thành. Query: `course_id`, `start_date`, `end_date` (unix) |
-| GET | `/api/dashboard/student/exercise-list` | Token | Bảng chi tiết từng bài luyện tập. Query: `course_id`, `start_date`, `end_date`, `page`, `limit` |
-| GET | `/api/dashboard/lesson-list` | Token | Danh sách bài học theo khóa/chủ đề. Query: `course_id`, `chapter_id?`. **Không có** `/dashboard/chapter-list` — FE `/teacher/reports` suy danh sách chủ đề từ field `chapter_id`/`chapter_name` của response |
+| GET | `/api/dashboard/student/homework` | Token | Tổng quan + biểu đồ theo tuần: BTVN giao / đã làm, tỉ lệ đúng, câu hoàn thành. Query: `course_id`, `start_date`, `end_date` (unix) |
+| GET | `/api/dashboard/student/homework-list` | Token | Bảng chi tiết từng BTVN. Query: `course_id`, `start_date`, `end_date`, `page`, `limit` |
 
-**Nguồn dữ liệu:** `exercises`, `exercise_ref_lessons` (đã giao: `assigned_by > 0`), `exercise_users`, `exercise_question_users`, `lesson_schedules`, `weeks`.
+**Nguồn dữ liệu:** `homeworks`, `homework_ref_lessons` (đã giao: `assigned_by > 0`), `homework_users`, `user_courses`. **Không bắt buộc** `lesson_schedules` / bảng `weeks` — nếu chưa xếp lịch tuần vẫn đếm BTVN đã giao theo `homework_ref_lessons` + khóa học.
 
-**Response list:** field proto `homeworks[]` (tên lịch sử) — mỗi item map từ exercise.
+Code: `be/repositories/dashboard_student_homework*.go`, FE: `fe/app/[locale]/progress-report/components/homework-tab.tsx`.
 
-**API homework/exam (giữ nguyên):** `/api/dashboard/student/homework`, `homework-list`, `exam`, `exam-list` — dùng cho BTVN / kiểm tra, không thay thế exercise trên báo cáo HS.
+**Trang Bài tập HS** (`/assignments`): `GET /api/study/student/exams-by-week` — query `week_id` (có thể `0` khi chưa xếp lịch tuần), `course_id?`, `page`, `limit`. Trả khóa học + danh sách bài học kèm exam/homework/exercise đã giao. **Danh sách bài học:** ưu tiên `lesson_schedules` theo tuần; nếu trống → mọi bài thuộc chương trình khóa (`chapters.program_id` hoặc `chapters.course_id` legacy); fallback cuối: bài có bài tập đã giao qua `*_ref_lessons`. Code: `be/repositories/exam_student_repository.go` (`getAssignedLessonsForCourse`). FE: `fe/app/[locale]/assignments/page.tsx`.
 
-Code: `be/repositories/dashboard_student_exercise*.go`, `be/controllers/dashboard_student_exercise*.go`, FE: `fe/lib/api/dashboard.ts`, `fe/app/[locale]/progress-report/components/homework-tab.tsx`.
+### 3.2.1 Dashboard học sinh — bài luyện tập (exercise)
 
-**Sau deploy:** restart backend (route mới); HS cần `exercises.show` (migration **0047** + `go run . refresh-permissions`).
+API exercise (`/dashboard/student/exercise`, `exercise-list`) dùng cho **luyện tập trong bài học**, không thay tab BTVN trên báo cáo HS.
+
+### 3.2.2 Dashboard học sinh — bài đánh giá (assessment)
+
+Tab **Đánh giá** trên FE `/progress-report` (học sinh). **Không** gọi `/api/manage/assessments` (403 — chỉ role admin/GV).
+
+| Method | Path | Auth | Mô tả |
+|--------|------|------|-------|
+| GET | `/api/dashboard/student/assessment-list` | Token | Dropdown chọn bài KT đánh giá. Query: `course_id` (bắt buộc), `subject_id?`, `type?` (`final_exam` / `mini_test`), `page`, `limit` |
+| GET | `/api/dashboard/student/assessments` | Token | Bảng điểm / tiêu chí theo bài đã chọn. Query: `course_id` (bắt buộc), `assessment_id?`, `type?`, `page`, `limit` |
+| POST | `/api/study/assessment-submit` | Token (HS) | Nộp file bài làm (`assessment_id`, `course_id`, `file_infos`) |
+
+**Nguồn dữ liệu:** `assessments`, `assessment_ref_lessons`, `assessment_scores`, `assessment_score_details`, `assessment_publishes`, `user_courses`.
+
+**Điểm HS chỉ hiện sau khi GV publish** (`PUT /api/manage/publish-assessments`). Nhận xét: `study_reports` + `PUT /api/manage/publish-study-report`.
+
+Code: `be/services/assessment_scoring_service.go`, `be/repositories/assessment_scoring_repository.go`, FE: `assessment-tab.tsx`, `fe/config/featureFlags.ts` (`ASSESSMENTS_ENABLED`).
+
+### 3.2.3 Module assessment — quản trị, chấm điểm, nhận xét (2026-06-22)
+
+| Method | Path | Auth | Mô tả |
+|--------|------|------|-------|
+| POST | `/api/assessments/save-score/bulk` | Token (GV/Admin) | Lưu điểm hàng loạt theo tiêu chí |
+| GET | `/api/dashboard/teacher/assessment/students` | Token | Danh sách HS + điểm. Query: `course_id`, `assessment_id`, `get_score` |
+| GET/PUT | `/api/manage/publish-assessments` | Token | Trạng thái / xuất bản bảng điểm |
+| GET/POST/PUT | `/api/manage/study-reports` | Token | CRUD báo cáo học tập (nhận xét sao/checklist) |
+| GET | `/api/manage/study-reports/evaluates/:course_id` | Token | Danh sách HS đã/chưa đánh giá |
+| PUT | `/api/manage/publish-study-report` | Token | Xuất bản nhận xét cho HS |
+| POST/GET/PUT/DELETE | `/api/manage/assessment-criteria-group(s)/*` | Token (Admin) | Nhóm tiêu chí chấm điểm |
+| POST/GET/PUT/DELETE | `/api/manage/study-report-criterias/*` | Token (Admin) | Mẫu tiêu chí nhận xét |
+
+Migration **0048–0049**. Tab admin: `ASSESSMENTS_ENABLED = true`. Tab GV báo cáo: `TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED = true`.
 
 ### 3.2.1 Dashboard GV — báo cáo BTVN (`/teacher/reports`)
 
@@ -158,6 +188,7 @@ FE: `/teacher/lessons/[id]/exam/[examId]?course_id=...` → nút **Chấm điể
 | Method | Path | Permission | Ghi chú |
 |--------|------|------------|---------|
 | GET | `/api/manage/courses/:id/users` | `courses.show` | Cần cột `user_courses.main_teacher` (migration 0042) |
+| GET | `/api/manage/courses/:id/score` | `courses.show` | **HS** (role 3): bảng điểm khóa — `exam_results[]` (điểm thang 10 từ `ratio/10`), chỉ bài kiểm tra **đã giao** (`exam_ref_lessons.assigned_by > 0`). FE `/courses/[id]` tab Điểm đọc field `exam_results` (không phải `exam_ressults`). |
 
 ---
 
@@ -203,7 +234,7 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 |---------|---------|
 | `admin/settings` | Settings API đã có; bỏ slug khỏi mảng để hiện menu |
 | `criteria-assessment`, `criteria-report` | Báo cáo tiêu chí — ngoài MVP |
-| Tab assessment trên `/teacher/reports` | `fe/config/hiddenModules.ts` → `TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED = false` (BE chưa có study-reports) |
+| Tab assessment trên `/teacher/reports` | `TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED = true` — chấm điểm + study-reports (migration 0048) |
 | Tab xuất mẫu trên `/teacher/reports` | `fe/config/hiddenModules.ts` → `TEACHER_REPORTS_EXPORT_TAB_ENABLED = false` |
 | H5P, SCORM, contest, … | Mở rộng sau MVP |
 

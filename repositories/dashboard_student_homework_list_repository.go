@@ -1,10 +1,13 @@
 package repositories
 
 import (
+	"fmt"
+	"time"
+
 	"be-lms/database/db"
 	"be-lms/dto"
-	"be-lms/models"
-	"time"
+
+	"gorm.io/gorm"
 )
 
 type DashboardStudentHomeworkListRepository interface {
@@ -17,126 +20,147 @@ func NewDashboardStudentHomeworkListRepository() DashboardStudentHomeworkListRep
 	return &dashboardStudentHomeworkListRepository{}
 }
 
-func (r *dashboardStudentHomeworkListRepository) GetStudentHomeworkList(userID int64, courseID *int64, startDate, endDate *int64, limit, offset int) ([]dto.DashboardStudentHomeworkListItemDTO, int64, error) {
-	// Lấy danh sách tuần
-	var weekIDs []int64
-	if startDate != nil && endDate != nil {
-		var weeks []models.Week
-		weekQuery := db.ReplicaDB.Model(&models.Week{}).
-			Where("start_date >= ?", time.Unix(*startDate, 0)).
-			Where("end_date <= ?", time.Unix(*endDate, 0))
-		if err := weekQuery.Find(&weeks).Error; err != nil {
-			return nil, 0, err
-		}
-		for _, w := range weeks {
-			weekIDs = append(weekIDs, w.ID)
-		}
+func homeworkUserKey(homeworkID, lessonID int64) string {
+	return fmt.Sprintf("%d:%d", homeworkID, lessonID)
+}
+
+func (r *dashboardStudentHomeworkListRepository) applyDateFilter(
+	query *gorm.DB,
+	userID int64,
+	startDate, endDate *int64,
+) *gorm.DB {
+	if startDate == nil || endDate == nil {
+		return query
 	}
-	// Query homeworks bằng GORM query builder, join weeks và courses để lấy thông tin tuần, course, lesson
-	homeworkQuery := db.ReplicaDB.Model(&models.Homework{}).
-		Joins("JOIN homework_ref_lessons hrl ON hrl.homework_id = homeworks.id AND hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0").
-		Joins("JOIN lessons l ON hrl.lesson_id = l.id").
-		Joins("JOIN lesson_schedules ls ON l.id = ls.lesson_id AND hrl.course_id = ls.course_id").
-		Joins("JOIN weeks w ON ls.week_id = w.id").
-		Joins("JOIN courses c ON ls.course_id = c.id")
-	if startDate != nil && endDate != nil {
-		homeworkQuery = homeworkQuery.Where("DATE(w.start_date) >= DATE(?) AND DATE(w.end_date) <= DATE(?)", time.Unix(*startDate, 0), time.Unix(*endDate, 0))
-	} else if len(weekIDs) > 0 {
-		homeworkQuery = homeworkQuery.Where("ls.week_id IN ?", weekIDs)
-	}
+	start := time.Unix(*startDate, 0)
+	end := time.Unix(*endDate, 0)
+	return query.Where(`(
+		(hrl.assigned_at IS NOT NULL AND hrl.assigned_at >= ? AND hrl.assigned_at <= ?)
+		OR EXISTS (
+			SELECT 1 FROM homework_users hu_filter
+			WHERE hu_filter.homework_id = h.id
+			  AND hu_filter.user_id = ?
+			  AND hu_filter.lesson_id = l.id
+			  AND hu_filter.created_at >= ?
+			  AND hu_filter.created_at <= ?
+		)
+	)`, start, end, userID, start, end)
+}
+
+func (r *dashboardStudentHomeworkListRepository) GetStudentHomeworkList(
+	userID int64,
+	courseID *int64,
+	startDate, endDate *int64,
+	limit, offset int,
+) ([]dto.DashboardStudentHomeworkListItemDTO, int64, error) {
+	baseQuery := db.ReplicaDB.Table("homework_ref_lessons hrl").
+		Joins("JOIN homeworks h ON h.id = hrl.homework_id AND h.deleted_at IS NULL").
+		Joins("JOIN lessons l ON l.id = hrl.lesson_id AND l.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.id = l.chapter_id AND ch.deleted_at IS NULL").
+		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL").
+		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = ?", userID).
+		Where("hrl.assigned_by IS NOT NULL AND hrl.assigned_by > 0").
+		Where("(hrl.course_id IS NULL OR hrl.course_id = 0 OR hrl.course_id = c.id)")
+
 	if courseID != nil {
-		homeworkQuery = homeworkQuery.Where("ls.course_id = ?", *courseID)
+		baseQuery = baseQuery.Where("c.id = ?", *courseID)
 	}
+	baseQuery = r.applyDateFilter(baseQuery, userID, startDate, endDate)
 
-	homeworkQuery = homeworkQuery.Where("homeworks.deleted_at IS NULL")
-
-	// Đếm tổng số
 	var total int64
-	if err := homeworkQuery.Count(&total).Error; err != nil {
+	if err := baseQuery.Session(&gorm.Session{}).Select("COUNT(DISTINCT h.id)").Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
-	// Lấy dữ liệu trang
+
+	listQuery := baseQuery.Session(&gorm.Session{}).
+		Select(`
+			h.id, h.name, h.description, h.cover_image_info, h.total_questions,
+			l.id as lesson_id, l.title as lesson_title,
+			c.id as course_id, c.name as course_name,
+			hrl.assigned_at as assigned_at
+		`).
+		Group("h.id, h.name, h.description, h.cover_image_info, h.total_questions, l.id, l.title, c.id, c.name, hrl.assigned_at").
+		Order("hrl.assigned_at DESC NULLS LAST, h.id DESC")
+
 	if limit > 0 {
-		homeworkQuery = homeworkQuery.Limit(limit)
+		listQuery = listQuery.Limit(limit)
 	}
 	if offset > 0 {
-		homeworkQuery = homeworkQuery.Offset(offset)
+		listQuery = listQuery.Offset(offset)
 	}
-	homeworkQuery = homeworkQuery.Order("homeworks.created_at DESC")
-	// Lấy thêm thông tin tuần, course, lesson
-	var homeworksWithWeek []struct {
-		models.Homework
-		WeekNumber    int
-		Year          int
-		WeekStartDate time.Time
-		WeekEndDate   time.Time
-		AssignedAt    *time.Time
-		CourseID      int64
-		CourseName    string
-		LessonID      int64
-		LessonTitle   string
+
+	var homeworksWithMeta []struct {
+		ID             int64
+		Name           string
+		Description    string
+		CoverImageInfo string `gorm:"column:cover_image_info"`
+		TotalQuestions int64
+		LessonID       int64
+		LessonTitle    string
+		CourseID       int64
+		CourseName     string
+		AssignedAt     *time.Time
 	}
-	if err := homeworkQuery.Select("homeworks.*, w.week_number, w.year, w.start_date as week_start_date, w.end_date as week_end_date, hrl.course_id, c.name as course_name, hrl.lesson_id, l.title as lesson_title, hrl.assigned_at as assigned_at").Scan(&homeworksWithWeek).Error; err != nil {
+	if err := listQuery.Scan(&homeworksWithMeta).Error; err != nil {
 		return nil, 0, err
 	}
-	// Lấy homework_users cho user này và các homework này
-	var homeworkIDs []int64
-	for _, h := range homeworksWithWeek {
+
+	homeworkIDs := make([]int64, 0, len(homeworksWithMeta))
+	for _, h := range homeworksWithMeta {
 		homeworkIDs = append(homeworkIDs, h.ID)
 	}
+
 	type HomeworkUserInfo struct {
 		HomeworkID         int64
+		LessonID           int64
 		QuestionsCompleted int64
 		CreatedAt          time.Time
 		Ratio              float64
 	}
-	var homeworkUsers []HomeworkUserInfo
-	db.ReplicaDB.Table("homework_users").
-		Select("homework_id, questions_completed, created_at, ratio").
-		Where("homework_id IN ? AND user_id = ?", homeworkIDs, userID).
-		Scan(&homeworkUsers)
-	homeworkUserMap := make(map[int64]HomeworkUserInfo)
-	for _, hu := range homeworkUsers {
-		homeworkUserMap[hu.HomeworkID] = hu
+	homeworkUserMap := make(map[string]HomeworkUserInfo)
+	if len(homeworkIDs) > 0 {
+		var homeworkUsers []HomeworkUserInfo
+		db.ReplicaDB.Table("homework_users").
+			Select("homework_id, lesson_id, questions_completed, created_at, ratio").
+			Where("homework_id IN ? AND user_id = ?", homeworkIDs, userID).
+			Scan(&homeworkUsers)
+		for _, hu := range homeworkUsers {
+			homeworkUserMap[homeworkUserKey(hu.HomeworkID, hu.LessonID)] = hu
+		}
 	}
 
-	// Lấy số câu skip cho mỗi homework
-	type SkipQuestionInfo struct {
-		HomeworkID int64
-		Count      int64
+	skipQuestionMap := make(map[string]int64)
+	if len(homeworkIDs) > 0 {
+		type SkipQuestionInfo struct {
+			HomeworkID int64
+			LessonID   int64
+			Count      int64
+		}
+		var skipQuestions []SkipQuestionInfo
+		db.ReplicaDB.Table("homework_user_skip_questions").
+			Select("homework_id, lesson_id, COUNT(*) as count").
+			Where("homework_id IN ? AND user_id = ?", homeworkIDs, userID).
+			Group("homework_id, lesson_id").
+			Scan(&skipQuestions)
+		for _, sq := range skipQuestions {
+			skipQuestionMap[homeworkUserKey(sq.HomeworkID, sq.LessonID)] = sq.Count
+		}
 	}
-	var skipQuestions []SkipQuestionInfo
-	db.ReplicaDB.Table("homework_user_skip_questions").
-		Select("homework_id, COUNT(*) as count").
-		Where("homework_id IN ? AND user_id = ?", homeworkIDs, userID).
-		Group("homework_id").
-		Scan(&skipQuestions)
-	skipQuestionMap := make(map[int64]int64)
-	for _, sq := range skipQuestions {
-		skipQuestionMap[sq.HomeworkID] = sq.Count
-	}
-	// Mapping kết quả
+
 	var result []dto.DashboardStudentHomeworkListItemDTO
-	for _, h := range homeworksWithWeek {
-		hu, ok := homeworkUserMap[h.ID]
+	for _, h := range homeworksWithMeta {
+		key := homeworkUserKey(h.ID, h.LessonID)
+		hu, ok := homeworkUserMap[key]
 		isSubmitted := ok && hu.CreatedAt.Unix() > 0
-		questionsCompleted := int(hu.QuestionsCompleted)
+		questionsCompleted := 0
 		ratio := 0.0
 		createdAt := int64(0)
 		if ok {
 			createdAt = hu.CreatedAt.Unix()
 			ratio = hu.Ratio
+			questionsCompleted = int(hu.QuestionsCompleted)
 		}
-		skipCount := int(skipQuestionMap[h.ID])
-		weekStart := int64(0)
-		weekEnd := int64(0)
 		assignedAt := int64(0)
-		if !h.WeekStartDate.IsZero() {
-			weekStart = h.WeekStartDate.Unix()
-		}
-		if !h.WeekEndDate.IsZero() {
-			weekEnd = h.WeekEndDate.Unix()
-		}
 		if h.AssignedAt != nil && !h.AssignedAt.IsZero() {
 			assignedAt = h.AssignedAt.Unix()
 		}
@@ -149,16 +173,12 @@ func (r *dashboardStudentHomeworkListRepository) GetStudentHomeworkList(userID i
 			IsSubmitted:        isSubmitted,
 			TotalQuestions:     int(h.TotalQuestions),
 			QuestionsCompleted: questionsCompleted,
-			Week:               h.WeekNumber,
-			Year:               h.Year,
-			WeekStartDate:      weekStart,
-			WeekEndDate:        weekEnd,
 			CourseID:           h.CourseID,
 			CourseName:         h.CourseName,
 			LessonID:           h.LessonID,
 			LessonTitle:        h.LessonTitle,
 			Ratio:              ratio,
-			SkipQuestionsCount: skipCount,
+			SkipQuestionsCount: int(skipQuestionMap[key]),
 			AssignedAt:         assignedAt,
 		})
 	}
