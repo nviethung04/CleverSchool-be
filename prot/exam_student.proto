@@ -75,6 +75,16 @@ message GetExamByStudentExercise {
   int32 total_question = 9;
 }
 
+message GetExamByStudentAssessment {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string type = 4;
+  bool is_submitted = 5;
+  bool is_scored = 6;
+  bool is_published = 7;
+}
+
 message GetExamByStudentLesson {
   int64 id = 1;
   string title = 2;
@@ -83,6 +93,7 @@ message GetExamByStudentLesson {
   repeated GetExamByStudentExam exams = 5;
   repeated GetExamByStudentHomework homeworks = 6;
   repeated GetExamByStudentExercise exercises = 7;
+  repeated GetExamByStudentAssessment assessments = 8;
 }
 
 message GetExamByStudentCourse {

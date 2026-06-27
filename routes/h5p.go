@@ -15,10 +15,11 @@ func RouteH5p(router *gin.Engine) {
 
 	h5pController := NewH5pController()
 
-	h5pGroup.GET("/content", middleware.AuthMiddleware(authRepo), h5pController.ListContent)
-	h5pGroup.GET("/content/:id", middleware.AuthMiddleware(authRepo), h5pController.ShowContent)
-	h5pGroup.PUT("/content/:id", middleware.AuthMiddleware(authRepo), h5pController.UpdateContent)
-	h5pGroup.DELETE("/content/:id", middleware.AuthMiddleware(authRepo), h5pController.DeleteContent)
+	h5pAuth := h5pGroup.Group("", middleware.AuthMiddleware(authRepo))
+	h5pAuth.GET("/content", middleware.RoleMiddleware("h5p-contents.index"), h5pController.ListContent)
+	h5pAuth.GET("/content/:id", middleware.RoleMiddleware("h5p-contents.show"), h5pController.ShowContent)
+	h5pAuth.PUT("/content/:id", middleware.RoleMiddleware("h5p-contents.update"), h5pController.UpdateContent)
+	h5pAuth.DELETE("/content/:id", middleware.RoleMiddleware("h5p-contents.destroy"), h5pController.DeleteContent)
 
 	// Old
 

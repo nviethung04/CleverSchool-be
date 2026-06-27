@@ -77,6 +77,9 @@ func (resource *QuestionResourceImpl) FormatQuestion(question *models.Question) 
 		Time:         float32(question.TimeLimitSeconds),
 		IsRandom:     question.IsRandom != 0,
 		Display: question.Display,
+		MaxCharacters:    int32(question.MaxCharacters),
+		AllowImageUpload: question.AllowImageUpload,
+		MaxRecordingTime: int32(question.MaxRecordingTime),
 	}
 
 	mediaQuestions := make([]*prot.MediaQuestion, 0, len(question.FileInfos))
@@ -216,9 +219,14 @@ func (r *QuestionResourceImpl) FormatModelQuestion(question *prot.Question) *mod
 		display = question.Metadata.Display
 	}
 
+	mediaKind := "text"
+	if question.Content != nil && question.Content.Media != nil && question.Content.Media.Type != "" {
+		mediaKind = question.Content.Media.Type
+	}
+
 	return &models.Question{
 		ID:               question.Id,
-		Kind:             question.Content.Media.Type,
+		Kind:             mediaKind,
 		QuestionType:     question.Type,
 		Title:            question.Metadata.Instructions,
 		Description:      question.Metadata.Description,
@@ -231,6 +239,9 @@ func (r *QuestionResourceImpl) FormatModelQuestion(question *prot.Question) *mod
 		SourceQuestionId: int64(question.SourceQuestionId),
 		SubjectId:        subjectId,
 		Display: display,
+		MaxCharacters:    int(question.Metadata.MaxCharacters),
+		AllowImageUpload: question.Metadata.AllowImageUpload,
+		MaxRecordingTime: int(question.Metadata.MaxRecordingTime),
 	}
 }
 
@@ -639,29 +650,52 @@ func (resource *QuestionResourceImpl) FormatAnswersByType(question *models.Quest
 		items := make([]*prot.AnswerContent, 0, len(answers))
 		categories := make([]*prot.GroupAnswer, 0, len(answers))
 		addedGroups := make(map[uint64]bool)
+		groupIDToPosition := make(map[uint64]int32)
 
 		for _, a := range answers {
-			items = append(items, &prot.AnswerContent{
-				Id:    uint64(a.ID),
-				Text:  a.Content,
-				Point: a.Point,
-				Media: &prot.MediaAnswer{
-					Type: a.Kind,
-					Url:  utils.StaticURL(a.FileInfo.Path, models.Storage),
-				},
-			})
-			groupID := uint64(a.Group.ID)
+			groupID := uint64(0)
+			if a.GroupID != nil {
+				groupID = uint64(*a.GroupID)
+			} else if a.Group.ID != 0 {
+				groupID = uint64(a.Group.ID)
+			}
+			if groupID == 0 {
+				continue
+			}
+
 			if !addedGroups[groupID] {
-				categories = append(categories, &prot.GroupAnswer{
+				cat := &prot.GroupAnswer{
 					Id:   groupID,
 					Name: a.Group.Content,
 					Media: &prot.MediaAnswer{
 						Type: a.Group.Kind,
 						Url:  utils.StaticURL(a.Group.FileInfo.Path, models.Storage),
 					},
-				})
+				}
+				categories = append(categories, cat)
 				addedGroups[groupID] = true
+				groupIDToPosition[groupID] = int32(len(categories))
 			}
+		}
+
+		for _, a := range answers {
+			groupID := uint64(0)
+			if a.GroupID != nil {
+				groupID = uint64(*a.GroupID)
+			} else if a.Group.ID != 0 {
+				groupID = uint64(a.Group.ID)
+			}
+
+			items = append(items, &prot.AnswerContent{
+				Id:            uint64(a.ID),
+				Text:          a.Content,
+				Point:         a.Point,
+				GroupPosition: groupIDToPosition[groupID],
+				Media: &prot.MediaAnswer{
+					Type: a.Kind,
+					Url:  utils.StaticURL(a.FileInfo.Path, models.Storage),
+				},
+			})
 		}
 
 		return &prot.QuestionOption{

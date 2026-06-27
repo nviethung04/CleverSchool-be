@@ -189,6 +189,18 @@ func GetPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách ca học", "Tạo ca học", "Sửa ca học", "Xoá ca học", "Xem chi tiết ca học", "Khôi phục ca học"},
 			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
+		"feedbacks": {
+			Group:        "Phản hồi",
+			SortPosition: 21,
+			Names:        []string{"Xem danh sách phản hồi", "Tạo phản hồi", "Sửa phản hồi", "Xoá phản hồi", "Xem chi tiết phản hồi"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"h5p-contents": {
+			Group:        "H5P",
+			SortPosition: 22,
+			Names:        []string{"Xem danh sách H5P", "Tạo H5P", "Sửa H5P", "Xoá H5P", "Xem chi tiết H5P"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
 	}
 }
 
@@ -363,6 +375,18 @@ func GetTeacherPermissions() map[string]PermissionGroup {
 			Names:        []string{"Xem danh sách ca học", "Tạo ca học", "Sửa ca học", "Xoá ca học", "Xem chi tiết ca học", "Khôi phục ca học"},
 			Actions:      []string{"index", "store", "update", "destroy", "show", "restore"},
 		},
+		"feedbacks": {
+			Group:        "Phản hồi",
+			SortPosition: 21,
+			Names:        []string{"Xem danh sách phản hồi", "Sửa phản hồi", "Xoá phản hồi", "Xem chi tiết phản hồi"},
+			Actions:      []string{"index", "update", "destroy", "show"},
+		},
+		"h5p-contents": {
+			Group:        "H5P",
+			SortPosition: 22,
+			Names:        []string{"Xem danh sách H5P", "Tạo H5P", "Sửa H5P", "Xoá H5P", "Xem chi tiết H5P"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
 	}
 }
 
@@ -458,5 +482,29 @@ func GetStudentPermissions() map[string]PermissionGroup {
 			Names:        []string{"Sửa tệp tin"},
 			Actions:      []string{"update"},
 		},
+		"feedbacks": {
+			Group:        "Phản hồi",
+			SortPosition: 21,
+			Names:        []string{"Xem danh sách phản hồi", "Tạo phản hồi", "Sửa phản hồi", "Xem chi tiết phản hồi"},
+			Actions:      []string{"index", "store", "update", "show"},
+		},
 	}
+}
+
+// GetSchoolPermissions — quản lý trường (role_id=4): phạm vi teacher + users.index + schools.show/update.
+func GetSchoolPermissions() map[string]PermissionGroup {
+	perms := GetTeacherPermissions()
+	perms["users"] = PermissionGroup{
+		Group:        "Tài khoản",
+		SortPosition: 1,
+		Names:        []string{"Xem danh sách tài khoản", "Tạo tài khoản", "Sửa tài khoản", "Xem chi tiết tài khoản"},
+		Actions:      []string{"index", "store", "update", "show"},
+	}
+	perms["schools"] = PermissionGroup{
+		Group:        "Trường học",
+		SortPosition: 4,
+		Names:        []string{"Sửa trường học", "Xem chi tiết trường học"},
+		Actions:      []string{"update", "show"},
+	}
+	return perms
 }

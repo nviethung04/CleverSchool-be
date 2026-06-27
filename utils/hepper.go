@@ -5,6 +5,7 @@ import (
 	"be-lms/i18n"
 	"be-lms/models"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -261,6 +262,16 @@ func GetBody[T proto.Message](c *gin.Context, newFunc func() T) (T, error, strin
 			DiscardUnknown: true,
 		}
 		if err := unmarshalOpts.Unmarshal(body, req); err != nil {
+			// Try to convert legacy / mismatched question payloads (FE may send wrong types)
+			if strings.Contains(c.Request.RequestURI, "/api/manage/questions") {
+				convertedBody, convertErr := ConvertLegacyQuestionRequest(body)
+				if convertErr == nil {
+					if err := unmarshalOpts.Unmarshal(convertedBody, req); err == nil {
+						return req, nil, ""
+					}
+				}
+			}
+
 			// Try to convert legacy SaveScoreBulk format
 			if strings.Contains(c.Request.RequestURI, "/save-score/bulk") {
 				convertedBody, convertErr := ConvertLegacySaveScoreRequest(body)
@@ -275,6 +286,33 @@ func GetBody[T proto.Message](c *gin.Context, newFunc func() T) (T, error, strin
 	}
 
 	return req, nil, ""
+}
+
+// ConvertLegacyQuestionRequest patches FE payloads that don't match protobuf schema.
+// Currently: some clients send metadata.instructions as boolean (true/false) instead of string.
+func ConvertLegacyQuestionRequest(body []byte) ([]byte, error) {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(body, &raw); err != nil {
+		return nil, err
+	}
+
+	metadataAny, ok := raw["metadata"]
+	if !ok {
+		return body, nil
+	}
+	metadata, ok := metadataAny.(map[string]interface{})
+	if !ok {
+		return body, nil
+	}
+
+	if v, ok := metadata["instructions"]; ok {
+		if _, isBool := v.(bool); isBool {
+			metadata["instructions"] = ""
+		}
+	}
+
+	raw["metadata"] = metadata
+	return json.Marshal(raw)
 }
 
 func GetBodyFromBytes[T proto.Message](bodyBytes []byte, newFunc func() T) (T, error) {

@@ -3,7 +3,7 @@
 Mục tiêu: **máy local, GitHub, VPS và Vercel** cùng một phiên bản tính năng. Mỗi lần merge/push có thay đổi BE hoặc FE, làm theo checklist này.
 
 Cập nhật: **2026-06-16**  
-Migration mới nhất: **44** (file `be/deploy/EXPECTED_MIGRATION_VERSION`)
+Migration mới nhất: **53** (file `be/deploy/EXPECTED_MIGRATION_VERSION`)
 
 Tài liệu liên quan: [deploy-vps.md](./deploy-vps.md), [features.md](./features.md), [getting-started.md](./getting-started.md)
 
@@ -153,7 +153,7 @@ Backup trước khi sửa tay: [deploy-vps.md](./deploy-vps.md) Phần E.
 
 - [ ] GitHub Actions deploy **xanh**
 - [ ] `post-deploy-check.sh` pass
-- [ ] `migrate:version` = 44 (hoặc version hiện tại trong `EXPECTED_MIGRATION_VERSION`)
+- [ ] `migrate:version` = 53 (hoặc version hiện tại trong `EXPECTED_MIGRATION_VERSION`)
 
 **Sau push FE**
 

@@ -391,12 +391,14 @@ func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.Asses
 	for _, attr := range lesson.Assessments {
 		for _, ref := range attr.AssessmentRefLessons {
 			if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == 0 {
+				isProgramAssigned := ref.AssignedBy != nil && *ref.AssignedBy > 0
 				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
 					Id:          attr.ID,
 					Name:        attr.Name,
 					Description: attr.Description,
 					Type:        attr.Type,
 					IsProgram:   true,
+					IsAssigned:  r.CourseId == 0 && isProgramAssigned,
 				}
 				break
 			}
@@ -405,12 +407,18 @@ func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.Asses
 
 	if r.CourseId != 0 {
 		for _, attr := range lesson.Assessments {
-			var hasCourseRef bool
+			var (
+				hasCourseRef bool
+				isAssigned   bool
+			)
 
 			for _, ref := range attr.AssessmentRefLessons {
 				if ref.LessonId == lesson.ID && ref.AssessmentId == attr.ID && ref.CourseId == r.CourseId {
 					hasCourseRef = true
-					break
+					if ref.AssignedBy != nil && *ref.AssignedBy > 0 {
+						isAssigned = true
+						break
+					}
 				}
 			}
 
@@ -418,13 +426,16 @@ func (r *LessonResourceImpl) GetAssessments(lesson *models.Lesson) []*prot.Asses
 				continue
 			}
 
-			if _, ok := assessmentsMap[attr.ID]; !ok {
+			if existing, ok := assessmentsMap[attr.ID]; ok {
+				existing.IsAssigned = isAssigned
+			} else {
 				assessmentsMap[attr.ID] = &prot.AssessmentInfo{
 					Id:          attr.ID,
 					Name:        attr.Name,
 					Description: attr.Description,
 					Type:        attr.Type,
 					IsProgram:   false,
+					IsAssigned:  isAssigned,
 				}
 			}
 		}

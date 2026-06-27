@@ -46,3 +46,9 @@ message AssessmentsResponse {
   repeated Assessment assessments = 1;
   int64 total = 2;
 }
+
+message AssignedAssessment {
+  int64 lesson_id = 1;
+  int64 course_id = 2;
+  bool is_assigned = 3;
+}

@@ -17,7 +17,7 @@ func RefreshPermissionsCacheCommand() {
 	}
 	_ = db.ConnectRedis(cfg)
 
-	for _, id := range []int{1, 2, 3} {
+	for _, id := range []int{1, 2, 3, 4, 5} {
 		if err := redisperm.NewRoleRedis(id).ClearRolePermissionsCache(); err != nil {
 			fmt.Printf("role %d: %v\n", id, err)
 			continue

@@ -2,6 +2,7 @@ package services
 
 import (
 	"be-lms/database/db"
+	"be-lms/i18n"
 	"be-lms/models"
 	"be-lms/repositories"
 	"be-lms/requests"
@@ -447,6 +448,16 @@ func (s *assessmentScoringService) SetPublish(req *requests.AssessmentPublishReq
 }
 
 func (s *assessmentScoringService) StudentSubmit(userID int64, req *requests.AssessmentSubmitRequest) error {
+	var assignedCount int64
+	if err := db.ReplicaDB.Table("assessment_ref_lessons").
+		Where("assessment_id = ? AND course_id = ? AND assigned_by IS NOT NULL AND assigned_by > 0", req.AssessmentID, req.CourseID).
+		Count(&assignedCount).Error; err != nil {
+		return err
+	}
+	if assignedCount == 0 {
+		return fmt.Errorf(i18n.Localize("messages.no_records_found"))
+	}
+
 	fileInfos := parseFileInfos(req.FileInfos)
 	score := &models.AssessmentScore{
 		UserId:       userID,

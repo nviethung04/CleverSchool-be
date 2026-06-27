@@ -206,6 +206,33 @@ func (s *examStudentService) GetExamByStudentService(req requests.GetExamByStude
 				seenExercise[ex.ID] = true
 			}
 
+			courseIDForLesson := course.ID
+			if req.CourseID > 0 {
+				courseIDForLesson = req.CourseID
+			}
+
+			assessments, err := s.repo.GetAssessmentsByLesson(lesson.ID, req.UserID, courseIDForLesson)
+			if err != nil {
+				return nil, err
+			}
+			var protoAssessments []*prot.GetExamByStudentAssessment
+			seenAssessment := make(map[int64]bool)
+			for _, a := range assessments {
+				if seenAssessment[a.ID] {
+					continue
+				}
+				protoAssessments = append(protoAssessments, &prot.GetExamByStudentAssessment{
+					Id:          a.ID,
+					Name:        a.Name,
+					Description: a.Description,
+					Type:        a.Type,
+					IsSubmitted: a.IsSubmitted,
+					IsScored:    a.IsScored,
+					IsPublished: a.IsPublished,
+				})
+				seenAssessment[a.ID] = true
+			}
+
 			protoLessons = append(protoLessons, &prot.GetExamByStudentLesson{
 				Id:          lesson.ID,
 				Title:       lesson.Title,
@@ -214,6 +241,7 @@ func (s *examStudentService) GetExamByStudentService(req requests.GetExamByStude
 				Exams:       protoExams,
 				Homeworks:   protoHomeworks,
 				Exercises:   protoExercises,
+				Assessments: protoAssessments,
 			})
 		}
 		protoCourses = append(protoCourses, &prot.GetExamByStudentCourse{

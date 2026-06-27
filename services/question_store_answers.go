@@ -449,20 +449,39 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 
 		return nil
 	case "category":
+		if request.Options == nil {
+			return nil
+		}
+
 		modelsAnswers := make([]models.AnswerGroup, 0, len(request.Options.Items))
 		answerIds := make([]int64, 0, len(request.Options.Items))
 		indexGroups := make([]*int64, 0, len(request.Options.Categories))
 
 		for _, gro := range request.Options.Categories {
+			mediaKind := "text"
+			mediaURL := ""
+			if gro.Media != nil {
+				if gro.Media.Type != "" {
+					mediaKind = gro.Media.Type
+				}
+				mediaURL = gro.Media.Url
+			}
 
-			fileUrl := utils.StripDomain(gro.Media.Url, models.Storage)
+			fileUrl := utils.StripDomain(mediaURL, models.Storage)
 			mediaInfo := s.GetMediaInFo(fileUrl)
 
 			group := models.GroupAnswer{
-				ID:       int64(gro.Id),
 				Content:  gro.Name,
-				Kind:     gro.Media.Type,
+				Kind:     mediaKind,
 				FileInfo: mediaInfo,
+			}
+
+			if gro.Id != 0 {
+				var existing models.GroupAnswer
+				if err := db.MasterDB.First(&existing, int64(gro.Id)).Error; err == nil {
+					group.ID = existing.ID
+					group.SortPosition = existing.SortPosition
+				}
 			}
 
 			if group.ID != 0 {
@@ -480,7 +499,6 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 
 		for index, ans := range request.Options.Items {
 			var groupId int64
-			var ok bool
 
 			indexGroup := int64(index + 1)
 			if ans.Id != 0 {
@@ -489,23 +507,16 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 
 			indexGroupKey := strconv.FormatInt(indexGroup, 10)
 
-			groupIdStr, ok := request.CorrectAnswers.List[indexGroupKey]
-
-			if !ok {
-				groupId = 0
-			} else {
-				var err error
-				groupId, err = strconv.ParseInt(groupIdStr, 10, 64)
-				if err != nil {
-					groupId = 0
+			if request.CorrectAnswers != nil {
+				if groupIdStr, ok := request.CorrectAnswers.List[indexGroupKey]; ok {
+					if parsed, err := strconv.ParseInt(groupIdStr, 10, 64); err == nil {
+						groupId = parsed
+					}
 				}
 			}
 
-			groupId = int64(groupId)
-
-			if groupId == 0 {
-				groupIdPtr := indexGroups[ans.GroupPosition-1]
-				if groupIdPtr != nil {
+			if groupId == 0 && ans.GroupPosition > 0 && int(ans.GroupPosition) <= len(indexGroups) {
+				if groupIdPtr := indexGroups[ans.GroupPosition-1]; groupIdPtr != nil {
 					groupId = *groupIdPtr
 				}
 			}
@@ -514,9 +525,16 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 				continue
 			}
 
-			gid := groupId
+			itemMediaKind := "text"
+			itemMediaURL := ""
+			if ans.Media != nil {
+				if ans.Media.Type != "" {
+					itemMediaKind = ans.Media.Type
+				}
+				itemMediaURL = ans.Media.Url
+			}
 
-			fileUrl := utils.StripDomain(ans.Media.Url, models.Storage)
+			fileUrl := utils.StripDomain(itemMediaURL, models.Storage)
 			mediaInfo := s.GetMediaInFo(fileUrl)
 
 			answer := models.AnswerGroup{
@@ -524,20 +542,24 @@ func (s *questionService) StoreAnswers(questionID int64, request *prot.Question,
 				QuestionID: &questionID,
 				Content:    ans.Text,
 				FileInfo:   mediaInfo,
-				Kind:       ans.Media.Type,
+				Kind:       itemMediaKind,
 				Point:      float64(ans.Point),
-				GroupID:    &gid,
+				GroupID:    &groupId,
 			}
 
 			if answer.ID != 0 {
-				if err := db.MasterDB.Save(&answer).Error; err != nil {
-					return err
-				} else {
+				var existing models.AnswerGroup
+				if err := db.MasterDB.First(&existing, answer.ID).Error; err == nil && existing.QuestionID != nil && *existing.QuestionID == questionID {
+					if err := db.MasterDB.Save(&answer).Error; err != nil {
+						return err
+					}
 					answerIds = append(answerIds, answer.ID)
+					continue
 				}
-			} else {
-				modelsAnswers = append(modelsAnswers, answer)
+				answer.ID = 0
 			}
+
+			modelsAnswers = append(modelsAnswers, answer)
 		}
 
 		if err := repositories.DeleteOldAnswers[models.AnswerGroup](questionID, answerIds); err != nil {

@@ -421,6 +421,11 @@ func (s *Seeder) SeedRoles() {
 		fmt.Println("Lỗi role Student:", err)
 		return
 	}
+	schoolRole, err := s.ensureRole(models.SchoolRoleId, "School", models.PageAdmin)
+	if err != nil {
+		fmt.Println("Lỗi role School:", err)
+		return
+	}
 
 	adminUser, err := s.ensureAdminUser("admin", "admin123", "Quản trị hệ thống")
 	if err != nil {
@@ -435,6 +440,7 @@ func (s *Seeder) SeedRoles() {
 	s.seedPermissions(config.GetPermissions(), adminRole)
 	s.seedPermissions(config.GetTeacherPermissions(), teacherRole)
 	s.seedPermissions(config.GetStudentPermissions(), studentRole)
+	s.seedPermissions(config.GetSchoolPermissions(), schoolRole)
 	s.seedPermissionString("internal.command", "system", "Lệnh nội bộ", adminRole)
 
 	s.clearRolePermissionCache()
@@ -445,10 +451,16 @@ func (s *Seeder) SeedRoles() {
 
 func (s *Seeder) clearRolePermissionCache() {
 	if db.RedisClient == nil {
-		fmt.Println("ℹ️  Redis chưa bật — sau seed chạy: redis-cli DEL permissions:role:1 permissions:role:2 permissions:role:3")
+		fmt.Println("ℹ️  Redis chưa bật — sau seed chạy: go run . refresh-permissions")
 		return
 	}
-	for _, roleID := range []int{int(models.AdminRoleId), int(models.TeacherRoleId), int(models.StudentRoleId)} {
+	for _, roleID := range []int{
+		int(models.AdminRoleId),
+		int(models.TeacherRoleId),
+		int(models.StudentRoleId),
+		int(models.SchoolRoleId),
+		int(models.ReadOnlyRoleId),
+	} {
 		if err := redisperm.NewRoleRedis(roleID).ClearRolePermissionsCache(); err != nil {
 			fmt.Printf("⚠️ Không xóa được cache role %d: %v\n", roleID, err)
 		}

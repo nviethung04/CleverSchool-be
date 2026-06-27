@@ -58,6 +58,16 @@ type GetExamByStudentExerciseDTO struct {
     Deadline      int64  `json:"deadline"`
 }
 
+type GetExamByStudentAssessmentDTO struct {
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
+	IsSubmitted bool   `json:"is_submitted"`
+	IsScored    bool   `json:"is_scored"`
+	IsPublished bool   `json:"is_published"`
+}
+
 type GetExamByStudentLessonDTO struct {
 	ID          int64                         `json:"id"`
 	Title       string                        `json:"title"`
@@ -66,6 +76,7 @@ type GetExamByStudentLessonDTO struct {
 	Exams       []GetExamByStudentExamDTO     `json:"exams"`
 	Homeworks   []GetExamByStudentHomeworkDTO `json:"homeworks"`
     Exercises   []GetExamByStudentExerciseDTO `json:"exercises"`
+	Assessments []GetExamByStudentAssessmentDTO `json:"assessments"`
 }
 
 type GetExamByStudentCourseDTO struct {

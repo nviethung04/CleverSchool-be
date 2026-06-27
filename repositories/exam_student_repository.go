@@ -23,6 +23,7 @@ type ExamStudentRepository interface {
 	CountHomeworkQuestionsCompleted(homeworkID, userID int64) (int32, error)
 	GetExamComment(examID, studentID int64) (string, error)
 	GetExamByStudentRepoWithDate(userID, weekID, courseID int64, startDate, endDate *int64, limit, offset int) ([]dto.GetExamByStudentCourseDTO, int64, error)
+	GetAssessmentsByLesson(lessonID, userID, courseID int64) ([]dto.GetExamByStudentAssessmentDTO, error)
 }
 
 type examStudentRepository struct{}
@@ -475,6 +476,59 @@ func (r *examStudentRepository) GetExercisesByLesson(lessonID, userID, courseID 
 			Description: r0.Description,
 			CoverImage:  r0.CoverImage,
 			Deadline:    r0.Deadline,
+		})
+	}
+	return result, nil
+}
+
+func (r *examStudentRepository) GetAssessmentsByLesson(lessonID, userID, courseID int64) ([]dto.GetExamByStudentAssessmentDTO, error) {
+	var rows []struct {
+		ID          int64
+		Name        string
+		Description string
+		Type        string
+	}
+	err := db.ReplicaDB.Table("assessments a").
+		Select("DISTINCT a.id, a.name, a.description, a.type").
+		Joins("JOIN assessment_ref_lessons arl ON arl.assessment_id = a.id").
+		Where("arl.lesson_id = ? AND arl.assigned_by IS NOT NULL AND arl.assigned_by > 0 AND a.deleted_at IS NULL", lessonID).
+		Where("(arl.course_id IS NULL OR arl.course_id = 0 OR arl.course_id = ?)", courseID).
+		Order("a.id ASC").
+		Scan(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]dto.GetExamByStudentAssessmentDTO, 0, len(rows))
+	for _, row := range rows {
+		var scoreCount int64
+		var isScored bool
+		_ = db.ReplicaDB.Table("assessment_scores").
+			Where("assessment_id = ? AND user_id = ? AND course_id = ?", row.ID, userID, courseID).
+			Count(&scoreCount).Error
+		isSubmitted := scoreCount > 0
+		if isSubmitted {
+			_ = db.ReplicaDB.Table("assessment_scores").
+				Select("is_scored").
+				Where("assessment_id = ? AND user_id = ? AND course_id = ?", row.ID, userID, courseID).
+				Limit(1).
+				Scan(&isScored).Error
+		}
+		var isPublished bool
+		_ = db.ReplicaDB.Table("assessment_publishes").
+			Select("publish").
+			Where("assessment_id = ? AND course_id = ?", row.ID, courseID).
+			Limit(1).
+			Scan(&isPublished).Error
+
+		result = append(result, dto.GetExamByStudentAssessmentDTO{
+			ID:          row.ID,
+			Name:        row.Name,
+			Description: row.Description,
+			Type:        row.Type,
+			IsSubmitted: isSubmitted,
+			IsScored:    isScored,
+			IsPublished: isPublished,
 		})
 	}
 	return result, nil

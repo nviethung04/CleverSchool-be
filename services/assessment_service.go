@@ -6,7 +6,12 @@ import (
 	"be-lms/repositories"
 	"be-lms/resources"
 	"be-lms/utils"
+	"fmt"
+	"sort"
 	"strconv"
+	"time"
+
+	"be-lms/i18n"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +23,8 @@ type AssessmentService interface {
 	Update(c *gin.Context, req *prot.AssessmentRequest) (*models.Assessment, error)
 	Delete(c *gin.Context, id int) error
 	Restore(c *gin.Context, id int) (*models.Assessment, error)
+	Assigned(c *gin.Context, id int) (*prot.AssignedAssessment, error)
+	AssignedLesson(c *gin.Context, id int) (*prot.AssignedLessons, error)
 }
 
 type assessmentService struct {
@@ -107,4 +114,70 @@ func (s *assessmentService) Restore(c *gin.Context, id int) (*models.Assessment,
 		return nil, err
 	}
 	return assessment, nil
+}
+
+func (s *assessmentService) Assigned(c *gin.Context, id int) (*prot.AssignedAssessment, error) {
+	req, err, _ := utils.GetBody[*prot.AssignedAssessment](c, func() *prot.AssignedAssessment {
+		return &prot.AssignedAssessment{}
+	})
+	if err != nil {
+		return nil, fmt.Errorf(i18n.Localize("messages.data_invalid"))
+	}
+	if req.CourseId == 0 || req.LessonId == 0 {
+		return nil, fmt.Errorf(i18n.Localize("messages.data_invalid"))
+	}
+
+	ref := models.AssessmentRefLesson{
+		AssessmentId: int64(id),
+		LessonId:     req.LessonId,
+		CourseId:     req.CourseId,
+	}
+	if req.IsAssigned {
+		now := time.Now()
+		ref.AssignedAt = &now
+		ref.AssignedBy = utils.PtrInt64(int64(utils.GetCurrentUserId(c)))
+	} else {
+		ref.AssignedAt = nil
+		ref.AssignedBy = nil
+	}
+
+	if err := s.repo.Assigned(ref); err != nil {
+		return req, fmt.Errorf(i18n.Localize("messages.no_record_update"))
+	}
+	return req, nil
+}
+
+func (s *assessmentService) AssignedLesson(c *gin.Context, id int) (*prot.AssignedLessons, error) {
+	assessment, err := s.repo.AssignedLesson(int64(id))
+	if err != nil {
+		return nil, err
+	}
+
+	var lessons []*prot.AssignedLesson
+	for _, lesson := range assessment.Lessons {
+		var isAssigned bool
+		for _, ref := range assessment.AssessmentRefLessons {
+			if ref.LessonId == lesson.ID {
+				isAssigned = ref.AssignedBy != nil && *ref.AssignedBy > 0
+				if isAssigned {
+					break
+				}
+			}
+		}
+		lessons = append(lessons, &prot.AssignedLesson{
+			Id:          lesson.ID,
+			Title:       lesson.Title,
+			Description: lesson.Description,
+			ObjectTitle: lesson.ObjectTitle,
+			IsAssigned:  isAssigned,
+		})
+	}
+
+	sort.Slice(lessons, func(i, j int) bool {
+		if lessons[i].IsAssigned != lessons[j].IsAssigned {
+			return lessons[i].IsAssigned && !lessons[j].IsAssigned
+		}
+		return lessons[i].Id < lessons[j].Id
+	})
+	return &prot.AssignedLessons{Lessons: lessons}, nil
 }

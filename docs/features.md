@@ -70,7 +70,7 @@ Tab **Bài tập về nhà** trên FE `/progress-report` (học sinh) gọi API 
 
 Code: `be/repositories/dashboard_student_homework*.go`, FE: `fe/app/[locale]/progress-report/components/homework-tab.tsx`.
 
-**Trang Bài tập HS** (`/assignments`): `GET /api/study/student/exams-by-week` — query `week_id` (có thể `0` khi chưa xếp lịch tuần), `course_id?`, `page`, `limit`. Trả khóa học + danh sách bài học kèm exam/homework/exercise đã giao. **Danh sách bài học:** ưu tiên `lesson_schedules` theo tuần; nếu trống → mọi bài thuộc chương trình khóa (`chapters.program_id` hoặc `chapters.course_id` legacy); fallback cuối: bài có bài tập đã giao qua `*_ref_lessons`. Code: `be/repositories/exam_student_repository.go` (`getAssignedLessonsForCourse`). FE: `fe/app/[locale]/assignments/page.tsx`.
+**Trang Bài tập HS** (`/assignments`): `GET /api/study/student/exams-by-week` — query `week_id` (có thể `0` khi chưa xếp lịch tuần), `course_id?`, `page`, `limit`. Trả khóa học + danh sách bài học kèm exam/homework/exercise/**assessment** đã giao (`assigned_by > 0` trên `*_ref_lessons`). **Danh sách bài học:** ưu tiên `lesson_schedules` theo tuần; nếu trống → mọi bài thuộc chương trình khóa (`chapters.program_id` hoặc `chapters.course_id` legacy); fallback cuối: bài có bài tập đã giao qua `*_ref_lessons`. Code: `be/repositories/exam_student_repository.go` (`getAssignedLessonsForCourse`, `GetAssessmentsByLesson`). FE: `fe/app/[locale]/assignments/page.tsx`, `assignments-page.tsx` (assessment → `/progress-report?tab=assessment`).
 
 ### 3.2.1 Dashboard học sinh — bài luyện tập (exercise)
 
@@ -84,7 +84,9 @@ Tab **Đánh giá** trên FE `/progress-report` (học sinh). **Không** gọi `
 |--------|------|------|-------|
 | GET | `/api/dashboard/student/assessment-list` | Token | Dropdown chọn bài KT đánh giá. Query: `course_id` (bắt buộc), `subject_id?`, `type?` (`final_exam` / `mini_test`), `page`, `limit` |
 | GET | `/api/dashboard/student/assessments` | Token | Bảng điểm / tiêu chí theo bài đã chọn. Query: `course_id` (bắt buộc), `assessment_id?`, `type?`, `page`, `limit` |
-| POST | `/api/study/assessment-submit` | Token (HS) | Nộp file bài làm (`assessment_id`, `course_id`, `file_infos`) |
+| POST | `/api/study/assessment-submit` | Token (HS) | Nộp file bài làm (`assessment_id`, `course_id`, `file_infos`). **Chỉ** khi bài đã giao (`assessment_ref_lessons.assigned_by > 0`) |
+| POST | `/api/manage/assessments/:id/assigned` | Token (GV/Admin) | Giao / thu hồi assessment theo khóa. Body: `{ lesson_id, is_assigned, course_id }` |
+| GET | `/api/manage/assessments/:id/assigned-lessons` | Token | Danh sách bài học đã giao của assessment |
 
 **Nguồn dữ liệu:** `assessments`, `assessment_ref_lessons`, `assessment_scores`, `assessment_score_details`, `assessment_publishes`, `user_courses`.
 
@@ -202,10 +204,12 @@ FE: `/teacher/lessons/[id]/exam/[examId]?course_id=...` → nút **Chấm điể
 | **0043–0044** | Bảng `settings` + permissions | GET/POST settings, đọc by-key |
 | **0045** | `assessment_ref_lessons` — liên kết assessment ↔ lesson | `PUT /lessons` field `assessments`; GET lesson trả `assessments` |
 | **0046** | `*_ref_lessons`: partial unique theo `course_id` (CT vs khóa) | `POST /homeworks|exams|exercises/:id/assigned` — giao bài theo khóa |
+| **0050** | `assessment_ref_lessons`: `assigned_at`, `assigned_by`; partial unique theo `course_id` | `POST /assessments/:id/assigned`; HS thấy assessment trên `exams-by-week` + `/assignments` |
 | **0047** | `exercises.*` permissions cho role học sinh (3) | HS xem/làm exercise; cache Redis — chạy `refresh-permissions` |
 | *(course)* | `course_ref_semesters` composite PK; model GORM | POST tạo khóa không lỗi `RETURNING id` |
 
 Chi tiết cột: [database/tables-reference.md](./database/tables-reference.md).  
+Danh sách tất cả bảng: [database/all-tables.md](./database/all-tables.md).  
 Lịch sử: [database/CHANGELOG.md](./database/CHANGELOG.md).
 
 ---
@@ -230,15 +234,15 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 
 `fe/config/hiddenModules.ts` ẩn module khỏi sidebar; trang vẫn mở được bằng URL.
 
-| Slug ẩn | Ghi chú |
-|---------|---------|
-| `admin/settings` | Settings API đã có; bỏ slug khỏi mảng để hiện menu |
-| `criteria-assessment`, `criteria-report` | Báo cáo tiêu chí — ngoài MVP |
-| Tab assessment trên `/teacher/reports` | `TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED = true` — chấm điểm + study-reports (migration 0048) |
-| Tab xuất mẫu trên `/teacher/reports` | `fe/config/hiddenModules.ts` → `TEACHER_REPORTS_EXPORT_TAB_ENABLED = false` |
-| H5P, SCORM, contest, … | Mở rộng sau MVP |
+| Trạng thái | Module |
+|------------|--------|
+| **Đã bật menu** (2026-06-23) | H5P (`/admin/h5p`), Xếp hạng HS (`/ranking`), Phản hồi HS/GV (`/feedback`), tab **Quản lý trường** trên `/admin/users/list` |
+| **BE tương ứng** (migration `0051`) | `feedbacks.*`, `h5p-contents.*` trong `permission.go` + `role_permissions`; role **School (4)** seed qua `GetSchoolPermissions()`; route `/manage/feedbacks` và `/api/h5p/content*` có `RoleMiddleware` |
+| **Redis** | `REDIS_ENABLED=true` trong `.env` / `be/deploy/.env.example` — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
+| Slug vẫn ẩn | `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
+| Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
 
-Core hiển thị: Tổng quan, Người dùng, Trường, Môn học, Chương trình, Khóa học, Học liệu, Học kỳ.
+Core hiển thị: Tổng quan, Người dùng (đủ 4 tab role), Trường, Môn học, Chương trình, Khóa học, Học liệu (+ H5P), Học kỳ.
 
 ---
 
@@ -247,7 +251,7 @@ Core hiển thị: Tổng quan, Người dùng, Trường, Môn học, Chương 
 1. Route + middleware + permission (`config/permission.go` + migration seed).
 2. Model, repository, service, controller, proto (nếu đổi contract).
 3. Migration `.up` / `.down` nếu đổi schema.
-4. Cập nhật: **file này**, `tables-reference.md`, `CHANGELOG.md`, `AGENTS.md` (nếu quy ước mới).
+4. Cập nhật: **file này**, `all-tables.md`, `tables-reference.md`, `CHANGELOG.md`, `AGENTS.md` (nếu quy ước mới).
 5. FE: page/API client + `fe/docs/ui-design.md` hoặc `fe/AGENTS.md` nếu đổi UX.
 6. **VPS:** tăng `be/deploy/EXPECTED_MIGRATION_VERSION`, cập nhật `docs/vps-release-checklist.md` §3 nếu cần.
 7. `go run . refresh-permissions` trên dev; trên VPS: `post-deploy-check.sh` sau CI.

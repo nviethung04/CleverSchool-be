@@ -661,22 +661,115 @@ func (x *GetExamByStudentExercise) GetTotalQuestion() int32 {
 	return 0
 }
 
+type GetExamByStudentAssessment struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	IsSubmitted   bool                   `protobuf:"varint,5,opt,name=is_submitted,json=isSubmitted,proto3" json:"is_submitted,omitempty"`
+	IsScored      bool                   `protobuf:"varint,6,opt,name=is_scored,json=isScored,proto3" json:"is_scored,omitempty"`
+	IsPublished   bool                   `protobuf:"varint,7,opt,name=is_published,json=isPublished,proto3" json:"is_published,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetExamByStudentAssessment) Reset() {
+	*x = GetExamByStudentAssessment{}
+	mi := &file_exam_student_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetExamByStudentAssessment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetExamByStudentAssessment) ProtoMessage() {}
+
+func (x *GetExamByStudentAssessment) ProtoReflect() protoreflect.Message {
+	mi := &file_exam_student_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetExamByStudentAssessment.ProtoReflect.Descriptor instead.
+func (*GetExamByStudentAssessment) Descriptor() ([]byte, []int) {
+	return file_exam_student_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetExamByStudentAssessment) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *GetExamByStudentAssessment) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *GetExamByStudentAssessment) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *GetExamByStudentAssessment) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *GetExamByStudentAssessment) GetIsSubmitted() bool {
+	if x != nil {
+		return x.IsSubmitted
+	}
+	return false
+}
+
+func (x *GetExamByStudentAssessment) GetIsScored() bool {
+	if x != nil {
+		return x.IsScored
+	}
+	return false
+}
+
+func (x *GetExamByStudentAssessment) GetIsPublished() bool {
+	if x != nil {
+		return x.IsPublished
+	}
+	return false
+}
+
 type GetExamByStudentLesson struct {
-	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Id            int64                       `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                      `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                      `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Status        bool                        `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
-	Exams         []*GetExamByStudentExam     `protobuf:"bytes,5,rep,name=exams,proto3" json:"exams,omitempty"`
-	Homeworks     []*GetExamByStudentHomework `protobuf:"bytes,6,rep,name=homeworks,proto3" json:"homeworks,omitempty"`
-	Exercises     []*GetExamByStudentExercise `protobuf:"bytes,7,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	state         protoimpl.MessageState        `protogen:"open.v1"`
+	Id            int64                         `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title         string                        `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description   string                        `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Status        bool                          `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
+	Exams         []*GetExamByStudentExam       `protobuf:"bytes,5,rep,name=exams,proto3" json:"exams,omitempty"`
+	Homeworks     []*GetExamByStudentHomework   `protobuf:"bytes,6,rep,name=homeworks,proto3" json:"homeworks,omitempty"`
+	Exercises     []*GetExamByStudentExercise   `protobuf:"bytes,7,rep,name=exercises,proto3" json:"exercises,omitempty"`
+	Assessments   []*GetExamByStudentAssessment `protobuf:"bytes,8,rep,name=assessments,proto3" json:"assessments,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetExamByStudentLesson) Reset() {
 	*x = GetExamByStudentLesson{}
-	mi := &file_exam_student_proto_msgTypes[6]
+	mi := &file_exam_student_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -688,7 +781,7 @@ func (x *GetExamByStudentLesson) String() string {
 func (*GetExamByStudentLesson) ProtoMessage() {}
 
 func (x *GetExamByStudentLesson) ProtoReflect() protoreflect.Message {
-	mi := &file_exam_student_proto_msgTypes[6]
+	mi := &file_exam_student_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -701,7 +794,7 @@ func (x *GetExamByStudentLesson) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExamByStudentLesson.ProtoReflect.Descriptor instead.
 func (*GetExamByStudentLesson) Descriptor() ([]byte, []int) {
-	return file_exam_student_proto_rawDescGZIP(), []int{6}
+	return file_exam_student_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetExamByStudentLesson) GetId() int64 {
@@ -753,6 +846,13 @@ func (x *GetExamByStudentLesson) GetExercises() []*GetExamByStudentExercise {
 	return nil
 }
 
+func (x *GetExamByStudentLesson) GetAssessments() []*GetExamByStudentAssessment {
+	if x != nil {
+		return x.Assessments
+	}
+	return nil
+}
+
 type GetExamByStudentCourse struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
 	Id            int64                     `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -771,7 +871,7 @@ type GetExamByStudentCourse struct {
 
 func (x *GetExamByStudentCourse) Reset() {
 	*x = GetExamByStudentCourse{}
-	mi := &file_exam_student_proto_msgTypes[7]
+	mi := &file_exam_student_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -783,7 +883,7 @@ func (x *GetExamByStudentCourse) String() string {
 func (*GetExamByStudentCourse) ProtoMessage() {}
 
 func (x *GetExamByStudentCourse) ProtoReflect() protoreflect.Message {
-	mi := &file_exam_student_proto_msgTypes[7]
+	mi := &file_exam_student_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -796,7 +896,7 @@ func (x *GetExamByStudentCourse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExamByStudentCourse.ProtoReflect.Descriptor instead.
 func (*GetExamByStudentCourse) Descriptor() ([]byte, []int) {
-	return file_exam_student_proto_rawDescGZIP(), []int{7}
+	return file_exam_student_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetExamByStudentCourse) GetId() int64 {
@@ -879,7 +979,7 @@ type GetExamByStudentResponse struct {
 
 func (x *GetExamByStudentResponse) Reset() {
 	*x = GetExamByStudentResponse{}
-	mi := &file_exam_student_proto_msgTypes[8]
+	mi := &file_exam_student_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -891,7 +991,7 @@ func (x *GetExamByStudentResponse) String() string {
 func (*GetExamByStudentResponse) ProtoMessage() {}
 
 func (x *GetExamByStudentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exam_student_proto_msgTypes[8]
+	mi := &file_exam_student_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -904,7 +1004,7 @@ func (x *GetExamByStudentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExamByStudentResponse.ProtoReflect.Descriptor instead.
 func (*GetExamByStudentResponse) Descriptor() ([]byte, []int) {
-	return file_exam_student_proto_rawDescGZIP(), []int{8}
+	return file_exam_student_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetExamByStudentResponse) GetCourses() []*GetExamByStudentCourse {
@@ -930,7 +1030,7 @@ type GetExamByStudentByCourseResponse struct {
 
 func (x *GetExamByStudentByCourseResponse) Reset() {
 	*x = GetExamByStudentByCourseResponse{}
-	mi := &file_exam_student_proto_msgTypes[9]
+	mi := &file_exam_student_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -942,7 +1042,7 @@ func (x *GetExamByStudentByCourseResponse) String() string {
 func (*GetExamByStudentByCourseResponse) ProtoMessage() {}
 
 func (x *GetExamByStudentByCourseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exam_student_proto_msgTypes[9]
+	mi := &file_exam_student_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -955,7 +1055,7 @@ func (x *GetExamByStudentByCourseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExamByStudentByCourseResponse.ProtoReflect.Descriptor instead.
 func (*GetExamByStudentByCourseResponse) Descriptor() ([]byte, []int) {
-	return file_exam_student_proto_rawDescGZIP(), []int{9}
+	return file_exam_student_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetExamByStudentByCourseResponse) GetCourse() *GetExamByStudentCourse {
@@ -1037,7 +1137,15 @@ const file_exam_student_proto_rawDesc = "" +
 	"\bdeadline\x18\x06 \x01(\x03R\bdeadline\x12!\n" +
 	"\fis_submitted\x18\a \x01(\bR\visSubmitted\x12%\n" +
 	"\x0eunscored_count\x18\b \x01(\x05R\runscoredCount\x12%\n" +
-	"\x0etotal_question\x18\t \x01(\x05R\rtotalQuestion\"\xa6\x02\n" +
+	"\x0etotal_question\x18\t \x01(\x05R\rtotalQuestion\"\xd9\x01\n" +
+	"\x1aGetExamByStudentAssessment\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x12!\n" +
+	"\fis_submitted\x18\x05 \x01(\bR\visSubmitted\x12\x1b\n" +
+	"\tis_scored\x18\x06 \x01(\bR\bisScored\x12!\n" +
+	"\fis_published\x18\a \x01(\bR\visPublished\"\xea\x02\n" +
 	"\x16GetExamByStudentLesson\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -1045,7 +1153,8 @@ const file_exam_student_proto_rawDesc = "" +
 	"\x06status\x18\x04 \x01(\bR\x06status\x120\n" +
 	"\x05exams\x18\x05 \x03(\v2\x1a.prot.GetExamByStudentExamR\x05exams\x12<\n" +
 	"\thomeworks\x18\x06 \x03(\v2\x1e.prot.GetExamByStudentHomeworkR\thomeworks\x12<\n" +
-	"\texercises\x18\a \x03(\v2\x1e.prot.GetExamByStudentExerciseR\texercises\"\xa9\x02\n" +
+	"\texercises\x18\a \x03(\v2\x1e.prot.GetExamByStudentExerciseR\texercises\x12B\n" +
+	"\vassessments\x18\b \x03(\v2 .prot.GetExamByStudentAssessmentR\vassessments\"\xa9\x02\n" +
 	"\x16GetExamByStudentCourse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1076,7 +1185,7 @@ func file_exam_student_proto_rawDescGZIP() []byte {
 	return file_exam_student_proto_rawDescData
 }
 
-var file_exam_student_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_exam_student_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_exam_student_proto_goTypes = []any{
 	(*ExamStudentItem)(nil),                  // 0: prot.ExamStudentItem
 	(*ExamStudentExamInfo)(nil),              // 1: prot.ExamStudentExamInfo
@@ -1084,10 +1193,11 @@ var file_exam_student_proto_goTypes = []any{
 	(*GetExamByStudentExam)(nil),             // 3: prot.GetExamByStudentExam
 	(*GetExamByStudentHomework)(nil),         // 4: prot.GetExamByStudentHomework
 	(*GetExamByStudentExercise)(nil),         // 5: prot.GetExamByStudentExercise
-	(*GetExamByStudentLesson)(nil),           // 6: prot.GetExamByStudentLesson
-	(*GetExamByStudentCourse)(nil),           // 7: prot.GetExamByStudentCourse
-	(*GetExamByStudentResponse)(nil),         // 8: prot.GetExamByStudentResponse
-	(*GetExamByStudentByCourseResponse)(nil), // 9: prot.GetExamByStudentByCourseResponse
+	(*GetExamByStudentAssessment)(nil),       // 6: prot.GetExamByStudentAssessment
+	(*GetExamByStudentLesson)(nil),           // 7: prot.GetExamByStudentLesson
+	(*GetExamByStudentCourse)(nil),           // 8: prot.GetExamByStudentCourse
+	(*GetExamByStudentResponse)(nil),         // 9: prot.GetExamByStudentResponse
+	(*GetExamByStudentByCourseResponse)(nil), // 10: prot.GetExamByStudentByCourseResponse
 }
 var file_exam_student_proto_depIdxs = []int32{
 	1, // 0: prot.ExamStudentResponseWithCount.exam_info:type_name -> prot.ExamStudentExamInfo
@@ -1095,14 +1205,15 @@ var file_exam_student_proto_depIdxs = []int32{
 	3, // 2: prot.GetExamByStudentLesson.exams:type_name -> prot.GetExamByStudentExam
 	4, // 3: prot.GetExamByStudentLesson.homeworks:type_name -> prot.GetExamByStudentHomework
 	5, // 4: prot.GetExamByStudentLesson.exercises:type_name -> prot.GetExamByStudentExercise
-	6, // 5: prot.GetExamByStudentCourse.lessons:type_name -> prot.GetExamByStudentLesson
-	7, // 6: prot.GetExamByStudentResponse.courses:type_name -> prot.GetExamByStudentCourse
-	7, // 7: prot.GetExamByStudentByCourseResponse.course:type_name -> prot.GetExamByStudentCourse
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	6, // 5: prot.GetExamByStudentLesson.assessments:type_name -> prot.GetExamByStudentAssessment
+	7, // 6: prot.GetExamByStudentCourse.lessons:type_name -> prot.GetExamByStudentLesson
+	8, // 7: prot.GetExamByStudentResponse.courses:type_name -> prot.GetExamByStudentCourse
+	8, // 8: prot.GetExamByStudentByCourseResponse.course:type_name -> prot.GetExamByStudentCourse
+	9, // [9:9] is the sub-list for method output_type
+	9, // [9:9] is the sub-list for method input_type
+	9, // [9:9] is the sub-list for extension type_name
+	9, // [9:9] is the sub-list for extension extendee
+	0, // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_exam_student_proto_init() }
@@ -1116,7 +1227,7 @@ func file_exam_student_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_exam_student_proto_rawDesc), len(file_exam_student_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -26,7 +26,8 @@ func (r *dashboardStudentAssessmentRepository) baseQuery(userID int64, courseID 
 		Joins("JOIN courses c ON c.program_id = ch.program_id AND c.deleted_at IS NULL").
 		Joins("JOIN user_courses uc ON uc.course_id = c.id AND uc.user_id = ?", userID).
 		Where("c.id = ? AND assessments.deleted_at IS NULL", courseID).
-		Where("(arl.course_id IS NULL OR arl.course_id = 0 OR arl.course_id = c.id)")
+		Where("(arl.course_id IS NULL OR arl.course_id = 0 OR arl.course_id = c.id)").
+		Where("arl.assigned_by IS NOT NULL AND arl.assigned_by > 0")
 
 	return query
 }

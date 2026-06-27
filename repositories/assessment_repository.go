@@ -9,6 +9,8 @@ import (
 
 type AssessmentRepository interface {
 	base.BaseRepositoryInterface[models.Assessment]
+	Assigned(ref models.AssessmentRefLesson) error
+	AssignedLesson(id int64) (*models.Assessment, error)
 }
 
 type assessmentRepository struct {

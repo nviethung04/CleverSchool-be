@@ -676,6 +676,7 @@ type AssessmentInfo struct {
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
 	IsProgram     bool                   `protobuf:"varint,5,opt,name=is_program,json=isProgram,proto3" json:"is_program,omitempty"`
+	IsAssigned    bool                   `protobuf:"varint,6,opt,name=is_assigned,json=isAssigned,proto3" json:"is_assigned,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -741,6 +742,13 @@ func (x *AssessmentInfo) GetType() string {
 func (x *AssessmentInfo) GetIsProgram() bool {
 	if x != nil {
 		return x.IsProgram
+	}
+	return false
+}
+
+func (x *AssessmentInfo) GetIsAssigned() bool {
+	if x != nil {
+		return x.IsAssigned
 	}
 	return false
 }
@@ -2031,14 +2039,16 @@ const file_lesson_proto_rawDesc = "" +
 	"\fobject_title\x18\n" +
 	" \x01(\tR\vobjectTitle\x12\x1d\n" +
 	"\n" +
-	"is_program\x18\v \x01(\bR\tisProgram\"\x89\x01\n" +
+	"is_program\x18\v \x01(\bR\tisProgram\"\xaa\x01\n" +
 	"\x0eAssessmentInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
-	"is_program\x18\x05 \x01(\bR\tisProgram\"\x85\x01\n" +
+	"is_program\x18\x05 \x01(\bR\tisProgram\x12\x1f\n" +
+	"\vis_assigned\x18\x06 \x01(\bR\n" +
+	"isAssigned\"\x85\x01\n" +
 	"\n" +
 	"AuthorInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +

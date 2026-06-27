@@ -38,7 +38,9 @@ docker run --rm \
   -e DB_MASTER_USER="${POSTGRES_USER:-lms_user}" \
   -e DB_MASTER_PASSWORD="${POSTGRES_PASSWORD}" \
   -e DB_MASTER_NAME="${POSTGRES_DB:-lms_db}" \
-  -e REDIS_ENABLED=false \
+  -e REDIS_ENABLED="${REDIS_ENABLED:-true}" \
+  -e REDIS_HOST="${REDIS_HOST:-redis}" \
+  -e REDIS_PORT="${REDIS_PORT:-6379}" \
   golang:1.24-alpine \
   sh -c '
     set -e

@@ -41,6 +41,12 @@ message QuestionMetaData {
   float time = 4;
   bool is_random = 5;
   string display = 6;
+  // Writing: maximum characters allowed
+  int32 max_characters = 7;
+  // Writing: allow attaching images in the answer
+  bool allow_image_upload = 8;
+  // Speaking: maximum recording duration (seconds)
+  int32 max_recording_time = 9;
 }
 
 message QuestionOption {

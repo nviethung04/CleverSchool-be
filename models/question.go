@@ -48,6 +48,10 @@ type Question struct {
 	FileInfos   MediaInfos `gorm:"column:file_infos;type:jsonb" json:"file_infos"`
 
 	TimeLimitSeconds int
+	// Extra metadata for writing/speaking question types
+	MaxCharacters    int  `gorm:"column:max_characters" json:"max_characters"`
+	AllowImageUpload bool `gorm:"column:allow_image_upload" json:"allow_image_upload"`
+	MaxRecordingTime int  `gorm:"column:max_recording_time" json:"max_recording_time"`
 	SortPosition     int
 	Point            float64
 	IsRandom         int16 `gorm:"default:0"`

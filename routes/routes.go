@@ -211,11 +211,13 @@ func InitRoutes(router *gin.Engine) {
 		managementRouter.POST("/homeworks/:id/assigned", middleware.RoleMiddleware("homeworks.store"), homeworkController.Assigned)
 		managementRouter.POST("/exams/:id/assigned", middleware.RoleMiddleware("exams.store"), examController.Assigned)
 		managementRouter.POST("/exercises/:id/assigned", middleware.RoleMiddleware("exercises.store"), exerciseController.Assigned)
+		managementRouter.POST("/assessments/:id/assigned", middleware.RoleMiddleware("assessments.store"), assessmentController.Assigned)
 
 		// Assigned lesson
 		managementRouter.GET("/homeworks/:id/assigned-lessons", middleware.RoleMiddleware("homeworks.index"), homeworkController.AssignedLesson)
 		managementRouter.GET("/exams/:id/assigned-lessons", middleware.RoleMiddleware("exams.index"), examController.AssignedLesson)
 		managementRouter.GET("/exercises/:id/assigned-lessons", middleware.RoleMiddleware("exercises.index"), exerciseController.AssignedLesson)
+		managementRouter.GET("/assessments/:id/assigned-lessons", middleware.RoleMiddleware("assessments.index"), assessmentController.AssignedLesson)
 
 		managementRouter.PUT("/lesson-plans/:id/complete", middleware.RoleMiddleware("lesson-plans.update"), lessonPlanController.Complete)
 		managementRouter.PUT("/chapters/:id/sort-lessons", middleware.RoleMiddleware("chapters.update"), chapterController.SortLessons)
@@ -345,12 +347,8 @@ func InitRoutes(router *gin.Engine) {
 
 	// Feedback routes
 	feedbackController := NewFeedbackController()
-	managementRouter.GET("/feedbacks", feedbackController.GetAll)
-	managementRouter.GET("/feedbacks/:id", feedbackController.GetByID)
-	managementRouter.POST("/feedbacks", feedbackController.Create)
-	managementRouter.PUT("/feedbacks/:id", feedbackController.Update)
-	managementRouter.PATCH("/feedbacks/:id/status", feedbackController.UpdateStatus)
-	managementRouter.DELETE("/feedbacks/:id", feedbackController.Delete)
+	RegisterModuleRoute(managementRouter, "feedbacks", []string{"index", "show", "store", "update", "destroy"}, feedbackController)
+	managementRouter.PATCH("/feedbacks/:id/status", middleware.RoleMiddleware("feedbacks.update"), feedbackController.UpdateStatus)
 
 	studyRouter := api.Group("/study")
 	studyRouter.Use(middleware.AuthMiddleware(authRepo))

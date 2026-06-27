@@ -286,15 +286,21 @@ func (x *QuestionContent) GetMedias() []*MediaQuestion {
 }
 
 type QuestionMetaData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Instructions  string                 `protobuf:"bytes,1,opt,name=instructions,proto3" json:"instructions,omitempty"`
-	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Points        float64                `protobuf:"fixed64,3,opt,name=points,proto3" json:"points,omitempty"`
-	Time          float32                `protobuf:"fixed32,4,opt,name=time,proto3" json:"time,omitempty"`
-	IsRandom      bool                   `protobuf:"varint,5,opt,name=is_random,json=isRandom,proto3" json:"is_random,omitempty"`
-	Display       string                 `protobuf:"bytes,6,opt,name=display,proto3" json:"display,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Instructions string                 `protobuf:"bytes,1,opt,name=instructions,proto3" json:"instructions,omitempty"`
+	Description  string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	Points       float64                `protobuf:"fixed64,3,opt,name=points,proto3" json:"points,omitempty"`
+	Time         float32                `protobuf:"fixed32,4,opt,name=time,proto3" json:"time,omitempty"`
+	IsRandom     bool                   `protobuf:"varint,5,opt,name=is_random,json=isRandom,proto3" json:"is_random,omitempty"`
+	Display      string                 `protobuf:"bytes,6,opt,name=display,proto3" json:"display,omitempty"`
+	// Writing: maximum characters allowed
+	MaxCharacters int32 `protobuf:"varint,7,opt,name=max_characters,json=maxCharacters,proto3" json:"max_characters,omitempty"`
+	// Writing: allow attaching images in the answer
+	AllowImageUpload bool `protobuf:"varint,8,opt,name=allow_image_upload,json=allowImageUpload,proto3" json:"allow_image_upload,omitempty"`
+	// Speaking: maximum recording duration (seconds)
+	MaxRecordingTime int32 `protobuf:"varint,9,opt,name=max_recording_time,json=maxRecordingTime,proto3" json:"max_recording_time,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *QuestionMetaData) Reset() {
@@ -367,6 +373,27 @@ func (x *QuestionMetaData) GetDisplay() string {
 		return x.Display
 	}
 	return ""
+}
+
+func (x *QuestionMetaData) GetMaxCharacters() int32 {
+	if x != nil {
+		return x.MaxCharacters
+	}
+	return 0
+}
+
+func (x *QuestionMetaData) GetAllowImageUpload() bool {
+	if x != nil {
+		return x.AllowImageUpload
+	}
+	return false
+}
+
+func (x *QuestionMetaData) GetMaxRecordingTime() int32 {
+	if x != nil {
+		return x.MaxRecordingTime
+	}
+	return 0
 }
 
 type QuestionOption struct {
@@ -1294,14 +1321,17 @@ const file_question_proto_rawDesc = "" +
 	"\x0fQuestionContent\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12)\n" +
 	"\x05media\x18\x02 \x01(\v2\x13.prot.MediaQuestionR\x05media\x12+\n" +
-	"\x06medias\x18\x03 \x03(\v2\x13.prot.MediaQuestionR\x06medias\"\xbb\x01\n" +
+	"\x06medias\x18\x03 \x03(\v2\x13.prot.MediaQuestionR\x06medias\"\xbe\x02\n" +
 	"\x10QuestionMetaData\x12\"\n" +
 	"\finstructions\x18\x01 \x01(\tR\finstructions\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x16\n" +
 	"\x06points\x18\x03 \x01(\x01R\x06points\x12\x12\n" +
 	"\x04time\x18\x04 \x01(\x02R\x04time\x12\x1b\n" +
 	"\tis_random\x18\x05 \x01(\bR\bisRandom\x12\x18\n" +
-	"\adisplay\x18\x06 \x01(\tR\adisplay\"\xb1\x03\n" +
+	"\adisplay\x18\x06 \x01(\tR\adisplay\x12%\n" +
+	"\x0emax_characters\x18\a \x01(\x05R\rmaxCharacters\x12,\n" +
+	"\x12allow_image_upload\x18\b \x01(\bR\x10allowImageUpload\x12,\n" +
+	"\x12max_recording_time\x18\t \x01(\x05R\x10maxRecordingTime\"\xb1\x03\n" +
 	"\x0eQuestionOption\x12-\n" +
 	"\aanswers\x18\x01 \x03(\v2\x13.prot.AnswerContentR\aanswers\x12,\n" +
 	"\asources\x18\x02 \x03(\v2\x12.prot.AnswerSourceR\asources\x12,\n" +

@@ -83,6 +83,7 @@ message AssessmentInfo {
   string description = 3;
   string type = 4;
   bool is_program = 5;
+  bool is_assigned = 6;
 }
 
 message AuthorInfo {

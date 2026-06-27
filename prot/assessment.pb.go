@@ -413,6 +413,66 @@ func (x *AssessmentsResponse) GetTotal() int64 {
 	return 0
 }
 
+type AssignedAssessment struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	LessonId      int64                  `protobuf:"varint,1,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"`
+	CourseId      int64                  `protobuf:"varint,2,opt,name=course_id,json=courseId,proto3" json:"course_id,omitempty"`
+	IsAssigned    bool                   `protobuf:"varint,3,opt,name=is_assigned,json=isAssigned,proto3" json:"is_assigned,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssignedAssessment) Reset() {
+	*x = AssignedAssessment{}
+	mi := &file_assessment_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssignedAssessment) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssignedAssessment) ProtoMessage() {}
+
+func (x *AssignedAssessment) ProtoReflect() protoreflect.Message {
+	mi := &file_assessment_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssignedAssessment.ProtoReflect.Descriptor instead.
+func (*AssignedAssessment) Descriptor() ([]byte, []int) {
+	return file_assessment_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *AssignedAssessment) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *AssignedAssessment) GetCourseId() int64 {
+	if x != nil {
+		return x.CourseId
+	}
+	return 0
+}
+
+func (x *AssignedAssessment) GetIsAssigned() bool {
+	if x != nil {
+		return x.IsAssigned
+	}
+	return false
+}
+
 var File_assessment_proto protoreflect.FileDescriptor
 
 const file_assessment_proto_rawDesc = "" +
@@ -465,7 +525,12 @@ const file_assessment_proto_rawDesc = "" +
 	"\x05files\x18\v \x03(\tR\x05files\"_\n" +
 	"\x13AssessmentsResponse\x122\n" +
 	"\vassessments\x18\x01 \x03(\v2\x10.prot.AssessmentR\vassessments\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x03R\x05totalB\rZ\vbe-lms/protb\x06proto3"
+	"\x05total\x18\x02 \x01(\x03R\x05total\"o\n" +
+	"\x12AssignedAssessment\x12\x1b\n" +
+	"\tlesson_id\x18\x01 \x01(\x03R\blessonId\x12\x1b\n" +
+	"\tcourse_id\x18\x02 \x01(\x03R\bcourseId\x12\x1f\n" +
+	"\vis_assigned\x18\x03 \x01(\bR\n" +
+	"isAssignedB\rZ\vbe-lms/protb\x06proto3"
 
 var (
 	file_assessment_proto_rawDescOnce sync.Once
@@ -479,12 +544,13 @@ func file_assessment_proto_rawDescGZIP() []byte {
 	return file_assessment_proto_rawDescData
 }
 
-var file_assessment_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_assessment_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_assessment_proto_goTypes = []any{
 	(*AssessmentFileInfo)(nil),  // 0: prot.AssessmentFileInfo
 	(*Assessment)(nil),          // 1: prot.Assessment
 	(*AssessmentRequest)(nil),   // 2: prot.AssessmentRequest
 	(*AssessmentsResponse)(nil), // 3: prot.AssessmentsResponse
+	(*AssignedAssessment)(nil),  // 4: prot.AssignedAssessment
 }
 var file_assessment_proto_depIdxs = []int32{
 	0, // 0: prot.Assessment.file_infos:type_name -> prot.AssessmentFileInfo
@@ -508,7 +574,7 @@ func file_assessment_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_assessment_proto_rawDesc), len(file_assessment_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
