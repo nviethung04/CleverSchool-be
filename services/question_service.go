@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/protobuf/encoding/protojson"
 	"gorm.io/gorm"
 )
 
@@ -396,6 +397,8 @@ func (s *questionService) GetClonedByID(c *gin.Context, id int, assignmentID int
 			return nil, err
 		}
 		if question.Id == int64(id) {
+			question = mergeCloneQuestionOptions(question)
+			question = questionResource.FormatByRole(question, int64(utils.GetCurrentRoleId(c)))
 			question = questionResource.FormatMediaUrls(question)
 			return questionResource.FormatStaticURL(question), nil
 		}
@@ -718,6 +721,10 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 		return nil, 0, hasCloned
 	}
 
+	healedClone := false
+	mergedForPersist := make([]*prot.Question, 0, len(rawQuestions))
+	roleId := int64(utils.GetCurrentRoleId(c))
+
 	for _, q := range rawQuestions {
 		question, err := questionResource.ParseProtQuestionFromJSON(q)
 		if err != nil {
@@ -725,20 +732,26 @@ func (s *questionService) GetCloned(c *gin.Context) ([]*prot.Question, int64, bo
 			return questions, 0, hasCloned
 		}
 
-		if clonedQuestionNeedsOptionsRefresh(question) {
-			if refreshed, refreshErr := refreshQuestionOptionsFromDB(question.Id); refreshErr == nil && refreshed != nil {
-				question = refreshed
-			}
+		needsHeal := clonedQuestionNeedsOptionsRefresh(question)
+		question = mergeCloneQuestionOptions(question)
+		if needsHeal && !clonedQuestionNeedsOptionsRefresh(question) {
+			healedClone = true
 		}
+		mergedForPersist = append(mergedForPersist, cloneProtQuestion(question))
 
-		question = questionResource.FormatByRole(question, int64(utils.GetCurrentRoleId(c)))
+		question = questionResource.FormatByRole(question, roleId)
 		question = questionResource.FormatStaticURL(question)
 		question = questionResource.FormatMediaUrls(question)
 
 		questions = append(questions, question)
 	}
 
-	roleId := int64(utils.GetCurrentRoleId(c))
+	if healedClone {
+		if err := persistCloneQuestionsSnapshot(assignmentID, assignmentType, mergedForPersist); err != nil {
+			config.Log.Errorf("persist healed clone snapshot: %v", err)
+		}
+	}
+
 	if roleId == models.StudentRoleId {
 		switch assignmentType {
 		case models.ClonedQuestionTypeHomework:
@@ -976,4 +989,276 @@ func refreshQuestionOptionsFromDB(questionID int64) (*prot.Question, error) {
 
 	questionResource := resources.NewQuestionResource()
 	return questionResource.FormatQuestion(question), nil
+}
+
+// mergeCloneQuestionOptions prefers live DB options when the clone snapshot is empty
+// or when the question is category (options are stored in answer_groups / group_answers).
+func mergeCloneQuestionOptions(question *prot.Question) *prot.Question {
+	if question == nil {
+		return question
+	}
+
+	cloneMissing := clonedQuestionNeedsOptionsRefresh(question)
+	preferDB := question.Type == models.QuestionTypeCategory
+	if !cloneMissing && !preferDB {
+		return question
+	}
+
+	refreshed, err := refreshQuestionOptionsFromDB(question.Id)
+	if err != nil || refreshed == nil || refreshed.Options == nil {
+		return question
+	}
+
+	dbUsable := !clonedQuestionNeedsOptionsRefresh(refreshed)
+	if !dbUsable {
+		return question
+	}
+
+	question.Options = refreshed.Options
+	if refreshed.CorrectAnswers != nil {
+		question.CorrectAnswers = refreshed.CorrectAnswers
+	}
+
+	return question
+}
+
+// categoryQuestionForScoring loads live DB options/answers for category scoring.
+// Clone snapshots are often missing or stale after question-bank edits.
+func categoryQuestionForScoring(cloned repositories.ClonedQuestion) (*prot.Question, error) {
+	questionID, err := strconv.ParseInt(cloned.ID.String(), 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	if refreshed, refreshErr := refreshQuestionOptionsFromDB(questionID); refreshErr == nil && refreshed != nil {
+		if !clonedQuestionNeedsOptionsRefresh(refreshed) {
+			refreshed.Id = questionID
+			if cloned.Type != "" {
+				refreshed.Type = cloned.Type
+			}
+			return refreshed, nil
+		}
+	}
+
+	question := &prot.Question{
+		Id:   questionID,
+		Type: cloned.Type,
+	}
+
+	unmarshalOpts := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if len(cloned.Options) > 0 {
+		question.Options = &prot.QuestionOption{}
+		if err := unmarshalOpts.Unmarshal(cloned.Options, question.Options); err != nil {
+			if err := parseCategoryOptionsFromCloneJSON(cloned.Options, question); err != nil {
+				return nil, fmt.Errorf("parse cloned options: %w", err)
+			}
+		}
+	}
+	if len(cloned.CorrectAnswers) > 0 {
+		question.CorrectAnswers = &prot.QuestionCorrectAnswers{}
+		if err := unmarshalOpts.Unmarshal(cloned.CorrectAnswers, question.CorrectAnswers); err != nil {
+			if err := parseCategoryCorrectAnswersFromCloneJSON(cloned.CorrectAnswers, question); err != nil {
+				return nil, fmt.Errorf("parse cloned correct_answers: %w", err)
+			}
+		}
+	}
+
+	return mergeCloneQuestionOptions(question), nil
+}
+
+func parseCategoryOptionsFromCloneJSON(raw json.RawMessage, question *prot.Question) error {
+	var payload struct {
+		Items []struct {
+			ID            json.Number `json:"id"`
+			Text          string      `json:"text"`
+			Point         float64     `json:"point"`
+			GroupPosition int64       `json:"group_position"`
+		} `json:"items"`
+		Categories []struct {
+			ID   json.Number `json:"id"`
+			Name string      `json:"name"`
+		} `json:"categories"`
+	}
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return err
+	}
+
+	question.Options = &prot.QuestionOption{}
+	for _, cat := range payload.Categories {
+		id, _ := strconv.ParseUint(cat.ID.String(), 10, 64)
+		question.Options.Categories = append(question.Options.Categories, &prot.GroupAnswer{
+			Id:   id,
+			Name: cat.Name,
+		})
+	}
+	for _, item := range payload.Items {
+		id, _ := strconv.ParseUint(item.ID.String(), 10, 64)
+		question.Options.Items = append(question.Options.Items, &prot.AnswerContent{
+			Id:            id,
+			Text:          item.Text,
+			Point:         item.Point,
+			GroupPosition: int32(item.GroupPosition),
+		})
+	}
+	return nil
+}
+
+func parseCategoryCorrectAnswersFromCloneJSON(raw json.RawMessage, question *prot.Question) error {
+	var payload struct {
+		List map[string]string `json:"list"`
+	}
+	if err := json.Unmarshal(raw, &payload); err != nil {
+		return err
+	}
+	question.CorrectAnswers = &prot.QuestionCorrectAnswers{List: payload.List}
+	return nil
+}
+
+func categoryCorrectGroupID(question *prot.Question, answerID int64, answerIDStr string) int64 {
+	if question == nil {
+		return 0
+	}
+
+	if question.CorrectAnswers != nil && question.CorrectAnswers.List != nil {
+		if v, ok := question.CorrectAnswers.List[answerIDStr]; ok {
+			if correctGroupID, err := strconv.ParseInt(v, 10, 64); err == nil && correctGroupID > 0 {
+				return correctGroupID
+			}
+		}
+	}
+
+	if question.Options == nil {
+		return 0
+	}
+
+	for _, item := range question.Options.Items {
+		if int64(item.Id) != answerID || item.GroupPosition <= 0 {
+			continue
+		}
+		pos := int(item.GroupPosition)
+		for i, cat := range question.Options.Categories {
+			if i+1 == pos {
+				return int64(cat.Id)
+			}
+		}
+	}
+
+	return 0
+}
+
+func buildCategoryGroupScoreResults(
+	reqAnswers map[string]int64,
+	question *prot.Question,
+	perGroupScore float64,
+) (totalScore float64, correctCount int, groupResults []*prot.GroupPair) {
+	itemIdToText := make(map[int64]string)
+	groupIdToName := make(map[int64]string)
+	if question != nil && question.Options != nil {
+		for _, item := range question.Options.Items {
+			itemIdToText[int64(item.Id)] = item.Text
+		}
+		for _, cat := range question.Options.Categories {
+			groupIdToName[int64(cat.Id)] = cat.Name
+		}
+	}
+
+	for answerIDStr, groupID := range reqAnswers {
+		answerID, err := strconv.ParseInt(answerIDStr, 10, 64)
+		if err != nil {
+			continue
+		}
+
+		correctGroupID := categoryCorrectGroupID(question, answerID, answerIDStr)
+		isCorrect := correctGroupID > 0 && groupID == correctGroupID
+		score := 0.0
+		if isCorrect {
+			score = perGroupScore
+			correctCount++
+			totalScore += score
+		}
+
+		groupResults = append(groupResults, &prot.GroupPair{
+			AnswerId:      answerID,
+			GroupId:       groupID,
+			AnswerContent: itemIdToText[answerID],
+			GroupContent:  groupIdToName[groupID],
+			IsCorrect:     isCorrect,
+			Score:         score,
+		})
+	}
+
+	return totalScore, correctCount, groupResults
+}
+
+// EnrichClonedQuestionMaps fills empty category options/correct_answers from live DB
+// for homework-answers and other APIs that read cloned_questions JSON directly.
+func EnrichClonedQuestionMaps(questions []map[string]interface{}) []map[string]interface{} {
+	if len(questions) == 0 {
+		return questions
+	}
+
+	questionResource := resources.NewQuestionResource()
+	marshalOpts := protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: true}
+
+	for i, rawMap := range questions {
+		raw, err := json.Marshal(rawMap)
+		if err != nil {
+			continue
+		}
+		q, err := questionResource.ParseProtQuestionFromJSON(raw)
+		if err != nil {
+			continue
+		}
+		merged := mergeCloneQuestionOptions(q)
+		b, err := marshalOpts.Marshal(merged)
+		if err != nil {
+			continue
+		}
+		var updated map[string]interface{}
+		if err := json.Unmarshal(b, &updated); err != nil {
+			continue
+		}
+		questions[i] = updated
+	}
+
+	return questions
+}
+
+func cloneProtQuestion(q *prot.Question) *prot.Question {
+	if q == nil {
+		return nil
+	}
+	b, err := protojson.Marshal(q)
+	if err != nil {
+		return q
+	}
+	var out prot.Question
+	if err := protojson.Unmarshal(b, &out); err != nil {
+		return q
+	}
+	return &out
+}
+
+func persistCloneQuestionsSnapshot(assignmentID int64, assignmentType string, questions []*prot.Question) error {
+	questionResource := resources.NewQuestionResource()
+	marshalOpts := protojson.MarshalOptions{EmitUnpopulated: true, UseProtoNames: true}
+
+	var buf strings.Builder
+	buf.WriteString("[")
+	for i, q := range questions {
+		stripped := questionResource.FormatStripDomain(q)
+		b, err := marshalOpts.Marshal(stripped)
+		if err != nil {
+			return err
+		}
+		buf.Write(b)
+		if i != len(questions)-1 {
+			buf.WriteString(",")
+		}
+	}
+	buf.WriteString("]")
+
+	return db.MasterDB.Model(&models.ClonedQuestion{}).
+		Where("assignment_id = ? AND assignment_type = ?", assignmentID, assignmentType).
+		Update("questions", []byte(buf.String())).Error
 }

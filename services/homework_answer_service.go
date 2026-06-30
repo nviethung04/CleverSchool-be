@@ -33,6 +33,7 @@ func (s *homeworkAnswerService) GetHomeworkAnswer(homeworkID, userID int64) (rep
 	if err != nil {
 		return overview, nil, nil, err
 	}
+	questions = EnrichClonedQuestionMaps(questions)
 	manualAnswers, err := s.repo.GetManualAnswers(homeworkID, userID)
 	if err != nil {
 		return overview, questions, nil, err

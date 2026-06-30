@@ -452,6 +452,11 @@ func (resource *QuestionResourceImpl) FormatCorrectAnswersByType(question *model
 		for _, a := range answers {
 			key := strconv.FormatInt(a.ID, 10)
 			value := strconv.FormatInt(int64(a.Group.ID), 10)
+			if a.GroupID != nil && *a.GroupID > 0 {
+				value = strconv.FormatInt(*a.GroupID, 10)
+			} else if value == "0" && a.Group.ID > 0 {
+				value = strconv.FormatInt(int64(a.Group.ID), 10)
+			}
 			correctAnswers[key] = value
 		}
 
