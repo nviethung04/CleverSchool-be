@@ -63,6 +63,20 @@ func (r *chapterRepository) Update(entity *models.Chapter) error {
 	return db.MasterDB.Omit(omit...).Save(entity).Error
 }
 
+// Override BaseRepository.Delete to avoid Save() overwriting nullable course_id with 0.
+func (r *chapterRepository) Delete(id int) error {
+	var model models.Chapter
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+	if err := db.MasterDB.Model(&models.Chapter{}).
+		Where("id = ?", id).
+		Update("deleted_by", model.DeletedBy).Error; err != nil {
+		return err
+	}
+	return db.MasterDB.Delete(&models.Chapter{}, id).Error
+}
+
 func (r *chapterRepository) UpdateLessonChapterId(chapterId int64, lessonId int64) error {
 	return db.MasterDB.Model(&models.Lesson{}).
 		Where("id = ?", lessonId).
