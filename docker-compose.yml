@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: lms-app
+    env_file:
+      - .env
     environment:
       PORT: 8080
       JWT_SECRET: dev_jwt_secret_doi_khi_len_production
@@ -22,6 +24,11 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: 0lJc4VUTFmyV
       REDIS_DB: 0
+      # For local dev; override in be/.env when needed
+      APP_FULL_URL: ${APP_FULL_URL:-http://localhost:8080}
+      API_DOMAIN: ${API_DOMAIN:-http://localhost:8080}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
+      ALLOW_ORIGINS: ${ALLOW_ORIGINS:-http://localhost:3000}
     ports:
       - "8080:8080"
     depends_on:
@@ -77,6 +84,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       DB_MASTER_HOST: postgres
       DB_MASTER_PORT: 5432
