@@ -47,9 +47,12 @@ func main() {
 	switch *model {
 	case "Question":
 		seed.SeedQuestions()
+	case "Subject":
+		seed.SeedDefaultEnglishSubject()
 	case "QuestionAttribute":
 		seed.SeedQuestionAttributes()
 	case "Role":
+		seed.SeedDefaultEnglishSubject()
 		seed.SeedRoles()
 	case "UserClassAndCourse":
 		seed.UserClassAndCourse()
@@ -61,10 +64,36 @@ func main() {
 	case "Lesson4Flashcard":
 		SeedLesson4Flashcards()
 	default:
+		seed.SeedDefaultEnglishSubject()
 		seed.SeedQuestions()
 		seed.SeedRoles()
 		return
 	}
+}
+
+func (s *Seeder) SeedDefaultEnglishSubject() {
+	var count int64
+	if err := db.MasterDB.Model(&models.Subject{}).
+		Where("deleted_at IS NULL").
+		Count(&count).Error; err != nil {
+		log.Printf("Error checking subjects: %v", err)
+		return
+	}
+	if count > 0 {
+		log.Println("ℹ️ Subjects already exist — skipping default English subject seed")
+		return
+	}
+
+	subject := models.Subject{
+		Name:        "Tiếng Anh",
+		Description: "Môn học mặc định (seed)",
+		Status:      true,
+	}
+	if err := db.MasterDB.Create(&subject).Error; err != nil {
+		log.Printf("Error seeding default English subject: %v", err)
+		return
+	}
+	log.Printf("✅ Seeded default subject: %s (id=%d)", subject.Name, subject.ID)
 }
 func (s *Seeder) SeedWeeksForYear(year int) {
 	var count int64

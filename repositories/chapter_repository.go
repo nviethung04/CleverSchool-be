@@ -47,6 +47,22 @@ func (r *chapterRepository) Create(entity *models.Chapter) error {
 	return query.Create(entity).Error
 }
 
+func (r *chapterRepository) Update(entity *models.Chapter) error {
+	if entity == nil {
+		return errors.New("entity is nil")
+	}
+	if err := r.BeforeUpdate(entity); err != nil {
+		return err
+	}
+
+	omit := []string{"created_at", "created_by", "author_id", "clone_info"}
+	if entity.CourseId == 0 {
+		omit = append(omit, "CourseId")
+	}
+
+	return db.MasterDB.Omit(omit...).Save(entity).Error
+}
+
 func (r *chapterRepository) UpdateLessonChapterId(chapterId int64, lessonId int64) error {
 	return db.MasterDB.Model(&models.Lesson{}).
 		Where("id = ?", lessonId).
@@ -56,52 +72,52 @@ func (r *chapterRepository) UpdateLessonChapterId(chapterId int64, lessonId int6
 func (r *chapterRepository) GetPositionByIdAndProgram(programId int64, id int64) (int, error) {
 	var position int
 
-    if id > 0 {
-        err := db.MasterDB.Model(&models.Chapter{}).
-            Select("sort_position").
-            Where("id = ? AND program_id = ?", id, programId).
-            Scan(&position).Error
-        if err != nil {
-            return position, err
-        }
-    }
+	if id > 0 {
+		err := db.MasterDB.Model(&models.Chapter{}).
+			Select("sort_position").
+			Where("id = ? AND program_id = ?", id, programId).
+			Scan(&position).Error
+		if err != nil {
+			return position, err
+		}
+	}
 
-    if position == 0 {
-        var countZero int64
-        if err := db.MasterDB.Model(&models.Chapter{}).
-            Where("program_id = ? AND sort_position = 0 AND id != ?", programId, id).
-            Count(&countZero).Error; err != nil {
-            return position, err
-        }
+	if position == 0 {
+		var countZero int64
+		if err := db.MasterDB.Model(&models.Chapter{}).
+			Where("program_id = ? AND sort_position = 0 AND id != ?", programId, id).
+			Count(&countZero).Error; err != nil {
+			return position, err
+		}
 
-        if countZero > 0 {
-            var maxPos sql.NullInt64
-            if err := db.MasterDB.Model(&models.Chapter{}).
-                Select("MAX(sort_position)").
-                Where("program_id = ?", programId).
-                Scan(&maxPos).Error; err != nil {
-                return position, err
-            }
+		if countZero > 0 {
+			var maxPos sql.NullInt64
+			if err := db.MasterDB.Model(&models.Chapter{}).
+				Select("MAX(sort_position)").
+				Where("program_id = ?", programId).
+				Scan(&maxPos).Error; err != nil {
+				return position, err
+			}
 
-            if maxPos.Valid {
-                position = int(maxPos.Int64) + 1
-            } else {
-                position = 1
-            }
+			if maxPos.Valid {
+				position = int(maxPos.Int64) + 1
+			} else {
+				position = 1
+			}
 
-            return position, nil
-        } else {
-            return position, errors.New("no chapter with sort_position=0 found")
-        }
-    } else {
-        return position, nil
-    }
+			return position, nil
+		} else {
+			return position, errors.New("no chapter with sort_position=0 found")
+		}
+	} else {
+		return position, nil
+	}
 }
 
 func (r *chapterRepository) ClearOldLessonByChapterId(chapterId int64, lessonIds []int64) error {
-    return db.MasterDB.Model(&models.Lesson{}).
-        Where("chapter_id = ? AND id NOT IN (?)", chapterId, lessonIds).
-        Update("chapter_id", 0).Error
+	return db.MasterDB.Model(&models.Lesson{}).
+		Where("chapter_id = ? AND id NOT IN (?)", chapterId, lessonIds).
+		Update("chapter_id", 0).Error
 }
 
 func (r *chapterRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {

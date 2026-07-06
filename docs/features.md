@@ -151,6 +151,7 @@ Code: `be/repositories/dashboard_teacher_exercise_student_repository.go`, `dashb
 **Mô hình dữ liệu**
 
 - Chương + bài học thuộc **chương trình** (`chapters.program_id`). Khóa học chỉ tham chiếu `program_id` — không clone riêng từng bài khi sửa CT.
+- `PUT /api/manage/chapters/:id`: FE thường chỉ gửi `title`, `description`, `lessons[]`. BE merge field còn lại từ bản ghi cũ. **`course_id` legacy** có thể `NULL` (migration `0030`); khi cập nhật, repository **không ghi** `course_id=0` (tránh vi phạm FK `chapters_course_id_fkey`) — giống `Create`.
 - Liên kết bài tập/KT/LT/đánh giá: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`, `assessment_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
 - Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên. Body field `assessments` (số nhiều) trên `PUT /lessons`.
 
@@ -236,15 +237,19 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 
 | Trạng thái | Module |
 |------------|--------|
-| **Đã bật menu** (2026-06-23) | H5P (`/admin/h5p`), Xếp hạng HS (`/ranking`), Phản hồi HS/GV (`/feedback`), tab **Quản lý trường** trên `/admin/users/list` |
+| **Đã bật menu** (2026-06-23) | Xếp hạng HS (`/ranking`), Phản hồi HS/GV (`/feedback`) |
+| Tab Quản lý trường (role 4) | **Ẩn** — `HIDDEN_USER_LIST_TABS` gồm `schools` trong `fe/config/hiddenModules.ts` (role School chưa lọc dữ liệu theo trường; BE vẫn seed role 4) |
 | **BE tương ứng** (migration `0051`) | `feedbacks.*`, `h5p-contents.*` trong `permission.go` + `role_permissions`; role **School (4)** seed qua `GetSchoolPermissions()`; route `/manage/feedbacks` và `/api/h5p/content*` có `RoleMiddleware` |
 | **Redis** | `REDIS_ENABLED=true` trong `.env` / `be/deploy/.env.example` — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
-| Slug vẫn ẩn | `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
+| Slug vẫn ẩn | `admin/subjects` (mặc định chỉ seed 1 môn *Tiếng Anh*), `admin/h5p`, `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
 | Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
 | Sửa câu hỏi clone trong bài tập | Tắt (`CLONE_QUESTION_EDIT_ENABLED = false`) — sửa từ form BTVN/kiểm tra/luyện tập luôn cập nhật ngân hàng câu hỏi gốc, không gửi `homework_id`/`exam_id`/`exercise_id` |
 | Nút Xuất/Nhập dữ liệu (Excel) | Tắt (`EXPORT_IMPORT_DATA_UI_ENABLED = false`) — admin users/schools, chi tiết trường (lớp/HS), ngân hàng câu hỏi GV; dashboard `DASHBOARD_FILTERS.export = false` |
+| Dialog media câu hỏi (URL / Thư viện) | Tắt (`QUESTION_MEDIA_URL_LIBRARY_UI_ENABLED = false`) — tạo/sửa câu hỏi chỉ còn tab **Tải lên file** trong `MediaUploadDialog` |
+| Trang Quản lý tập tin (`/admin/images`) | **Ẩn menu** — slug `admin/images` trong `HIDDEN_MODULES`; API `upload-file` và upload trong form câu hỏi/khóa vẫn dùng bình thường |
+| Học kỳ & lịch tuần | **Ẩn** — `admin/semesters` trong `HIDDEN_MODULES`; `SEMESTER_SCHEDULE_UI_ENABLED = false` (chọn kỳ trên khóa, Schedule, chọn tuần HS/GV). Giao/làm bài theo khóa vẫn chạy (`week_id=0`) |
 
-Core hiển thị: Tổng quan, Người dùng (đủ 4 tab role), Trường, Môn học, Chương trình, Khóa học, Học liệu (+ H5P), Học kỳ.
+Core hiển thị: Tổng quan, Người dùng (tab HS / GV / Admin; tab Quản lý trường ẩn), Trường, Khóa học, Chương trình, Học liệu. (Học kỳ, Quản lý tập tin ẩn menu.) (Môn học ẩn menu vì mặc định chỉ có 1 môn; H5P ẩn menu). Thứ tự menu: khóa học (vận hành) trước chương trình (mẫu nội dung).
 
 ---
 
