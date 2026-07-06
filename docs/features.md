@@ -241,6 +241,7 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 | **Redis** | `REDIS_ENABLED=true` trong `.env` / `be/deploy/.env.example` — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
 | Slug vẫn ẩn | `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
 | Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
+| Sửa câu hỏi clone trong bài tập | Tắt (`CLONE_QUESTION_EDIT_ENABLED = false`) — sửa từ form BTVN/kiểm tra/luyện tập luôn cập nhật ngân hàng câu hỏi gốc, không gửi `homework_id`/`exam_id`/`exercise_id` |
 
 Core hiển thị: Tổng quan, Người dùng (đủ 4 tab role), Trường, Môn học, Chương trình, Khóa học, Học liệu (+ H5P), Học kỳ.
 
@@ -282,3 +283,4 @@ Core hiển thị: Tổng quan, Người dùng (đủ 4 tab role), Trường, M�
 | `NOT IN (NULL)` khi xóa ref lesson rỗng | `DeleteOld*` với mảng ID rỗng | Chỉ thêm `NOT IN` khi `len(ids) > 0` |
 | Báo cáo HS tab Bài luyện tập trống / 404 `exercise-list` | FE gọi homework API hoặc BE chưa restart | API exercise §3.2; restart BE sau deploy |
 | HS 403 khi mở exercise từ bài học | Thiếu `exercises.show` trong Redis | Migration 0047 + `refresh-permissions`; đăng nhập lại |
+| Câu hỏi **category** (vd. id 14) không hiện danh mục / chấm sai / đáp án đúng trống | Snapshot `cloned_questions` rỗng (`options`/`correct_answers`) sau khi sửa ngân hàng câu hỏi | `mergeCloneQuestionOptions` + `EnrichClonedQuestionMaps` (homework-answers); tự heal snapshot khi `GetCloned`; chấm qua `categoryQuestionForScoring` — **restart BE** |

@@ -18,6 +18,8 @@ Hướng dẫn setup **greenfield** (DB mới, chưa production). Cập nhật: 
 
 ## Cách 1: Docker (Khuyến nghị — nhanh nhất)
 
+**Hướng dẫn gọn (Docker — BE và FE riêng):** [docs/docker-chay-nhanh.md](../../docs/docker-chay-nhanh.md) — `be/docker-compose.yml` rồi `fe/docker-compose.yml`.
+
 ### Bước 1 — Vào thư mục backend
 
 ```bash
