@@ -18,56 +18,31 @@ Hướng dẫn setup **greenfield** (DB mới, chưa production). Cập nhật: 
 
 ## Cách 1: Docker (Khuyến nghị — nhanh nhất)
 
-**Hướng dẫn gọn (Docker — BE và FE riêng):** [docs/docker-chay-nhanh.md](../../docs/docker-chay-nhanh.md) — `be/docker-compose.yml` rồi `fe/docker-compose.yml`.
+**Hướng dẫn đầy đủ từng lệnh (máy mới):** [docs/docker-chay-nhanh.md](../../docs/docker-chay-nhanh.md) — mục **3** (BE) rồi mục **4** (FE).
 
-### Bước 1 — Vào thư mục backend
+Tóm tắt BE — chạy lần lượt trong `be/`:
 
 ```bash
 cd be
+docker compose up -d postgres redis
+docker compose ps                                                    # postgres + redis healthy
+docker compose up -d --build app
+docker compose logs app --tail 40                                    # migration version 53, không lỗi
+docker compose ps                                                    # lms-app Up
+docker compose --profile tools run --rm seeder
+docker compose exec app ./myapp refresh-permissions
+curl -s -X POST http://localhost:8080/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'                    # có token
 ```
-
-### Bước 2 — Chạy stack
-
-```bash
-docker compose up -d --build
-```
-
-Services:
 
 - API: http://localhost:8080  
 - PostgreSQL: `localhost:5432` (user `lms_user`, db `lms_db`)  
-- Redis: `localhost:6379` (password trong `docker-compose.yml`)
+- Redis: `localhost:6379` (password trong `docker-compose.yml`)  
+- Migration tự chạy khi `lms-app` start (`docker-entrypoint.sh`); mục tiêu version **53** (`deploy/EXPECTED_MIGRATION_VERSION`)  
+- Đăng nhập dev: `admin` / `admin123`
 
-### Bước 3 — Migration
-
-Container `lms-app` tự chạy `./myapp migrate` khi start (`docker-entrypoint.sh`, `RUN_MIGRATIONS=true`).
-
-Kiểm tra log:
-
-```bash
-docker compose logs app
-```
-
-Kỳ vọng: migration lên version trong `be/deploy/EXPECTED_MIGRATION_VERSION` (hiện **44**), không `dirty`.
-
-### Bước 4 — Kiểm tra API
-
-```bash
-curl http://localhost:8080/api/login
-# hoặc bật Swagger: thêm ENABLE_SWAGGER=true vào environment app rồi restart
-```
-
-### Bước 5 — Frontend
-
-```bash
-cd ../fe
-# Sửa fe/.env:
-# NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api
-pnpm install
-pnpm dev
-```
-
-Mở http://localhost:3000
+Frontend (terminal khác): `cd fe && docker compose up -d --build` — xem mục 4 trong [docker-chay-nhanh.md](../../docs/docker-chay-nhanh.md).
 
 ---
 

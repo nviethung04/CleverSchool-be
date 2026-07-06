@@ -6,6 +6,7 @@ services:
     container_name: lms-app
     environment:
       PORT: 8080
+      JWT_SECRET: dev_jwt_secret_doi_khi_len_production
       DB_MASTER_HOST: postgres
       DB_MASTER_PORT: 5432
       DB_MASTER_USER: lms_user
@@ -68,6 +69,36 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+  # One-shot: docker compose --profile tools run --rm seeder
+  seeder:
+    profiles:
+      - tools
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DB_MASTER_HOST: postgres
+      DB_MASTER_PORT: 5432
+      DB_MASTER_USER: lms_user
+      DB_MASTER_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
+      DB_MASTER_NAME: lms_db
+      DB_REPLICA_HOST: postgres
+      DB_REPLICA_PORT: 5432
+      DB_REPLICA_USER: lms_user
+      DB_REPLICA_PASSWORD: qlsJWiklVEKPCic0cpjOjMbJ
+      DB_REPLICA_NAME: lms_db
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: 0lJc4VUTFmyV
+      REDIS_DB: 0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["./seeder", "-model", "Role"]
+    networks:
+      - lms-network
 
 networks:
   lms-network:

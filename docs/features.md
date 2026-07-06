@@ -242,6 +242,7 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 | Slug vẫn ẩn | `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
 | Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
 | Sửa câu hỏi clone trong bài tập | Tắt (`CLONE_QUESTION_EDIT_ENABLED = false`) — sửa từ form BTVN/kiểm tra/luyện tập luôn cập nhật ngân hàng câu hỏi gốc, không gửi `homework_id`/`exam_id`/`exercise_id` |
+| Nút Xuất/Nhập dữ liệu (Excel) | Tắt (`EXPORT_IMPORT_DATA_UI_ENABLED = false`) — admin users/schools, chi tiết trường (lớp/HS), ngân hàng câu hỏi GV; dashboard `DASHBOARD_FILTERS.export = false` |
 
 Core hiển thị: Tổng quan, Người dùng (đủ 4 tab role), Trường, Môn học, Chương trình, Khóa học, Học liệu (+ H5P), Học kỳ.
 
