@@ -538,7 +538,7 @@ func (s *courseService) GetScore(c *gin.Context, id int64) (*prot.ScoreByCourse,
 
 	scoreByCourse := prot.ScoreByCourse{
 		ExamCount:    int32(len(exams)),
-		FinishExam:   int32(len(examUsers)),
+		FinishExam:   int32(doneCount),
 		ExamResults:  examResults,
 		MaxScore:     maxScore,
 		AverageScore: averageScore,

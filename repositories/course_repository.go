@@ -396,6 +396,7 @@ func (r *courseRepository) GetExamUsers(userId int64, courseId int64) ([]models.
 	var examUsers []models.ExamUser
 
 	err := db.ReplicaDB.Model(&models.ExamUser{}).
+		Select("DISTINCT exam_users.*").
 		Joins("JOIN exams ON exams.id = exam_users.exam_id AND exams.deleted_at IS NULL").
 		Joins("JOIN exam_ref_lessons erl ON erl.exam_id = exams.id").
 		Joins("JOIN lessons ON lessons.id = erl.lesson_id AND lessons.deleted_at IS NULL").
