@@ -56,6 +56,8 @@ func (s *homeworkAnswerService) GetHomeworkAnswerProto(homeworkID, userID int64)
 		QuestionsCompleted:      overview.QuestionsCompleted,
 		LastQuestionIdCompleted: overview.LastQuestionIDCompleted,
 		ManualQuestionsCount:    overview.ManualQuestionsCount,
+		HomeworkQuestionForm:    overview.HomeworkQuestionForm,
+		QuestionFiles:           s.convertMediaInfosToProto(overview.QuestionFiles),
 	}
 	var protoQuestions []*structpb.Struct
 	for _, q := range questions {
@@ -124,7 +126,19 @@ func (s *homeworkAnswerService) GetHomeworkAnswerProto(homeworkID, userID int64)
         ManualAnswers: protoManualAnswers,
         SkippedQuestionIds: skippedIDs,
         IsAllScored: isAllScored,
+        SubmitFiles:   s.convertMediaInfosToProto(overview.SubmitFiles),
     }, nil
+}
+
+func (s *homeworkAnswerService) convertMediaInfosToProto(medias models.MediaInfos) []*prot.HomeworkFile {
+	var files []*prot.HomeworkFile
+	for _, m := range medias {
+		files = append(files, &prot.HomeworkFile{
+			Type: m.Type,
+			Url:  utils.StaticURL(m.Path, models.Storage),
+		})
+	}
+	return files
 }
 
 func stringPtrToString(s *string) string {

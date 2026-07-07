@@ -4,6 +4,7 @@ package prot;
 option go_package = "be-lms/prot";
 
 import "google/protobuf/struct.proto";
+import "homework.proto";
 
 message HomeworkAnswerRequest {
   int64 homework_id = 1;
@@ -22,6 +23,8 @@ message HomeworkAnswerOverview {
   int32 manual_questions_count = 9; // số câu hỏi manual đã làm
   double ratio = 10;                 // tỷ lệ điểm/hoàn thành
   string latest_comment = 11;        // comment mới nhất của giáo viên
+  string homework_question_form = 12;
+  repeated HomeworkFile question_files = 13;
 }
 
 message ManualAnswer {
@@ -44,6 +47,7 @@ message HomeworkAnswerResponse {
   repeated ManualAnswer manual_answers = 3;
   repeated int64 skipped_question_ids = 4; // danh sách câu hỏi skip của học sinh
   bool is_all_scored = 5; // tất cả câu manual đã được chấm hay chưa
+  repeated HomeworkFile submit_files = 6; // danh sách file bài làm của học sinh
 }
 
 //protoc --go_out=. --go_opt=paths=source_relative prot/homework_answer.proto

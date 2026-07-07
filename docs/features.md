@@ -151,7 +151,7 @@ Code: `be/repositories/dashboard_teacher_exercise_student_repository.go`, `dashb
 **Mô hình dữ liệu**
 
 - Chương + bài học thuộc **chương trình** (`chapters.program_id`). Khóa học chỉ tham chiếu `program_id` — không clone riêng từng bài khi sửa CT.
-- `PUT /api/manage/chapters/:id`: FE thường chỉ gửi `title`, `description`, `lessons[]`. BE merge field còn lại từ bản ghi cũ. **`course_id` legacy** có thể `NULL` (migration `0030`); khi cập nhật, repository **không ghi** `course_id=0` (tránh vi phạm FK `chapters_course_id_fkey`) — giống `Create`.
+- `PUT /api/manage/chapters/:id`: FE thường chỉ gửi `title`, `description`, `lessons[]`. BE merge field còn lại từ bản ghi cũ. **`course_id` legacy** có thể `NULL` (migration `0030`); khi cập nhật/xóa, repository **không ghi** `course_id=0` (tránh vi phạm FK `chapters_course_id_fkey`) — giống `Create`.
 - Liên kết bài tập/KT/LT/đánh giá: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`, `assessment_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
 - Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên. Body field `assessments` (số nhiều) trên `PUT /lessons`.
 

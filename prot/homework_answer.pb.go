@@ -87,6 +87,8 @@ type HomeworkAnswerOverview struct {
 	ManualQuestionsCount    int32                  `protobuf:"varint,9,opt,name=manual_questions_count,json=manualQuestionsCount,proto3" json:"manual_questions_count,omitempty"` // số câu hỏi manual đã làm
 	Ratio                   float64                `protobuf:"fixed64,10,opt,name=ratio,proto3" json:"ratio,omitempty"`                                                           // tỷ lệ điểm/hoàn thành
 	LatestComment           string                 `protobuf:"bytes,11,opt,name=latest_comment,json=latestComment,proto3" json:"latest_comment,omitempty"`                        // comment mới nhất của giáo viên
+	HomeworkQuestionForm    string                 `protobuf:"bytes,12,opt,name=homework_question_form,json=homeworkQuestionForm,proto3" json:"homework_question_form,omitempty"`
+	QuestionFiles           []*HomeworkFile        `protobuf:"bytes,13,rep,name=question_files,json=questionFiles,proto3" json:"question_files,omitempty"`
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -196,6 +198,20 @@ func (x *HomeworkAnswerOverview) GetLatestComment() string {
 		return x.LatestComment
 	}
 	return ""
+}
+
+func (x *HomeworkAnswerOverview) GetHomeworkQuestionForm() string {
+	if x != nil {
+		return x.HomeworkQuestionForm
+	}
+	return ""
+}
+
+func (x *HomeworkAnswerOverview) GetQuestionFiles() []*HomeworkFile {
+	if x != nil {
+		return x.QuestionFiles
+	}
+	return nil
 }
 
 type ManualAnswer struct {
@@ -322,6 +338,7 @@ type HomeworkAnswerResponse struct {
 	ManualAnswers      []*ManualAnswer         `protobuf:"bytes,3,rep,name=manual_answers,json=manualAnswers,proto3" json:"manual_answers,omitempty"`
 	SkippedQuestionIds []int64                 `protobuf:"varint,4,rep,packed,name=skipped_question_ids,json=skippedQuestionIds,proto3" json:"skipped_question_ids,omitempty"` // danh sách câu hỏi skip của học sinh
 	IsAllScored        bool                    `protobuf:"varint,5,opt,name=is_all_scored,json=isAllScored,proto3" json:"is_all_scored,omitempty"`                             // tất cả câu manual đã được chấm hay chưa
+	SubmitFiles        []*HomeworkFile         `protobuf:"bytes,6,rep,name=submit_files,json=submitFiles,proto3" json:"submit_files,omitempty"`                                // danh sách file bài làm của học sinh
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -391,15 +408,22 @@ func (x *HomeworkAnswerResponse) GetIsAllScored() bool {
 	return false
 }
 
+func (x *HomeworkAnswerResponse) GetSubmitFiles() []*HomeworkFile {
+	if x != nil {
+		return x.SubmitFiles
+	}
+	return nil
+}
+
 var File_homework_answer_proto protoreflect.FileDescriptor
 
 const file_homework_answer_proto_rawDesc = "" +
 	"\n" +
-	"\x15homework_answer.proto\x12\x04prot\x1a\x1cgoogle/protobuf/struct.proto\"Q\n" +
+	"\x15homework_answer.proto\x12\x04prot\x1a\x1cgoogle/protobuf/struct.proto\x1a\x0ehomework.proto\"Q\n" +
 	"\x15HomeworkAnswerRequest\x12\x1f\n" +
 	"\vhomework_id\x18\x01 \x01(\x03R\n" +
 	"homeworkId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x03R\x06userId\"\xf8\x03\n" +
+	"\auser_id\x18\x02 \x01(\x03R\x06userId\"\xe9\x04\n" +
 	"\x16HomeworkAnswerOverview\x12!\n" +
 	"\fstudent_name\x18\x01 \x01(\tR\vstudentName\x12#\n" +
 	"\rhomework_name\x18\x02 \x01(\tR\fhomeworkName\x121\n" +
@@ -412,7 +436,9 @@ const file_homework_answer_proto_rawDesc = "" +
 	"\x16manual_questions_count\x18\t \x01(\x05R\x14manualQuestionsCount\x12\x14\n" +
 	"\x05ratio\x18\n" +
 	" \x01(\x01R\x05ratio\x12%\n" +
-	"\x0elatest_comment\x18\v \x01(\tR\rlatestComment\"\xaf\x02\n" +
+	"\x0elatest_comment\x18\v \x01(\tR\rlatestComment\x124\n" +
+	"\x16homework_question_form\x18\f \x01(\tR\x14homeworkQuestionForm\x129\n" +
+	"\x0equestion_files\x18\r \x03(\v2\x12.prot.HomeworkFileR\rquestionFiles\"\xaf\x02\n" +
 	"\fManualAnswer\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x16\n" +
@@ -424,13 +450,14 @@ const file_homework_answer_proto_rawDesc = "" +
 	"\x0econtent_struct\x18\b \x01(\v2\x17.google.protobuf.StructR\rcontentStruct\x12\x1b\n" +
 	"\tis_scored\x18\t \x01(\bR\bisScored\x12!\n" +
 	"\fmanual_score\x18\n" +
-	" \x01(\x01R\vmanualScore\"\x9a\x02\n" +
+	" \x01(\x01R\vmanualScore\"\xd1\x02\n" +
 	"\x16HomeworkAnswerResponse\x128\n" +
 	"\boverview\x18\x01 \x01(\v2\x1c.prot.HomeworkAnswerOverviewR\boverview\x125\n" +
 	"\tquestions\x18\x02 \x03(\v2\x17.google.protobuf.StructR\tquestions\x129\n" +
 	"\x0emanual_answers\x18\x03 \x03(\v2\x12.prot.ManualAnswerR\rmanualAnswers\x120\n" +
 	"\x14skipped_question_ids\x18\x04 \x03(\x03R\x12skippedQuestionIds\x12\"\n" +
-	"\ris_all_scored\x18\x05 \x01(\bR\visAllScoredB\rZ\vbe-lms/protb\x06proto3"
+	"\ris_all_scored\x18\x05 \x01(\bR\visAllScored\x125\n" +
+	"\fsubmit_files\x18\x06 \x03(\v2\x12.prot.HomeworkFileR\vsubmitFilesB\rZ\vbe-lms/protb\x06proto3"
 
 var (
 	file_homework_answer_proto_rawDescOnce sync.Once
@@ -450,18 +477,21 @@ var file_homework_answer_proto_goTypes = []any{
 	(*HomeworkAnswerOverview)(nil), // 1: prot.HomeworkAnswerOverview
 	(*ManualAnswer)(nil),           // 2: prot.ManualAnswer
 	(*HomeworkAnswerResponse)(nil), // 3: prot.HomeworkAnswerResponse
-	(*structpb.Struct)(nil),        // 4: google.protobuf.Struct
+	(*HomeworkFile)(nil),           // 4: prot.HomeworkFile
+	(*structpb.Struct)(nil),        // 5: google.protobuf.Struct
 }
 var file_homework_answer_proto_depIdxs = []int32{
-	4, // 0: prot.ManualAnswer.content_struct:type_name -> google.protobuf.Struct
-	1, // 1: prot.HomeworkAnswerResponse.overview:type_name -> prot.HomeworkAnswerOverview
-	4, // 2: prot.HomeworkAnswerResponse.questions:type_name -> google.protobuf.Struct
-	2, // 3: prot.HomeworkAnswerResponse.manual_answers:type_name -> prot.ManualAnswer
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 0: prot.HomeworkAnswerOverview.question_files:type_name -> prot.HomeworkFile
+	5, // 1: prot.ManualAnswer.content_struct:type_name -> google.protobuf.Struct
+	1, // 2: prot.HomeworkAnswerResponse.overview:type_name -> prot.HomeworkAnswerOverview
+	5, // 3: prot.HomeworkAnswerResponse.questions:type_name -> google.protobuf.Struct
+	2, // 4: prot.HomeworkAnswerResponse.manual_answers:type_name -> prot.ManualAnswer
+	4, // 5: prot.HomeworkAnswerResponse.submit_files:type_name -> prot.HomeworkFile
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_homework_answer_proto_init() }
@@ -469,6 +499,7 @@ func file_homework_answer_proto_init() {
 	if File_homework_answer_proto != nil {
 		return
 	}
+	file_homework_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

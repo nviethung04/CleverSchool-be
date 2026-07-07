@@ -30,9 +30,13 @@ type HomeworkAnswerOverview struct {
 	QuestionsCompleted      int64
 	LastQuestionIDCompleted int64
 	ManualQuestionsCount    int32
+	HomeworkQuestionForm    string
+	QuestionFiles           models.MediaInfos
+	SubmitFiles             models.MediaInfos
 }
 
 type HomeworkAnswerRepository interface {
+	HomeworkAnswerOverview(homeworkID, userID int64) (HomeworkAnswerOverview, error)
 	GetHomeworkAnswerOverview(homeworkID, userID int64) (HomeworkAnswerOverview, error)
 	GetClonedQuestions(homeworkID int64) ([]map[string]interface{}, error)
 	GetManualAnswers(homeworkID, userID int64) ([]ManualAnswer, error)
@@ -45,6 +49,10 @@ type homeworkAnswerRepository struct {
 
 func NewHomeworkAnswerRepository() HomeworkAnswerRepository {
 	return &homeworkAnswerRepository{}
+}
+
+func (r *homeworkAnswerRepository) HomeworkAnswerOverview(homeworkID, userID int64) (HomeworkAnswerOverview, error) {
+	return r.GetHomeworkAnswerOverview(homeworkID, userID)
 }
 
 func (r *homeworkAnswerRepository) GetHomeworkAnswerOverview(homeworkID, userID int64) (HomeworkAnswerOverview, error) {
@@ -62,6 +70,9 @@ func (r *homeworkAnswerRepository) GetHomeworkAnswerOverview(homeworkID, userID 
 	overview.HomeworkDescription = hw.Description
 	overview.HomeworkStatus = int32(hw.Status)
 	overview.HomeworkCoverImage = hw.CoverImageInfo.Path // trả về string gốc
+	overview.HomeworkQuestionForm = hw.QuestionForm
+	overview.QuestionFiles = hw.FileInfos
+
 	// Lấy số câu hỏi từ cloned_questions
 	var raw struct{ Questions json.RawMessage }
 	if err := db.MasterDB.Table("cloned_questions").Select("questions").Where("assignment_id = ? AND assignment_type = ?", homeworkID, "homework").First(&raw).Error; err == nil {
@@ -78,6 +89,7 @@ func (r *homeworkAnswerRepository) GetHomeworkAnswerOverview(homeworkID, userID 
 		First(&hwUser)
 	overview.QuestionsCompleted = hwUser.QuestionsCompleted
 	overview.LastQuestionIDCompleted = hwUser.LastQuestionIDCompleted
+	overview.SubmitFiles = hwUser.FileInfos
 
 	// Lấy số câu hỏi manual đã làm
 	var manualCount int64

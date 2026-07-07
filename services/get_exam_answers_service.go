@@ -726,16 +726,15 @@ func (s *getExamAnswersService) GetExamAnswers(ctx context.Context, req *prot.Ge
 					},
 				}
 				config.Log.Error(err)
-				continue
-			}
-
-			questionAnswer.Answer = &prot.QuestionAnswer_AnswerManual{
-				AnswerManual: &prot.AnswerManual{
-					Answer:        answer.Answer,
-					AnswerFileUrl: utils.StaticURL(answer.AnswerFileInfo.Path, models.Storage),
-					Score:         float32(answer.Score),
-					IsScored:      answer.IsScored,
-				},
+			} else {
+				questionAnswer.Answer = &prot.QuestionAnswer_AnswerManual{
+					AnswerManual: &prot.AnswerManual{
+						Answer:        answer.Answer,
+						AnswerFileUrl: utils.StaticURL(answer.AnswerFileInfo.Path, models.Storage),
+						Score:         float32(answer.Score),
+						IsScored:      answer.IsScored,
+					},
+				}
 			}
 		}
 
