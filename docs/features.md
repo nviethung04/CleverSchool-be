@@ -153,6 +153,7 @@ Code: `be/repositories/dashboard_teacher_exercise_student_repository.go`, `dashb
 - Chương + bài học thuộc **chương trình** (`chapters.program_id`). Khóa học chỉ tham chiếu `program_id` — không clone riêng từng bài khi sửa CT.
 - `PUT /api/manage/chapters/:id`: FE thường chỉ gửi `title`, `description`, `lessons[]`. BE merge field còn lại từ bản ghi cũ. **`course_id` legacy** có thể `NULL` (migration `0030`); khi cập nhật/xóa, repository **không ghi** `course_id=0` (tránh vi phạm FK `chapters_course_id_fkey`) — giống `Create`.
 - Liên kết bài tập/KT/LT/đánh giá: `exam_ref_lessons`, `homework_ref_lessons`, `exercise_ref_lessons`, `assessment_ref_lessons`. **Mức chương trình:** `course_id IS NULL` (không ghi `0` — FK `courses`). **Mức khóa:** `course_id` = id khóa hợp lệ.
+- `assessments`: `program_id`/`subject_id`/… là FK nullable. Repository override `Create`/`Update`/`Delete` để **không ghi FK=0** (tránh vi phạm `assessments_program_id_fkey`). `Delete` chỉ set `deleted_by` rồi soft-delete, **không** `Save()` cả record (`be/repositories/assessment_repository.go`).
 - Từ vựng: bảng `lesson_vocabularies` — **không** qua `PUT /lessons`; dùng API flashcard ở trên. Body field `assessments` (số nhiều) trên `PUT /lessons`.
 
 Code: `be/services/lesson_service.go` (`Update`), `be/repositories/lesson_repository.go`, `be/services/flashcard_service.go` (`SyncLessonVocabularies`).

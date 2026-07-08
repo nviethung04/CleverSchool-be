@@ -60,3 +60,18 @@ func (r *assessmentRepository) Update(entity *models.Assessment) error {
 	omit := append([]string{"created_at", "created_by"}, assessmentOmitZeroFK(entity)...)
 	return db.MasterDB.Omit(omit...).Save(entity).Error
 }
+
+// Override BaseRepository.Delete to avoid Save() overwriting nullable FK fields (program_id,
+// subject_id, ...) with 0, which violates FK constraints like assessments_program_id_fkey.
+func (r *assessmentRepository) Delete(id int) error {
+	var model models.Assessment
+	if err := r.BeforeDelete(id, &model); err != nil {
+		return err
+	}
+	if err := db.MasterDB.Model(&models.Assessment{}).
+		Where("id = ?", id).
+		Update("deleted_by", model.DeletedBy).Error; err != nil {
+		return err
+	}
+	return db.MasterDB.Delete(&models.Assessment{}, id).Error
+}
