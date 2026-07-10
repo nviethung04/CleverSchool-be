@@ -84,8 +84,9 @@ func (s *exerciseService) GetByID(c *gin.Context, id int) (*prot.Exercise, error
 func (s *exerciseService) checkStudentExerciseAccess(userID, exerciseID int64) (bool, error) {
 	var count int64
 	err := db.ReplicaDB.Table("user_courses uc").
-		Joins("JOIN exercise_ref_lessons erl ON uc.course_id = erl.course_id").
-		Where("uc.user_id = ? AND erl.exercise_id = ? AND erl.course_id IS NOT NULL", userID, exerciseID).
+		Joins("JOIN exercise_ref_lessons erl ON erl.exercise_id = ?", exerciseID).
+		Where("uc.user_id = ?", userID).
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = uc.course_id)").
 		Count(&count).Error
 	if err != nil {
 		return false, err
@@ -98,8 +99,9 @@ func (s *exerciseService) checkStudentExerciseAccess(userID, exerciseID int64) (
 		Joins("JOIN courses c ON c.id = uc.course_id AND c.deleted_at IS NULL").
 		Joins("JOIN chapters ch ON ch.program_id = c.program_id AND ch.deleted_at IS NULL").
 		Joins("JOIN lessons l ON l.chapter_id = ch.id AND l.deleted_at IS NULL").
-		Joins("JOIN exercise_ref_lessons erl ON erl.lesson_id = l.id AND erl.exercise_id = ? AND erl.course_id IS NULL", exerciseID).
+		Joins("JOIN exercise_ref_lessons erl ON erl.lesson_id = l.id AND erl.exercise_id = ?", exerciseID).
 		Where("uc.user_id = ?", userID).
+		Where("(erl.course_id IS NULL OR erl.course_id = 0)").
 		Count(&count).Error
 	return count > 0, err
 }

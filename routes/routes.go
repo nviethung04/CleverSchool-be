@@ -385,6 +385,9 @@ func InitRoutes(router *gin.Engine) {
 		// Get exam/exercise students
 		studyRouter.GET("/exam-students", examStudentController.GetExamStudents)
 		exerciseStudentController := NewExerciseStudentController()
+		exerciseControllerForStudy := NewExerciseController()
+		// HS làm bài luyện tập: Auth + kiểm tra ghi danh/khóa (không cần exercises.show trên /manage)
+		studyRouter.GET("/student/exercises/:id", exerciseControllerForStudy.GetByID)
 		// exercise/homework comment
 		exerciseCommentCtl := NewExerciseCommentController()
 		homeworkCommentCtl := NewHomeworkCommentController()
