@@ -23,6 +23,7 @@ import (
 type ExerciseService interface {
     GetAll(c *gin.Context) ([]models.Exercise, int64, error)
     GetByID(c *gin.Context, id int) (*prot.Exercise, error)
+    ResolveStudentLessonID(c *gin.Context, exerciseID int64) int64
     Create(c *gin.Context, req *prot.ExerciseRequest) (*models.Exercise, error)
     Update(c *gin.Context, req *prot.ExerciseRequest) (*models.Exercise, error)
     Delete(c *gin.Context, id int) error
@@ -79,6 +80,45 @@ func (s *exerciseService) GetByID(c *gin.Context, id int) (*prot.Exercise, error
 	}
 	res := resources.NewExerciseResource()
 	return res.FormatExercise(item), nil
+}
+
+func (s *exerciseService) ResolveStudentLessonID(c *gin.Context, exerciseID int64) int64 {
+	tokenStr := c.GetHeader("Token")
+	userID, err := utils.GetUserID(tokenStr)
+	if err != nil {
+		return 0
+	}
+
+	courseID := int64(0)
+	if cs := c.Query("course_id"); cs != "" {
+		courseID, _ = strconv.ParseInt(cs, 10, 64)
+	}
+
+	var lessonID int64
+	q := db.ReplicaDB.Table("exercise_ref_lessons erl").
+		Joins("JOIN user_courses uc ON uc.user_id = ?", userID).
+		Where("erl.exercise_id = ?", exerciseID).
+		Where("(erl.course_id IS NULL OR erl.course_id = 0 OR erl.course_id = uc.course_id)")
+	if courseID > 0 {
+		q = q.Where("uc.course_id = ?", courseID)
+	}
+	if err := q.Order("erl.lesson_id ASC").Limit(1).Pluck("erl.lesson_id", &lessonID).Error; err == nil && lessonID > 0 {
+		return lessonID
+	}
+
+	lessonID = 0
+	q2 := db.ReplicaDB.Table("user_courses uc").
+		Joins("JOIN courses c ON c.id = uc.course_id AND c.deleted_at IS NULL").
+		Joins("JOIN chapters ch ON ch.program_id = c.program_id AND ch.deleted_at IS NULL").
+		Joins("JOIN lessons l ON l.chapter_id = ch.id AND l.deleted_at IS NULL").
+		Joins("JOIN exercise_ref_lessons erl ON erl.lesson_id = l.id AND erl.exercise_id = ?", exerciseID).
+		Where("uc.user_id = ?", userID).
+		Where("(erl.course_id IS NULL OR erl.course_id = 0)")
+	if courseID > 0 {
+		q2 = q2.Where("uc.course_id = ?", courseID)
+	}
+	_ = q2.Order("erl.lesson_id ASC").Limit(1).Pluck("erl.lesson_id", &lessonID).Error
+	return lessonID
 }
 
 func (s *exerciseService) checkStudentExerciseAccess(userID, exerciseID int64) (bool, error) {

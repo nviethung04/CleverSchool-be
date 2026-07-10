@@ -87,5 +87,15 @@ func (ctl *ExerciseController) GetByID(c *gin.Context) {
 		return
 	}
 
+	if utils.GetCurrentRoleId(c) == models.StudentRoleId {
+		lessonID := ctl.svc.ResolveStudentLessonID(c, int64(id))
+		if lessonID > 0 {
+			utils.RespondProtoWithDataExtra(c, item, map[string]interface{}{
+				"lesson_id": lessonID,
+			})
+			return
+		}
+	}
+
 	utils.Respond(c, item, err, "")
 }

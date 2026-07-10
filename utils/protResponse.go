@@ -4,6 +4,7 @@ import (
 	"be-lms/config"
 	"be-lms/i18n"
 	"be-lms/prot"
+	"encoding/json"
 	"net/http"
 	"reflect"
 	"strings"
@@ -209,4 +210,47 @@ func Respond(c *gin.Context, data interface{}, err error, message string, status
 		"message": "success",
 		"data":    data,
 	})
+}
+
+// RespondProtoWithDataExtra marshals a protobuf message like Respond, then merges extra keys into data.
+func RespondProtoWithDataExtra(c *gin.Context, msg proto.Message, extras map[string]interface{}) {
+	br := &prot.BaseResponse{
+		Code:    int32(http.StatusOK),
+		Message: "success",
+	}
+	anyMsg, err := anypb.New(msg)
+	if err != nil {
+		Respond(c, msg, err, "messages.error_get_data")
+		return
+	}
+	br.Data = anyMsg
+
+	jsonBytes, err := protojson.MarshalOptions{
+		EmitUnpopulated: true,
+		UseProtoNames:   true,
+	}.Marshal(br)
+	if err != nil {
+		Respond(c, msg, err, "messages.error_get_data")
+		return
+	}
+
+	var response map[string]interface{}
+	if err := json.Unmarshal(jsonBytes, &response); err != nil {
+		Respond(c, msg, err, "messages.error_get_data")
+		return
+	}
+
+	if data, ok := response["data"].(map[string]interface{}); ok {
+		for k, v := range extras {
+			data[k] = v
+		}
+		response["data"] = data
+	}
+
+	out, err := json.Marshal(response)
+	if err != nil {
+		Respond(c, msg, err, "messages.error_get_data")
+		return
+	}
+	c.Data(http.StatusOK, "application/json", out)
 }

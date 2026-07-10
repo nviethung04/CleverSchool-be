@@ -172,7 +172,7 @@ FE: `fe/components/lesson-form.tsx`, `fe/lib/api/lessons.ts` (`syncLessonVocabul
 | GET | `/api/study/teacher/exam-answers` | `exam_id`, `user_id` | Chi tiết bài làm 1 HS (GV chấm Writing/Speaking) |
 | POST | `/api/study/save-score/manual-scoring` | body: `exam_id`, `user_id`, `score_list` | Lưu điểm chấm tay |
 | POST | `/api/study/save-score/bulk` | body: `exercise_id` **+ `lesson_id`**, `time`, `list_answers[]` | HS nộp bài luyện tập (trắc nghiệm). `lesson_id` bắt buộc — ghi `exercise_users` và đáp án theo bài học |
-| GET | `/api/study/student/exercises/:id` | Token (HS) | Chi tiết bài luyện tập để làm bài — Auth + HS thuộc khóa có gắn exercise (`exercise_ref_lessons`); **không** cần `exercises.show`. FE: `/assignments/do-exercise/[id]` |
+| GET | `/api/study/student/exercises/:id` | Token (HS). Query `course_id?` | Chi tiết bài luyện tập để làm bài — Auth + ghi danh khóa; response thêm `lesson_id` (từ `exercise_ref_lessons`) để FE nộp `save-score/bulk`. FE: `/assignments/do-exercise/[id]` |
 
 **Lưu đáp án HS (migration 0009):** `homework_users` / `exam_users` / `exercise_users` (tổng điểm, trạng thái); chi tiết từng câu: `*_question_users`, `*_question_user_fill_in_blanks`, …, `*_question_user_manual_scoring` (Writing/Speaking). Bài luyện tập: join báo cáo GV theo `(exercise_id, user_id, lesson_id)`.
 
@@ -292,4 +292,5 @@ Core hiển thị: Tổng quan, Người dùng (tab HS / GV / Admin; tab Quản 
 | `NOT IN (NULL)` khi xóa ref lesson rỗng | `DeleteOld*` với mảng ID rỗng | Chỉ thêm `NOT IN` khi `len(ids) > 0` |
 | Báo cáo HS tab Bài luyện tập trống / 404 `exercise-list` | FE gọi homework API hoặc BE chưa restart | API exercise §3.2; restart BE sau deploy |
 | HS 403 / «Không có quyền truy cập» khi mở exercise | FE gọi `/manage/exercises/:id` cần `exercises.show` trong Redis | FE HS dùng `GET /api/study/student/exercises/:id` (Auth + ghi danh khóa); migration `0055` + `refresh-permissions` nếu vẫn gọi `/manage` |
+| HS bấm **Nộp** luyện tập không có phản hồi | URL thiếu `lessonId` (`POST save-score/bulk` bắt buộc `lesson_id`) | Vào từ tab Bài tập — URL `.../do-exercise/{id}?from=assigments&lessonId=...&courseId=...` |
 | Câu hỏi **category** (vd. id 14) không hiện danh mục / chấm sai / đáp án đúng trống | Snapshot `cloned_questions` rỗng (`options`/`correct_answers`) sau khi sửa ngân hàng câu hỏi | `mergeCloneQuestionOptions` + `EnrichClonedQuestionMaps` (homework-answers); tự heal snapshot khi `GetCloned`; chấm qua `categoryQuestionForScoring` — **restart BE** |
