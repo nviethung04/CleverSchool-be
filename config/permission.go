@@ -491,20 +491,44 @@ func GetStudentPermissions() map[string]PermissionGroup {
 	}
 }
 
-// GetSchoolPermissions — quản lý trường (role_id=4): phạm vi teacher + users.index + schools.show/update.
+// GetSchoolPermissions — quản lý trường (role_id=4): vận hành trong phạm vi một trường (BE lọc theo school_id JWT).
 func GetSchoolPermissions() map[string]PermissionGroup {
-	perms := GetTeacherPermissions()
-	perms["users"] = PermissionGroup{
-		Group:        "Tài khoản",
-		SortPosition: 1,
-		Names:        []string{"Xem danh sách tài khoản", "Tạo tài khoản", "Sửa tài khoản", "Xem chi tiết tài khoản"},
-		Actions:      []string{"index", "store", "update", "show"},
+	return map[string]PermissionGroup{
+		"users": {
+			Group:        "Tài khoản",
+			SortPosition: 1,
+			Names:        []string{"Xem danh sách tài khoản", "Tạo tài khoản", "Sửa tài khoản", "Xem chi tiết tài khoản"},
+			Actions:      []string{"index", "store", "update", "show"},
+		},
+		"schools": {
+			Group:        "Trường học",
+			SortPosition: 4,
+			Names:        []string{"Sửa trường học", "Xem chi tiết trường học"},
+			Actions:      []string{"update", "show"},
+		},
+		"classes": {
+			Group:        "Lớp học",
+			SortPosition: 5,
+			Names:        []string{"Xem danh sách lớp học", "Tạo lớp học", "Sửa lớp học", "Xoá lớp học", "Xem chi tiết lớp học"},
+			Actions:      []string{"index", "store", "update", "destroy", "show"},
+		},
+		"courses": {
+			Group:        "Khóa học",
+			SortPosition: 7,
+			Names:        []string{"Xem danh sách khoá học", "Tạo khoá học", "Sửa khoá học", "Xem chi tiết khoá học"},
+			Actions:      []string{"index", "store", "update", "show"},
+		},
+		"grades": {
+			Group:        "Khối lớp",
+			SortPosition: 17,
+			Names:        []string{"Xem danh sách khối", "Xem chi tiết khối"},
+			Actions:      []string{"index", "show"},
+		},
+		"subjects": {
+			Group:        "Môn học",
+			SortPosition: 6,
+			Names:        []string{"Xem danh sách môn học", "Xem chi tiết môn học"},
+			Actions:      []string{"index", "show"},
+		},
 	}
-	perms["schools"] = PermissionGroup{
-		Group:        "Trường học",
-		SortPosition: 4,
-		Names:        []string{"Sửa trường học", "Xem chi tiết trường học"},
-		Actions:      []string{"update", "show"},
-	}
-	return perms
 }

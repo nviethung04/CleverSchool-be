@@ -9,11 +9,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type ClassRepository interface {
 	base.BaseRepositoryInterface[models.Class]
+	base.BeforeQueryHook
 	GetUsers(classId int64, roleId int64) ([]models.User, error)
 	ReplaceUserClass(classId int64, userIds []int64, roleId int64) error
 	AddUserClass(classId int64, userIds []int64, roleId int64) error
@@ -29,9 +31,19 @@ type classRepository struct {
 }
 
 func NewClassRepository() ClassRepository {
-	return &classRepository{
+	repo := &classRepository{
 		BaseRepository: base.NewBaseRepository[models.Class](),
 	}
+	repo.BaseRepository.SetBeforeQueryHook(repo)
+	return repo
+}
+
+func (r *classRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {
+	schoolId := r.GetAdminSchoolId(ctx)
+	if schoolId > 0 {
+		query = query.Where("classes.school_id = ?", schoolId)
+	}
+	return query
 }
 
 // Create không ghi grade_id=0 (vi phạm FK classes_grade_id_fkey).

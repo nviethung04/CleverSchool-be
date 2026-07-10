@@ -470,6 +470,12 @@ func (r *courseRepository) StoreSemester(courseId int64, semesterIds []int64) er
 }
 
 func (r *courseRepository) BeforeQuery(query *gorm.DB, ctx *gin.Context) *gorm.DB {
+	schoolId := r.GetAdminSchoolId(ctx)
+	if schoolId > 0 {
+		query = query.
+			Joins("JOIN course_schools ON course_schools.course_id = courses.id").
+			Where("course_schools.school_id = ?", schoolId)
+	}
 	return query
 }
 

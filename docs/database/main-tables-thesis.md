@@ -1,7 +1,7 @@
 # Các bảng chính — CleverSchool LMS (cho đồ án)
 
 Danh sách **rút gọn** các bảng cốt lõi mô tả trong đồ án / báo cáo. Không gồm bảng phụ (contest, HR, level test, chi tiết từng dạng câu hỏi, …).  
-Danh mục đầy đủ: [all-tables.md](./all-tables.md).
+Danh mục đầy đủ: [all-tables.md](./all-tables.md). **ERD cho slide đồ án:** [erd-thesis.md](./erd-thesis.md).
 
 **Tổng: 35 bảng chính**
 

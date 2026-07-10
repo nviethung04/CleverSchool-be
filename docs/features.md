@@ -239,8 +239,9 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 | Trạng thái | Module |
 |------------|--------|
 | **Đã bật menu** (2026-06-23) | Xếp hạng HS (`/ranking`), Phản hồi HS/GV (`/feedback`) |
-| Tab Quản lý trường (role 4) | **Ẩn** — `HIDDEN_USER_LIST_TABS` gồm `schools` trong `fe/config/hiddenModules.ts` (role School chưa lọc dữ liệu theo trường; BE vẫn seed role 4) |
-| **BE tương ứng** (migration `0051`) | `feedbacks.*`, `h5p-contents.*` trong `permission.go` + `role_permissions`; role **School (4)** seed qua `GetSchoolPermissions()`; route `/manage/feedbacks` và `/api/h5p/content*` có `RoleMiddleware` |
+| Tab Quản lý trường (role 4) | **Bật** — tạo/sửa user role School; BE lọc `users`/`schools`/`classes`/`courses` theo `school_id` JWT |
+| **Role School (4) — quyền** | `GetSchoolPermissions()` + migration `0054`: `users.*` (trừ destroy), `schools.show`/`update`, `classes.*` (trừ restore), `courses.*` (trừ destroy/restore), `grades`/`subjects` chỉ đọc — **không** sao chép quyền teacher (programs, lessons, questions, …) |
+| **BE tương ứng** (migration `0051`–`0054`) | `feedbacks.*`, `h5p-contents.*` trong `permission.go` + `role_permissions`; role **School (4)** seed qua `GetSchoolPermissions()`; route `/manage/feedbacks` và `/api/h5p/content*` có `RoleMiddleware` |
 | **Redis** | `REDIS_ENABLED=true` trong `.env` / `be/deploy/.env.example` — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
 | Slug vẫn ẩn | `admin/subjects` (mặc định chỉ seed 1 môn *Tiếng Anh*), `admin/h5p`, `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
 | Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
