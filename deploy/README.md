@@ -1,11 +1,15 @@
-# Deploy BE (VPS + Cloudflare)
+# Deploy BE (Railway hoặc VPS + Cloudflare)
+
+**Không VPS:** [be/docs/deploy-railway.md](../docs/deploy-railway.md) — Postgres + Redis managed, FE vẫn Vercel.
+
+Env mẫu Railway: [env.railway.example](./env.railway.example).
 
 | Nhánh | API |
 |-------|-----|
 | `develop` | https://api-dev.viethung.uk |
 | `pre` | https://api-staging.viethung.uk |
 
-Hướng dẫn đầy đủ: [be/docs/deploy-vps.md](../be/docs/deploy-vps.md)
+Hướng dẫn VPS: [docs/deploy-vps.md](../docs/deploy-vps.md)
 
 **Sau mỗi release (tránh lệch code):** [be/docs/vps-release-checklist.md](../be/docs/vps-release-checklist.md)
 

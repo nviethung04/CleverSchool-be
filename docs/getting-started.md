@@ -2,6 +2,8 @@
 
 Hướng dẫn setup **greenfield** (DB mới, chưa production). Cập nhật: 2026-06-04.
 
+**Deploy không VPS (Railway):** xem [deploy-railway.md](./deploy-railway.md).
+
 **Deploy VPS (Docker + CI/CD GitHub):** xem [deploy-vps.md](./deploy-vps.md).
 
 ## Yêu Cầu
@@ -210,8 +212,9 @@ Chạy không flag → seed câu hỏi mẫu + Role (mặc định cũ).
 ## Tài Liệu Liên Quan
 
 - [features.md](./features.md) — chức năng hệ thống  
-- [vps-release-checklist.md](./vps-release-checklist.md) — **đồng bộ VPS / Vercel sau mỗi release**  
+- [vps-release-checklist.md](./vps-release-checklist.md) — **đồng bộ Railway hoặc VPS / Vercel sau mỗi release**  
 - [../fe/docs/user-guide.md](../fe/docs/user-guide.md) — **luồng sử dụng** Admin / GV / HS  
+- [deploy-railway.md](./deploy-railway.md) — Railway (không VPS)  
 - [deploy-vps.md](./deploy-vps.md) — setup VPS + CI/CD  
 - [database/migration-guide.md](./database/migration-guide.md) — chi tiết migration  
 - [index.md](../index.md) — cửa vào docs backend  

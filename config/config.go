@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ type Config struct {
 	JWTSecret    string
 
 	RedisEnabled  bool
+	RedisURL      string
 	RedisHost     string
 	RedisPort     string
 	RedisPassword string
@@ -54,12 +56,35 @@ func LoadConfig() Config {
 		log.Println("⚠️ Warning: No .env file found")
 	}
 
-	dbName := os.Getenv("DB_MASTER_NAME")
+	dbMasterURL := firstNonEmpty(os.Getenv("DATABASE_URL"), buildPostgresURL(
+		os.Getenv("DB_MASTER_USER"),
+		os.Getenv("DB_MASTER_PASSWORD"),
+		os.Getenv("DB_MASTER_HOST"),
+		os.Getenv("DB_MASTER_PORT"),
+		os.Getenv("DB_MASTER_NAME"),
+	))
+	dbReplicaURL := firstNonEmpty(os.Getenv("DATABASE_REPLICA_URL"), "")
+	if dbReplicaURL == "" && os.Getenv("DB_REPLICA_HOST") != "" {
+		dbReplicaURL = buildPostgresURL(
+			os.Getenv("DB_REPLICA_USER"),
+			os.Getenv("DB_REPLICA_PASSWORD"),
+			os.Getenv("DB_REPLICA_HOST"),
+			os.Getenv("DB_REPLICA_PORT"),
+			os.Getenv("DB_REPLICA_NAME"),
+		)
+	}
 
-	dbMasterURL := "postgres://" + os.Getenv("DB_MASTER_USER") + ":" + os.Getenv("DB_MASTER_PASSWORD") + "@" + os.Getenv("DB_MASTER_HOST") + ":" + os.Getenv("DB_MASTER_PORT") + "/" + os.Getenv("DB_MASTER_NAME") + "?sslmode=disable"
-	dbReplicaURL := ""
-	if os.Getenv("DB_REPLICA_HOST") != "" {
-		dbReplicaURL = "postgres://" + os.Getenv("DB_REPLICA_USER") + ":" + os.Getenv("DB_REPLICA_PASSWORD") + "@" + os.Getenv("DB_REPLICA_HOST") + ":" + os.Getenv("DB_REPLICA_PORT") + "/" + os.Getenv("DB_REPLICA_NAME") + "?sslmode=disable"
+	dbName := firstNonEmpty(os.Getenv("DB_MASTER_NAME"), os.Getenv("PGDATABASE"), dbNameFromURL(dbMasterURL))
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	redisURL := os.Getenv("REDIS_URL")
+	redisEnabled := os.Getenv("REDIS_ENABLED") == "true" || redisURL != ""
+	if os.Getenv("REDIS_ENABLED") == "false" {
+		redisEnabled = false
 	}
 
 	allowOrigins := []string{}
@@ -99,7 +124,11 @@ func LoadConfig() Config {
 
 	apiDomain := os.Getenv("API_DOMAIN")
 	if apiDomain == "" {
-		apiDomain = "http://localhost:8080"
+		if railwayDomain := os.Getenv("RAILWAY_PUBLIC_DOMAIN"); railwayDomain != "" {
+			apiDomain = "https://" + railwayDomain
+		} else {
+			apiDomain = "http://localhost:8080"
+		}
 	}
 
 	masterPassword := os.Getenv("MASTER_PASSWORD")
@@ -118,16 +147,22 @@ func LoadConfig() Config {
 		internalAPIKey = "internal-api-key-2025"
 	}
 
+	appURL := os.Getenv("APP_FULL_URL")
+	if appURL == "" {
+		appURL = apiDomain
+	}
+
 	return Config{
-		Port:         os.Getenv("PORT"),
+		Port:         port,
 		DBMasterURL:  dbMasterURL,
 		DBReplicaURL: dbReplicaURL,
 		JWTSecret:    os.Getenv("JWT_SECRET"),
 
-		RedisEnabled:  os.Getenv("REDIS_ENABLED") == "true",
-		RedisHost:     os.Getenv("REDIS_HOST"),
-		RedisPort:     os.Getenv("REDIS_PORT"),
-		RedisPassword: os.Getenv("REDIS_PASSWORD"),
+		RedisEnabled:  redisEnabled,
+		RedisURL:      redisURL,
+		RedisHost:     firstNonEmpty(os.Getenv("REDIS_HOST"), os.Getenv("REDISHOST")),
+		RedisPort:     firstNonEmpty(os.Getenv("REDIS_PORT"), os.Getenv("REDISPORT")),
+		RedisPassword: firstNonEmpty(os.Getenv("REDIS_PASSWORD"), os.Getenv("REDISPASSWORD")),
 		RedisDB:       getEnvInt("REDIS_DB", 0),
 
 		MeiliEnabled: os.Getenv("MEILI_ENABLED") == "true",
@@ -139,7 +174,7 @@ func LoadConfig() Config {
 		AllowOrigins:      allowOrigins,
 		BasicAuthUsername: basicAuthUsername,
 		BasicAuthPassword: basicAuthPassword,
-		AppUrl:            os.Getenv("APP_FULL_URL"),
+		AppUrl:            appURL,
 
 		DBName:    dbName,
 		APIDomain: apiDomain,
@@ -149,6 +184,33 @@ func LoadConfig() Config {
 		DiscordHookUrl: discordWebhookUrl,
 		InternalAPIKey: internalAPIKey,
 	}
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		if strings.TrimSpace(value) != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func buildPostgresURL(user, pass, host, port, name string) string {
+	if host == "" || name == "" {
+		return ""
+	}
+	if port == "" {
+		port = "5432"
+	}
+	return "postgres://" + user + ":" + pass + "@" + host + ":" + port + "/" + name + "?sslmode=disable"
+}
+
+func dbNameFromURL(raw string) string {
+	parsed, err := url.Parse(raw)
+	if err != nil {
+		return ""
+	}
+	return strings.Trim(parsed.Path, "/")
 }
 
 func getEnvInt(key string, defaultValue int) int {

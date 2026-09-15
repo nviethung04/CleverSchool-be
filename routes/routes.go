@@ -3,6 +3,7 @@ package routes
 import (
 	"be-lms/command"
 	"be-lms/controllers"
+	"be-lms/database/db"
 	"be-lms/middleware"
 	"be-lms/repositories"
 	"be-lms/services"
@@ -13,6 +14,19 @@ import (
 
 // ====== INIT ROUTES ======
 func InitRoutes(router *gin.Engine) {
+	router.GET("/health", func(c *gin.Context) {
+		if db.MasterDB == nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy"})
+			return
+		}
+		sqlDB, err := db.MasterDB.DB()
+		if err != nil || sqlDB.Ping() != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
+
 	RegisterCliRoutes(router)
 	RegisterLogRoute(router)
 	RouteMedia(router)

@@ -1,11 +1,11 @@
-# Checklist đồng bộ VPS — tránh lệch code / DB / FE
+# Checklist đồng bộ release — tránh lệch code / DB / FE
 
-Mục tiêu: **máy local, GitHub, VPS và Vercel** cùng một phiên bản tính năng. Mỗi lần merge/push có thay đổi BE hoặc FE, làm theo checklist này.
+Mục tiêu: **máy local, GitHub, Railway (hoặc VPS) và Vercel** cùng một phiên bản tính năng. Mỗi lần merge/push có thay đổi BE hoặc FE, làm theo checklist này.
 
-Cập nhật: **2026-06-16**  
+Cập nhật: **2026-09-15**  
 Migration mới nhất: **53** (file `be/deploy/EXPECTED_MIGRATION_VERSION`)
 
-Tài liệu liên quan: [deploy-vps.md](./deploy-vps.md), [features.md](./features.md), [getting-started.md](./getting-started.md)
+Tài liệu liên quan: [deploy-railway.md](./deploy-railway.md), [deploy-vps.md](./deploy-vps.md), [features.md](./features.md), [getting-started.md](./getting-started.md)
 
 ---
 
@@ -13,9 +13,10 @@ Tài liệu liên quan: [deploy-vps.md](./deploy-vps.md), [features.md](./featur
 
 | Thành phần | Repo / nơi chạy | Cách lên môi trường |
 |------------|-----------------|---------------------|
-| **Backend** | `CleverSchool-be` (hoặc `be/` trong monorepo) | Push `develop` / `staging` → GitHub Actions → VPS Docker |
+| **Backend (Railway)** | `be/` monorepo hoặc repo BE | Push branch Railway theo dõi → build Dockerfile → migrate + start. [deploy-railway.md](./deploy-railway.md) |
+| **Backend (VPS)** | `CleverSchool-be` (hoặc `be/` trong monorepo) | Push `develop` / `staging` → GitHub Actions → VPS Docker |
 | **Frontend** | `fe/` (Vercel) | Push branch → Vercel auto build |
-| **Monorepo local** | `CleverSchool/` (cha) | Dev local; **CI BE không chạy** nếu chỉ push monorepo mà không push repo BE |
+| **Monorepo local** | `CleverSchool/` (cha) | Dev local; CI VPS không chạy nếu chỉ push folder cha. Railway monorepo: Root Directory `/be` |
 
 **Tránh lệch:** Sau khi sửa `be/` trên máy local, phải **push lên repo mà CI đang theo dõi** (xem `deploy-vps.md` §B5). Chỉ commit trong folder cha không kích hoạt deploy VPS.
 
@@ -38,7 +39,13 @@ Tài liệu liên quan: [deploy-vps.md](./deploy-vps.md), [features.md](./featur
 4. Smoke local: login, API mới (assessments, settings, course-schedule, …).
 5. FE: `pnpm build` trong `fe/`.
 
-### Bước B — Push backend → VPS
+### Bước B — Push backend → Railway (không VPS)
+
+Push nhánh Railway đang theo dõi. Root Directory `/be` nếu monorepo. Kiểm tra Deploy Logs + `GET /health`. Chi tiết: [deploy-railway.md](./deploy-railway.md).
+
+Hoặc **Bước B (VPS)** bên dưới.
+
+### Bước B (VPS) — Push backend → VPS
 
 ```bash
 # Trong repo BE (nhánh develop hoặc staging)

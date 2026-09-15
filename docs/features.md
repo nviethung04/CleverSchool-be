@@ -2,7 +2,7 @@
 
 Danh mục chức năng backend và điểm nối frontend. **Mỗi thay đổi API, schema hoặc hành vi nghiệp vụ phải cập nhật file này** (xem `be/AGENTS.md`).
 
-Cập nhật: **2026-06-21**
+Cập nhật: **2026-09-15**
 
 ---
 
@@ -169,6 +169,7 @@ FE: `fe/components/lesson-form.tsx`, `fe/lib/api/lessons.ts` (`syncLessonVocabul
 | POST | `/api/study/exercise-reset` | body: `exercise_id`, `user_id`, `lesson_id?` (optional, không lọc xóa) | GV reset lượt làm: xóa **mọi** `exercise_users` + đáp án + nhận xét của HS cho bài đó |
 | GET | `/api/study/homework-students` | `homework_id`, `course_id?` | Danh sách HS + tiến độ bài luyện tập |
 | GET | `/api/study/teacher/homework-answers` | `homework_id`, `user_id` | Chi tiết đáp án + điểm 1 HS (luyện tập). `questions` = câu tự chấm; `manual_answers` = writing/speaking. FE `/teacher/lessons/.../homework/.../student/...` hiển thị cả hai |
+| GET | `/api/study/teacher/exercise-answers` | `exercise_id`, `user_id` | Chi tiết đáp án luyện tập 1 HS (`questions[]` + oneof `answer_*_exercise`). FE `/teacher/lessons/.../exercise/.../student/...` dùng `convertApiDataToDisplay` — MC audio/nghe cần `answer_ids` + `answer_file_urls` |
 | GET | `/api/study/teacher/exam-answers` | `exam_id`, `user_id` | Chi tiết bài làm 1 HS (GV chấm Writing/Speaking) |
 | POST | `/api/study/save-score/manual-scoring` | body: `exam_id`, `user_id`, `score_list` | Lưu điểm chấm tay |
 | POST | `/api/study/save-score/bulk` | body: `exercise_id` **+ `lesson_id`**, `time`, `list_answers[]` | HS nộp bài luyện tập (trắc nghiệm). `lesson_id` bắt buộc — ghi `exercise_users` và đáp án theo bài học |
@@ -243,7 +244,7 @@ Trang **chưa** đồng bộ (vẫn có Upload/Link): `fe/app/[locale]/teacher/c
 | Tab Quản lý trường (role 4) | **Bật** — tạo/sửa user role School; BE lọc `users`/`schools`/`classes`/`courses` theo `school_id` JWT |
 | **Role School (4) — quyền** | `GetSchoolPermissions()` + migration `0054`: `users.*` (trừ destroy), `schools.show`/`update`, `classes.*` (trừ restore), `courses.*` (trừ destroy/restore), `grades`/`subjects` chỉ đọc — **không** sao chép quyền teacher (programs, lessons, questions, …) |
 | **BE tương ứng** (migration `0051`–`0054`) | `feedbacks.*`, `h5p-contents.*` trong `permission.go` + `role_permissions`; role **School (4)** seed qua `GetSchoolPermissions()`; route `/manage/feedbacks` và `/api/h5p/content*` có `RoleMiddleware` |
-| **Redis** | `REDIS_ENABLED=true` trong `.env` / `be/deploy/.env.example` — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
+| **Redis** | `REDIS_ENABLED=true` hoặc `REDIS_URL` (Railway) — session + cache permission; sau migrate chạy `go run . refresh-permissions` |
 | Slug vẫn ẩn | `admin/subjects` (mặc định chỉ seed 1 môn *Tiếng Anh*), `admin/h5p`, `admin/settings`, `admin/export`, `admin/notices`, `admin/feedback`, `criteria-*`, `lecture-bank`, `contest`, `scorm`, HR extensions |
 | Tab GV báo cáo | Assessment: bật (`TEACHER_REPORTS_ASSESSMENT_TAB_ENABLED`); Xuất mẫu: tắt |
 | Sửa câu hỏi clone trong bài tập | Tắt (`CLONE_QUESTION_EDIT_ENABLED = false`) — sửa từ form BTVN/kiểm tra/luyện tập luôn cập nhật ngân hàng câu hỏi gốc, không gửi `homework_id`/`exam_id`/`exercise_id` |
@@ -263,11 +264,13 @@ Core hiển thị: Tổng quan, Người dùng (tab HS / GV / Admin; tab Quản 
 3. Migration `.up` / `.down` nếu đổi schema.
 4. Cập nhật: **file này**, `all-tables.md`, `tables-reference.md`, `CHANGELOG.md`, `AGENTS.md` (nếu quy ước mới).
 5. FE: page/API client + `fe/docs/ui-design.md` hoặc `fe/AGENTS.md` nếu đổi UX.
-6. **VPS:** tăng `be/deploy/EXPECTED_MIGRATION_VERSION`, cập nhật `docs/vps-release-checklist.md` §3 nếu cần.
-7. `go run . refresh-permissions` trên dev; trên VPS: `post-deploy-check.sh` sau CI.
+6. **Deploy:** tăng `be/deploy/EXPECTED_MIGRATION_VERSION`. Railway: [deploy-railway.md](./deploy-railway.md). VPS: cập nhật `docs/vps-release-checklist.md` §3 nếu cần.
+7. `go run . refresh-permissions` trên dev; Railway/VPS: chạy lại sau migrate.
 8. Restart backend sau deploy migration.
 
-**Release lên VPS / Vercel:** [vps-release-checklist.md](./vps-release-checklist.md)
+**Release Railway / VPS / Vercel:** [vps-release-checklist.md](./vps-release-checklist.md) · [deploy-railway.md](./deploy-railway.md)
+
+`GET /health` — public, dùng healthcheck Railway.
 
 ---
 
@@ -293,4 +296,6 @@ Core hiển thị: Tổng quan, Người dùng (tab HS / GV / Admin; tab Quản 
 | Báo cáo HS tab Bài luyện tập trống / 404 `exercise-list` | FE gọi homework API hoặc BE chưa restart | API exercise §3.2; restart BE sau deploy |
 | HS 403 / «Không có quyền truy cập» khi mở exercise | FE gọi `/manage/exercises/:id` cần `exercises.show` trong Redis | FE HS dùng `GET /api/study/student/exercises/:id` (Auth + ghi danh khóa); migration `0055` + `refresh-permissions` nếu vẫn gọi `/manage` |
 | HS bấm **Nộp** luyện tập không có phản hồi | URL thiếu `lessonId` (`POST save-score/bulk` bắt buộc `lesson_id`) | Vào từ tab Bài tập — URL `.../do-exercise/{id}?from=assigments&lessonId=...&courseId=...` |
+| Speaking upload OK nhưng `save-score/bulk` `file_url` rỗng | FE gán `fileUrl` nhầm câu khi chuyển câu trước khi upload xong | `SpeakingQuestion` gửi `questionId`; nộp bài re-upload blob nếu thiếu URL |
+| GV/Admin xem luyện tập HS — câu **nghe** (MC audio) không tô đáp án | FE convert thiếu `answer_ids` / `answer_file_urls` | Trang `/teacher/lessons/.../exercise/.../student/...` dùng `convertApiDataToDisplay` + `normalizeExerciseQuestion` |
 | Câu hỏi **category** (vd. id 14) không hiện danh mục / chấm sai / đáp án đúng trống | Snapshot `cloned_questions` rỗng (`options`/`correct_answers`) sau khi sửa ngân hàng câu hỏi | `mergeCloneQuestionOptions` + `EnrichClonedQuestionMaps` (homework-answers); tự heal snapshot khi `GetCloned`; chấm qua `categoryQuestionForScoring` — **restart BE** |

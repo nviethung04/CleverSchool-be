@@ -38,8 +38,16 @@ func gormConfig() *gorm.Config {
 func ConnectPostgres(cfg config.Config) error {
 	var err error
 
-	// Connect Postgres Master
-	MasterDB, err = gorm.Open(postgres.Open(cfg.DBMasterURL), gormConfig())
+	// Connect Postgres Master (retry: Railway has no compose depends_on)
+	// Source: https://docs.railway.com/guides/docker-compose
+	for attempt := 1; attempt <= 10; attempt++ {
+		MasterDB, err = gorm.Open(postgres.Open(cfg.DBMasterURL), gormConfig())
+		if err == nil {
+			break
+		}
+		log.Printf("Postgres connect attempt %d/10 failed: %v", attempt, err)
+		time.Sleep(time.Duration(attempt) * 2 * time.Second)
+	}
 	if err != nil {
 		log.Println("Failed to connect to master database:", err)
 		return err
@@ -83,7 +91,7 @@ func ConnectRedis(cfg config.Config) error {
 		return nil
 	}
 
-	RedisClient = redis.NewClient(&redis.Options{
+	opts := &redis.Options{
 		Addr:         fmt.Sprintf("%s:%s", cfg.RedisHost, cfg.RedisPort),
 		Password:     cfg.RedisPassword,
 		DB:           cfg.RedisDB,
@@ -93,9 +101,33 @@ func ConnectRedis(cfg config.Config) error {
 		DialTimeout:  20 * time.Second,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
-	})
+	}
+	if cfg.RedisURL != "" {
+		parsed, err := redis.ParseURL(cfg.RedisURL)
+		if err != nil {
+			log.Println("❌ Invalid REDIS_URL:", err)
+			return err
+		}
+		parsed.PoolSize = opts.PoolSize
+		parsed.MinIdleConns = opts.MinIdleConns
+		parsed.PoolTimeout = opts.PoolTimeout
+		parsed.DialTimeout = opts.DialTimeout
+		parsed.ReadTimeout = opts.ReadTimeout
+		parsed.WriteTimeout = opts.WriteTimeout
+		opts = parsed
+	}
 
-	_, err := RedisClient.Ping(Ctx).Result()
+	RedisClient = redis.NewClient(opts)
+
+	var err error
+	for attempt := 1; attempt <= 10; attempt++ {
+		_, err = RedisClient.Ping(Ctx).Result()
+		if err == nil {
+			break
+		}
+		log.Printf("Redis ping attempt %d/10 failed: %v", attempt, err)
+		time.Sleep(time.Duration(attempt) * 2 * time.Second)
+	}
 	if err != nil {
 		log.Println("❌ Failed to connect to Redis:", err)
 		return err
